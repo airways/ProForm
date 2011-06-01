@@ -21,13 +21,14 @@
 
 <h3>Dynamic Fields Loop</h3>
 {exp:proform:form form_name="{segment_2}"}
+        
     {if complete}
         Thank you!
     {if:else}
         {fieldrows}
             <ul class="fieldRow">
             {fields}
-            <li{if field_error} class="error"{/if}>{field_label}
+            <li{if field_error} class="error"{/if}>{field_label} fields = {fieldrow:count}
                 {if field_control == 'textarea'}
                     <textarea name="{field_name}" cols="40" rows="10">{field_value}</textarea>
                 {if:elseif field_control == 'checkbox'}
@@ -69,7 +70,7 @@
     <tr>
         <td>{row:number}</td>
         <td>{value:form_entry_id}</td>
-        <td>{value:user_agent}</td>
+        <td>{value:user_agent}</td
         <td>{value:ip_address}</td>
         {fields}
             {if field_type == 'file'}

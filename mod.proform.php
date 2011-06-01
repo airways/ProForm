@@ -93,8 +93,8 @@ class Proform {
         
         // Get optional params
         $in_place_errors    = $this->EE->TMPL->fetch_param('in_place_errors', 'yes');
-        $form_id            = $this->EE->TMPL->fetch_param('form_id', $form_name . '_bm_form');
-        $form_class         = $this->EE->TMPL->fetch_param('form_class', $form_name . '_bm_form');
+        $form_id            = $this->EE->TMPL->fetch_param('form_id', $form_name . '_proform');
+        $form_class         = $this->EE->TMPL->fetch_param('form_class', $form_name . '_proform');
         $form_url           = $this->EE->TMPL->fetch_param('form_url', current_url());
         $error_url          = $this->EE->TMPL->fetch_param('error_url', $form_url);
         $thank_you_url      = $this->EE->TMPL->fetch_param('thank_you_url',  current_url());
@@ -1030,11 +1030,13 @@ class Proform {
             {
                 if($field->field_row != $last_field_row)
                 {
-                    $result[] = array('fields' => array());
+                    $result[] = array(
+                        'fields' => array());
                     $last_field_row = $field->field_row;
                 }
 
                 $result[count($result)-1]['fields'][] = $field_array;
+                $result[count($result)-1]['fieldrow:count'] = count($result[count($result)-1]['fields']);
             } else {
                 $result[] = $field_array;
             }    
