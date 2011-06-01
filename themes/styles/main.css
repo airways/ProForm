@@ -1,0 +1,310 @@
+* {	margin: 0; padding: 0; }
+
+body {
+	
+}
+
+#breadCrumb {
+    margin-bottom: 10px;
+}
+
+#info {
+	display: block;
+	padding: 10px; margin-bottom: 20px;
+	border: 1px solid #333;
+	background-color: #efefef;
+}
+
+#test-list {
+	list-style: none;
+}
+
+#test-list li {
+	display: block;
+	padding: 20px 10px; margin-bottom: 3px;
+	background-color: #efefef;
+}
+
+#test-list li img.handle {
+	margin-right: 20px;
+	cursor: move;
+}
+
+.bm_commands {
+    float: right;
+}
+
+.bm_commands .cp_button {
+    font-size: 11px !important;
+    margin: 0;
+    padding: 0;
+    text-shadow: none;
+}
+
+.bm_commands #filter_ajax_indicator {
+    display: none;
+}
+
+/*.rightNav .button a {
+    background-clip: border-box;
+    background-color: #27343C;
+    
+    background-origin: padding-box;
+    border-bottom-color: white;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-bottom-style: none;
+    border-bottom-width: 0px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}*/
+
+.heading h2.edit {
+    background-image: none;
+}
+
+.tableFooter {
+    padding-top: 0px !important;
+    padding-bottom: 10px !important;
+    margin-bottom: 0px !important;
+    padding-left: 0px !important;
+    display: block;
+    height: 20px;
+}
+
+
+
+th, td {
+    padding: 7px !important;
+}
+
+.pageContents {
+/*    padding: 0px !important;*/
+}
+
+/* when wallace is not installed, the bm_commands dive will be outside
+   of the heading, and needs some padding around it */
+.pageContents .bm_commands {
+    margin: 5px;
+}
+
+.no_items_msg {
+    color: #009900;
+    padding: 20px;
+}
+
+.editForm {
+}
+
+.deleteForm {
+    padding: 10px;
+}
+
+
+.tDnD_whileDrag td {
+    background: #DDD !important;
+}
+
+.btn {
+    color: #000;
+    background: #DDD;
+    border-left: 1px solid white;
+    border-top: 1px solid white;
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
+    margin-left: 5px;
+    margin-right: 5px;
+
+    cursor: pointer;
+}
+
+.btn a {
+    color: #000 !important;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+
+.formFields {
+/*    margin-top: 30px;*/
+    margin-bottom: 5px;
+}
+
+.formFields td {
+    padding: 0px !important;
+}
+
+.formFields td div.cellPad {
+    padding: 7px;
+}
+
+.dragFields td div.cellPad {
+    cursor: move;
+}
+
+.formFields .fieldWidget {
+    display: inline-block;
+    
+}
+.formFields .fieldWidget .fieldName {
+    /*width: 110px;*/
+    display: inline-block;
+    margin-left: 3px;
+    overflow: hidden;
+
+
+}
+.formFields .fieldWidget .btns {
+    text-align:right;
+    width: 10px;
+    display: inline-block;
+
+}
+
+.moveHandle {
+    background: url(../images/move.png) no-repeat;
+    padding-left: 15px;
+    cursor: move;
+}
+
+ul.fieldRow.alt {
+    background: #e2edf4;
+}
+
+ul.fieldRow {
+    background: #cddde7;
+    padding-left: 10px;
+    height: 10px;
+    padding-top: 5px;
+    padding-bottom: 9px;
+}
+
+ul.fieldRow li {
+    float: left;
+    width: 140px;
+    height: 15px;
+    overflow: hidden;
+    
+}
+
+ul.targetRow {
+    height: 4px !important;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    background: #FFF;
+}
+
+ul.targetRow .ui-sortable-placeholder {
+    background: #9ab8cb;
+    height: 4px !important;
+}
+
+
+/*
+.mouseDown ul.fieldRow {
+    padding-left: 5px;
+    height: 15px;
+}
+
+.mouseDown ul.fieldRow li {
+    float: left;
+    width: 140px;
+    height: 15px;
+    overflow: hidden;
+}
+*/
+.mouseUp .targetRow {
+    
+   
+}
+.mouseDown .targetRow {
+    
+    
+
+}
+
+.formFields {
+    
+}
+
+.ui-sortable-placeholder {
+    
+    background: #9ab8cb;
+    visibility: visible !important;
+}
+
+.fieldWidget a {
+    color: #000 !important;
+}
+
+.fieldWidget .requiredTag {
+    display: none;
+}
+
+.isRequired a {
+
+}
+
+.isRequired .requiredTag {
+    display: inline;
+    color: #F00;
+    margin-left: 5px;
+}
+
+table.plain td,
+table.plain tr {
+}
+
+.bm_grid table {
+    border: 1px solid #D0D7DF;
+    width: 100%;
+}
+
+.bm_grid table td,
+.bm_grid table td:last-child {
+    border: 1px solid #D0D7DF !important; /* goddamnit */
+    padding: 5px !important;
+    
+}
+
+.bm_grid .grid_param {
+    width: 80%;
+}
+
+.remove_grid_row,
+.add_grid_row {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    background: url(../images/remove_btn.png) 0 -20px no-repeat;
+    text-indent: -9999px;
+}
+
+.add_grid_row {
+    margin-left: 10px;
+    position: relative;
+    top: -3px;
+    background: url(../images/add_btn.png) 0 -20px no-repeat;
+}
+
+.remove_grid_row:active,
+.add_grid_row:active {
+    background-position: 0 -40px;
+}
+
+.commandBar {
+    margin: 5px;
+    text-align: right;
+}
+
+textarea, textarea.markItUpEditor, input[type="text"], input[type="password"] {
+    width: 95%;
+}
+
+.help {
+    display: block;
+}
+
+button.submit {
+    cursor: pointer;
+}
