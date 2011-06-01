@@ -30,7 +30,6 @@
  *
  **/
 
-//require_once(dirname(__FILE__).'/'.BM_LIB.'/bm_handle_mgr.php');
 require_once PATH_THIRD.'prolib/prolib.php';
 
 /**
@@ -48,18 +47,37 @@ class Proform_notifications
     
     function __construct()
     {
-        //$this->EE = &get_instance();
         prolib($this, 'proform');
         $this->mgr = new Bm_handle_mgr();
     }
     
+
+    function has_notifications($form, $data)
+    {
+
+        if ($this->EE->extensions->active_hook('proform_notification_exists') === TRUE)
+        {
+            if(!$this->EE->extensions->call('proform_notification_exists', $form, $this))
+            {
+                return FALSE;
+            }
+        }
+
+        if(strlen(trim($form->notification_list)) > 0)
+        {
+            return TRUE;
+        }
+
+        return FALSE;
+
+    }
+
     function send_notifications($form, $data)
     {
         $this->EE->extensions->end_script = FALSE;
         
         $this->EE->load->library('parser');
         $this->EE->load->library('template');
-        $this->EE->load->library(BM_LIB.'bm_email');
         $this->EE->load->helper('text'); 
 
         if ($this->EE->extensions->active_hook('proform_notification_start') === TRUE)

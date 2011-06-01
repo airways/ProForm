@@ -949,7 +949,6 @@ class Proform_mcp {
     
     function new_field()
     {
-        //$this->EE->load->library(BM_LIB.'bm_uploads');
 
         if($this->EE->input->post('field_name') !== FALSE) 
         {
@@ -1092,7 +1091,6 @@ class Proform_mcp {
     
     function edit_field($editing=TRUE, $vars = array())
     {
-        //$this->EE->load->library(BM_LIB.'bm_uploads');
         
         if($editing && $this->EE->input->post('field_id') !== FALSE) 
         {
@@ -1123,7 +1121,6 @@ class Proform_mcp {
         $mailinglists = $this->_get_mailinglists();
         $mailinglists = array_merge(array(0 => 'None'), $mailinglists);
         
-        //$this->EE->load->library(BM_LIB.'bm_validation');
         $types = array(
             'field_id'          => 'read_only',
             'field_label'       => 'input',
@@ -1852,10 +1849,13 @@ class Proform_mcp {
     function _get_mailinglists()
     {
         $result = array();
-        $query = $this->EE->db->query("SELECT list_id, list_name FROM exp_mailing_lists");
-        foreach($query->result() as $row)
+        if($this->EE->db->table_exists('exp_mailing_lists'))
         {
-            $result[$row->list_id] = $row->list_name;
+            $query = $this->EE->db->query("SELECT list_id, list_name FROM exp_mailing_lists");
+            foreach($query->result() as $row)
+            {
+                $result[$row->list_id] = $row->list_name;
+            }
         }
         return $result;
     }

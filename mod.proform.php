@@ -3,7 +3,6 @@
 /**
  * @package ProForm
  * @author Isaac Raway <isaac@metasushi.com>
- * @version 0.3
  * 
  * Copyright (c)2009, 2010, 2011. Isaac Raway and MetaSushi, LLC.
  * All rights reserved.
@@ -41,10 +40,9 @@ class Proform {
     
     function Proform()
     {
-        $this->EE = &get_instance();
+        prolib($this, 'proform');
+
         $this->EE->db->cache_off();
-        
-        $this->EE->load->helper(BM_HLP.'krumo');
         
         @session_start();
         if(!isset($_SESSION['bm_form']))
@@ -66,8 +64,6 @@ class Proform {
         $this->EE->load->library('formslib');
         $this->EE->load->library('encrypt');
         $this->EE->load->library('proform_notifications');
-        $this->EE->load->library(BM_LIB.'bm_parser');
-        $this->EE->load->library(BM_LIB.'bm_uploads');
         
         $this->EE->proform_notifications->default_from_address = $this->EE->formslib->ini('from_address');
         $this->EE->proform_notifications->template_group_name = $this->EE->formslib->ini('notification_template_group');
@@ -154,6 +150,7 @@ class Proform {
         if (preg_match("/({captcha})/", $tagdata))
         {
             $captcha = $this->EE->functions->create_captcha();
+            if(!$captcha) $captcha = "[CAPTCHA ERROR]";
             $tagdata = preg_replace("/{captcha}/", $captcha, $tagdata);
             $use_captcha = TRUE;
         }
@@ -347,7 +344,6 @@ class Proform {
     {
         // List entries posted to a form
         $this->EE->load->library('formslib');
-        $this->EE->load->library(BM_LIB.'bm_parser');
         
         // Get params
         $form_name = $this->EE->TMPL->fetch_param('form_name', FALSE);
@@ -427,7 +423,7 @@ class Proform {
                         $row_vars = $this->EE->extensions->call('proform_entries_row', $this, $form_obj, $row_vars);
                     }
 
-                    $rowdata = $this->EE->bm_parser->parse_variables($tagdata, &$row_vars, array('fieldrows', 'fields'));
+                    $rowdata = $this->EE->bm_parser->parse_variables($tagdata, $row_vars, array('fieldrows', 'fields'));
 
                     $this->return_data .= $rowdata;
                     
@@ -445,7 +441,7 @@ class Proform {
                 //$row_vars['fields'] = $this->create_fields_array($form_obj);
                 $row_vars['fields:count'] = count($row_vars['fields']);
                 
-                $rowdata = $this->EE->bm_parser->parse_variables($tagdata, &$row_vars, array('fieldrows', 'fields'));
+                $rowdata = $this->EE->bm_parser->parse_variables($tagdata, $row_vars, array('fieldrows', 'fields'));
                 
                 //echo $rowdata;die;
                 $this->return_data .= $rowdata;
@@ -550,8 +546,6 @@ class Proform {
         $this->EE->load->library('user_agent');
 
         $this->EE->load->library('formslib');
-        $this->EE->load->library(BM_LIB.'bm_validation');
-        $this->EE->load->library(BM_LIB.'bm_uploads');
         $this->EE->load->library('proform_notifications');
 
         // decrypt the form's configuration array
@@ -645,10 +639,14 @@ class Proform {
 
                 $this->_process_insert($form_obj, $fields, $form_session, $data);
 
-                if(!$this->EE->proform_notifications->send_notifications($form_obj, $data)) {
-                    echo "{exp:proform:form} could not send notifications for form: ".$form_obj->form_name;die;
+                if($this->EE->proform_notifications->has_notifications($form_obj, $data))
+                {
+                    if(!$this->EE->proform_notifications->send_notifications($form_obj, $data))
+                    {
+                        echo "{exp:proform:form} could not send notifications for form: ".$form_obj->form_name;die;
+                    }
                 }
-
+                
                 if ($this->EE->extensions->active_hook('proform_process_end') === TRUE)
                 {
                     $this->EE->extensions->call('proform_process_end', $form_obj, $form_config, $form_session, $this);
@@ -987,7 +985,6 @@ class Proform {
 
     function create_fields_array($form_obj, $field_errors = array(), $field_values = array(), $field_checked_flags = array(), $create_field_rows = TRUE)
     {
-        $this->EE->load->library(BM_LIB.'bm_uploads');
 
         if(is_object($field_values))
         {
