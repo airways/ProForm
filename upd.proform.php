@@ -34,8 +34,8 @@
 //require_once(BASEPATH.'../../expressionengine/third_party/bm_forms/libraries/formslib.php');
 
 class Proform_upd {
-    // @version 1.4
-    var $version = "1.4";
+    // @version 1.5
+    var $version = "1.5";
     
     function Proform_upd() {
         $this->EE = &get_instance();

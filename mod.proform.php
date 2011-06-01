@@ -1034,10 +1034,11 @@ class Proform {
                         'fields' => array());
                     $last_field_row = $field->field_row;
                 }
-
+                $field_array['field_no'] = count($result[count($result)-1]['fields']) + 1;
                 $result[count($result)-1]['fields'][] = $field_array;
                 $result[count($result)-1]['fieldrow:count'] = count($result[count($result)-1]['fields']);
             } else {
+                $field_array['field_no'] = count($result) + 1;
                 $result[] = $field_array;
             }    
         }

@@ -28,7 +28,7 @@
         {fieldrows}
             <ul class="fieldRow">
             {fields}
-            <li{if field_error} class="error"{/if}>{field_label} fields = {fieldrow:count}
+            <li{if field_error} class="error"{/if}>{field_label} {field_no}
                 {if field_control == 'textarea'}
                     <textarea name="{field_name}" cols="40" rows="10">{field_value}</textarea>
                 {if:elseif field_control == 'checkbox'}
