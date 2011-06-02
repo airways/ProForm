@@ -621,7 +621,7 @@ class Proform {
 
             $this->_process_mailinglist($form_obj, $fields, $form_session, $data);
 
-            // teturn any errors to the form template
+            // return any errors to the form template
             if(count($form_session->errors) > 0)
             {
                 return $form_session;
@@ -1035,6 +1035,7 @@ class Proform {
                     $last_field_row = $field->field_row;
                 }
                 $field_array['field_no'] = count($result[count($result)-1]['fields']) + 1;
+                $field_array['field_even'] = $field_array['field_no'] % 2 == 0 ? 'yes' : 'no';
                 $result[count($result)-1]['fields'][] = $field_array;
                 $result[count($result)-1]['fieldrow:count'] = count($result[count($result)-1]['fields']);
             } else {

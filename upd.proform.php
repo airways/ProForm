@@ -30,12 +30,9 @@
  * 
  **/
 
-//require_once(BASEPATH.'../../expressionengine/third_party/bm_forms/libraries/bm_handle_mgr.php');
-//require_once(BASEPATH.'../../expressionengine/third_party/bm_forms/libraries/formslib.php');
-
 class Proform_upd {
-    // @version 1.5
-    var $version = "1.5";
+    // @version 1.6
+    var $version = "1.6";
     
     function Proform_upd() {
         $this->EE = &get_instance();

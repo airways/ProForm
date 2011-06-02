@@ -39,15 +39,22 @@
 
 <?php echo form_open($assign_action_url, '', $form_hidden); ?>
 <div class="commandBar">
-    <label for="field_id">Add Field</label>
-    &nbsp;
+    <label for="field_id">Add Special</label>&nbsp;<?php
+    if(count($special_options) > 0):
+        echo form_dropdown('special_id', $special_options); ?>
+            &nbsp; <input type="submit" class="submit" name="add_special" value="Add" />
     <?php
-    if(count($field_options) > 0):
-        echo form_dropdown('field_id', $field_options); ?>
-            &nbsp; <input type="submit" class="submit" value="Add" />
-<?php
     else: 
         echo lang('no_unassigned_fields_available'); 
+    endif; ?>
+
+    <label for="field_id">Add Field</label>&nbsp;<?php
+    if(count($field_options) > 0):
+        echo form_dropdown('field_id', $field_options); ?>
+            &nbsp; <input type="submit" class="submit" name="add_field" value="Add" />
+    <?php
+    else:
+        echo lang('no_unassigned_fields_available');
     endif; ?>
 
 <!--    &nbsp; <a href="<?php echo $new_field_url?>">New Field</a>-->

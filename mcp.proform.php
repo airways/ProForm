@@ -507,7 +507,11 @@ class Proform_mcp {
             'new_field_url' => 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_field',
             'default_value_action_url' => 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=set_default_value',
         );
-        
+
+        $vars['special_options'] = array(
+            'step' => 'Step'
+        );
+
         // list available fields to add to the form
         $vars['field_options'] = array();
         foreach($this->EE->formslib->get_fields() as $field) 
@@ -1772,11 +1776,13 @@ class Proform_mcp {
         
         $out .= '<div id="field_'.$key.'" class="bm_grid" data-key="'.$key.'">';
         
-        $out .= '<table id="gridrow_'.$key.'" class="plain"><tbody><tr>';
+        $out .= '<table id="gridrow_'.$key.'" class="mainTable" border="0" cellspacing="0" cellpadding="0"><tbody><tr>';
+        
+        $width = floor(100 / count($headings));
         
         foreach($headings as $heading)
         {
-            $out .= '<th>'.$heading.'</th>';
+            $out .= '<th width="'. $width .'%">'.$heading.'</th>';
         }
         $out .= '</tr>';
         
@@ -1797,19 +1803,20 @@ class Proform_mcp {
             {
                 $grid[] = $cells;
                 
-                $out .= '<tr class="grid_row"><td>'.$options[$cells[0]]['label'].'</td>';
+                $out .= '<tr class="grid_row"><td>'.$options[$cells[0]]['label'].'</td><td>';
+                $out .= '<a href="#" class="remove_grid_row" name="remove_'. $key .'_'. $i .'" data-key="'. $key .'" data-opt="'.$cells[0].'">X</a>';
                 
                 if(isset($options[$cells[0]]['flags']) && strpos($options[$cells[0]]['flags'], 'has_param') !== FALSE)
                 {
-                    $out .=  '<td><input data-key="'.$key.'" data-opt="'.$cells[0].'" class="grid_param" type="text" size="5" value="'.(isset($cells[1])?$cells[1]:'').'"/><span class="help">'
-                        .(isset($options[$cells[0]]['flags']['help']) ? $options[$cells[0]]['flags']['help'] : '').'</span></td>';
+                    $out .=  '<input data-key="'.$key.'" data-opt="'.$cells[0].'" class="grid_param" type="text" size="5" value="'.(isset($cells[1])?$cells[1]:'').'"/><span class="help">'
+                        .(isset($options[$cells[0]]['flags']['help']) ? $options[$cells[0]]['flags']['help'] : '').'</span>';
                 } else {
-                    $out .= '<td>&nbsp;<span class="help">'
-                        .(isset($options[$cells[0]]['flags']['help']) ? $options[$cells[0]]['flags']['help'] : '').'</span></td>';
+                    $out .= '<span class="help">'
+                        .(isset($options[$cells[0]]['flags']['help']) ? $options[$cells[0]]['flags']['help'] : '').'</span>';
                 }
                 
                 // $out .= '<td>'.form_button('remove_'.$key.'_'.$i, 'X', 'class="remove_grid_row" data-key="'.$key.'" data-opt="'.$cells[0].'" ').'</tr>';
-                $out .= '<td><a href="#" class="remove_grid_row" name="remove_'. $key .'_'. $i .'" data-key="'. $key .'" data-opt="'.$cells[0].'">X</a></td></tr>';
+                $out .= '</td></tr>';
             }
             
             $i++;
