@@ -4,6 +4,14 @@ body {
     margin-right: auto;
 }
 
+#title {
+    color: white;
+    width: 900px;
+    padding: 30px;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
 #content {
     width: 900px;
     padding: 30px;

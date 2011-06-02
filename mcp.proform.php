@@ -919,8 +919,8 @@ class Proform_mcp {
         $p_config = $this->pagination_config('list_fields', $total); // creates our pagination config for us
         $this->EE->pagination->initialize($p_config);
         $vars['pagination'] = $this->EE->pagination->create_links();
-
-
+        
+        
         ////////////////////////////////////////
         // Generate table of fields
         foreach($fields as $field) 

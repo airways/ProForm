@@ -70,8 +70,7 @@
             <? /*=form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit')).NBS.NBS.form_dropdown('action', $options)*/ ?>
         </div>
         
-        <span class="js_hide"><?=$pagination?></span>   
-        <span class="pagination" id="filter_pagination"></span>
+        <span class="pagination"><?=$pagination?></span>
     </div>
     <?php
    // form_close();

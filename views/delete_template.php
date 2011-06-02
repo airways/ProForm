@@ -46,8 +46,7 @@
             <?=form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit'))?>
         </div>
         
-        <span class="js_hide"><?=$pagination?></span>   
-        <span class="pagination" id="filter_pagination"></span>
+        <span class="pagination"><?=$pagination?></span>
     </div>
     <? echo form_close(); ?>
 </div>
