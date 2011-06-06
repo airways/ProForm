@@ -157,7 +157,7 @@ var bm_grid = {
                 
                 if(!found)
                 {
-                    // <button data-key="' + key + '" data-opt="' + val + '" type="button" class="remove_grid_row">X</button></td>
+                    // <button data-key="' + kbm_form_editey + '" data-opt="' + val + '" type="button" class="remove_grid_row">X</button></td>
                     bm_grid.data[key].push([val]);
                     $('#'+id+' tbody').append(
                         '<tr class="grid_row">'
@@ -230,6 +230,24 @@ var bm_grid = {
     }
 }
 
+
+var bm_field_edit = {
+    bind_events: function() {
+        //console.log($('input[name=type]'));
+        $('select[name=type]').change(function() {
+            bm_field_edit.update_settings_fields();
+        });
+    },
+    update_settings_fields: function() {
+        $('.edit_settings').hide();
+        $('#type_'+$('select[name=type]').val()).show();
+    }
+}
+
+$(document).ready(function() {
+    bm_field_edit.bind_events();
+    bm_field_edit.update_settings_fields();
+});
 
 
 

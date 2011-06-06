@@ -25,22 +25,42 @@
     {if complete}
         Thank you!
     {if:else}
+        {!-- render all hidden fields in one place - you can also do these inline if you like --}
+        {fields}
+            {if field_control == 'hidden'}
+                <input type="{field_control}" name="{field_name}" value="{field_value}" />
+            {/if}
+        {/fields}
+
+        {!-- render normal fields in aligned rows --}
         {fieldrows}
-            <ul class="fieldRow">
-            {fields}
-            <li{if field_error} class="error"{/if}>{field_label} {field_no}
-                {if field_control == 'textarea'}
-                    <textarea name="{field_name}" cols="40" rows="10">{field_value}</textarea>
-                {if:elseif field_control == 'checkbox'}
-                    <input type="{field_control}" name="{field_name}" value="y" {field_checked} />
-                {if:else}
-                    <input type="{field_control}" name="{field_name}" value="{field_value}" />
-                {/if}
-                {field_error}
-            </li>
-            {/fields}
-            </ul>
+            {!-- check if the row contains only hidden fields. if so, skip it because we already
+                 rendered it's fields. --}
+            {if fieldrow:count > fieldrow:hidden_count}
+                <ul class="fieldRow">
+                    <li>Count: {fieldrow:count}, {fieldrow:hidden_count} hidden</li>
+
+                {fields}
+                    {if field_control != 'hidden'}{!-- skip hidden fields --}
+                        <li{if field_error} class="error"{/if}>
+
+                            {field_label} {field_no}
+
+                            {if field_control == 'textarea'}
+                                <textarea name="{field_name}" cols="40" rows="10">{field_value}</textarea>
+                            {if:elseif field_control == 'checkbox'}
+                                <input type="{field_control}" name="{field_name}" value="y" {field_checked} />
+                            {if:else}
+                                <input type="{field_control}" name="{field_name}" value="{field_value}" />
+                            {/if}
+                            {field_error}
+                        </li>
+                    {/if}
+                {/fields}
+                </ul>
+            {/if}
         {/fieldrows}
+        
         Enter this word: {captcha}<p/>
         <input type="text" name="captcha" />{if error:captcha}<span class="error">{error:captcha}</span>{/if}
         <p/>

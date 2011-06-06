@@ -59,13 +59,25 @@ class Proform_mcp {
             'datetime'      => 'Date and Time',
             'file'          => 'File',
             'string'        => 'String',
-            'text'          => 'Text',
+            //'text'          => 'Text',
             'Number'        => array(
                 'int'       => 'Integer',
-                'float'     => 'Float'
+                'float'     => 'Float',
+                'currency'  => 'Currency'
             ),
             'list'          => 'List',
-            'mailinglist'   => 'Mailing List Subscription'
+            'mailinglist'   => 'Mailing List Subscription',
+            'hidden'        => 'Hidden',
+            'member_data'   => 'Member Data',
+        );
+
+        $this->field_type_settings = array(
+            'list' => array(
+                array('type' => 'textarea', 'name' => 'options', 'label' => 'Options')
+            ),
+            'member_data' => array(
+                array('type' => 'input', 'name' => 'member_field', 'label' => 'Field')
+            ),
         );
         
         $this->field_validation_options = array(
@@ -365,7 +377,8 @@ class Proform_mcp {
             'submitter_notification_template' => array('dropdown', $template_names),
             'encryption_on' => array('checkbox', 'y'));
         
-        $form = $this->_create_cp_form($form_fields, $types);
+        $form = $this->EE->bm_forms->create_cp_form($form_fields, $types);
+
         
         $vars['form'] = $form;
 
@@ -961,6 +974,7 @@ class Proform_mcp {
 
 
         $vars = array();
+        
         $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_field';
         $auto_add_form_id = $this->EE->input->get_post('auto_add_form_id');
         
@@ -1040,9 +1054,9 @@ class Proform_mcp {
             #return FALSE;
         }
         
-        /*$field_validation = trim($this->EE->input->post('validation'));
+        $field_validation = trim($this->EE->input->post('validation'));
 
-        if(strlen($field_validation) < 1)
+        /*if(strlen($field_validation) < 1)
         {
             show_error(lang('invalid_submit') . '[3]');
             return FALSE;
@@ -1068,7 +1082,11 @@ class Proform_mcp {
         if(!$field)
         {
             // add the field
-            $this->EE->formslib->new_field($field_name, $field_label, $field_type, $field_length, $field_validation, $upload_pref_id, $mailinglist_id);
+            $settings = array();
+            
+            $this->EE->formslib->new_field($field_name, $field_label, $field_type, $field_length,
+                                           $field_validation, $upload_pref_id, $mailinglist_id,
+                                           $settings);
             $field = $this->EE->formslib->get_field($field_name);
         }
         else
@@ -1095,6 +1113,7 @@ class Proform_mcp {
     
     function edit_field($editing=TRUE, $vars = array())
     {
+        $this->EE->load->library('formslib');
         
         if($editing && $this->EE->input->post('field_id') !== FALSE) 
         {
@@ -1107,16 +1126,15 @@ class Proform_mcp {
             $this->sub_page('tab_edit_field');
         
             $field_id = (int)$this->EE->input->get('field_id');
-            $query = $this->EE->db->get_where('proform_fields', array('field_id' => $field_id));
+            //$query = $this->EE->db->get_where('proform_fields', array('field_id' => $field_id));
+            $field = $this->EE->formslib->get_field($field_id);
         
             $vars['editing'] = TRUE;
             $vars['hidden'] = array('field_id' => $field_id);
         
-            $form_fields = $query->row();
-            
             $vars['hidden_fields'] = array();
         } else {
-            $form_fields = new BM_Field(FALSE);
+            $field = new BM_Field(FALSE);
         }
         
         $upload_prefs = $this->EE->bm_uploads->get_upload_prefs();
@@ -1130,7 +1148,7 @@ class Proform_mcp {
             'field_label'       => 'input',
             'field_name'        => 'input',
             'type'              => array(
-                'dropdown', $this->field_type_options),
+                'dropdown', $this->field_type_options, $this->field_type_settings),
             'length'            => 'input',
             'upload_pref_id'    => array(
                 'dropdown', $upload_prefs), 
@@ -1142,10 +1160,10 @@ class Proform_mcp {
                     'options'   => $this->EE->bm_validation->available_rules))
             );
         
-        $form = $this->_create_cp_form($form_fields, $types);
+        $form = $this->EE->bm_forms->create_cp_form($field, $types);
         
         $vars['form'] = $form;
-        
+        $vars['form_name'] = 'field_edit';
         $this->EE->load->library('table');
         return $this->EE->load->view('generic_edit', $vars, TRUE);
     }
@@ -1181,7 +1199,16 @@ class Proform_mcp {
         // find form
         $this->EE->load->library('formslib');
         $field = $this->EE->formslib->get_field($field_id);
-        
+
+        $settings = array();
+
+        // doing this based on if there is a value, not if the type is set - in case someone picks the
+        // wrong type we don't want to lose their settings.
+        if($this->EE->input->post('type_list'))
+            $settings['type_list'] = $this->EE->input->post('type_list');
+        if($this->EE->input->post('type_member_data'))
+            $settings['type_member_data'] = $this->EE->input->post('type_member_data');
+
         $field->field_label = $field_label;
         $field->field_name = $field_name;
         $field->type = $type;
@@ -1189,6 +1216,7 @@ class Proform_mcp {
         $field->validation = $validation;
         $field->upload_pref_id = $upload_pref_id;
         $field->mailinglist_id = $mailinglist_id;
+        $field->settings = $settings;
         $field->save();
         
         // go back to form listing
@@ -1347,7 +1375,7 @@ class Proform_mcp {
             $vars['field_names'] = $field_names;
             
             //var_dump($form_fields);
-            $form = $this->_create_cp_form($form_fields, $types);
+            $form = $this->EE->bm_forms->create_cp_form($form_fields, $types);
             //var_dump($form);die;
             $vars['form'] = $form;
             
@@ -1561,7 +1589,7 @@ class Proform_mcp {
         
         $types = array('template_id' => 'read_only', 'template' => 'textarea');
         
-        $form = $this->_create_cp_form($template, $types);
+        $form = $this->EE->bm_forms->create_cp_form($template, $types);
         
         $vars['form'] = $form;
         
@@ -1702,7 +1730,7 @@ class Proform_mcp {
         return FALSE;
     }
     
-    function _create_cp_form($form_fields, $types)
+    /*function _create_cp_form($form_fields, $types)
     {
         $form = array();
         
@@ -1754,6 +1782,7 @@ class Proform_mcp {
         
         return $form;
     } // function _create_cp_form
+    */
     
     
     function _render_grid($key, $headings, $options, $value)

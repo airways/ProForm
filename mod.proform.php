@@ -578,7 +578,9 @@ class Proform {
             {
                 $this->_process_captcha($form_obj, $fields, $form_session, $data);
             }
-            
+
+            $this->_process_secure_fields($form_obj, $fields, $form_session, $data);
+
             $this->_process_validation($form_obj, $fields, $form_session, $data);
 
 
@@ -665,6 +667,18 @@ class Proform {
     ////////////////////////////////////////////////////////////////////////////////
     // Processing Helpers
     ////////////////////////////////////////////////////////////////////////////////
+
+    function _process_secure_fields(&$form_obj, &$fields, &$form_session, &$data)
+    {
+        // set secure fields values from the session or other backend sources
+        foreach($fields as $field)
+        {
+            if($field->type == 'member_data')
+            {
+                $data[$field->field_name] = $this->EE->session->userdata[$field->settings['type_member_data']];
+            }
+        }
+    }
 
     function _process_uploads(&$form_obj, &$fields, &$form_session, &$data)
     {
@@ -996,6 +1010,10 @@ class Proform {
 
         foreach($form_obj->fields() as $field)
         {
+            // skip secured fields such as member_id, member_name, etc.
+            //if($field->type == 'member_data') continue;
+            
+            // handle normal posted fields
             $field_array = array(
                     'field_id'          => $field->field_id,
                     'field_name'        => $field->field_name,
@@ -1038,11 +1056,15 @@ class Proform {
                 $field_array['field_even'] = $field_array['field_no'] % 2 == 0 ? 'yes' : 'no';
                 $result[count($result)-1]['fields'][] = $field_array;
                 $result[count($result)-1]['fieldrow:count'] = count($result[count($result)-1]['fields']);
+                if(!isset($result[count($result)-1]['fieldrow:hidden_count']))
+                    $result[count($result)-1]['fieldrow:hidden_count'] = 0;
+                if($field_array['field_control'] == 'hidden')
+                    $result[count($result)-1]['fieldrow:hidden_count'] ++;
             } else {
                 $field_array['field_no'] = count($result) + 1;
                 $result[] = $field_array;
             }    
-        }
+        } // foreach($form_obj->fields() as $field)
 
 //        if($create_field_rows){var_dump($result);die;}
         return $result;

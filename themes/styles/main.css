@@ -308,3 +308,12 @@ textarea, textarea.markItUpEditor, input[type="text"], input[type="password"] {
 button.submit {
     cursor: pointer;
 }
+
+.hidden {
+    display: none;
+}
+
+.edit_settings {
+    margin-top: 10px;
+    display: hidden;
+}

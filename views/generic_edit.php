@@ -40,7 +40,7 @@
     <div style="color: black; background: yellow; margin: 10px; padding: 5px; border: 1px solid red;"><strong>Warning:</strong> You do not have a encryption_key value set.<br/>Encryption will not work until this value is set. It should be set to a complex string with upper and lower case letters, numbers, and symbols, 32 characters in length.</div>
 <?php endif; ?>
 
-<div class="editForm">
+<div class="editForm" id="<?php if(isset($form_name)) echo $form_name; ?>">
 <?php
     echo form_open($action_url, array('class' => 'generic_edit'), isset($hidden) ? $hidden : array());
     $table_template = $cp_table_template;

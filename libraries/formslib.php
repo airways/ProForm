@@ -36,14 +36,7 @@ require_once PATH_THIRD.'prolib/prolib.php';
 if(!class_exists('Formslib')) {
 class Formslib 
 {
-    /**
-     * @var Bm_handle_mgr
-     */
     var $prefs_mgr;
-
-    /**
-     * @var Bm_handle_mgr
-     */
     var $session_mgr;
 
     function Formslib()
@@ -87,7 +80,7 @@ class Formslib
             'ip_address'        => array('type' => 'varchar', 'constraint' => '128'),
             'user_agent'        => array('type' => 'varchar', 'constraint' => '255')
         );
-            
+        
         $forge->add_field($fields);
         $forge->add_key('form_entry_id', TRUE);
         $forge->add_key('updated');
@@ -151,20 +144,30 @@ class Formslib
         return $result;
     }
     
-    function get_forms_with_field($field_name) 
+    function get_forms_with_field($field)
     {
-        // TODO: optimize with table data
-        $forms = $this->get_forms();
+        $result = array();
+        $query = $this->EE->db->get_where('exp_proform_form_fields', array('field_id' => $field->field_id));
+        if($query->num_rows() > 0)
+        {
+            foreach($query->result() as $form_row)
+            {
+                $result[] = $this->get_form($form_row->form_id);
+            }
+        }
+        return $result;
+        
+        /*$forms = $this->get_forms();
         $result = array();
     
         foreach($forms as $form) 
         {
-            if(array_key_exists($field_name, $form->fields())) 
+            if(array_key_exists($field, $form->fields()))
             {
                 $result[] = $form;
             }
         }
-        return $result;
+        return $result;*/
     }
     
     function save_form($form) 
@@ -208,10 +211,12 @@ class Formslib
         return $form;
     }
 
-    function new_field($name, $label, $type, $length, $validation, $upload_pref_id, $mailinglist_id) 
+    function new_field($name, $label, $type, $length, $validation, $upload_pref_id, $mailinglist_id, $settings)
     {
         // create a new field that can be assigned to forms
-        
+
+        $settings = serialize($settings);
+
         // insert the field record
         $data = array(
             'field_name' => $name,
@@ -220,7 +225,8 @@ class Formslib
             'length' => $length,
             'validation' => $validation,
             'upload_pref_id' => $upload_pref_id,
-            'mailinglist_id' => $mailinglist_id
+            'mailinglist_id' => $mailinglist_id,
+            'settings' => $settings
         );
         $this->EE->db->insert('proform_fields', $data);
         
@@ -245,6 +251,7 @@ class Formslib
         if($query->num_rows > 0) 
         {
             $field = new BM_Field($query->row());
+            $field->settings = unserialize($field->settings);
         }
         
         return $field;
@@ -278,12 +285,14 @@ class Formslib
     function save_field($field) 
     {
         $f = $this->remove_transitory($field);
-        
+
+        $f['settings'] = serialize($field->settings);
+
         $query = $this->EE->db->where('field_id', $field->field_id)
                               ->update('proform_fields', $f);
         
         // reassign to forms to update physical field
-        $forms = $this->get_forms_with_field($field->field_name);
+        $forms = $this->get_forms_with_field($field);
         
         foreach($forms as $form) 
         {
@@ -296,11 +305,11 @@ class Formslib
     function delete_field($field) 
     {
         // first remove the field from all forms
-        $forms = $this->get_forms_with_field($field->field_name);
+        $forms = $this->get_forms_with_field($field);
         
         foreach($forms as $form) 
         {
-            $form->remove_field($field->field_name);
+            $form->remove_field($field);
         }
         
         // get rid of the field record
@@ -488,6 +497,8 @@ class BM_Form extends BM_RowInitialized {
                 foreach($query->result() as $row) 
                 {
                     $this->__fields[$row->field_name] = new BM_Field($row);
+                    if(isset($this->__fields[$row->field_name]->settings))
+                        $this->__fields[$row->field_name]->settings = unserialize($this->__fields[$row->field_name]->settings);
                 }
             }
         }
@@ -556,24 +567,45 @@ class BM_Form extends BM_RowInitialized {
         $this->__EE->load->dbforge();
         $forge = &$this->__EE->dbforge;
         
-        if(array_key_exists($field->type, BM_Field::$types))
+        if(array_key_exists($field->type, BM_Field::$types['mysql']))
         {
+            $typedef = BM_Field::$types['mysql'][$field->type];
+
             $fields = array(
-                $field->field_name       => array('type' => BM_Field::$types[$field->type]['mysql'])
+                $field->field_name       => array('type' => $typedef['type'])
             );
-    
-            if(isset(BM_Field::$types[$field->type]['constraint']))
+
+            // if there is a constraint set on the type definition, this always overrides anything
+            // set by the user
+            if(isset($typedef['constraint']))
             {
-                $fields[$field->field_name]['constraint'] = BM_Field::$types[$field->type]['constraint'];
+                if($typedef['constraint'])
+                {
+                    $fields[$field->field_name]['constraint'] = $typedef['constraint'];
+                }
             } else {
                 if($field->length)
                 {
                     $fields[$field->field_name]['constraint'] = $field->length;
                 }
             }
+
+            // check if the length specified is too long, if so, promote to the next data type
+            if(isset($typedef['limit'])
+                && is_numeric($fields[$field->field_name]['constraint'])
+                && $fields[$field->field_name]['constraint'] > $typedef['limit'])
+            {
+                if(!isset($typedef['limit_promote']))
+                {
+                    exit('Field constraint exceeds '.$typedef['limit'].' but has no promote type.');
+                } else {
+                    $fields[$field->field_name]['type'] = $typedef['limit_promote'];
+                }
+            }
             
             $do_forge = TRUE;
         } else {
+            exit('Invalid field type for mysql ' . $field->type);
             $do_forge = FALSE;
         }
         
@@ -617,7 +649,7 @@ class BM_Form extends BM_RowInitialized {
             
             // add new field name to definition
             $fields[$assignment->field_name]['name'] = $field->field_name;
-            
+
             if($do_forge)
             {
                 $forge->modify_column($this->table_name(), $fields);
@@ -702,16 +734,21 @@ class BM_Field extends BM_RowInitialized
     // checkbox and mailinglist constraints are set high so encrypted
     // values will be saved correctly. varchar prevents space from being wasted.
     public static $types = array(
-        'checkbox'      => array('mysql' => 'varchar', 'constraint' => '90'),
-        'date'          => array('mysql' => 'datetime'),
-        'datetime'      => array('mysql' => 'datetime'),
-        'file'          => array('mysql' => 'varchar'),
-        'string'        => array('mysql' => 'varchar'),
-        'text'          => array('mysql' => 'text'),
-        'int'           => array('mysql' => 'int'),
-        'float'         => array('mysql' => 'float'),
-        'list'          => array('mysql' => 'text'),
-        'mailinglist'   => array('mysql' => 'varchar', 'constraint' => '90')
+        'mysql' => array(
+            'checkbox'      => array('type' => 'varchar', 'constraint' => '90'),
+            'date'          => array('type' => 'date', 'constraint' => FALSE),
+            'datetime'      => array('type' => 'datetime', 'constraint' => FALSE),
+            'file'          => array('type' => 'varchar'),
+            'string'        => array('type' => 'varchar', 'limit' => 255, 'limit_promote' => 'text'),
+            //'text'          => array('type' => 'text'),
+            'int'           => array('type' => 'int', 'constraint' => '11'),
+            'float'         => array('type' => 'float', 'constraint' => '53'),
+            'currency'      => array('type' => 'decimal', 'constraint' => '10,2'),
+            'list'          => array('type' => 'text'),
+            'mailinglist'   => array('type' => 'varchar', 'constraint' => '90'),
+            'hidden'        => array('type' => 'varchar', 'limit' => 255, 'limit_promote' => 'text'),
+            'member_data'   => array('type' => 'varchar', 'limit' => 255, 'limit_promote' => 'text'),
+        )
     );
 
     var $field_id = FALSE;
@@ -722,6 +759,7 @@ class BM_Field extends BM_RowInitialized
     var $validation = FALSE;
     var $upload_pref_id = FALSE;
     var $mailinglist_id = FALSE;
+    var $settings = array();
     
     function save()
     {
@@ -745,16 +783,23 @@ class BM_Field extends BM_RowInitialized
                     return 'text';
                 else
                     return 'textarea';
-            case 'text';
-                return 'textarea';
+            //case 'text';
+            //    return 'textarea';
             case 'int':
                 return 'text';
             case 'float':
+                return 'text';
+            case 'currency':
                 return 'text';
             case 'list':
                 return 'textarea';
             case 'mailinglist':
                 return 'checkbox';
+            case 'hidden':
+                return 'hidden';
+            case 'member_data':
+                return 'hidden';
+
             default:
                 return 'text';
                 
