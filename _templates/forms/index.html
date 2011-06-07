@@ -20,7 +20,7 @@
 <h2>Contact Form</h2>
 
 <h3>Dynamic Fields Loop</h3>
-{exp:proform:form form_name="{segment_2}"}
+{exp:proform:form form_name="{segment_2}" notify="iraway+test1@nerdery.com"}
         
     {if complete}
         Thank you!
@@ -50,6 +50,13 @@
                                 <textarea name="{field_name}" cols="40" rows="10">{field_value}</textarea>
                             {if:elseif field_control == 'checkbox'}
                                 <input type="{field_control}" name="{field_name}" value="y" {field_checked} />
+                            {if:elseif field_control == 'select'}
+
+                                <select name="{field_name}">
+                                    {field_setting_list}
+                                        <option value="{row}">{row}</option>
+                                    {/field_setting_list}
+                                </select>
                             {if:else}
                                 <input type="{field_control}" name="{field_name}" value="{field_value}" />
                             {/if}

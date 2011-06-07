@@ -98,6 +98,7 @@ class Proform {
         $form_url           = $this->EE->TMPL->fetch_param('form_url', current_url());
         $error_url          = $this->EE->TMPL->fetch_param('error_url', $form_url);
         $thank_you_url      = $this->EE->TMPL->fetch_param('thank_you_url',  current_url());
+        $notify             = explode('|', $this->EE->TMPL->fetch_param('notify', ''));
 
 
         $tagdata = $this->EE->TMPL->tagdata;
@@ -164,7 +165,8 @@ class Proform {
             'form_url'          => $form_url,
             'error_url'         => $error_url,
             'thank_you_url'     => $thank_you_url,
-            'requested'         => time()
+            'requested'         => time(),
+            'notify'            => $notify
         );
         
         $form_config_enc = $this->EE->encrypt->encode(serialize($form_config));
@@ -470,7 +472,9 @@ class Proform {
         $form_name = $this->EE->TMPL->fetch_param('form_name', FALSE);
         $send_notification = $this->EE->TMPL->fetch_param('send_notification', FALSE);
         if(!$send_notification) $send_notification = 'yes';
-        
+
+        $notify = explode('|', $this->EE->TMPL->fetch_param('notify', ''));
+
         // Get the form object
         $form_obj = $this->EE->formslib->get_form($form_name);
         
@@ -506,7 +510,10 @@ class Proform {
             // Send notifications
             if($send_notification == 'yes') {
                 $data['entry_id'] = $this->EE->db->insert_id();
-                $this->EE->proform_notifications->send_notifications($form_obj, $data);
+                $config = array(
+                    'notify' => $notify
+                );
+                $this->EE->proform_notifications->send_notifications($form_obj, $data, $config);
             }
             
             if ($this->EE->extensions->active_hook('proform_insert_end') === TRUE)
@@ -605,7 +612,7 @@ class Proform {
                         }
                     }
                     
-                    if($value)
+                    if($value !== FALSE)
                     {
                         $form_session->values[$field->field_name] = $value;
                     } else {
@@ -641,9 +648,9 @@ class Proform {
 
                 $this->_process_insert($form_obj, $fields, $form_session, $data);
 
-                if($this->EE->proform_notifications->has_notifications($form_obj, $data))
+                if($this->EE->proform_notifications->has_notifications($form_obj, $data, $form_config))
                 {
-                    if(!$this->EE->proform_notifications->send_notifications($form_obj, $data))
+                    if(!$this->EE->proform_notifications->send_notifications($form_obj, $data, $form_config))
                     {
                         echo "{exp:proform:form} could not send notifications for form: ".$form_obj->form_name;die;
                     }
@@ -675,7 +682,12 @@ class Proform {
         {
             if($field->type == 'member_data')
             {
-                $data[$field->field_name] = $this->EE->session->userdata[$field->settings['type_member_data']];
+                if(array_key_exists($field->settings['type_member_data'], $this->EE->session->userdata))
+                {
+                    $data[$field->field_name] = $this->EE->session->userdata[$field->settings['type_member_data']];
+                } else {
+                    $data[$field->field_name] = 'Invalid member key ' . $field->settings['type_member_data'];
+                }
             }
         }
     }
@@ -1027,6 +1039,31 @@ class Proform {
                                                           && $field_checked_flags[$field->field_name]) ? 'checked="checked"' : '',
                     'field_control'     => $field->get_control()
                 );
+
+            if(is_array($field->settings))
+            {
+                foreach($field->settings as $k => $v)
+                {
+                    if(substr($k, 0, 5) == 'type_')
+                    {
+                        $k = substr($k, 5);
+                    }
+
+                    if($k == 'list')
+                    {
+                        $v = explode("\n", $v);
+                    }
+
+                    $field_array['field_setting_'.$k] = $v;
+                }
+            }
+            
+            /*if($field_array['field_type'] == 'list')
+            {
+                var_dump($field_array);
+                var_dump($field);
+                exit;
+            }*/
 
             if(array_key_exists($field->field_name, $field_errors))
             {

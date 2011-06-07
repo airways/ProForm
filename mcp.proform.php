@@ -1083,6 +1083,11 @@ class Proform_mcp {
         {
             // add the field
             $settings = array();
+
+            if($this->EE->input->post('type_list'))
+                $settings['type_list'] = $this->EE->input->post('type_list');
+            if($this->EE->input->post('type_member_data'))
+                $settings['type_member_data'] = $this->EE->input->post('type_member_data');
             
             $this->EE->formslib->new_field($field_name, $field_label, $field_type, $field_length,
                                            $field_validation, $upload_pref_id, $mailinglist_id,

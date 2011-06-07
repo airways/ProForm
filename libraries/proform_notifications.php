@@ -52,18 +52,18 @@ class Proform_notifications
     }
     
 
-    function has_notifications($form, $data)
+    function has_notifications($form, $data, $config)
     {
 
         if ($this->EE->extensions->active_hook('proform_notification_exists') === TRUE)
         {
-            if(!$this->EE->extensions->call('proform_notification_exists', $form, $this))
+            if(!$this->EE->extensions->call('proform_notification_exists', $form, $this, $config))
             {
                 return FALSE;
             }
         }
 
-        if(strlen(trim($form->notification_list)) > 0)
+        if(strlen(trim($form->notification_list)) > 0 || (isset($config['notify']) && count($config['notify']) > 0))
         {
             return TRUE;
         }
@@ -72,9 +72,18 @@ class Proform_notifications
 
     }
 
-    function send_notifications($form, $data)
+    function send_notifications($form, $data, $config)
     {
         $this->EE->extensions->end_script = FALSE;
+
+        foreach($form as $k => $v)
+        {
+            if($k[0] != '_')
+            {
+                if(substr($k, 0, 5) != 'form_') $k = 'form_'.$k;
+                $data[$k] = $v;
+            }
+        }
         
         $this->EE->load->library('parser');
         $this->EE->load->library('template');
@@ -86,7 +95,7 @@ class Proform_notifications
             if($this->EE->extensions->end_script) return;
         }
 
-        if(strlen($form->notification_list) > 0) {
+        if(strlen($form->notification_list) > 0 || (isset($config['notify']) && count($config['notify']) > 0)) {
             if(is_object($data)) {
                 $data = (array)$data;
             }
@@ -95,6 +104,11 @@ class Proform_notifications
             
             // prepare list of emails to send notification to
             $notification_list = explode("\n", $form->notification_list);
+
+            if(isset($config['notify']))
+            {
+                $notification_list = array_unique(array_merge($notification_list, $config['notify']));
+            }
             
             $result = TRUE;
             
@@ -164,16 +178,17 @@ class Proform_notifications
             if($this->EE->bm_email->send)
             {
                 $result = $result && $this->EE->bm_email->Send();
+                if(!$result)
+                {
+                    var_dump($this->EE->bm_email->_debug_msg);
+                }
             }
-            /*echo $message;
-            var_dump($this->EE->bm_email);
-            die;*/
+            //echo $message;
+            //var_dump($this->EE->bm_email);
+            //die;*/
         }
 
-        if(!$result)
-        {
-            //var_dump($this->EE->bm_email->_debug_msg);
-        }
+
         return $result;
     }
     /* template manager interface */

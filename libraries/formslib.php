@@ -792,14 +792,13 @@ class BM_Field extends BM_RowInitialized
             case 'currency':
                 return 'text';
             case 'list':
-                return 'textarea';
+                return 'select';
             case 'mailinglist':
                 return 'checkbox';
             case 'hidden':
                 return 'hidden';
             case 'member_data':
                 return 'hidden';
-
             default:
                 return 'text';
                 
