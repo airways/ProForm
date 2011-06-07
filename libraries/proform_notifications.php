@@ -84,10 +84,10 @@ class Proform_notifications
                 $data[$k] = $v;
             }
         }
-        
+
         $this->EE->load->library('parser');
         $this->EE->load->library('template');
-        $this->EE->load->helper('text'); 
+        $this->EE->load->helper('text');
 
         if ($this->EE->extensions->active_hook('proform_notification_start') === TRUE)
         {
@@ -101,14 +101,26 @@ class Proform_notifications
             }
             $data = $this->mgr->remove_transitory($data);
             
-            
             // prepare list of emails to send notification to
             $notification_list = explode("\n", $form->notification_list);
-
+            
             if(isset($config['notify']))
             {
                 $notification_list = array_unique(array_merge($notification_list, $config['notify']));
+                sort($notification_list);   // fix keys
             }
+
+            // remove blanks
+            for($i = 0; $i < count($notification_list); $i++)
+            {
+                if(!$notification_list[$i])
+                {
+                    unset($notification_list[$i]);
+                }
+            }
+
+            // fix keys again
+            sort($notification_list);
             
             $result = TRUE;
             
@@ -178,16 +190,18 @@ class Proform_notifications
             if($this->EE->bm_email->send)
             {
                 $result = $result && $this->EE->bm_email->Send();
+
                 if(!$result)
                 {
-                    var_dump($this->EE->bm_email->_debug_msg);
+                    $this->EE->bm_email->print_debugger();
+                    echo $this->EE->bm_email->_debug_msg;
+                    var_dump($this->EE->bm_email);
                 }
             }
             //echo $message;
             //var_dump($this->EE->bm_email);
             //die;*/
         }
-
 
         return $result;
     }
