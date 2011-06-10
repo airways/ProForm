@@ -84,7 +84,7 @@ class Formslib
         $forge->add_field($fields);
         $forge->add_key('form_entry_id', TRUE);
         $forge->add_key('updated');
-        $forge->create_table('proform__' . $form_name);
+        $forge->create_table(BM_Form::make_table_name($form_name));
         
         $form_obj = $this->get_form($form_name);
         return $form_obj;
@@ -713,9 +713,20 @@ class BM_Form extends BM_RowInitialized {
         $this->__fields = FALSE;
     }
     
+    static function make_table_name($form_name)
+    {
+        // change a few characters to underscores so we still have separated words
+        $table_name = str_replace(array('-', ':', '.', ' '), '_', $form_name);
+        
+        // remove everything else
+        $table_name = preg_replace('/[^_a-zA-Z0-9]/', '', $table_name);
+        
+        return 'proform__' . $table_name;
+    }
+
     function table_name()
     {
-        return 'proform__' . $this->form_name;
+        return BM_Form::make_table_name($this->form_name);
     }
     
     function save()
