@@ -301,6 +301,8 @@ class Proform {
 
                 $variables['fields:count'] = count($variables['fields']);
                 $variables['complete'] = $complete;
+                $variables['error_count'] = count($form_session->errors);
+                $variables['errors'] = $form_session->errors;
                 
                 // Load typography
                 $this->EE->load->library('typography');
@@ -308,7 +310,7 @@ class Proform {
                 $this->EE->typography->parse_images = TRUE;
                 $this->EE->typography->allow_headings = FALSE;
                 
-                $var_pairs = array('fieldrows', 'fields');
+                $var_pairs = array('fieldrows', 'fields', 'errors');
                 
                 if ($this->EE->extensions->active_hook('proform_form_preparse') === TRUE)
                 {

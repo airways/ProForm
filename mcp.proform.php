@@ -252,6 +252,9 @@ class Proform_mcp {
     
     function new_form()
     {
+        //echo "E_ALL: " . E_ALL;
+        //echo "error reporting: " . error_reporting();
+        //exit;
         if($this->EE->input->post('form_name') !== FALSE)
         {
             if($this->process_new_form()) return;

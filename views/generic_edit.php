@@ -100,12 +100,7 @@
     ?>
     
     <div class="tableFooter">
-        
-            <?=form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit'))?>
-
-        <? if(isset($pagination)): ?>
-        <span class="pagination"><?=$pagination?></span>
-        <? endif; ?>
+        <?php echo form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit'))?>
     </div>
-    <? echo form_close(); ?>
+    <?php echo form_close(); ?>
 </div>
