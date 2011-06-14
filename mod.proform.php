@@ -301,8 +301,14 @@ class Proform {
 
                 $variables['fields:count'] = count($variables['fields']);
                 $variables['complete'] = $complete;
-                $variables['error_count'] = count($form_session->errors);
-                $variables['errors'] = $form_session->errors;
+                if($form_session)
+                {
+                    $variables['error_count'] = count($form_session->errors);
+                    $variables['errors'] = $form_session->errors;
+                } else {
+                    $variables['error_count'] = 0;
+                    $variables['errors'] = array();
+                }
                 
                 // Load typography
                 $this->EE->load->library('typography');

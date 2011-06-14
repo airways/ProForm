@@ -848,8 +848,8 @@ class BM_FormSession
 }
 }
 
-if(!class_exists('BM_Preference')) {
-class BM_Preference extends BM_RowInitialized
+/*if(!class_exists('BM_Preference')) {
+class BM_ProformPreference extends BM_RowInitialized
 {
     var $preference_id = FALSE;
     var $preference_name = FALSE;
@@ -861,4 +861,4 @@ class BM_Preference extends BM_RowInitialized
     }
 
 }
-}
+}*/
