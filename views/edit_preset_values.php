@@ -32,7 +32,7 @@
 
 <!--start:bm_commands-->
 <div class="bm_commands" style="float: right;">
-    <span class="cp_button"><a href="<?=BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=assign_field'.AMP.'form_id='.$form_id?>"><?=lang('assign_field')?></a></span>
+    <span class="cp_button"><a href="<?php echo BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=assign_field'.AMP.'form_id='.$form_id; ?>"><?php echo lang('assign_field'); ?></a></span>
 </div>
 <!--end:bm_commands-->
 
@@ -79,7 +79,7 @@ if (count($fields) > 0):
 
 
     <div class="tableFooter">
-        <?=form_submit(array('name' => 'submit', 'value' => lang('save_layout'), 'class' => 'submit')) /*.NBS.NBS.form_dropdown('action', $options) */ ?>
+        <?php echo form_submit(array('name' => 'submit', 'value' => lang('save_layout'), 'class' => 'submit')); ?>
     </div>
     <?php
     echo form_close();

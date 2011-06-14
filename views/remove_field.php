@@ -35,18 +35,18 @@
 <?php
     echo form_open($action_url, '', $form_hidden);
     ?>
-    <p>Are you sure you want to REMOVE this FIELD from form <?=$form_name?>?</p>
+    <p>Are you sure you want to REMOVE this FIELD from form <?php echo $form_name; ?>?</p>
     <p>This field will be removed and all of the data in this form for this field will be permanently deleted.</p>
     <p>This cannot be undone.</p>
     <p style="color: red;">
         <b>About to remove:</b><br/>
-        FIELD: <?=$field_name?><br/>
-        from FORM: <?=$form_name?>
+        FIELD: <?php echo $field_name; ?><br/>
+        from FORM: <?php echo $form_name; ?>
     </p>
     <div class="tableFooter">
         <div class="tableSubmit">
-            <?=form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit'))?>
+            <?php echo form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit')); ?>
         </div>
     </div>
-    <? echo form_close(); ?>
+    <?php echo form_close(); ?>
 </div>

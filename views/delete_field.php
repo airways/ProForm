@@ -40,16 +40,12 @@
     <p>This cannot be undone.</p>
     <p style="color: red;">
         <b>About to delete:</b><br/>
-        FIELD: <?=$field_name?>
+        FIELD: <?php echo $field_name; ?>
     </p>
     <div class="tableFooter">
         <div class="tableSubmit">
-            <?=form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit'))?>
+            <?php echo form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit')); ?>
         </div>
-        <?php /*
-        <span class="js_hide"><?=$pagination?></span>   
-        <span class="pagination" id="filter_pagination"></span>
-        */ ?>
     </div>
-    <? echo form_close(); ?>
+    <?php echo form_close(); ?>
 </div>

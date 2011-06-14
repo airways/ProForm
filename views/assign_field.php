@@ -49,10 +49,10 @@
 if(count($field_options) > 0):
 ?>
 <div class="tableFooter">
-    <?=form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit'))?>
+    <?php echo form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit')); ?>
 </div>
 
-    <?
+    <?php
 endif;
 
 echo form_close(); ?>

@@ -32,7 +32,7 @@
 
 <!--start:bm_commands-->
 <div class="bm_commands" style="float: right;">
-    <span class="cp_button"><a href="<?=BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_form'?>"><?=lang('new_form')?></a></span>
+    <span class="cp_button"><a href="<?php echo BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_form'; ?>"><?php echo lang('new_form'); ?></a></span>
 </div>
 <!--end:bm_commands-->
 
@@ -66,10 +66,6 @@
     
     <div class="tableFooter">
 
-        <div class="tableSubmit">
-            <? /*=form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit')).NBS.NBS.form_dropdown('action', $options)*/ ?>
-        </div>
-        
         <span class="pagination"><?=$pagination?></span>
     </div>
     <?php

@@ -31,7 +31,7 @@
  **/ ?>
 
 <div style="float: right;">
-    <span class="cp_button"><a href="<?=BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_template'?>"><?=lang('new_template')?></a></span>
+    <span class="cp_button"><a href="<?php echo BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_template'; ?>"><?php echo lang('new_template'); ?></a></span>
 </div>
 
 <div class="clear_left shun"></div>
@@ -60,7 +60,7 @@
     <div class="tableFooter">
 
         <div class="tableSubmit">
-            <?=form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit')).NBS.NBS.form_dropdown('action', $options)?>
+            <?php echo form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit')).NBS.NBS.form_dropdown('action', $options); ?>
         </div>
         
     </div>

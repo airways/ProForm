@@ -30,13 +30,6 @@
  * 
  **/ ?>
 
-<?php /*
-<!--start:bm_commands-->
-<div class="bm_commands" style="float: right;">
-    <span class="cp_button"><a href="<?=BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=bm_forms'.AMP.'method=assign_field'.AMP.'form_id='.$form_id?>"><?=lang('assign_field')?></a></span>
-</div>
-<!--end:bm_commands--> */ ?>
-
 <?php echo form_open($assign_action_url, '', $form_hidden); ?>
 <div class="commandBar">
     <label for="field_id">Add Special</label>&nbsp;<?php
@@ -133,7 +126,7 @@ if (count($fields) > 0):
 
 
     <div class="tableFooter">
-        <?=form_submit(array('name' => 'submit', 'value' => lang('save_layout'), 'class' => 'submit')) /*.NBS.NBS.form_dropdown('action', $options) */ ?>
+        <?php echo form_submit(array('name' => 'submit', 'value' => lang('save_layout'), 'class' => 'submit')); ?>
     </div>
     <?php echo form_close();
 

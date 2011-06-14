@@ -32,7 +32,7 @@
 
 <!--start:bm_commands-->
 <div class="bm_commands" style="float: right;">
-    <span class="cp_button"><a href="<?=BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_field'?>"><?=lang('new_field')?></a></span>
+    <span class="cp_button"><a href="<?php echo BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_field'; ?>"><?php echo lang('new_field'); ?></a></span>
 </div>
 <!--end:bm_commands-->
 
@@ -61,7 +61,7 @@
             
         </div>
         
-        <span class="pagination"><?=$pagination?></span>
+        <span class="pagination"><?php echo $pagination; ?></span>
     </div>
     <?php
    // form_close();

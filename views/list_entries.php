@@ -30,15 +30,9 @@
  * 
  **/ ?>
 
-<?php /* <!--start:bm_commands-->
-<div class="bm_commands" style="float: right;">
-    <span class="cp_button"><a href="<?=BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=bm_forms'.AMP.'method=new_field'?>"><?=lang('new_field')?></a></span>
-</div>
-<!--end:bm_commands--> */ ?>
-
 <!--start:bm_commands-->
 <div class="bm_commands" style="float: right;">
-    <span class="cp_button"><a href="<?=BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=export_entries'.AMP.'form_id='.$form_id?>"><?=lang('export_entries')?></a></span>
+    <span class="cp_button"><a href="<?php echo BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=export_entries'.AMP.'form_id='.$form_id; ?>"><?php echo lang('export_entries'); ?></a></span>
 </div>
 <!--end:bm_commands-->
 
@@ -75,7 +69,7 @@
             
         </div>
 
-        <?=$pagination?>   
+        <?php echo $pagination; ?>
         <span class="pagination" id="filter_pagination"></span>
     </div>
 

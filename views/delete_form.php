@@ -39,16 +39,13 @@
     <p>All of it's data and structure will be removed permanently. This cannot be undone.</p>
     <p style="color: red;">
         <b>About to delete:</b><br/>
-        FORM: <?=$form_name?>
+        FORM: <?php echo $form_name; ?>
     </p>
     <div class="tableFooter">
         <div class="tableSubmit">
-            <?=form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit'))?>
+            <?php echo form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit')); ?>
         </div>
-        <?php /*
-        <span class="js_hide"><?=$pagination?></span>   
-        <span class="pagination" id="filter_pagination"></span>
-        */ ?>
+        
     </div>
     <? echo form_close(); ?>
 </div>

@@ -39,14 +39,14 @@
     <p>This cannot be undone.</p>
     <p style="color: red;">
         <b>About to delete:</b><br/>
-        TEMPLATE: <?=$template_name?>
+        TEMPLATE: <?php echo $template_name; ?>
     </p>
     <div class="tableFooter">
         <div class="tableSubmit">
-            <?=form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit'))?>
+            <?php echo form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit')); ?>
         </div>
         
-        <span class="pagination"><?=$pagination?></span>
+        
     </div>
     <? echo form_close(); ?>
 </div>
