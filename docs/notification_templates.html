@@ -1,0 +1,36 @@
+<html>
+<head>
+    <title>ProForm - Notification Templates</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js" type="text/javascript"></script>
+    <style type="text/css" media="screen,print">@import url(docs_assets/main.css);</style>
+    <style type="text/css" media="screen,print">@import url(docs_assets/docs.css);</style>
+</head>
+<body>
+<div id="title">ProForm</div>
+<div id="content">
+
+    <h1>Notification Templates</h1>
+    <!-- <kbd>PUBLISH</kbd> -->
+
+    <p>Notification templates in <dfn>ProForm</dfn> are based on the same ExpressionEngine templates that you use to
+    build any page on your site. Because of this, they can make use of any installed Module or Plugin, and have full
+    conditionals support.</p>
+
+    <h2>Sample Template</h2>
+    <p>One of the simplest possible notification templates looks like this:</p>
+    <pre>
+Someone submitted the {form_name} form:
+
+{fields}
+    {field_label}: {field_value}
+{/fields}</pre>
+    <p>If you do not need a fancy display or other information about the entry, this is probably all you will need - a
+    single template can render notifications for any form submitted to ProForm.</p>
+
+    <h2>Variables</h2>
+    <p>All of the variables available in the <a href="entries_tag.html#variables">Entries Tag</a> are available in
+    the notification template when notifications are generated for a newly created entry.</p>
+
+</div>
+</body>
+</html>

@@ -481,7 +481,8 @@ class Proform {
         $send_notification = $this->EE->TMPL->fetch_param('send_notification', FALSE);
         if(!$send_notification) $send_notification = 'yes';
 
-        $notify = explode('|', $this->EE->TMPL->fetch_param('notify', ''));
+        // Make both newlines and pipes valid delimiters - useful if the value comes from Low Variables or similar
+        $notify = explode("\n", implode("\n", explode('|', $this->EE->TMPL->fetch_param('notify', ''))));
 
         // Get the form object
         $form_obj = $this->EE->formslib->get_form($form_name);
@@ -521,6 +522,12 @@ class Proform {
                 $config = array(
                     'notify' => $notify
                 );
+
+                $fieldrows = $this->create_fields_array($form_obj, array(), $data, array(), TRUE);
+                $fields = $this->create_fields_array($form_obj, array(), $data, array(), FALSE);
+                $data['fieldrows'] = $fieldrows;
+                $data['fields'] = $fields;
+
                 $this->EE->proform_notifications->send_notifications($form_obj, $data, $config);
             }
             
@@ -658,6 +665,11 @@ class Proform {
 
                 if($this->EE->proform_notifications->has_notifications($form_obj, $data, $form_config))
                 {
+                    $fieldrows = $this->create_fields_array($form_obj, array(), $data, array(), TRUE);
+                    $fields = $this->create_fields_array($form_obj, array(), $data, array(), FALSE);
+                    $data['fieldrows'] = $fieldrows;
+                    $data['fields'] = $fields;
+
                     if(!$this->EE->proform_notifications->send_notifications($form_obj, $data, $form_config))
                     {
                         echo "{exp:proform:form} could not send notifications for form: ".$form_obj->form_name;die;

@@ -76,6 +76,10 @@ class Proform_notifications
     {
         $this->EE->extensions->end_script = FALSE;
 
+        if(is_object($data)) {
+            $data = (array)$data;
+        }
+        
         foreach($form as $k => $v)
         {
             if($k[0] != '_')
@@ -96,9 +100,7 @@ class Proform_notifications
         }
 
         if(strlen($form->notification_list) > 0 || (isset($config['notify']) && count($config['notify']) > 0)) {
-            if(is_object($data)) {
-                $data = (array)$data;
-            }
+
             $data = $this->mgr->remove_transitory($data);
             
             // prepare list of emails to send notification to

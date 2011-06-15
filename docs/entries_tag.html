@@ -1,0 +1,103 @@
+<html>
+<head>
+    <title>ProForm - Entries Tag</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js" type="text/javascript"></script>
+    <style type="text/css" media="screen,print">@import url(docs_assets/main.css);</style>
+    <style type="text/css" media="screen,print">@import url(docs_assets/docs.css);</style>
+</head>
+<body>
+<div id="title">ProForm</div>
+<div id="content">
+
+    <h1>Entries Tag</h1>
+    <!-- <kbd>PUBLISH</kbd> -->
+    <p>The <dfn>Entries Tag</dfn> provides a way to query and display any entry created through ProForm.</p>
+
+    <p>Here's a simple example of using the <dfn>Entries Tag</dfn> to display all entries created in a particular
+    form:</p>
+
+    <pre>
+{exp:proform:entries form_name="{segment_2}"}
+    &lt;tr&gt;
+        &lt;th&gt;Row Number&lt;/th&gt;
+        &lt;th&gt;Form Entry ID&lt;/th&gt;
+        &lt;th&gt;User Agent&lt;/th&gt;
+        &lt;th&gt;IP Address&lt;/th&gt;
+        {fields}
+        &lt;th&gt;{field_label}&lt;/th&gt;
+        {/fields}
+    &lt;/tr&gt;
+
+    {if entries:no_results}
+    &lt;tr&gt;
+       &lt;td colspan="100" class="error"&gt;No entries!&lt;/td&gt;
+    &lt;/tr&gt;
+    {if:else}
+    &lt;tr&gt;
+        &lt;td&gt;{row:number}&lt;/td&gt;
+        &lt;td&gt;{value:form_entry_id}&lt;/td&gt;
+        &lt;td&gt;{value:user_agent}&lt;/td&gt;
+        &lt;td&gt;{value:ip_address}&lt;/td&gt;
+        {fields}
+            {if field_type == 'file'}
+                {if field_value}
+                    &lt;td&gt;&lt;img src="{field_value}" /&gt;&lt;/td&gt;
+                {if:else}
+                    &lt;td&gt;&lt;/td&gt;
+                {/if}
+            {if:else}
+                &lt;td&gt;{field_value}&lt;/td&gt;
+            {/if}
+        {/fields}
+    &lt;/tr&gt;
+    {/if}
+{/exp:proform:entries}</pre>
+
+    <h2>Parameters</h2>
+
+    <p>The following parameters are available:</p>
+
+    <ul>
+        <li><a href="#param_entry_id">entry_id="1"</a></li>
+    </ul>
+
+    <h2>Single Variables</h2>
+
+    <p>The following variables are available in a notification template:</p>
+
+    <ul>
+        <li><a href="#var_form_id">{form_id}</a></li>
+        <li><a href="#var_form_label">{form_label}</a></li>
+        <li><a href="#var_form_name">{form_name}</a></li>
+        <li><a href="#var_value_form_entry_id">{value:form_entry_id}</a></li>
+        <li><a href="#var_value_user_agent">{value:user_agent}</a></li>
+        <li><a href="#var_value_ip_address">{value:ip_address}</a></li>
+
+    </ul>
+
+    <h3><a name="var_form_id">{form_id}</a></h3>
+
+    <p>Provides the unique numeric ID of the form.</p>
+
+    <h3><a name="var_form_label">{form_label}</a></h3>
+
+    <p>Provides the firendly form label for the form. This can be any human readable string.</p>
+
+    <h3><a name="var_form_name">{form_name}</a></h3>
+
+    <p>Provides the internal form name for the form. This should be all lowercase and only contained letters, numbers,
+    and underscores.</p>
+
+    <h2>Variable Pairs</h2>
+
+    <p>The following variables are available in a notification template:</p>
+
+    <ul>
+        <li><a href="#var_fields">{fields}</a></li>
+        <li><a href="#var_fieldrows">{fieldrows}</a></li>
+    </ul>
+
+
+</div>
+</body>
+</html>
