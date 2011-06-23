@@ -100,7 +100,9 @@ class Proform_notifications
         }
 
         if(strlen($form->notification_list) > 0 || (isset($config['notify']) && count($config['notify']) > 0)) {
-
+            if(is_object($data)) {
+                $data = (array)$data;
+            }
             $data = $this->mgr->remove_transitory($data);
             
             // prepare list of emails to send notification to

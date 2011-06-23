@@ -95,9 +95,9 @@ class Proform {
         $in_place_errors    = $this->EE->TMPL->fetch_param('in_place_errors', 'yes');
         $form_id            = $this->EE->TMPL->fetch_param('form_id', $form_name . '_proform');
         $form_class         = $this->EE->TMPL->fetch_param('form_class', $form_name . '_proform');
-        $form_url           = $this->EE->TMPL->fetch_param('form_url', current_url());
+        $form_url           = $this->EE->TMPL->fetch_param('form_url', $_SERVER['REQUEST_URI']);
         $error_url          = $this->EE->TMPL->fetch_param('error_url', $form_url);
-        $thank_you_url      = $this->EE->TMPL->fetch_param('thank_you_url',  current_url());
+        $thank_you_url      = $this->EE->TMPL->fetch_param('thank_you_url',  $_SERVER['REQUEST_URI']);
         $notify             = explode('|', $this->EE->TMPL->fetch_param('notify', ''));
 
 
@@ -189,7 +189,7 @@ class Proform {
                 /*$base_url = $this->EE->functions->fetch_site_index(0, 0).QUERY_MARKER.
                     'ACT='.$this->EE->functions->fetch_action_id('Proform', 'process_form_act');*/
                     
-                $base_url = current_url();
+                $base_url = $form_config['form_url'];
                 
                 $form_details = array(
                         'action'            => $base_url,
