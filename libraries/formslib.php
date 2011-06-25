@@ -558,6 +558,11 @@ class BM_Form extends BM_RowInitialized {
         }
         return $this->__entries;
     }
+
+    function delete_entry($entry_id)
+    {
+        $this->__EE->db->delete($this->table_name(), array('form_entry_id' => $entry_id));
+    }
     
     function assign_field($field, $is_required = 'n') 
     {

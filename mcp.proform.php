@@ -87,6 +87,8 @@ class Proform_mcp {
         $this->EE->cp->add_to_head('<link rel="stylesheet" href="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/styles/main.css" type="text/css" media="screen" />');
         $this->EE->cp->add_to_head('<link rel="stylesheet" href="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/styles/jquery.contextMenu.css" type="text/css" media="screen" />');
 
+        $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/prolib/javascript/prolib.js"></script>');
+
         $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/jquery.tablednd_0_5.js"></script>');
         $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/global.js"></script>');
 
@@ -1296,6 +1298,7 @@ class Proform_mcp {
         $this->sub_page('tab_list_entries', $form->form_name);
         $vars['form_id'] = $form_id;
         $vars['edit_entry_url'] = ACTION_BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_form_entry'.AMP.'form_id='.$form_id;
+        $vars['delete_entry_url'] = ACTION_BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=delete_form_entry'.AMP.'form_id='.$form_id;
 
         // Get page of data
 
@@ -1341,6 +1344,7 @@ class Proform_mcp {
                 }
             }
         }
+        $headings[] = lang('heading_commands');
         $vars['headings'] = $headings;
 
         return $this->EE->load->view('list_entries', $vars, TRUE);
@@ -1393,6 +1397,22 @@ class Proform_mcp {
             $this->EE->load->library('table');
             return $this->EE->load->view('generic_edit', $vars, TRUE);
         }
+    }
+
+    function delete_form_entry()
+    {
+        $this->EE->load->library('formslib');
+
+        $form_id = (int)$this->EE->input->get('form_id');
+        $form_entry_id = (int)$this->EE->input->get('entry_id');
+
+        $form_obj = $this->EE->formslib->get_form($form_id);
+        if($form_obj)
+        {
+            $form_obj->delete_entry($form_entry_id);
+        }
+        $this->EE->functions->redirect(ACTION_BASE.AMP.'method=list_entries'.AMP.'form_id='.$form_id);
+        return TRUE;
     }
     
     function export_entries()

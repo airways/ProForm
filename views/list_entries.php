@@ -57,6 +57,7 @@
             }
         }
 
+        $row[] = '<a href="'.$delete_entry_url.'&entry_id='.$entry->form_entry_id.'" class="pl_confirm" rel="Are you sure you want to delete this entry?">Delete</a>';
         $this->table->add_row($row);
     }
     
