@@ -168,7 +168,7 @@ class Proform {
             'requested'         => time(),
             'notify'            => $notify
         );
-        var_dump($form_config);
+        //var_dump($form_config);
         
         $form_config_enc = $this->EE->encrypt->encode(serialize($form_config));
         
