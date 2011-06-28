@@ -151,9 +151,11 @@ class Proform {
         if (preg_match("/({captcha})/", $tagdata))
         {
             $captcha = $this->EE->functions->create_captcha();
-            if(!$captcha) $captcha = "[CAPTCHA ERROR]";
+            if(!$captcha && $captcha !== '') $captcha = "[CAPTCHA ERROR]";
             $tagdata = preg_replace("/{captcha}/", $captcha, $tagdata);
-            $use_captcha = TRUE;
+
+            if($captcha !== '')
+                $use_captcha = TRUE;
         }
         
         $form_config = array(
@@ -408,7 +410,7 @@ class Proform {
 
                         if($field->type == 'file' && $row_vars['value:'.$field->field_name] != '')
                         {
-                            $dir = $this->EE->bm_uploads->get_upload_pref($field->upload_prefs_id);
+                            $dir = $this->EE->bm_uploads->get_upload_pref($field->upload_pref_id);
                             $row_vars['value:'.$field->field_name] = $dir->url.$row_vars['value:'.$field->field_name];
                         }
                     }
@@ -720,7 +722,7 @@ class Proform {
         {
             if($field->type == 'file')
             {
-                // if the field already exists in $form_session->values then we have already uplaoded the file
+                // if the field already exists in $form_session->values then we have already uploaded the file
                 if(array_key_exists($field->field_name, $form_session->values))
                 {
 
@@ -730,9 +732,14 @@ class Proform {
                     //echo "Previously saved file: " . $form_session->values[$field->field_name];die;
                 } else {
                     // "upload" the file to it's permanent home
-                    $upload_data = $this->EE->bm_uploads->handle_upload($field->upload_prefs_id, $field->field_name);
-
+                    $upload_data = $this->EE->bm_uploads->handle_upload($field->upload_pref_id, $field->field_name, $field->is_required == 'y');
+                    
+                    // default to no file saved
+                    $data[$field->field_name] = '';
+                    
                     // we should get back an array if the transfer was successful
+                    // if the file was required and was not uploaded, we'll get back FALSE
+                    // if the file was not required and was in fact not uploaded, we'll get back a TRUE
                     if($upload_data AND is_array($upload_data))
                     {
                         // save the filename to the session's values array so we don't clobber it if there are
@@ -741,8 +748,8 @@ class Proform {
 
                         // save the filename in case we get to actually save the form insert this time
                         $data[$field->field_name] = $upload_data['file_name'];
-                    } else {
-                        //$form_session->errors[$field->field_name] = $this->EE->bm_uploads->errors;
+                    } elseif(count($this->EE->bm_uploads->errors) > 0) {
+                        // if the file wasn't required, there would be no errors in the array
                         $form_session->add_error($field->field_name, $this->EE->bm_uploads->errors);
                     }
                 }
@@ -1098,7 +1105,7 @@ class Proform {
 
             if($field->type == 'file' && $field_array['field_value'] != '')
             {
-                $dir = $this->EE->bm_uploads->get_upload_pref($field->upload_prefs_id);
+                $dir = $this->EE->bm_uploads->get_upload_pref($field->upload_pref_id);
                 $field_array['field_value'] = $dir->url.$field_array['field_value'];
             }
 
