@@ -170,6 +170,15 @@ class Proform {
             'requested'         => time(),
             'notify'            => $notify
         );
+        
+        //echo "<pre>";
+        //var_dump($form_config);
+        // swap out global vars like {path=x} and {site_url}
+        foreach($form_config as $k => $v)
+        {
+            if(!is_array($v) && !is_numeric($v))
+                $form_config[$k] = $this->EE->TMPL->parse_globals($v);
+        }
         //var_dump($form_config);
         
         $form_config_enc = $this->EE->encrypt->encode(serialize($form_config));
