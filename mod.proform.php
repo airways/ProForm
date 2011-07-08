@@ -1069,6 +1069,7 @@ class Proform {
                     'field_label'       => $field->field_label,
                     'field_type'        => $field->type,
                     'field_length'      => $field->length,
+                    'field_is_required' => $field->is_required == 'y' ? 'y' : '',
                     'field_validation'  => $field->validation,
                     'field_error'       => array_key_exists($field->field_name, $field_errors) ? $field_errors[$field->field_name] : '',
                     'field_value'       => array_key_exists($field->field_name, $field_values) ? $field_values[$field->field_name] : '',

@@ -4,6 +4,9 @@
     .error {
         color: red;
     }
+    .required {
+        border: 1px solid blue;
+    }
     .fieldRow {
         clear:both;
         border: 1px dotted red;
@@ -42,9 +45,9 @@
 
                 {fields}
                     {if field_control != 'hidden'}{!-- skip hidden fields --}
-                        <li{if field_error} class="error"{/if}>
+                        <li class="{if field_error}error{/if} {if field_is_required}required{/if}">
 
-                            {field_label} {field_no}
+                            {field_label} {if field_is_required}*{/if} {field_no}
 
                             {if field_control == 'textarea'}
                                 <textarea name="{field_name}" cols="40" rows="10">{field_value}</textarea>
