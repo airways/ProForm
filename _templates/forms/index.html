@@ -92,6 +92,7 @@ page: {get:page}
     <tr>
         <th>Row Number</th>
         <th>Form Entry ID</th>
+        <th>Created / Updated</th>
         <th>User Agent</th>
         <th>IP Address</th>
         {fields}
@@ -107,6 +108,7 @@ page: {get:page}
     <tr>
         <td>{row:number}</td>
         <td>{value:form_entry_id}</td>
+        <td>{value:updated} {value:updated format="%Y-%m-%d %H:%i:%s"}</td>
         <td>{value:user_agent}</td>
         <td>{value:ip_address}</td>
         {fields}

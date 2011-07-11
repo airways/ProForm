@@ -78,7 +78,8 @@ class Formslib
             'form_entry_id'     => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE, 'auto_increment' => TRUE),
             'updated'           => array('type' => 'timestamp'),
             'ip_address'        => array('type' => 'varchar', 'constraint' => '128'),
-            'user_agent'        => array('type' => 'varchar', 'constraint' => '255')
+            'user_agent'        => array('type' => 'varchar', 'constraint' => '255'),
+            'dst_enabled'       => array('type' => 'varchar', 'constraint' => '1'),
         );
         
         $forge->add_field($fields);

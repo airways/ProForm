@@ -577,6 +577,8 @@ class Proform {
             {
                 $data = $this->EE->formslib->encrypt_values($data);
             }
+
+            $data['dst_enabled'] = $this->prolib->dst_enabled ? 'y' : 'n';
             
             // Insert data into the form
             $this->EE->db->insert($form_obj->table_name(), $data);
@@ -989,6 +991,8 @@ class Proform {
         } else {
             $save_data = $data;
         }
+        
+        $save_data['dst_enabled'] = $this->prolib->dst_enabled ? 'y' : 'n';
         
         if(!$result = $this->EE->db->insert($form_obj->table_name(), $save_data))
         {
