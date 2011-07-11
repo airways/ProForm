@@ -70,7 +70,7 @@ class Proform {
         
         if(strlen($this->EE->config->item('encryption_key')) < 32) 
         {
-            echo "{exp:proform:form} requires a valid (32 character) encryption_key to be set in the config file.";die;
+            show_error("{exp:proform:form} requires a valid (32 character) encryption_key to be set in the config file.");
         }
 
         /*
@@ -87,7 +87,7 @@ class Proform {
         // Check required input
         if(!$form_name) 
         {
-            echo "{exp:proform:form} requires name param.";die;
+            show_error("{exp:proform:form} requires name param.");
             //return $this->EE->output->show_user_error('general', array('exp:proform:form requires form_name param'));
         }
         
@@ -353,12 +353,12 @@ class Proform {
 
                 return $this->return_data;
             } else {
-                echo "Form does not have any assigned fields: $form_name";die;
+                show_error("Form does not have any assigned fields: $form_name");
             }
         }
         else
         {
-            echo "{exp:proform:form} form not found: $form_name";die;
+            show_error("{exp:proform:form} form not found: $form_name");
         }
     }
     
@@ -368,13 +368,24 @@ class Proform {
         $this->EE->load->library('formslib');
         
         // Get params
-        $form_name = $this->EE->TMPL->fetch_param('form_name', FALSE);
+        $form_name      = $this->EE->TMPL->fetch_param('form_name');
+        $paginate       = $this->EE->TMPL->fetch_param('paginate');
+        $paginate_base  = $this->EE->TMPL->fetch_param('paginate_base');
+        $p_page         = $this->EE->TMPL->fetch_param('page');
+        $page           = $p_page > 0 ? $p_page : 1;
+        $limit          = $this->EE->TMPL->fetch_param('limit');
         
         // Check required input
         if(!$form_name)
         {
-            echo "{exp:proform:form} requires name param.";die;
+            show_error("{exp:proform:form} requires name param.");
             //return $this->EE->output->show_user_error('general', array('exp:proform:form requires form_name param'));
+        }
+        
+        if($paginate)
+        {
+            // fetch and remove the {paginate} pair from tagdata
+            $this->fetch_pagination_data();
         }
         
         $this->return_data = "";
@@ -391,12 +402,20 @@ class Proform {
         {
             $tagdata = $this->EE->TMPL->tagdata;
             
-            if($form_obj->entries())
+            // if $limit != 0 then the results wil be paginated
+            if($entries = $form_obj->entries(($page - 1) * $limit, $limit))
             {
                 $row_i = 1;
-                $count = count($form_obj->entries());
+                $count = count($entries);
+                $total_entries = $form_obj->count_entries();
+                if($limit > 0)
+                {
+                    $total_pages = ceil($total_entries / $limit);
+                } else {
+                    $total_pages = 1;
+                }
                 
-                foreach($form_obj->entries() as $row)
+                foreach($entries as $row)
                 {
                     if($form_obj->encryption_on == 'y')
                     {
@@ -404,6 +423,9 @@ class Proform {
                     }
                     
                     $row_vars = array();
+                    $row_vars['total_entries'] = $total_entries;
+                    $row_vars['total_pages'] = $total_pages;
+                    $row_vars['current_page'] = $page;
                     $row_vars['fieldrows'] = $this->create_fields_array($form_obj, array(), $row, array(), TRUE);
                     $row_vars['fields'] = $this->create_fields_array($form_obj, array(), $row, array(), FALSE);
 
@@ -471,12 +493,43 @@ class Proform {
         }
         else
         {
-            echo "{exp:proform:form} form name not found: $form_name";die;
+            show_error("{exp:proform:form} form name not found: $form_name");
         }
         
         if ($this->EE->extensions->active_hook('proform_entries_end') === TRUE)
         {
             $this->return_data = $this->EE->extensions->call('proform_entries_end', $this, $form_obj, $this->return_data);
+        }
+        
+        // add pagination links
+        if($paginate)
+        {
+            $pages = array();
+            for($n = 1; $n <= $total_pages; $n++)
+            {
+                $pages[] = array(
+                    'page'      => $n,
+                    'current'   => $n == $page,
+                    'first'     => $n > 1 ? 'yes' : '',
+                    'last'      => $n == $total_pages ? 'yes' : '',
+                );
+            }
+            
+            $pagination_vars = array(
+                'current_page'  => $page,
+                'first_page'    => 1,
+                'last_page'     => $total_pages,
+                'total_pages'   => $total_pages,
+                'pages'         => $pages
+            );
+            $this->paginate_data = $this->EE->bm_parser->parse_variables($this->paginate_data, $pagination_vars, array('pages'));
+            
+            if($paginate == 'top')
+            {
+                $this->return_data = $this->paginate_data.$this->return_data;
+            } else {
+                $this->return_data = $this->return_data.$this->paginate_data;
+            }
         }
 
         return $this->return_data;
@@ -504,7 +557,7 @@ class Proform {
             // Check required input
             if(!$form_name)
             {
-                echo "{exp:proform:form} requires form_name param.";die;
+                show_error("{exp:proform:form} requires form_name param.");
                 //return $this->EE->output->show_user_error('general', array('exp:proform:insert requires form_name param'));
             }
             
@@ -551,7 +604,7 @@ class Proform {
         }
         else
         {
-            echo "{exp:proform:form} form name not found: $form_name";die;
+            show_error("{exp:proform:form} form name not found: $form_name");
         }
     }
     
@@ -684,7 +737,7 @@ class Proform {
 
                     if(!$this->EE->proform_notifications->send_notifications($form_obj, $data, $form_config))
                     {
-                        echo "{exp:proform:form} could not send notifications for form: ".$form_obj->form_name;die;
+                        show_error("{exp:proform:form} could not send notifications for form: ".$form_obj->form_name);
                     }
                 }
                 
@@ -939,7 +992,7 @@ class Proform {
         
         if(!$result = $this->EE->db->insert($form_obj->table_name(), $save_data))
         {
-            echo "{exp:proform:form} could not insert into form: ".$form_obj->form_name;die;
+            show_error("{exp:proform:form} could not insert into form: ".$form_obj->form_name);
         }
 
         $data['form:entry_id'] = $this->EE->db->insert_id();
@@ -1145,6 +1198,90 @@ class Proform {
         return $result;
     }
     
+    /**
+      *  Fetch pagination data
+      */
+    function fetch_pagination_data()
+    {
+        if (strpos($this->EE->TMPL->tagdata, LD.'paginate'.RD) === FALSE) return;
+
+        if (preg_match("/".LD."paginate".RD."(.+?)".LD.'\/'."paginate".RD."/s", $this->EE->TMPL->tagdata, $match))
+        {
+
+            if ($this->EE->extensions->active_hook('proform_fetch_pagination_data') === TRUE)
+            {
+                $edata = $this->EE->extensions->call('proform_fetch_pagination_data', $this);
+            }
+            
+            $this->paginate = TRUE;
+            $this->paginate_data = $match[1];
+
+            $this->EE->TMPL->tagdata = preg_replace("/".LD."paginate".RD.".+?".LD.'\/'."paginate".RD."/s", "", $this->EE->TMPL->tagdata);
+        }
+    }
+    
+    /**
+      *  Add pagination data to result
+      */
+    function add_pagination_data()
+    {
+        if ($this->pagination_links == '')
+        {
+            return;
+        }
+
+        if ($this->paginate == TRUE)
+        {
+            $this->paginate_data = str_replace(LD.'current_page'.RD,        $this->current_page,        $this->paginate_data);
+            $this->paginate_data = str_replace(LD.'total_pages'.RD,         $this->total_pages,         $this->paginate_data);
+            $this->paginate_data = str_replace(LD.'pagination_links'.RD,    $this->pagination_links,    $this->paginate_data);
+
+            if (preg_match("/".LD."if previous_page".RD."(.+?)".LD.'\/'."if".RD."/s", $this->paginate_data, $match))
+            {
+                if ($this->page_previous == '')
+                {
+                     $this->paginate_data = preg_replace("/".LD."if previous_page".RD.".+?".LD.'\/'."if".RD."/s", '', $this->paginate_data);
+                }
+                else
+                {
+                    $match[1] = preg_replace("/".LD.'path.*?'.RD."/",   $this->page_previous, $match[1]);
+                    $match[1] = preg_replace("/".LD.'auto_path'.RD."/", $this->page_previous, $match[1]);
+
+                    $this->paginate_data = str_replace($match[0],   $match[1], $this->paginate_data);
+                }
+            }
+
+
+            if (preg_match("/".LD."if next_page".RD."(.+?)".LD.'\/'."if".RD."/s", $this->paginate_data, $match))
+            {
+                if ($this->page_next == '')
+                {
+                     $this->paginate_data = preg_replace("/".LD."if next_page".RD.".+?".LD.'\/'."if".RD."/s", '', $this->paginate_data);
+                }
+                else
+                {
+                    $match[1] = preg_replace("/".LD.'path.*?'.RD."/",   $this->page_next, $match[1]);
+                    $match[1] = preg_replace("/".LD.'auto_path'.RD."/", $this->page_next, $match[1]);
+
+                    $this->paginate_data = str_replace($match[0],   $match[1], $this->paginate_data);
+                }
+            }
+            
+            $this->paginate_data = $this->EE->functions->prep_conditionals($this->paginate_data, array('total_pages' => $this->total_pages));
+
+            $position = ( ! $this->EE->TMPL->fetch_param('paginate')) ? '' : $this->EE->TMPL->fetch_param('paginate');
+
+            switch ($position)
+            {
+                case "top"  : $this->return_data  = $this->paginate_data.$this->return_data;
+                    break;
+                case "both" : $this->return_data  = $this->paginate_data.$this->return_data.$this->paginate_data;
+                    break;
+                default     : $this->return_data .= $this->paginate_data;
+                    break;
+            }
+        }
+    }
 
 }
 

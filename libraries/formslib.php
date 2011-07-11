@@ -522,38 +522,22 @@ class BM_Form extends BM_RowInitialized {
         return $this->__EE->db->count_all($this->table_name());
     }
 
-    function entries($rownum = 0, $perpage = 0, $count = FALSE)
+    function entries($start_row = 0, $limit = 0, $count = FALSE)
     {
-        if(!$this->__entries) 
+        $this->__EE->db->select('*');
+        
+        if($start_row >= 0 AND $limit > 0) {
+            $this->__EE->db->limit($limit, $start_row); // yes it is reversed compared to MySQL
+        }
+        
+        $query = $this->__EE->db->get($this->table_name());
+        
+        $this->__entries = array();
+        if($query->num_rows > 0) 
         {
-            //var_dump($this->table);
-            //$query = $this->EE->db->query($sql = "SELECT * FROM " . $this->table_name());
-            if($perpage != 0) {
-                $this->__EE->db->limit($perpage, $rownum); // yes it is reversed compared to MySQL
-            }
-            $query = $this->__EE->db->get($this->table_name());
-
-            // TODO: why the hell don't these queries work?
-            //$query = $this->EE->db->get($this->table);
-            //$query = $this->EE->db->select('*')->from('exp_'.$this->table)->get();
-            
-            if($query->num_rows == 0) 
+            foreach($query->result() as $row) 
             {
-                // TODO: add no_results parsing
-                
-                //echo "No results";
-                //die;
-            } 
-            else 
-            {
-                $this->__entries = array();
-                
-                foreach($query->result() as $row) 
-                {
-                    $this->__entries[] = $row;
-                }
-                //var_dump($this->__entries);
-                //die;
+                $this->__entries[] = $row;
             }
         }
         return $this->__entries;

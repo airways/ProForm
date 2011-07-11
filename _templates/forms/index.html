@@ -81,8 +81,13 @@
 {/exp:proform:form}
 
 <h3>Dynamic Fields Loop Entries</h3>
+page: {get:page}
 <table border="1">
-{exp:proform:entries form_name="{segment_2}"}
+{exp:proform:entries form_name="{segment_2}" paginate="bottom" limit="3" page="{get:page}"}
+    {paginate}
+        <p>Page {current_page} of {total_pages} pages <a href="?page={first_page}">First</a> {pages}<a href="?page={page}">{page}</a> {/pages} <a href="?page={last_page}">Last</a></p>
+    {/paginate}
+    
     {if row:number == 1}
     <tr>
         <th>Row Number</th>
