@@ -31,8 +31,8 @@
  **/
 
 class Proform_upd {
-    // @version 2.1.0
-    var $version = "2.1.0";
+    // @version 2.1.1
+    var $version = "2.1.1";
     
     function Proform_upd() {
         $this->EE = &get_instance();
