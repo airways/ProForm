@@ -126,6 +126,7 @@ $lang = array(
     'field_submitter_email_field_desc' => 'Field containing submitter\'s e-mail address',
     'field_encryption_on' => 'Encrypt Data',
     'field_encryption_on_desc' => 'Encrypt data stored in the form\'s database table. This will cause each field to need about 2.6 times as many characters (minimum 88 characters), so make sure to plan for this in field constraints.',
+    'encryption_toggle_disabled' => 'Encryption cannot be turned on or off if there are already entries in the form.',
     
     'field_pref_notification_template_group' => 'Notification Template Group',
     'field_pref_notification_template_group_desc' => 'Template group containing e-mail notification templates',

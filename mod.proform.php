@@ -143,7 +143,7 @@ class Proform {
             $form_result = FALSE;
             $this->_copy_post($form_obj, $form_session);
             
-            $form_session = $this->_process_form(&$form_obj, &$form_session);
+            $form_session = $this->_process_form($form_obj, $form_session);
             
             if($form_result === TRUE)
             {

@@ -1,0 +1,26 @@
+{exp:proform:results}
+    {if form_name}
+        <h1>Thank you for submitting the {form_name} form</h1>
+    
+        <p>We have received the following information which you submitted:</p>
+        
+        {fields}
+            {field_name} = {field_value}<br/>
+        {/fields}
+        
+        <p>Custom thank you message from the form:</p>
+        
+        <p>{thank_you_message}</p>
+        
+        {if download_url}
+            <p>You may now download your file: <a href="{download_url}">{download_label}</a></p>
+        {/if}
+        
+        {if referrer_url}
+            <p>Return to <a href="{referrer_url}">previous page</a>.</p>
+        {/if}
+    {if:else}
+        <h1>Thanks for the form</h1>
+        <p>But, aw snap something went wrong and I can't confirm your submission.</p>
+    {/if}
+{/exp:proform:results}

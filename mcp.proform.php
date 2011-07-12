@@ -343,6 +343,8 @@ class Proform_mcp {
     
     function edit_form($editing=TRUE, $vars=array())
     {
+        $this->EE->load->library('formslib');
+        
         if($editing && $this->EE->input->post('form_id') !== FALSE) 
         {
             if($this->process_edit_form()) return;
@@ -355,6 +357,7 @@ class Proform_mcp {
         
             $form_id = (int)$this->EE->input->get('form_id');
             $query = $this->EE->db->get_where('proform_forms', array('form_id' => $form_id));
+            $form_obj = $this->EE->formslib->get_form($form_id);
 
             $vars['editing'] = TRUE;
             $vars['hidden'] = array('form_id' => $form_id);
@@ -380,7 +383,7 @@ class Proform_mcp {
             'notification_list' => 'textarea',
             'submitter_notification_on' => array('checkbox', 'y'),
             'submitter_notification_template' => array('dropdown', $template_names),
-            'encryption_on' => array('checkbox', 'y'));
+            'encryption_on' => (isset($form_obj) AND $form_obj->count_entries()) ? array('read_only_checkbox', lang('encryption_toggle_disabled')) : array('checkbox', 'y'));
         
         $form = $this->EE->bm_forms->create_cp_form($form_fields, $types);
 
