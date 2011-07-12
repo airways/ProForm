@@ -23,7 +23,9 @@
 <h2>Contact Form</h2>
 
 <h3>Dynamic Fields Loop</h3>
-{exp:proform:form form_name="{segment_2}" notify="iraway+test1@nerdery.com" thank_you_url="{path=thanks}"}
+{exp:proform:form form_name="{segment_2}" notify="iraway+test1@nerdery.com"
+    thank_you_url="{path=forms/thank_you}" thank_you_message="Thanks for filling that there contact form"
+    download_url="{path='test.zip'}" download_label="Test!"}
 
     {if complete}
         Thank you!
