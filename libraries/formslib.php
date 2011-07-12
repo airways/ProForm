@@ -814,6 +814,7 @@ class BM_FormSession
 {
     var $values = array();
     var $errors = array();
+    var $checked_flags = array();
     
     /**
      * Add an error message for a given field
