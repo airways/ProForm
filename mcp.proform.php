@@ -76,7 +76,8 @@ class Proform_mcp {
                 array('type' => 'textarea', 'name' => 'options', 'label' => 'Options')
             ),
             'member_data' => array(
-                array('type' => 'input', 'name' => 'member_field', 'label' => 'Field')
+                array('type' => 'dropdown', 'name' => 'member_field', 'label' => 'Field', 
+                      'options' => $this->prolib->bm_forms->simple_select_options(array_keys($this->EE->session->userdata)))
             ),
         );
         
@@ -1329,7 +1330,7 @@ class Proform_mcp {
 
         ////////////////////////////////////////
         // Table Headings
-        $vars['hidden_columns'] = array("updated", "ip_address", "user_agent");
+        $vars['hidden_columns'] = array("updated", "ip_address", "user_agent", "dst_enabled");
         
         $headings = array('ID');
         $fields = $form->fields();

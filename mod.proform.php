@@ -198,7 +198,10 @@ class Proform {
             }
         }
         
-        //$this->prolib->debug($form_config);
+        /*
+        echo "<b>Form config:</b>:";
+        $this->prolib->debug($form_config);
+        // */
         // swap out global vars like {path=x} and {site_url}
         foreach($form_config as $k => $v)
         {
@@ -554,6 +557,7 @@ class Proform {
             } else {
                 // parse a single fake row and add it to the result:
                 //   - row number 1, count 0, no_results = true
+                $total_pages = 0;
                 $row_vars = array();
                 $row_vars['row:number'] = 1;
                 $row_vars['entries:count'] = 0;
@@ -875,6 +879,10 @@ class Proform {
                 }
             }
         }
+        /*
+        echo "<b>Secure fields:</b>";
+        $this->prolib->debug($data);
+        // */
     }
 
     function _process_uploads(&$form_obj, &$form_session, &$data)
@@ -1084,10 +1092,20 @@ class Proform {
         {
             $save_data = $this->EE->formslib->encrypt_values($data);
             
+            /*
+            echo "<b>Encrypted data:</b>";
+            $this->prolib->debug($save_data);
+            // */
+            
             // TODO: check for constraint overflows in encrypted values?
             // TODO: how do we handle encrypted numbers?
         } else {
             $save_data = $data;
+
+            /*
+            echo "<b>Non-encrypted data:</b>";
+            $this->prolib->debug($save_data);
+            // */
         }
         
         $save_data['dst_enabled'] = $this->prolib->dst_enabled ? 'y' : 'n';
@@ -1104,6 +1122,7 @@ class Proform {
         {
             $this->EE->extensions->call('proform_insert_end', $this, $data);
         }
+        
     }
     
     function _process_mailinglist(&$form_obj, &$form_session, &$data)
