@@ -93,7 +93,7 @@ class Proform_notifications
         $this->EE->load->library('template');
         $this->EE->load->helper('text');
 
-        if ($this->EE->extensions->active_hook('proform_notification_start') === TRUE)
+        if($this->EE->extensions->active_hook('proform_notification_start') === TRUE)
         {
             $this->EE->extensions->call('proform_notification_start', $form, $this);
             if($this->EE->extensions->end_script) return;
@@ -128,9 +128,13 @@ class Proform_notifications
             
             $result = TRUE;
             
-            $result &= $this->_send_notifications('admin', $form->notification_template, $form, $data, $form->subject, $notification_list);
+            // send email to the admin
+            if($form->admin_notification_on == 'y')
+            {
+                $result &= $this->_send_notifications('admin', $form->notification_template, $form, $data, $form->subject, $notification_list);
+            }
             
-///            var_dump($form);die;
+            // send email to the submitter
             if($form->submitter_notification_on == 'y' && $form->submitter_email_field 
                 && isset($data[$form->submitter_email_field]) && $data[$form->submitter_email_field])
             {
@@ -138,8 +142,17 @@ class Proform_notifications
                 $result &= $this->_send_notifications('submitter', $form->submitter_notification_template, 
                     $form, $data, $form->submitter_notification_subject ? $form->submitter_notification_subject : $form->subject, array($submitter_email));
             }
+
+            // send share emails ("tell a friend", etc)
+            if($form->share_notification_on == 'y' && $form->share_email_field 
+                && isset($data[$form->share_email_field]) && $data[$form->share_email_field])
+            {
+                $share_email = $data[$form->share_email_field];
+                $result &= $this->_send_notifications('share', $form->share_notification_template, 
+                    $form, $data, $form->share_notification_subject ? $form->share_notification_subject : $form->subject, array($share_email));
+            }
             
-            if ($this->EE->extensions->active_hook('proform_notification_end') === TRUE)
+            if($this->EE->extensions->active_hook('proform_notification_end') === TRUE)
             {
                 $this->EE->extensions->call('proform_notification_end', $form, $this);
             }

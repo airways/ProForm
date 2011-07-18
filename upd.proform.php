@@ -31,8 +31,8 @@
  **/
 
 class Proform_upd {
-    // @version 2.1.4
-    var $version = "2.1.4";
+    // @version 2.1.6
+    var $version = "2.1.6";
     
     function Proform_upd() {
         $this->EE = &get_instance();
@@ -70,16 +70,28 @@ class Proform_upd {
             'form_id'                           => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE, 'auto_increment' => TRUE),
             'form_label'                        => array('type' => 'varchar', 'constraint' => '250'),
             'form_name'                         => array('type' => 'varchar', 'constraint' => '32'),
+            'form_type'                         => array('type' => 'varchar', 'constraint' => '10', 'default' => 'form'),
             'encryption_on'                     => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'),
             'settings'                          => array('type' => 'blob'),
+            
+            'admin_notification_on'             => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'),
             'notification_template'             => array('type' => 'varchar', 'constraint' => '50'),
             'notification_list'                 => array('type' => 'text'),
             'subject'                           => array('type' => 'varchar', 'constraint' => '128'),
+            
             'submitter_notification_on'         => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'),
             'submitter_notification_template'   => array('type' => 'varchar', 'constraint' => '50'),
             'submitter_notification_subject'    => array('type' => 'varchar', 'constraint' => '128'),
             'submitter_email_field'             => array('type' => 'varchar', 'constraint' => '32'),
-            'from_address'                      => array('type' => 'varchar', 'constraint' => '64'));
+
+            'share_notification_on'             => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'),
+            'share_notification_template'       => array('type' => 'varchar', 'constraint' => '50'),
+            'share_notification_subject'        => array('type' => 'varchar', 'constraint' => '128'),
+            'share_email_field'                 => array('type' => 'varchar', 'constraint' => '32'),
+            
+            'from_address'                      => array('type' => 'varchar', 'constraint' => '64'),
+            'save_entries_on'                   => array('type' => 'varchar', 'constraint' => '1', 'default' => 'y'),
+        );
         $forge->add_field($fields);
         $forge->add_key('form_id', TRUE);
         $forge->add_key('form_name');
@@ -89,7 +101,8 @@ class Proform_upd {
         $fields = array(
             'display_entry_id'  => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE, 'auto_increment' => TRUE),
             'form_id'           => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE),
-            'entry_id'          => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE));
+            'entry_id'          => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE),
+        );
         $forge->add_field($fields);
         $forge->add_key('display_entry_id', TRUE);
         $forge->add_key('form_id');
@@ -107,7 +120,7 @@ class Proform_upd {
             'upload_pref_id' => array('type' => 'int', 'constraint' => '4'),
             'mailinglist_id' => array('type' => 'int', 'constraint' => '4'),
             'settings'       => array('type' => 'blob'),
-            );
+        );
         $this->EE->dbforge->add_field($fields);
         $forge->add_key('field_id', TRUE);
         $forge->create_table('proform_fields');
@@ -121,7 +134,8 @@ class Proform_upd {
             'field_name'    => array('type' => 'varchar', 'constraint' => '32'),
             'is_required'   => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'),
             'preset_value'  => array('type' => 'text'),
-            'preset_forced' => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'));
+            'preset_forced' => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'),
+        );
         $this->EE->dbforge->add_field($fields);
         $forge->add_key('field_id');
         $forge->add_key('form_id');
@@ -171,8 +185,8 @@ class Proform_upd {
         
         ////////////////////////////////////////
         // Register tab
-        $this->EE->load->library('layout');
-        $this->EE->layout->add_layout_tabs($this->tabs(), 'proform');
+        //$this->EE->load->library('layout');
+        //$this->EE->layout->add_layout_tabs($this->tabs(), 'proform');
 
         ////////////////////////////////////////
         // Create default preferences
@@ -181,7 +195,6 @@ class Proform_upd {
         $prefs = array(
             array('preference_name' => 'notification_template_group', 'value' => 'notifications'),
             array('preference_name' => 'from_address', 'value' => 'admin@example.com'),
-
         );
 
         foreach($prefs as $pref)
@@ -217,6 +230,7 @@ class Proform_upd {
         //$this->EE->dbforge->drop_table('bm_fields');
         //$this->EE->dbforge->drop_table('proform_sessions');
         //$this->EE->dbforge->drop_table('proform_templates');
+        $this->EE->dbforge->drop_table('proform_form_fields');
         $this->EE->dbforge->drop_table('proform_preferences');
         
         ////////////////////////////////////////

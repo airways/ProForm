@@ -112,6 +112,17 @@ var bm_forms_layout = {
                 bm_forms_layout.bind_events();
             }
         });
+        
+        $('input[name=save_entries_on]').change(function() {
+            var new_val = $(this).is(':checked');
+            if(!new_val)
+            {
+                if(!confirm('Are you sure you want to turn off saving entry data?\n\nThis should ONLY be turned off for sharing forms:\nyou almost always want to save data sent to you\nby visitors!'))
+                {
+                    $(this).attr('checked', 'checked');
+                }
+            }
+        });
    }
 };
 

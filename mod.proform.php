@@ -143,7 +143,7 @@ class Proform {
             $form_result = FALSE;
             $this->_copy_post($form_obj, $form_session);
             
-            $form_session = $this->_process_form($form_obj, $form_session);
+            $form_session = $this->_process_form($form_obj, $form_session, $form_result);
             
             if($form_result === TRUE)
             {
@@ -284,11 +284,14 @@ class Proform {
                         if($form_session and array_key_exists($field->field_name, $form_session->errors)) {
                             if(is_array($form_session->errors[$field->field_name]))
                             {
+                                $field_errors[$field->field_name.'_array'] = $form_session->errors[$field->field_name];
                                 $field_errors[$field->field_name] = $this->EE->bm_uploads->implode_errors_array($form_session->errors[$field->field_name]);
                             } else {
+                                $field_errors[$field->field_name.'_array'] = '';
                                 $field_errors[$field->field_name] = $form_session->errors[$field->field_name];
                             }
                         } else {
+                            $field_errors[$field->field_name.'_array'] = '';
                             $field_errors[$field->field_name] = '';
                         }
                     }
@@ -304,6 +307,7 @@ class Proform {
                 
                 if(isset($form_session->errors['captcha']))
                 {
+                    $field_errors['captcha_array'] = $form_session->errors['captcha'];
                     $field_errors['captcha'] = $form_session->errors['captcha'];
                 }
                 
@@ -314,7 +318,7 @@ class Proform {
                 // Turn various arrays of values into variables
                 $variables = array();
                 
-                $this->_copy_values($form_obj, $variables);
+                $this->prolib->copy_values($form_obj, $variables);
                 
                 foreach($varsets as $varset)
                 {
@@ -425,8 +429,8 @@ class Proform {
                 $form_obj = $this->EE->formslib->get_form($form_name);
                 //$this->prolib->debug($form_obj);
 
-                $this->_copy_values($form_config, $variables);
-                $this->_copy_values($form_obj, $variables);
+                $this->prolib->copy_values($form_config, $variables);
+                $this->prolib->copy_values($form_obj, $variables);
                 
                 $variables['fieldrows'] = $this->create_fields_array($form_obj, $form_session->errors, $form_session->values, $form_session->checked_flags, TRUE);
                 $variables['fields'] = $this->create_fields_array($form_obj, $form_session->errors, $form_session->values, $form_session->checked_flags, FALSE);
@@ -627,7 +631,7 @@ class Proform {
         $form_name = $this->EE->TMPL->fetch_param('form_name', FALSE);
         $send_notification = $this->EE->TMPL->fetch_param('send_notification', FALSE);
         if(!$send_notification) $send_notification = 'yes';
-
+        
         // Make both newlines and pipes valid delimiters - useful if the value comes from Low Variables or similar
         $notify = explode("\n", implode("\n", explode('|', $this->EE->TMPL->fetch_param('notify', ''))));
 
@@ -756,7 +760,7 @@ class Proform {
         }
     }
     
-    function _process_form(&$form_obj, &$form_session)
+    function _process_form(&$form_obj, &$form_session, &$result)
     {
         $result = FALSE;
         
@@ -887,45 +891,47 @@ class Proform {
 
     function _process_uploads(&$form_obj, &$form_session, &$data)
     {
-        // Save uploaded files
-        foreach($form_obj->fields() as $field)
+        if($form_obj->save_entries_on == 'y')
         {
-            if($field->type == 'file')
+            // Save uploaded files
+            foreach($form_obj->fields() as $field)
             {
-                // if the field already exists in $form_session->values then we have already uploaded the file
-                if(array_key_exists($field->field_name, $form_session->values))
+                if($field->type == 'file')
                 {
-
-                    // save the filename for use in the form entries insert
-                    $data[$field->field_name] = $form_session->values[$field->field_name];
-
-                    //echo "Previously saved file: " . $form_session->values[$field->field_name];die;
-                } else {
-                    // "upload" the file to it's permanent home
-                    $upload_data = $this->EE->bm_uploads->handle_upload($field->upload_pref_id, $field->field_name, $field->is_required == 'y');
-                    
-                    // default to no file saved
-                    $data[$field->field_name] = '';
-                    
-                    // we should get back an array if the transfer was successful
-                    // if the file was required and was not uploaded, we'll get back FALSE
-                    // if the file was not required and was in fact not uploaded, we'll get back a TRUE
-                    if($upload_data AND is_array($upload_data))
+                    // if the field already exists in $form_session->values then we have already uploaded the file
+                    if(array_key_exists($field->field_name, $form_session->values))
                     {
-                        // save the filename to the session's values array so we don't clobber it if there are
-                        // other errors
-                        $form_session->values[$field->field_name] = $upload_data['file_name'];
-
-                        // save the filename in case we get to actually save the form insert this time
-                        $data[$field->field_name] = $upload_data['file_name'];
-                    } elseif(count($this->EE->bm_uploads->errors) > 0) {
-                        // if the file wasn't required, there would be no errors in the array
-                        $form_session->add_error($field->field_name, $this->EE->bm_uploads->errors);
-                    }
-                }
+                        // save the filename for use in the form entries insert
+                        $data[$field->field_name] = $form_session->values[$field->field_name];
+                        
+                        //echo "Previously saved file: " . $form_session->values[$field->field_name];die;
+                    } else {
+                        // "upload" the file to it's permanent home
+                        $upload_data = $this->EE->bm_uploads->handle_upload($field->upload_pref_id, $field->field_name, $field->is_required == 'y');
+                        
+                        // default to no file saved
+                        $data[$field->field_name] = '';
+                        
+                        // we should get back an array if the transfer was successful
+                        // if the file was required and was not uploaded, we'll get back FALSE
+                        // if the file was not required and was in fact not uploaded, we'll get back a TRUE
+                        if($upload_data AND is_array($upload_data))
+                        {
+                            // save the filename to the session's values array so we don't clobber it if there are
+                            // other errors
+                            $form_session->values[$field->field_name] = $upload_data['file_name'];
+                            
+                            // save the filename in case we get to actually save the form insert this time
+                            $data[$field->field_name] = $upload_data['file_name'];
+                        } elseif(count($this->EE->bm_uploads->errors) > 0) {
+                            // if the file wasn't required, there would be no errors in the array
+                            $form_session->add_error($field->field_name, $this->EE->bm_uploads->errors);
+                        }
+                    } // else array_key_exists($field->field_name, $form_session->values) 
+                } // $field->type == 'file'
             }
-        }
-    }
+        } // save_entries_on == 'y'
+    } // function _process_uploads
     
     function _process_captcha(&$form_obj, &$form_session, &$data)
     {
@@ -950,7 +956,7 @@ class Proform {
                     WHERE (word='".$this->EE->db->escape_str($_POST['captcha'])."'
                     AND ip_address = '".$this->EE->input->ip_address()."')
                     OR date < UNIX_TIMESTAMP()-7200");
-    }
+    } // function _process_captch
     
     function _process_validation(&$form_obj, &$form_session, &$data)
     {
@@ -1064,66 +1070,80 @@ class Proform {
             //var_dump($form_session->errors);die;
         }
         //exit('end of validation');
-    }
+    } // function _process_validation
 
     function _process_duplicates(&$form_obj, &$form_session, &$data)
     {
         // TODO: check for duplicates
         // TODO: make sure encryption is taken into account for duplicates checks
-    }
+    } // function _process_duplicates
 
     function _process_insert(&$form_obj, &$form_session, &$data)
     {
-        foreach($form_obj->fields() as $field)
+        $data['dst_enabled'] = $this->prolib->dst_enabled ? 'y' : 'n';
+        
+        if($form_obj->save_entries_on == 'y')
         {
-            // files are saved previously because they cannot be automatically re-uploaded from an errored form
-            if(!array_key_exists($field->field_name, $data))
+            foreach($form_obj->fields() as $field)
             {
-                $data[$field->field_name] = $form_session->values[$field->field_name];
+                // files are saved previously because they cannot be automatically re-uploaded from an errored form
+                if(!array_key_exists($field->field_name, $data))
+                {
+                    $data[$field->field_name] = $form_session->values[$field->field_name];
+                }
+            }
+        
+            if ($this->EE->extensions->active_hook('proform_insert_start') === TRUE)
+            {
+                $data = $this->EE->extensions->call('proform_insert_start', $this, $data);
+            }
+        
+            if($form_obj->encryption_on == 'y')
+            {
+                $save_data = $this->EE->formslib->encrypt_values($data);
+            
+                /*
+                echo "<b>Encrypted data:</b>";
+                $this->prolib->debug($save_data);
+                // */
+            
+                // TODO: check for constraint overflows in encrypted values?
+                // TODO: how do we handle encrypted numbers?
+            } else {
+                $save_data = $data;
+
+                /*
+                echo "<b>Non-encrypted data:</b>";
+                $this->prolib->debug($save_data);
+                // */
+            }
+        
+            
+            if(!$result = $this->EE->db->insert($form_obj->table_name(), $save_data))
+            {
+                show_error("{exp:proform:form} could not insert into form: ".$form_obj->form_name);
+            }
+
+            $data['form:entry_id'] = $this->EE->db->insert_id();
+            $data['form:name'] = $form_obj->form_name;
+
+            if ($this->EE->extensions->active_hook('proform_insert_end') === TRUE)
+            {
+                $this->EE->extensions->call('proform_insert_end', $this, $data);
+            }
+        } else {
+            $data['form:entry_id'] = 0;
+            $data['form:name'] = $form_obj->form_name;
+            
+            if ($this->EE->extensions->active_hook('proform_no_insert') === TRUE)
+            {
+                $data = $this->EE->extensions->call('proform_no_insert', $this, $data);
             }
         }
         
-        if ($this->EE->extensions->active_hook('proform_insert_start') === TRUE)
-        {
-            $data = $this->EE->extensions->call('proform_insert_start', $this, $data);
-        }
         
-        if($form_obj->encryption_on == 'y')
-        {
-            $save_data = $this->EE->formslib->encrypt_values($data);
-            
-            /*
-            echo "<b>Encrypted data:</b>";
-            $this->prolib->debug($save_data);
-            // */
-            
-            // TODO: check for constraint overflows in encrypted values?
-            // TODO: how do we handle encrypted numbers?
-        } else {
-            $save_data = $data;
-
-            /*
-            echo "<b>Non-encrypted data:</b>";
-            $this->prolib->debug($save_data);
-            // */
-        }
         
-        $save_data['dst_enabled'] = $this->prolib->dst_enabled ? 'y' : 'n';
-        
-        if(!$result = $this->EE->db->insert($form_obj->table_name(), $save_data))
-        {
-            show_error("{exp:proform:form} could not insert into form: ".$form_obj->form_name);
-        }
-
-        $data['form:entry_id'] = $this->EE->db->insert_id();
-        $data['form:name'] = $form_obj->form_name;
-
-        if ($this->EE->extensions->active_hook('proform_insert_end') === TRUE)
-        {
-            $this->EE->extensions->call('proform_insert_end', $this, $data);
-        }
-        
-    }
+    } // function _process_insert
     
     function _process_mailinglist(&$form_obj, &$form_session, &$data)
     {
@@ -1214,7 +1234,7 @@ class Proform {
                 } // if($this->EE->input->get_post($field->field_name) && $email && $list_id)
             } // if($field->type == 'mailinglist')
         } // foreach($form_obj->fields() as $field)
-    }
+    } // function _process_mailinglist
 
     ////////////////////////////////////////////////////////////////////////////////
     // Helpers
@@ -1317,7 +1337,7 @@ class Proform {
 
 //        if($create_field_rows){var_dump($result);die;}
         return $result;
-    }
+    } // function create_fields_array
     
     /**
       *  Fetch pagination data
@@ -1339,84 +1359,7 @@ class Proform {
 
             $this->EE->TMPL->tagdata = preg_replace("/".LD."paginate".RD.".+?".LD.'\/'."paginate".RD."/s", "", $this->EE->TMPL->tagdata);
         }
-    }
-    
-    /**
-      *  Add pagination data to result
-      */
-    function add_pagination_data()
-    {
-        if ($this->pagination_links == '')
-        {
-            return;
-        }
-
-        if ($this->paginate == TRUE)
-        {
-            $this->paginate_data = str_replace(LD.'current_page'.RD,        $this->current_page,        $this->paginate_data);
-            $this->paginate_data = str_replace(LD.'total_pages'.RD,         $this->total_pages,         $this->paginate_data);
-            $this->paginate_data = str_replace(LD.'pagination_links'.RD,    $this->pagination_links,    $this->paginate_data);
-
-            if (preg_match("/".LD."if previous_page".RD."(.+?)".LD.'\/'."if".RD."/s", $this->paginate_data, $match))
-            {
-                if ($this->page_previous == '')
-                {
-                     $this->paginate_data = preg_replace("/".LD."if previous_page".RD.".+?".LD.'\/'."if".RD."/s", '', $this->paginate_data);
-                }
-                else
-                {
-                    $match[1] = preg_replace("/".LD.'path.*?'.RD."/",   $this->page_previous, $match[1]);
-                    $match[1] = preg_replace("/".LD.'auto_path'.RD."/", $this->page_previous, $match[1]);
-
-                    $this->paginate_data = str_replace($match[0],   $match[1], $this->paginate_data);
-                }
-            }
-
-
-            if (preg_match("/".LD."if next_page".RD."(.+?)".LD.'\/'."if".RD."/s", $this->paginate_data, $match))
-            {
-                if ($this->page_next == '')
-                {
-                     $this->paginate_data = preg_replace("/".LD."if next_page".RD.".+?".LD.'\/'."if".RD."/s", '', $this->paginate_data);
-                }
-                else
-                {
-                    $match[1] = preg_replace("/".LD.'path.*?'.RD."/",   $this->page_next, $match[1]);
-                    $match[1] = preg_replace("/".LD.'auto_path'.RD."/", $this->page_next, $match[1]);
-
-                    $this->paginate_data = str_replace($match[0],   $match[1], $this->paginate_data);
-                }
-            }
-            
-            $this->paginate_data = $this->EE->functions->prep_conditionals($this->paginate_data, array('total_pages' => $this->total_pages));
-
-            $position = ( ! $this->EE->TMPL->fetch_param('paginate')) ? '' : $this->EE->TMPL->fetch_param('paginate');
-
-            switch ($position)
-            {
-                case "top"  : $this->return_data  = $this->paginate_data.$this->return_data;
-                    break;
-                case "both" : $this->return_data  = $this->paginate_data.$this->return_data.$this->paginate_data;
-                    break;
-                default     : $this->return_data .= $this->paginate_data;
-                    break;
-            }
-        }
-    }
-    
-    function _copy_values(&$from, &$to)
-    {
-        foreach($from as $key => $value)
-        {
-            if(!is_array($value) 
-                AND !is_object($value)
-                AND substr($key, 0, 2) != '__')
-            {
-                $to[$key] = $value;
-            }
-        }
-        
-    }
+    } // function fetch_pagination_data
 
 }
 

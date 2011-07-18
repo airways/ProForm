@@ -39,6 +39,8 @@ class Formslib
     var $prefs_mgr;
     var $session_mgr;
 
+    var $form_types = array('form' => 'Entry Form');
+    
     function Formslib()
     {
         #$this->EE = &get_instance();
@@ -49,8 +51,10 @@ class Formslib
         //$this->session_mgr = new Bm_handle_mgr("proform_sessions", "session", "BM_FormSession", array('values', 'errors'));
     }
     
-    function new_form($form_name, $form_label, $encryption_on, $notification_template, $from_address, $notification_list, $subject,
-        $submitter_notification_on, $submitter_notification_template, $submitter_notification_subject, $submitter_email_field) 
+    function new_form($form_name, $form_label, $encryption_on,
+        $admin_notification_on, $notification_template, $notification_list, $subject,
+        $submitter_notification_on, $submitter_notification_template, $submitter_notification_subject, $submitter_email_field,
+        $share_notification_on, $share_notification_template, $share_notification_subject, $share_email_field) 
     {
         // Create new table for the form
         $this->EE->load->dbforge();
@@ -61,14 +65,18 @@ class Formslib
             'form_name'                         => strtolower(str_replace(' ', '_', $form_name)), // clean up just incase
             'form_label'                        => $form_label,
             'encryption_on'                     => $encryption_on,
+            'admin_notification_on'             => $admin_notification_on,
             'notification_template'             => $notification_template,
-            'from_address'                      => $from_address,
             'notification_list'                 => $notification_list,
             'subject'                           => $subject,
             'submitter_notification_on'         => $submitter_notification_on,
             'submitter_notification_template'   => $submitter_notification_template,
             'submitter_notification_subject'    => $submitter_notification_subject,
             'submitter_email_field'             => $submitter_email_field,
+            'share_notification_on'             => $share_notification_on,
+            'share_notification_template'       => $share_notification_template,
+            'share_notification_subject'        => $share_notification_subject,
+            'share_email_field'                 => $share_email_field,
             'settings'                          => serialize(array()),
         );
         $this->EE->db->insert('proform_forms', $data);
@@ -461,15 +469,25 @@ class BM_Form extends BM_RowInitialized {
     var $form_id;
     var $form_label;
     var $form_name;
-    var $encryption_on;
+    var $form_type = 'form';
+    var $save_entries_on = 'y';
+    var $encryption_on = 'n';
+    
+    var $admin_notification_on = 'y';
     var $notification_template;
-    var $from_address;
     var $notification_list;
     var $subject;
-    var $submitter_notification_on;
+    
+    var $submitter_notification_on = 'n';
     var $submitter_notification_template;
     var $submitter_notification_subject;
     var $submitter_email_field;
+
+    var $share_notification_on = 'n';
+    var $share_notification_template;
+    var $share_notification_subject;
+    var $share_email_field;
+    
     var $settings;
     
     function fields() 

@@ -309,7 +309,6 @@ class Proform_mcp {
         $form_label = trim($this->EE->input->post('form_label'));
         $encryption_on = trim($this->EE->input->post('encryption_on'));
         $notification_template = trim($this->EE->input->post('notification_template'));
-        $from_address = trim($this->EE->input->post('from_address'));
         $notification_list = trim($this->EE->input->post('notification_list'));
         $subject = trim($this->EE->input->post('subject'));
         $submitter_notification_on = trim($this->EE->input->post('submitter_notification_on'));
@@ -326,10 +325,10 @@ class Proform_mcp {
         {
             // create new form and table
             $this->EE->load->library('formslib');
-            $form = $this->EE->formslib->new_form($form_name, $form_label, $encryption_on, $notification_template,
-                $from_address, $notification_list, $subject,
-                $submitter_notification_on, $submitter_notification_template, $submitter_notification_subject,
-                $submitter_email_field);
+            $form = $this->EE->formslib->new_form($form_name, $form_label, $encryption_on,
+                $admin_notification_on, $notification_template, $notification_list, $subject,
+                $submitter_notification_on, $submitter_notification_template, $submitter_notification_subject, $submitter_email_field,
+                $share_notification_on, $share_notification_template, $share_notification_subject, $share_email_field);
             
             // go back to form listing
             $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form->form_id);
@@ -379,12 +378,18 @@ class Proform_mcp {
         
         $types = array(
             'form_id' => 'read_only', 
+            'form_type' => 'read_only', 
             'entries_count' => 'read_only', 
             'notification_template' => array('dropdown', $template_names), 
             'notification_list' => 'textarea',
+            'admin_notification_on' => array('checkbox', 'y'),
             'submitter_notification_on' => array('checkbox', 'y'),
             'submitter_notification_template' => array('dropdown', $template_names),
-            'encryption_on' => (isset($form_obj) AND $form_obj->count_entries()) ? array('read_only_checkbox', lang('encryption_toggle_disabled')) : array('checkbox', 'y'));
+            'share_notification_on' => array('checkbox', 'y'),
+            'share_notification_template' => array('dropdown', $template_names),
+            'encryption_on' => (isset($form_obj) AND $form_obj->count_entries()) ? array('read_only_checkbox', lang('encryption_toggle_disabled')) : array('checkbox', 'y'),
+            'save_entries_on' => array('checkbox', 'y'),
+        );
         
         $form = $this->EE->bm_forms->create_cp_form($form_fields, $types);
 
@@ -404,14 +409,18 @@ class Proform_mcp {
         $form_name = $this->EE->input->post('form_name');
         $form_label = $this->EE->input->post('form_label');
         $encryption_on = $this->EE->input->post('encryption_on');
+        $admin_notification_on = $this->EE->input->post('admin_notification_on');
         $notification_template = $this->EE->input->post('notification_template');
         $notification_list = $this->EE->input->post('notification_list');
         $subject = $this->EE->input->post('subject');
-        $from_address = $this->EE->input->post('from_address');
         $submitter_notification_on = $this->EE->input->post('submitter_notification_on');
         $submitter_notification_template = $this->EE->input->post('submitter_notification_template');
         $submitter_notification_subject = $this->EE->input->post('submitter_notification_subject');
         $submitter_email_field = $this->EE->input->post('submitter_email_field');
+        $share_notification_on = $this->EE->input->post('share_notification_on');
+        $share_notification_template = $this->EE->input->post('share_notification_template');
+        $share_notification_subject = $this->EE->input->post('share_notification_subject');
+        $share_email_field = $this->EE->input->post('share_email_field');
 
         if(!$form_id || $form_id <= 0) show_error(lang('invalid_submit'));
         if(!$form_id) show_error(lang('missing_form_name'));
@@ -419,26 +428,28 @@ class Proform_mcp {
         //if(!$notification_template) show_error(lang('missing_notification_template'));
         //if(!$notification_list) show_error(lang('missing_notification_list'));
         //if(!$subject) show_error(lang('missing_subject'));
-        //if(!$from_address) show_error(lang('missing_from_address'));
 
         $form_name = trim($form_name);
         $form_label = trim($form_label);
         $encryption_on = trim($encryption_on);
+        $admin_notification_on = trim($admin_notification_on);
         $notification_template = trim($notification_template);
         $notification_list = trim($notification_list);
         $subject = trim($subject);
-        $from_address = trim($from_address);
         $submitter_notification_on = trim($submitter_notification_on);
         $submitter_notification_template = trim($submitter_notification_template);
         $submitter_notification_subject = trim($submitter_notification_subject);
         $submitter_email_field = trim($submitter_email_field);
+        $share_notification_on = trim($share_notification_on);
+        $share_notification_template = trim($share_notification_template);
+        $share_notification_subject = trim($share_notification_subject);
+        $share_email_field = trim($share_email_field);
 
         if(strlen($form_name) < 1 || is_numeric($form_name)) show_error(lang('invalid_form_name'));
         if(strlen($form_label) < 1 || is_numeric($form_label)) show_error(lang('invalid_form_label'));
         //if(strlen($notification_template) < 1 || is_numeric($form_label)) show_error(lang('invalid_notification_template'));
         //if(strlen($notification_list) < 1 || is_numeric($form_label)) show_error(lang('invalid_notification_list'));
         //if(strlen($subject) < 1 || is_numeric($subject)) show_error(lang('invalid_subject'));
-        //if(strlen($from_address) < 1 || is_numeric($from_address)) show_error(lang('invalid_from_address'));
 
         // find form
         $this->EE->load->library('formslib');
@@ -447,14 +458,18 @@ class Proform_mcp {
         $form->form_label = $form_label;
         $form->form_name = $form_name;
         $form->encryption_on = $encryption_on;
+        $form->admin_notification_on = $admin_notification_on;
         $form->notification_template = $notification_template;
         $form->notification_list = $notification_list;
         $form->subject = $subject;
-        $form->from_address = $from_address;
         $form->submitter_notification_on = $submitter_notification_on;
         $form->submitter_notification_template = $submitter_notification_template;
         $form->submitter_notification_subject = $submitter_notification_subject;
         $form->submitter_email_field = $submitter_email_field;
+        $form->share_notification_on = $share_notification_on;
+        $form->share_notification_template = $share_notification_template;
+        $form->share_notification_subject = $share_notification_subject;
+        $form->share_email_field = $share_email_field;
         $form->save();
         
         // go back to form listing
@@ -1480,237 +1495,6 @@ class Proform_mcp {
         }
         
         die;
-    }
-    
-    function list_templates()
-    {
-        $this->EE->load->library('javascript');
-        $this->EE->load->library('table');
-        $this->EE->load->library('proform_notifications');
-        $this->EE->load->helper('form');
-        
-        $this->sub_page('tab_list_templates');
-        
-        $vars['form_hidden'] = NULL;
-        $vars['templates'] = array();
-        
-        $vars['options'] = array(
-                    'edit'      => lang('edit_selected'),
-                    'delete'    => lang('delete_selected')
-                    );  
-                    
-        if (!$rownum = $this->EE->input->get_post('rownum'))
-        {
-            $rownum = 0;
-        }
-        
-        $templates = $this->EE->proform_notifications->get_templates();
-        
-        ////////////////////////////////////////
-        // Generate table of templates
-        foreach($templates as $row)
-        {
-            $template = new stdClass();
-            
-            $template->id                   = $row->template_id;
-            $template->name                 = $row->template_name;
-            $template->edit_link            = ACTION_BASE.AMP.'method=edit_template'.AMP.'template_id='.$row->template_id;
-            $template->delete_link          = ACTION_BASE.AMP.'method=delete_template'.AMP.'template_id='.$row->template_id;
-            
-            // Toggle checkbox
-            $template->toggle = array(
-                                    'name'      => 'toggle[]',
-                                    'id'        => 'edit_box_'.$row->template_id,
-                                    'value'     => $row->template_id,
-                                    'class'     =>'toggle');
-            
-            $vars['templates'][$template->id] = $template;
-            
-        }
-        
-        ////////////////////////////////////////
-        // Javascript
-        $this->data_table_js();
-        $this->EE->javascript->compile();
-        
-        ////////////////////////////////////////
-        // Render view
-        return $this->EE->load->view('list_templates', $vars, TRUE);
-    }
-    
-    function new_template()
-    {
-        if($this->EE->input->post('template_name') !== FALSE)
-        {
-            if($this->process_new_template()) return;
-        }
-        
-        $vars = array();
-        $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_template';
-        
-        $this->sub_page('tab_new_template');
-        
-        // blank form object
-        $vars['editing'] = FALSE;
-        $vars['form'] = array(
-            array('lang_field' => 'template_name', 'control' => form_input('template_name'), 'required'),
-            array('lang_field' => 'from_address', 'control' => form_input('from_address')),
-            array('lang_field' => 'subject', 'control' => form_input('subject'), 'required'),
-            array('lang_field' => 'template', 'control' => form_textarea('template'), 'required')
-        );
-        
-        $this->EE->load->library('table');
-        return $this->EE->load->view('generic_edit', $vars, TRUE);
-    }
-    
-    function process_new_template()
-    {
-        $template_name = trim($this->EE->input->post('template_name'));
-        $template = trim($this->EE->input->post('template'));
-        $from_address = trim($this->EE->input->post('from_address'));
-        $subject = trim($this->EE->input->post('subject'));
-        $template = trim($this->EE->input->post('template'));
-        
-        if(
-            (strlen($template_name) > 1 && !is_numeric($template_name)) &&
-            (!is_numeric($from_address)) && 
-            (strlen($subject) > 1 && !is_numeric($subject)) &&
-            (strlen($template) > 1 && !is_numeric($template))
-        ) 
-        {
-            // create new template
-            $this->EE->load->library('proform_notifications');
-            $this->EE->proform_notifications->new_template(array(
-                'template_name' => $template_name,
-                'from_address' => $from_address,
-                'subject' => $subject,
-                'template' => $template));
-            
-            // go back to template listing
-            $this->EE->functions->redirect(ACTION_BASE.AMP.'method=list_templates');
-            return TRUE;
-        } 
-        else 
-        {
-            show_error(lang('invalid_submit'));
-            return FALSE;
-        }
-    }
-    
-    function edit_template()
-    {
-        if($this->EE->input->post('template_id') !== FALSE) 
-        {
-            if($this->process_edit_template()) return;
-        }
-        
-        $vars = array();
-        $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_template';
-        $this->sub_page('tab_edit_form');
-        
-        $template_id = (int)$this->EE->input->get('template_id');
-        
-        $this->EE->load->library('proform_notifications');
-        $template = $this->EE->proform_notifications->get_template($template_id);
-        
-        
-        $vars['editing'] = TRUE;
-        $vars['hidden'] = array('template_id' => $template_id);
-        
-        unset($template->settings);
-        
-        $types = array('template_id' => 'read_only', 'template' => 'textarea');
-        
-        $form = $this->EE->bm_forms->create_cp_form($template, $types);
-        
-        $vars['form'] = $form;
-        
-        $this->EE->load->library('table');
-        return $this->EE->load->view('generic_edit', $vars, TRUE);
-    }
-    
-    function process_edit_template()
-    {
-        $template_id = $this->EE->input->post('template_id');
-        $template_name = $this->EE->input->post('template_name');
-        $from_address = $this->EE->input->post('from_address');
-        $subject = $this->EE->input->post('subject');
-        $template = $this->EE->input->post('template');
-
-        if(!$template_id || $template_id <= 0) show_error(lang('invalid_submit'));
-        if(!$template_name) show_error(lang('missing_template_name'));
-        if(!$subject) show_error(lang('missing_subject'));
-        if(!$template) show_error(lang('missing_template'));
-
-        $template_name = trim($template_name);
-        $from_address = trim($from_address);
-        $subject = trim($subject);
-        $template = trim($template);
-        
-        if(strlen($template_name) < 1 || is_numeric($template_name)) show_error(lang('invalid_template_name'));
-        if(strlen($template) < 1 || is_numeric($template)) show_error(lang('invalid_template'));
-        if(is_numeric($from_address)) show_error(lang('invalid_from_address'));
-        if(strlen($subject) < 1 || is_numeric($template)) show_error(lang('invalid_subject'));
-        
-        // find template
-        $this->EE->load->library('proform_notifications');
-        $template_obj = $this->EE->proform_notifications->get_template($template_id);
-        
-        // update it
-        $template_obj->template_name = $template_name;
-        $template_obj->from_address = $from_address;
-        $template_obj->subject = $subject;
-        $template_obj->template = $template;
-        $template_obj->save();
-        
-        // go back to template listing
-        $this->EE->functions->redirect(ACTION_BASE.AMP.'method=list_templates');
-        return TRUE;
-    }
-    
-    function delete_template()
-    {
-        if($this->EE->input->post('template_id') !== FALSE)
-        {
-            if($this->process_delete_template()) return;
-        }
-        
-        $this->EE->load->library('proform_notifications');
-        $template_id = $this->EE->input->get('template_id');
-        $template = $this->EE->proform_notifications->get_template($template_id);
-        
-        $vars = array();
-        $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=delete_template';
-        $vars['template_name'] = $template->template_name;
-        $vars['template_id'] = $template->template_id;
-        
-        $this->sub_page('tab_delete_template');
-        
-        $this->EE->load->library('table');
-        return $this->EE->load->view('delete_template', $vars, TRUE);
-    }
-    
-    
-    function process_delete_template()
-    {
-        $template_id = trim($this->EE->input->post('template_id'));
-        
-        if(is_numeric($template_id))
-        {
-            $this->EE->load->library('proform_notifications');
-            
-            $template = $this->EE->proform_notifications->get_template($template_id);
-            $this->EE->proform_notifications->delete_template($template);
-            
-            // go back to field listing
-            $this->EE->functions->redirect(ACTION_BASE.AMP.'method=list_templates');
-            return TRUE;
-        }
-        else
-        {
-            show_error(lang('invalid_submit'));
-            return FALSE;
-        }
     }
     
     function data_table_js()
