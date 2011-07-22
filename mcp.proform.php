@@ -269,66 +269,23 @@ class Proform_mcp {
         
         return $this->edit_form(FALSE, $vars);
         
-        /*$this->sub_page('tab_new_form');
-        
-        $this->EE->load->library('proform_notifications');
-        $this->EE->load->library('formslib');
-        $template_names = $this->EE->proform_notifications->get_template_names(
-            $this->EE->formslib->ini('notification_template_group', 'notifications'));
-            
-        // blank form object
-        $vars['editing'] = FALSE;
-        $vars['form'] = array(
-            array('lang_field' => 'form_label', 'control' => form_input('form_label'), 'required'),
-            array('lang_field' => 'form_name', 'control' => form_input('form_name'), 'required'),
-            array('lang_field' => 'encryption_on', 'control' => form_checkbox('encryption_on', 'n')),
-            array('lang_field' => 'notification_template', 
-                'control' => form_dropdown('notification_template', $template_names), 'required'),
-            array('lang_field' => 'from_address', 'control' => form_input('from_address')),
-            array('lang_field' => 'notification_list', 'control' => form_textarea('notification_list')),
-            array('lang_field' => 'subject', 'control' => form_input('subject'), 'required'),
-            
-            array('lang_field' => 'submitter_notification_on', 'control' => form_checkbox('submitter_notification_on', 'y')),
-            array('lang_field' => 'submitter_notification_template', 
-                'control' => form_dropdown('submitter_notification_template', $template_names)),
-            array('lang_field' => 'submitter_notification_subject', 'control' => form_input('submitter_notification_subject')),
-            array('lang_field' => 'submitter_email_field', 'control' => form_input('submitter_email_field'))
-            
-        );
-        
-        $vars['mcrypt'] = function_exists('mcrypt_encrypt') ? 'yes' : 'no';
-        $vars['encryption_key_set'] = (strlen($this->EE->config->item('encryption_key')) >= 32) ? 'yes' : 'no';
-
-        $this->EE->load->library('table');
-        return $this->EE->load->view('generic_edit', $vars, TRUE);*/
     }
     
     function process_new_form()
     {
-        $form_name = trim($this->EE->input->post('form_name'));
-        $form_label = trim($this->EE->input->post('form_label'));
-        $encryption_on = trim($this->EE->input->post('encryption_on'));
-        $notification_template = trim($this->EE->input->post('notification_template'));
-        $notification_list = trim($this->EE->input->post('notification_list'));
-        $subject = trim($this->EE->input->post('subject'));
-        $submitter_notification_on = trim($this->EE->input->post('submitter_notification_on'));
-        $submitter_notification_template = trim($this->EE->input->post('submitter_notification_template'));
-        $submitter_notification_subject = trim($this->EE->input->post('submitter_notification_subject'));
-        $submitter_email_field = trim($this->EE->input->post('submitter_email_field'));
+        $data = array();
+        $this->prolib->copy_post(&$data, "BM_Form");
         
         if(
-            (strlen($form_name) > 1 && !is_numeric($form_name)) &&
-            (strlen($form_label) > 1 && !is_numeric($form_label)) &&
-            (strlen($notification_template) > 1 && !is_numeric($notification_template)) &&
-            (!is_numeric($notification_list))
+            (strlen($data['form_name']) > 1 && !is_numeric($data['form_name'])) &&
+            (strlen($data['form_label']) > 1 && !is_numeric($data['form_label'])) &&
+            (strlen($data['notification_template']) > 1 && !is_numeric($data['notification_template'])) &&
+            (!is_numeric($data['notification_list']))
         ) 
         {
             // create new form and table
             $this->EE->load->library('formslib');
-            $form = $this->EE->formslib->new_form($form_name, $form_label, $encryption_on,
-                $admin_notification_on, $notification_template, $notification_list, $subject,
-                $submitter_notification_on, $submitter_notification_template, $submitter_notification_subject, $submitter_email_field,
-                $share_notification_on, $share_notification_template, $share_notification_subject, $share_email_field);
+            $form = $this->EE->formslib->new_form($data);
             
             // go back to form listing
             $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form->form_id);
@@ -405,71 +362,20 @@ class Proform_mcp {
     
     function process_edit_form()
     {
-        $form_id = $this->EE->input->post('form_id');
-        $form_name = $this->EE->input->post('form_name');
-        $form_label = $this->EE->input->post('form_label');
-        $encryption_on = $this->EE->input->post('encryption_on');
-        $admin_notification_on = $this->EE->input->post('admin_notification_on');
-        $notification_template = $this->EE->input->post('notification_template');
-        $notification_list = $this->EE->input->post('notification_list');
-        $subject = $this->EE->input->post('subject');
-        $submitter_notification_on = $this->EE->input->post('submitter_notification_on');
-        $submitter_notification_template = $this->EE->input->post('submitter_notification_template');
-        $submitter_notification_subject = $this->EE->input->post('submitter_notification_subject');
-        $submitter_email_field = $this->EE->input->post('submitter_email_field');
-        $share_notification_on = $this->EE->input->post('share_notification_on');
-        $share_notification_template = $this->EE->input->post('share_notification_template');
-        $share_notification_subject = $this->EE->input->post('share_notification_subject');
-        $share_email_field = $this->EE->input->post('share_email_field');
-
-        if(!$form_id || $form_id <= 0) show_error(lang('invalid_submit'));
-        if(!$form_id) show_error(lang('missing_form_name'));
-        if(!$form_id) show_error(lang('missing_form_label'));
-        //if(!$notification_template) show_error(lang('missing_notification_template'));
-        //if(!$notification_list) show_error(lang('missing_notification_list'));
-        //if(!$subject) show_error(lang('missing_subject'));
-
-        $form_name = trim($form_name);
-        $form_label = trim($form_label);
-        $encryption_on = trim($encryption_on);
-        $admin_notification_on = trim($admin_notification_on);
-        $notification_template = trim($notification_template);
-        $notification_list = trim($notification_list);
-        $subject = trim($subject);
-        $submitter_notification_on = trim($submitter_notification_on);
-        $submitter_notification_template = trim($submitter_notification_template);
-        $submitter_notification_subject = trim($submitter_notification_subject);
-        $submitter_email_field = trim($submitter_email_field);
-        $share_notification_on = trim($share_notification_on);
-        $share_notification_template = trim($share_notification_template);
-        $share_notification_subject = trim($share_notification_subject);
-        $share_email_field = trim($share_email_field);
-
-        if(strlen($form_name) < 1 || is_numeric($form_name)) show_error(lang('invalid_form_name'));
-        if(strlen($form_label) < 1 || is_numeric($form_label)) show_error(lang('invalid_form_label'));
-        //if(strlen($notification_template) < 1 || is_numeric($form_label)) show_error(lang('invalid_notification_template'));
-        //if(strlen($notification_list) < 1 || is_numeric($form_label)) show_error(lang('invalid_notification_list'));
-        //if(strlen($subject) < 1 || is_numeric($subject)) show_error(lang('invalid_subject'));
+        $this->EE->load->library('formslib');
 
         // find form
-        $this->EE->load->library('formslib');
-        $form = $this->EE->formslib->get_form($form_id);
+        $form_id = trim($this->EE->input->post('form_id'));
+        if(!$form_id || $form_id <= 0) show_error(lang('missing_form_id'));
         
-        $form->form_label = $form_label;
-        $form->form_name = $form_name;
-        $form->encryption_on = $encryption_on;
-        $form->admin_notification_on = $admin_notification_on;
-        $form->notification_template = $notification_template;
-        $form->notification_list = $notification_list;
-        $form->subject = $subject;
-        $form->submitter_notification_on = $submitter_notification_on;
-        $form->submitter_notification_template = $submitter_notification_template;
-        $form->submitter_notification_subject = $submitter_notification_subject;
-        $form->submitter_email_field = $submitter_email_field;
-        $form->share_notification_on = $share_notification_on;
-        $form->share_notification_template = $share_notification_template;
-        $form->share_notification_subject = $share_notification_subject;
-        $form->share_email_field = $share_email_field;
+        $form = $this->EE->formslib->get_form($form_id);
+        $this->prolib->copy_post(&$form);
+        
+        if(!$form->form_name) show_error(lang('missing_form_name'));
+        if(!$form->form_label) show_error(lang('missing_form_label'));
+        if(strlen($form->form_name) < 1 || is_numeric($form->form_name)) show_error(lang('invalid_form_name'));
+        if(strlen($form->form_label) < 1 || is_numeric($form->form_label)) show_error(lang('invalid_form_label'));
+        
         $form->save();
         
         // go back to form listing

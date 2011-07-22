@@ -170,6 +170,7 @@ $lang = array(
     'no_unassigned_fields_available' => 'No unassigned fields available.',
     'no_entries' => 'No entries in this form.',
 
+    'missing_form_id' => 'Internal error: missing form_id',
     'missing_form_name' => 'Missing require field Form Name.',
     'missing_form_label' => 'Missing require field Form Label.',
     'missing_notification_template' => 'Missing require field Notifcation Template.',

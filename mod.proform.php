@@ -696,6 +696,12 @@ class Proform {
         }
     }
     
+    function debug()
+    {
+        var_dump($this->EE->TMPL->tagdata);
+        exit;
+    }
+    
     /*function forms()
     {
         // List available forms
@@ -863,6 +869,7 @@ class Proform {
             }
         }
     }
+    
 
     ////////////////////////////////////////////////////////////////////////////////
     // Processing Helpers

@@ -51,34 +51,24 @@ class Formslib
         //$this->session_mgr = new Bm_handle_mgr("proform_sessions", "session", "BM_FormSession", array('values', 'errors'));
     }
     
-    function new_form($form_name, $form_label, $encryption_on,
-        $admin_notification_on, $notification_template, $notification_list, $subject,
-        $submitter_notification_on, $submitter_notification_template, $submitter_notification_subject, $submitter_email_field,
-        $share_notification_on, $share_notification_template, $share_notification_subject, $share_email_field) 
+    function new_form($data) 
     {
         // Create new table for the form
         $this->EE->load->dbforge();
         $forge = &$this->EE->dbforge;
         
-        // Insert form record with blank settings
-        $data = array(
-            'form_name'                         => strtolower(str_replace(' ', '_', $form_name)), // clean up just incase
-            'form_label'                        => $form_label,
-            'encryption_on'                     => $encryption_on,
-            'admin_notification_on'             => $admin_notification_on,
-            'notification_template'             => $notification_template,
-            'notification_list'                 => $notification_list,
-            'subject'                           => $subject,
-            'submitter_notification_on'         => $submitter_notification_on,
-            'submitter_notification_template'   => $submitter_notification_template,
-            'submitter_notification_subject'    => $submitter_notification_subject,
-            'submitter_email_field'             => $submitter_email_field,
-            'share_notification_on'             => $share_notification_on,
-            'share_notification_template'       => $share_notification_template,
-            'share_notification_subject'        => $share_notification_subject,
-            'share_email_field'                 => $share_email_field,
-            'settings'                          => serialize(array()),
-        );
+        // Check and clean up data array
+        assert('$data["form_name"]');
+        $data['form_name'] = strtolower(str_replace(' ', '_', $data['form_name']));
+        
+        if(!isset($data['settings']))
+        {
+            $data['settings'] = serialize(array());
+        } else {
+            $data['settings'] = serialize($data['settings']);
+        }
+        
+        // Insert new form
         $this->EE->db->insert('proform_forms', $data);
         
         // Create FORM table for storing actual form entries
@@ -93,7 +83,7 @@ class Formslib
         $forge->add_field($fields);
         $forge->add_key('form_entry_id', TRUE);
         $forge->add_key('updated');
-        $forge->create_table(BM_Form::make_table_name($form_name));
+        $forge->create_table(BM_Form::make_table_name($data['form_name']));
         
         $form_obj = $this->get_form($form_name);
         return $form_obj;
