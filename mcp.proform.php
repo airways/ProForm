@@ -88,6 +88,7 @@ class Proform_mcp {
         $this->EE->cp->add_to_head('<link rel="stylesheet" href="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/styles/main.css" type="text/css" media="screen" />');
         $this->EE->cp->add_to_head('<link rel="stylesheet" href="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/styles/jquery.contextMenu.css" type="text/css" media="screen" />');
 
+        $this->EE->cp->add_to_head('<link rel="stylesheet" href="' . $this->EE->config->item('theme_folder_url') . 'third_party/prolib/styles/prolib.css" type="text/css" media="screen" />');
         $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/prolib/javascript/prolib.js"></script>');
 
         $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/jquery.tablednd_0_5.js"></script>');
@@ -95,6 +96,8 @@ class Proform_mcp {
 
         $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/jquery.contextMenu.js"></script>');
         $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/jquery.form.js"></script>');
+        
+        
     }
     
     ////////////////////////////////////////////////////////////////////////////////
@@ -190,6 +193,7 @@ class Proform_mcp {
         
         ////////////////////////////////////////
         // Render view
+        $this->_get_flashdata($vars);
         return $this->EE->load->view('index', $vars, TRUE);
     }
     
@@ -274,7 +278,7 @@ class Proform_mcp {
     function process_new_form()
     {
         $data = array();
-        $this->prolib->copy_post(&$data, "BM_Form");
+        $this->prolib->copy_post($data, "BM_Form");
         
         if(
             (strlen($data['form_name']) > 1 && !is_numeric($data['form_name'])) &&
@@ -287,7 +291,8 @@ class Proform_mcp {
             $this->EE->load->library('formslib');
             $form = $this->EE->formslib->new_form($data);
             
-            // go back to form listing
+            // go back to form edit page
+            $this->EE->session->set_flashdata('message', lang('msg_form_created'));
             $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form->form_id);
             return TRUE;
         } 
@@ -344,7 +349,7 @@ class Proform_mcp {
             'submitter_notification_template' => array('dropdown', $template_names),
             'share_notification_on' => array('checkbox', 'y'),
             'share_notification_template' => array('dropdown', $template_names),
-            'encryption_on' => (isset($form_obj) AND $form_obj->count_entries()) ? array('read_only_checkbox', lang('encryption_toggle_disabled')) : array('checkbox', 'y'),
+            'encryption_on' => (isset($form_obj) AND $form_obj AND $form_obj->count_entries()) ? array('read_only_checkbox', lang('encryption_toggle_disabled')) : array('checkbox', 'y'),
             'save_entries_on' => array('checkbox', 'y'),
         );
         
@@ -357,6 +362,11 @@ class Proform_mcp {
         $vars['key_warning'] = $form_fields->encryption_on && !(strlen($this->EE->config->item('encryption_key')) >= 32);
 
         $this->EE->load->library('table');
+
+        //var_dump($vars['message']);echo '<br/>';
+        //var_dump($vars);
+        //exit;
+        $this->_get_flashdata($vars);
         return $this->EE->load->view('generic_edit', $vars, TRUE);
     }
     
@@ -369,7 +379,7 @@ class Proform_mcp {
         if(!$form_id || $form_id <= 0) show_error(lang('missing_form_id'));
         
         $form = $this->EE->formslib->get_form($form_id);
-        $this->prolib->copy_post(&$form);
+        $this->prolib->copy_post($form);
         
         if(!$form->form_name) show_error(lang('missing_form_name'));
         if(!$form->form_label) show_error(lang('missing_form_label'));
@@ -418,6 +428,7 @@ class Proform_mcp {
             $this->EE->formslib->delete_form($form);
             
             // go back to form listing
+            $this->EE->session->set_flashdata('message', lang('msg_form_deleted'));
             $this->EE->functions->redirect(ACTION_BASE);
             return TRUE;
         }
@@ -518,7 +529,7 @@ class Proform_mcp {
             $this->EE->load->library('table');
 
             $vars['presets'] = $form->get_presets();
-            
+            $this->_get_flashdata($vars);
             return $this->EE->load->view('edit_form_fields', $vars, TRUE);
         } 
         else 
@@ -696,6 +707,7 @@ class Proform_mcp {
             
             
             $this->EE->load->library('table');
+            $this->_get_flashdata($vars);
             return $this->EE->load->view('assign_field', $vars, TRUE);
         } 
         else 
@@ -727,6 +739,7 @@ class Proform_mcp {
                 $form->assign_field($field);
             
                 // go back to edit field assignments listing for this form
+                $this->EE->session->set_flashdata('message', lang('msg_field_added'));
                 $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form_fields'.AMP.'form_id='.$form_id);
                 return TRUE;
             } 
@@ -797,6 +810,7 @@ class Proform_mcp {
             
             
             $this->EE->load->library('table');
+            $this->_get_flashdata($vars);
             return $this->EE->load->view('remove_field', $vars, TRUE);
         } 
         else 
@@ -827,6 +841,7 @@ class Proform_mcp {
             $form->remove_field($field);
             
             // go back to edit field assignments listing for this form
+            $this->EE->session->set_flashdata('message', lang('msg_field_removed'));
             $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form_fields'.AMP.'form_id='.$form_id);
             return TRUE;
         } 
@@ -891,6 +906,7 @@ class Proform_mcp {
         
         ////////////////////////////////////////
         // Render view
+        $this->_get_flashdata($vars);
         return $this->EE->load->view('list_fields', $vars, TRUE);
     }
     
@@ -1036,9 +1052,11 @@ class Proform_mcp {
         if(!$auto_add_form_id)
         {
             // go back to field listing
+            $this->EE->session->set_flashdata('message', lang('msg_field_created'));
             $this->EE->functions->redirect(ACTION_BASE.AMP.'method=list_fields');
         } else {
             // add the field to that form
+            $this->EE->session->set_flashdata('message', lang('msg_field_created_added'));
             $this->EE->functions->redirect(ACTION_BASE.AMP.'method=assign_field'.AMP.'field_id='.$field->field_id.AMP.'form_id='.$auto_add_form_id);
         }
         
@@ -1194,6 +1212,7 @@ class Proform_mcp {
             $this->EE->formslib->delete_field($field);
             
             // go back to field listing
+            $this->EE->session->set_flashdata('message', lang('msg_field_deleted'));
             $this->EE->functions->redirect(ACTION_BASE.AMP.'method=list_fields');
             return TRUE;
         }
@@ -1616,6 +1635,12 @@ class Proform_mcp {
             }
         }
         return $result;
+    }
+    
+    function _get_flashdata(&$vars)
+    {
+        $vars['message'] = $this->EE->session->flashdata('message') ? $this->EE->session->flashdata('message') : false;
+        $vars['error'] = $this->EE->session->flashdata('error') ? $this->EE->session->flashdata('error') : false;
     }
 }
 

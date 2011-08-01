@@ -30,6 +30,9 @@
  * 
  **/ ?>
 
+<?php if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>'; ?>
+<?php if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>'; ?>
+
 <?php echo form_open($assign_action_url, '', $form_hidden); ?>
 <div class="commandBar">
     <label for="field_id">Add Special</label>&nbsp;<?php

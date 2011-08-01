@@ -36,6 +36,9 @@
 </div>
 <!--end:bm_commands-->
 
+<?php if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>'; ?>
+<?php if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>'; ?>
+
 <div class="formFields mouseUp">
 <?php
 

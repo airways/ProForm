@@ -60,6 +60,7 @@ class Formslib
         // Check and clean up data array
         assert('$data["form_name"]');
         $data['form_name'] = strtolower(str_replace(' ', '_', $data['form_name']));
+        $form_name = $data['form_name'];
         
         if(!isset($data['settings']))
         {

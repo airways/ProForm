@@ -69,6 +69,7 @@ $lang = array(
     'list_templates' => 'Templates',
     'new_template' => 'Create New Template',
     'export_entries' => 'Export Entries',
+    'save_layout' => 'Save Layout',
     
     // "Tab" / subpages in CP
     'tab_global_form_preferences' => 'Module Settings',
@@ -156,7 +157,6 @@ $lang = array(
     'field_updated' => 'Updated',
     'field_ip_address' => 'IP Address',
     'field_user_agent' => 'User Agent',
-
     
     // Errors
     'invalid_submit' => 'The form has invalid values.',
@@ -169,7 +169,7 @@ $lang = array(
     'field_already_exists' => 'A field with that name already exists.',
     'no_unassigned_fields_available' => 'No unassigned fields available.',
     'no_entries' => 'No entries in this form.',
-
+    
     'missing_form_id' => 'Internal error: missing form_id',
     'missing_form_name' => 'Missing require field Form Name.',
     'missing_form_label' => 'Missing require field Form Label.',
@@ -184,8 +184,17 @@ $lang = array(
     'missing_template_name' => 'Missing require field Template Name.',
     'missing_subject' => 'Missing require field Subject.',
     'missing_template' => 'Missing require field Template.',
+    
+    // Messages
+    'msg_form_created' => 'New form successfully created.',
+    'msg_form_deleted' => 'Form successfully deleted.',
 
-    'save_layout' => 'Save Layout',
+    'msg_field_created' => 'New field successfully created.',
+    'msg_field_deleted' => 'Field successfully deleted.',
+    'msg_field_created_added' => 'New field successfully created and added to the form.',
+    'msg_field_deleted' => 'Field successfully deleted.',
+    'msg_field_added' => 'Field successfully added to the form.',
+    'msg_field_removed' => 'Field successfully removed from the form.',
     
     // End
     '' => ''

@@ -34,7 +34,11 @@
     <span class="cp_button"><a href="<?php echo BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_template'; ?>"><?php echo lang('new_template'); ?></a></span>
 </div>
 
+
 <div class="clear_left shun"></div>
+
+<?php if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>'; ?>
+<?php if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>'; ?>
 
 <?php if (count($templates) > 0):
 //    form_open($action_url, '', $form_hidden);
