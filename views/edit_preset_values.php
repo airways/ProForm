@@ -2,7 +2,7 @@
 
 /**
  * @package ProForm
- * @author Isaac Raway <isaac@metasushi.com>
+ * @author Isaac Raway <isaac.raway@gmail.com>
  *
  * Copyright (c)2009, 2010, 2011. Isaac Raway and MetaSushi, LLC.
  * All rights reserved.

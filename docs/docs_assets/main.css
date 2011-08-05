@@ -7,9 +7,10 @@ body {
 #title {
     color: white;
     width: 900px;
-    padding: 30px;
+    padding: 60px 30px 30px 30px;
     margin-left: auto !important;
     margin-right: auto !important;
+    font-size: 60px;
 }
 
 #content {
