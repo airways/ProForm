@@ -27,6 +27,17 @@
     thank_you_url="{path=forms/thank_you}" thank_you_message="Thanks for filling that there contact form"
     download_url="{path='test.zip'}" download_label="Test!"}
 
+    errors = {error_count}
+    {if error_count}
+    <div class="errors">
+        <p>The form has the following errors:</p>
+        <ul>
+        {errors}
+            <li>{error}</li>
+        {/errors}
+        </ul>
+    </div>
+    {/if}
     {if complete}
         Thank you!
     {if:else}

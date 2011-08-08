@@ -336,8 +336,12 @@ class Proform {
                     }
                 }
 
+                // Setup template pair variables
                 $variables['fieldrows'] = $this->create_fields_array($form_obj, $field_errors, $field_values, $field_checked_flags, TRUE);
                 $variables['fields'] = $this->create_fields_array($form_obj, $field_errors, $field_values, $field_checked_flags, FALSE);
+                
+                //echo "<pre>";
+                //var_dump($variables);exit;
 
                 /*
                 // this doesn't quite work - we can't tell if the {fields} occurance in the second if is inside a {fieldrows} or outside of it
@@ -354,8 +358,15 @@ class Proform {
                 $variables['complete'] = $complete;
                 if($form_session->processed)
                 {
+                    $variables['errors'] = array();
+                    foreach($form_session->errors as $field => $errors)
+                    {
+                        foreach($errors as $error)
+                        {
+                            $variables['errors'][] = array('field' => $field, 'error' => $error);
+                        }
+                    }
                     $variables['error_count'] = count($form_session->errors);
-                    $variables['errors'] = $form_session->errors;
                 } else {
                     $variables['error_count'] = 0;
                     $variables['errors'] = array();
