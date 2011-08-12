@@ -53,6 +53,8 @@ class Proform_mcp {
                 'global_form_preferences' => TAB_ACTION.'method=global_form_preferences'
                 ));
         
+        $this->config_overrides = $this->EE->config->item('proform'); 
+        
         $this->field_type_options = array(
             'checkbox'      => 'Checkbox',
             'date'          => 'Date',
@@ -70,6 +72,11 @@ class Proform_mcp {
             'hidden'        => 'Hidden',
             'member_data'   => 'Member Data',
         );
+        
+        if(isset($this->config_overrides['field_type_options'])) 
+        { 
+            $this->field_type_options = $this->config_overrides['field_type_options']; 
+        } 
 
         $this->field_type_settings = array(
             'list' => array(
@@ -1096,6 +1103,13 @@ class Proform_mcp {
         $mailinglists = $this->_get_mailinglists();
         $mailinglists = array_merge(array(0 => 'None'), $mailinglists);
         
+        $validation_rules = $this->EE->bm_validation->available_rules; 
+        
+        if(isset($this->config_overrides['validation_rules'])) 
+        { 
+            $validation_rules = $this->_filter_array($this->config_overrides['validation_rules'], $validation_rules); 
+        }
+          
         $types = array(
             'field_id'          => 'read_only',
             'field_label'       => 'input',
@@ -1110,7 +1124,7 @@ class Proform_mcp {
             'validation'        => array(
                 'grid', array( /* options for items that can be added to the grid */
                     'headings'  => array('Rule', 'Param'),
-                    'options'   => $this->EE->bm_validation->available_rules))
+                    'options'   => $validation_rules))
             );
         
         $form = $this->EE->bm_forms->create_cp_form($field, $types);
@@ -1119,6 +1133,21 @@ class Proform_mcp {
         $vars['form_name'] = 'field_edit';
         $this->EE->load->library('table');
         return $this->EE->load->view('generic_edit', $vars, TRUE);
+    }
+    
+    private function _filter_array($array, $original) 
+    { 
+        $filtered_rules = array(); 
+     
+        foreach($original as $key => $value) 
+        { 
+            if(in_array($key, $array)) 
+            { 
+                $filtered_rules[$key] = $value; 
+            } 
+        } 
+     
+        return $filtered_rules; 
     }
     
     function process_edit_field()
