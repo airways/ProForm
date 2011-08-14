@@ -53,15 +53,13 @@ class Proform_mcp {
                 'global_form_preferences' => TAB_ACTION.'method=global_form_preferences'
                 ));
         
-        $this->config_overrides = $this->EE->config->item('proform'); 
-        
         $this->field_type_options = array(
             'checkbox'      => 'Checkbox',
             'date'          => 'Date',
             'datetime'      => 'Date and Time',
             'file'          => 'File',
             'string'        => 'String',
-            //'text'          => 'Text',
+            'text'          => 'Text',
             'Number'        => array(
                 'int'       => 'Integer',
                 'float'     => 'Float',
@@ -73,10 +71,43 @@ class Proform_mcp {
             'member_data'   => 'Member Data',
         );
         
+        $this->config_overrides = $this->EE->config->item('proform');
+        
         if(isset($this->config_overrides['field_type_options'])) 
         { 
             $this->field_type_options = $this->config_overrides['field_type_options']; 
         } 
+
+        if(isset($this->config_overrides['member_field_options']))
+        {
+            $this->member_field_options = $this->config_overrides['member_field_options'];
+        }
+        else
+        {
+            if(isset($this->config_overrides['member_field_options_simple']) AND $this->config_overrides['member_field_options_simple'] == 'y')
+            {
+                $default = array('member_id', 'group_id', 'username', 'screen_name', 'email', 'language');
+                
+                // Get all CUSTOM member fields
+                $fields = $this->EE->db->query("SELECT m_field_id AS field_id, 
+                                        m_field_name AS field_name, 
+                                        m_field_label AS field_label 
+                                        FROM exp_member_fields");
+                
+                $custom = array();
+                  
+                foreach($fields->result_array() as $row)
+                {
+                    $custom[] = $row['field_name'];
+                }
+                
+                $this->member_field_options = array_merge($default, $custom);
+            }
+            else
+            {
+                $this->member_field_options = array_keys($this->EE->session->userdata);
+            }
+        }
 
         $this->field_type_settings = array(
             'list' => array(
@@ -84,7 +115,7 @@ class Proform_mcp {
             ),
             'member_data' => array(
                 array('type' => 'dropdown', 'name' => 'member_field', 'label' => 'Field', 
-                      'options' => $this->prolib->bm_forms->simple_select_options(array_keys($this->EE->session->userdata)))
+                      'options' => $this->prolib->bm_forms->simple_select_options($this->member_field_options))
             ),
         );
         
