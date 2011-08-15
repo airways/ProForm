@@ -396,8 +396,8 @@ class Proform_mcp {
         
         $vars['form'] = $form;
 
-        $vars['mcrypt_warning'] = $form_fields->encryption_on && !function_exists('mcrypt_encrypt');
-        $vars['key_warning'] = $form_fields->encryption_on && !(strlen($this->EE->config->item('encryption_key')) >= 32);
+        $vars['mcrypt_warning'] = $form_fields->encryption_on && !function_exists('mcrypt_encrypt') && $this->EE->session->userdata['group_id'] == 1;
+        $vars['key_warning'] = $form_fields->encryption_on && !(strlen($this->EE->config->item('encryption_key')) >= 32) && $this->EE->session->userdata['group_id'] == 1;
 
         $this->EE->load->library('table');
 
