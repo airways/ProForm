@@ -30,9 +30,10 @@
  * 
  **/
 
+require_once PATH_THIRD.'proform/config.php';
+
 class Proform_upd {
-    // @version 2.1.11
-    var $version = "2.1.11";
+    var $version    = PROFORM_VERSION;
     
     function Proform_upd() {
         $this->EE = &get_instance();
@@ -42,9 +43,9 @@ class Proform_upd {
         ////////////////////////////////////////
         // Register module
         $data = array(
-            'module_name' => 'Proform',
-            'module_version' => $this->version,
-            'has_cp_backend' => 'y');
+            'module_name'       => PROFORM_NAME,
+            'module_version'    => PROFORM_VERSION,
+            'has_cp_backend'    => 'y');
         $this->EE->db->insert('modules', $data);
         
         ////////////////////////////////////////
@@ -72,6 +73,7 @@ class Proform_upd {
             'form_name'                         => array('type' => 'varchar', 'constraint' => '32'),
             'form_type'                         => array('type' => 'varchar', 'constraint' => '10', 'default' => 'form'),
             'encryption_on'                     => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'),
+            'safecracker_channel_id'            => array('type' => 'int', 'constraint' => '10', 'default' => 0),
             'settings'                          => array('type' => 'blob'),
             
             'admin_notification_on'             => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'),
@@ -89,8 +91,6 @@ class Proform_upd {
             'share_notification_subject'        => array('type' => 'varchar', 'constraint' => '128'),
             'share_email_field'                 => array('type' => 'varchar', 'constraint' => '32'),
             
-            'from_address'                      => array('type' => 'varchar', 'constraint' => '64'),
-            'save_entries_on'                   => array('type' => 'varchar', 'constraint' => '1', 'default' => 'y'),
         );
         $forge->add_field($fields);
         $forge->add_key('form_id', TRUE);
@@ -193,8 +193,11 @@ class Proform_upd {
         $this->EE->load->library('formslib');
 
         $prefs = array(
-            array('preference_name' => 'notification_template_group', 'value' => 'notifications'),
-            array('preference_name' => 'from_address', 'value' => 'admin@example.com'),
+            array('preference_name' => 'notification_template_group',       'value' => 'notifications'),
+            array('preference_name' => 'from_address',                      'value' => 'admin@example.com'),
+            array('preference_name' => 'safecracker_integration_on',        'value' => 'n'),
+            array('preference_name' => 'safecracker_field_group_id',        'value' => '0'),
+            array('preference_name' => 'safecracker_separate_channels_on',  'value' => 'y'),
         );
 
         foreach($prefs as $pref)

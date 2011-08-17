@@ -367,7 +367,7 @@ class Formslib
 
         return $result;
     }
-    function get_preferences() { return $this->prefs_mgr->get_objects(); }
+    function get_preferences() { return $this->prefs_mgr->get_objects(FALSE, FALSE, 'preference_id'); }
     function save_preference($object)  { return $this->prefs_mgr->save_object($object); }
     function delete_preference($object)  { return $this->prefs_mgr->delete_object($object); }
 
@@ -447,6 +447,43 @@ class Formslib
         }
         return $result;
     }
+    
+    /**
+     * Get list of channels to be used in a form_dropdown field
+     * 
+     * @return array
+     */
+    function get_channel_options($field_group_id = FALSE)
+    {
+        $result = array();
+        if($field_group_id)
+        {
+            $this->EE->db->where('field_group', $field_group_id);
+        }
+        
+        $query = $this->EE->db->get('exp_channels');
+        foreach($query->result() as $row)
+        {
+            $result[$row->channel_id] = $row->channel_title;
+        }
+        return $result;
+    }
+    
+    /**
+     * Get list of field groups to be used in a form_dropdown field
+     * 
+     * @return array
+     */
+    function get_field_group_options()
+    {
+        $result = array(0 => 'None');
+        $query = $this->EE->db->get('exp_field_groups');
+        foreach($query->result() as $row)
+        {
+            $result[$row->group_id] = $row->group_name;
+        }
+        return $result;
+    }
 } // class Formslib
 }
 
@@ -458,11 +495,11 @@ class BM_Form extends BM_RowInitialized {
     var $__entries = FALSE;
     
     var $form_id;
+    var $form_type = 'form';
     var $form_label;
     var $form_name;
-    var $form_type = 'form';
-    var $save_entries_on = 'y';
     var $encryption_on = 'n';
+    var $safecracker_channel_id = 0;
     
     var $admin_notification_on = 'y';
     var $notification_template;

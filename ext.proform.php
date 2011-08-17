@@ -30,22 +30,22 @@
  * 
  **/
 
+require_once PATH_THIRD.'proform/config.php';
+
 class Proform_ext {
 
-    var $settings = array();
-    var $name = 'ProForm';
-    var $version = '1.0';
-    var $description = 'Applies some CP tweaks - 100% optional';
     var $settings_exist = 'n';
-    var $docs_url = 'http://blueapples.org/';
-
+    var $settings       = array();
+    var $name           = PROFORM_NAME;
+    var $version        = PROFORM_VERSION;
+    var $description    = PROFORM_DESCRIPTION;
+    var $docs_url       = PROFORM_DOCSUR;
 
     function __construct($settings='')
     {
         $this->settings = $settings;
         $this->EE =& get_instance();
     }
-
 
     function show_full_control_panel_end($out)
     {

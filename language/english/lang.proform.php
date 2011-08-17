@@ -62,7 +62,9 @@ $lang = array(
     // Buttons
     'home' => 'Home',
     'global_form_preferences' => 'Module Settings',
-    'new_form' => 'Create New Form',
+    'new_form' => 'Create New Contact Form',
+    'new_saef' => 'Create New SAEF Form',
+    'new_share' => 'Create New Share Form',
     'list_fields' => 'Fields',
     'new_field' => 'Create New Field',
     'assign_field' => 'Assign Field',
@@ -70,6 +72,10 @@ $lang = array(
     'new_template' => 'Create New Template',
     'export_entries' => 'Export Entries',
     'save_layout' => 'Save Layout',
+    
+    'form_desc' => '<b>Form</b> &mdash; A normal form that saves data in a database table. Good for contact forms and other forms that don\'t generally get turned into content on the site.',
+    'saef_desc' => '<b>SAEF</b> &mdash; A Stand Alone Entry Form form designed to work through SafeCracker and stores it\'s data in a Channel. Good for forms who\'s values end up as content on the site.',
+    'share_desc' => '<b>Share</b> &mdash; A form for sending email notifiacations only - does not store submitted data anywhere.',
     
     // "Tab" / subpages in CP
     'tab_global_form_preferences' => 'Module Settings',
@@ -146,6 +152,14 @@ $lang = array(
     'field_encryption_on' => 'Encrypt Data',
     'field_encryption_on_desc' => 'Encrypt data stored in the form\'s database table. This will cause each field to need about 2.6 times as many characters (minimum 88 characters), so make sure to plan for this in field constraints.',
     'encryption_toggle_disabled' => 'Encryption cannot be turned on or off if there are already entries in the form.',
+    
+    'field_safecracker_on' => 'SafeCracker Integration',
+    'field_safecracker_on_desc' => 'Store data from this form in a channel through the use of SafeCracker. Note that encryption <strong>cannot</strong> be used when this option is turned on.',
+    'field_safecracker_channel_id' => 'SafeCracker Channel',
+    'field_safecracker_channel_id_desc' => 'Channel to store data in',
+    'safecracker_toggle_disabled_entries' => 'SafeCracker option cannot be turned on or off if there are already entries',
+    'safecracker_toggle_disabled_option' => 'To use SafeCracker integration, first turn on and configure the option in Module Settings',
+    
     'field_save_entries_on' => 'Save Entries',
     'field_save_entries_on_desc' => 'Save entries entered into the form in the database',
     
@@ -153,6 +167,12 @@ $lang = array(
     'field_pref_notification_template_group_desc' => 'Template group containing e-mail notification templates',
     'field_pref_from_address' => 'Default From Address',
     'field_pref_from_address_desc' => 'Default E-mail address notifications are sent from, should match the actual mail settings used to send mail',
+    'field_pref_safecracker_integration_on' => 'SafeCracker Integration',
+    'field_pref_safecracker_integration_on_desc' => 'Enable SafeCracker Integration to allow form data to be saved into entries.',
+    'field_pref_safecracker_field_group_id' => 'SafeCracker: Field Group',
+    'field_pref_safecracker_separate_channels_on' => 'SafeCracker: Separate Channel Per Form',
+    
+
     'field_form_entry_id' => 'Entry ID',
     'field_updated' => 'Updated',
     'field_ip_address' => 'IP Address',

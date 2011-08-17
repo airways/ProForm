@@ -35,11 +35,11 @@
 <?php if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>'; ?>
 <?php if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>'; ?>
 
-<?php if(isset($mcrypt_warning) && $mcrypt_warning): ?>
+<?php if(isset($is_super_admin) && $is_super_admin && isset($mcrypt_warning) && $mcrypt_warning): ?>
     <div style="color: black; background: yellow; margin: 10px; padding: 5px; border: 1px solid red;"><strong>Warning:</strong> Your server does not support mcrypt.<br/>Data stored with "encryption" turned on will use a simple XOR encoding cipher rather than the more secure encryption. It is <strong>strongly</strong> recommended that you install the mcrypt PHP extension.</div>
 <?php endif; ?>
 
-<?php if(isset($key_warning) && $key_warning): ?>
+<?php if(isset($is_super_admin) && $is_super_admin && isset($key_warning) && $key_warning): ?>
     <div style="color: black; background: yellow; margin: 10px; padding: 5px; border: 1px solid red;"><strong>Warning:</strong> You do not have a encryption_key value set.<br/>Encryption will not work until this value is set. It should be set to a complex string with upper and lower case letters, numbers, and symbols, 32 characters in length.</div>
 <?php endif; ?>
 

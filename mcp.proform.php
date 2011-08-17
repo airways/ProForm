@@ -32,6 +32,7 @@
 
 require_once PATH_THIRD.'prolib/prolib.php';
 require_once PATH_THIRD.'proform/libraries/formslib.php';
+require_once PATH_THIRD.'proform/config.php';
 
 define('ACTION_BASE', BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP);
 
@@ -261,9 +262,17 @@ class Proform_mcp {
             {
                 case 'pref_notification_template_group':
                     $groups = $this->EE->proform_notifications->get_template_group_names();
+                    $groups = array_merge(array(0 => 'None'), $groups);
                     $control = form_dropdown($f_name, $groups, $pref->value);
                     break;
-
+                case 'pref_safecracker_integration_on':
+                case 'pref_safecracker_separate_channels_on':
+                    $control = form_checkbox($f_name, 'y', $pref->value == 'y');
+                    break;
+                case 'pref_safecracker_field_group_id':
+                    $groups = $this->EE->formslib->get_field_group_options();
+                    $control = form_dropdown($f_name, $groups, $pref->value);
+                    break;
                 default:
                     $control = form_input($f_name, $pref->value);
             }
@@ -285,10 +294,18 @@ class Proform_mcp {
         foreach($prefs as $pref)
         {
             $f_name = 'pref_' . $pref->preference_name;
-            if($this->EE->input->post($f_name))
+            if($this->EE->input->post($f_name) !== FALSE)
             {
                 $pref->value = $this->EE->input->post($f_name);
                 $pref->save();
+            } else {
+                switch($f_name)
+                {
+                    case 'pref_safecracker_integration_on':
+                    case 'pref_safecracker_separate_channels_on':
+                        $pref->value = 'n';
+                        $pref->save();
+                }
             }
         }
 
@@ -306,8 +323,13 @@ class Proform_mcp {
         }
         
         $vars = array();
+        $type = $this->EE->input->get('type');
+        if($type != 'form' && $type != 'saef' && $type != 'share')
+        {
+            $type = 'form';
+        }
+        $vars['new_type'] = $type;
         $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_form';
-        $vars['hidden_fields'] = array('form_id');
         
         return $this->edit_form(FALSE, $vars);
         
@@ -320,9 +342,7 @@ class Proform_mcp {
         
         if(
             (strlen($data['form_name']) > 1 && !is_numeric($data['form_name'])) &&
-            (strlen($data['form_label']) > 1 && !is_numeric($data['form_label'])) &&
-            (strlen($data['notification_template']) > 1 && !is_numeric($data['notification_template'])) &&
-            (!is_numeric($data['notification_list']))
+            (strlen($data['form_label']) > 1 && !is_numeric($data['form_label']))
         ) 
         {
             // create new form and table
@@ -365,30 +385,37 @@ class Proform_mcp {
             $form_fields = $query->row();
         } else {
             $form_fields = new BM_Form(FALSE);
+            $form_fields->form_type = $vars['new_type'];
             $vars['editing'] = FALSE;
         }
         
         $this->EE->load->library('proform_notifications');
         $this->EE->load->library('formslib');
-        $template_names = $this->EE->proform_notifications->get_template_names(
+        $template_options = $this->EE->proform_notifications->get_template_names(
             $this->EE->formslib->ini('notification_template_group', 'notifications'));
+        $template_options = array_merge(array(0 => 'None'), $template_options);
         
         //unset($form_fields->form_id);
         unset($form_fields->settings);
         
+        $channel_options = $this->EE->formslib->get_channel_options($this->EE->formslib->ini('safecracker_field_group_id'));
+        $channel_options = array_merge(array(0 => 'None'), $channel_options);
+        
         $types = array(
             'form_id' => 'read_only', 
-            'form_type' => 'read_only', 
+            'form_type' => array('static', lang($form_fields->form_type.'_desc')),
             'entries_count' => 'read_only', 
-            'notification_template' => array('dropdown', $template_names), 
+            'notification_template' => array('dropdown', $template_options), 
             'notification_list' => 'textarea',
             'admin_notification_on' => array('checkbox', 'y'),
             'submitter_notification_on' => array('checkbox', 'y'),
-            'submitter_notification_template' => array('dropdown', $template_names),
+            'submitter_notification_template' => array('dropdown', $template_options),
             'share_notification_on' => array('checkbox', 'y'),
-            'share_notification_template' => array('dropdown', $template_names),
-            'encryption_on' => (isset($form_obj) AND $form_obj AND $form_obj->count_entries()) ? array('read_only_checkbox', lang('encryption_toggle_disabled')) : array('checkbox', 'y'),
-            'save_entries_on' => array('checkbox', 'y'),
+            'share_notification_template' => array('dropdown', $template_options),
+            'encryption_on' => (isset($form_obj) AND $form_obj AND $form_obj->count_entries())
+                                        ? array('read_only_checkbox', lang('encryption_toggle_disabled'))
+                                        : array('checkbox', 'y'),
+            'safecracker_channel_id' => array('dropdown', $channel_options)
         );
         
         $form = $this->EE->bm_forms->create_cp_form($form_fields, $types);
@@ -396,8 +423,9 @@ class Proform_mcp {
         
         $vars['form'] = $form;
 
-        $vars['mcrypt_warning'] = $form_fields->encryption_on && !function_exists('mcrypt_encrypt') && $this->EE->session->userdata['group_id'] == 1;
-        $vars['key_warning'] = $form_fields->encryption_on && !(strlen($this->EE->config->item('encryption_key')) >= 32) && $this->EE->session->userdata['group_id'] == 1;
+        $vars['$is_super_admin'] = $this->EE->session->userdata['group_id'] == 1;
+        $vars['mcrypt_warning'] = $form_fields->encryption_on && !function_exists('mcrypt_encrypt');
+        $vars['key_warning'] = $form_fields->encryption_on && !(strlen($this->EE->config->item('encryption_key')) >= 32);
 
         $this->EE->load->library('table');
 
@@ -405,6 +433,48 @@ class Proform_mcp {
         //var_dump($vars);
         //exit;
         $this->_get_flashdata($vars);
+        
+        /*
+        var $encryption_on = 'n';
+        var $safecracker_on = 'n';
+        var $safecracker_channel_id = 0;
+
+        var $admin_notification_on = 'y';
+        var $notification_template;
+        var $notification_list;
+        var $subject;
+
+        var $submitter_notification_on = 'n';
+        var $submitter_notification_template;
+        var $submitter_notification_subject;
+        var $submitter_email_field;
+
+        var $share_notification_on = 'n';
+        var $share_notification_template;
+        var $share_notification_subject;
+        var $share_email_field;
+        */
+        
+        switch($form_fields->form_type)
+        {
+            case 'form':
+                $vars['hidden_fields'] = array('form_id', 'safecracker_channel_id');
+                break;
+            case 'saef':
+                $vars['hidden'] = array('save_entries_on' => 'y');
+                $vars['hidden_fields'] = array('form_id', 'encryption_on',
+                'admin_notification_on', 'notification_template', 'notification_list', 'subject',
+                'submitter_notification_on', 'submitter_notification_template', 'submitter_notification_subject', 'submitter_email_field',
+                'share_notification_on', 'share_notification_template', 'share_notification_subject', 'share_email_field',
+                );
+                break;
+            case 'share':
+                $vars['hidden_fields'] = array('form_id', 'safecracker_channel_id', 'encryption_on',
+                );
+                break;
+        }
+        
+        
         return $this->EE->load->view('generic_edit', $vars, TRUE);
     }
     
@@ -950,13 +1020,11 @@ class Proform_mcp {
     
     function new_field()
     {
-
         if($this->EE->input->post('field_name') !== FALSE) 
         {
             if($this->process_new_field()) return;
         }
-
-
+        
         $vars = array();
         
         $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_field';
@@ -970,7 +1038,6 @@ class Proform_mcp {
         // blank form object
         $vars['editing'] = FALSE;
         
-        $vars['hidden_fields'] = array('field_id');
         
         return $this->edit_field(FALSE, $vars);
         /*
@@ -1122,8 +1189,6 @@ class Proform_mcp {
         
             $vars['editing'] = TRUE;
             $vars['hidden'] = array('field_id' => $field_id);
-        
-            $vars['hidden_fields'] = array();
         } else {
             $field = new BM_Field(FALSE);
         }
@@ -1162,6 +1227,8 @@ class Proform_mcp {
         
         $vars['form'] = $form;
         $vars['form_name'] = 'field_edit';
+        $vars['hidden_fields'] = array('field_id', 'settings');
+        
         $this->EE->load->library('table');
         return $this->EE->load->view('generic_edit', $vars, TRUE);
     }

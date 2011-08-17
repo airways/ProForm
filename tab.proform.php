@@ -30,6 +30,8 @@
  * 
  **/
 
+require_once PATH_THIRD.'proform/config.php';
+
 class Proform_tab {
 
     function Proform_tab()
