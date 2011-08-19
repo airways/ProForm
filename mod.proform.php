@@ -1277,6 +1277,7 @@ class Proform {
             
             // handle normal posted fields
             $field_array = array(
+                    'field_callback'    => function($data, $key=FALSE) { return time(); },
                     'field_id'          => $field->field_id,
                     'field_name'        => $field->field_name,
                     'field_label'       => $field->field_label,
