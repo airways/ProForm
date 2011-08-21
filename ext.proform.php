@@ -39,7 +39,7 @@ class Proform_ext {
     var $name           = PROFORM_NAME;
     var $version        = PROFORM_VERSION;
     var $description    = PROFORM_DESCRIPTION;
-    var $docs_url       = PROFORM_DOCSUR;
+    var $docs_url       = PROFORM_DOCSURL;
 
     function __construct($settings='')
     {

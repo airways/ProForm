@@ -369,7 +369,9 @@ class Proform_mcp {
         {
             if($this->process_edit_form()) return;
         }
-
+        
+        $vars['hidden'] = array();
+        
         if($editing)
         {
             $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_form';
@@ -380,12 +382,13 @@ class Proform_mcp {
             $form_obj = $this->EE->formslib->get_form($form_id);
 
             $vars['editing'] = TRUE;
-            $vars['hidden'] = array('form_id' => $form_id);
+            $vars['hidden']['form_id'] = $form_id;
         
             $form_fields = $query->row();
         } else {
             $form_fields = new BM_Form(FALSE);
             $form_fields->form_type = $vars['new_type'];
+            $vars['hidden']['form_type'] = $vars['new_type'];
             $vars['editing'] = FALSE;
         }
         
@@ -423,7 +426,7 @@ class Proform_mcp {
         
         $vars['form'] = $form;
 
-        $vars['$is_super_admin'] = $this->EE->session->userdata['group_id'] == 1;
+        $vars['is_super_admin'] = $this->EE->session->userdata['group_id'] == 1;
         $vars['mcrypt_warning'] = $form_fields->encryption_on && !function_exists('mcrypt_encrypt');
         $vars['key_warning'] = $form_fields->encryption_on && !(strlen($this->EE->config->item('encryption_key')) >= 32);
 
@@ -461,7 +464,7 @@ class Proform_mcp {
                 $vars['hidden_fields'] = array('form_id', 'safecracker_channel_id');
                 break;
             case 'saef':
-                $vars['hidden'] = array('save_entries_on' => 'y');
+                $vars['hidden']['save_entries_on'] = 'y';
                 $vars['hidden_fields'] = array('form_id', 'encryption_on',
                 'admin_notification_on', 'notification_template', 'notification_list', 'subject',
                 'submitter_notification_on', 'submitter_notification_template', 'submitter_notification_subject', 'submitter_email_field',
@@ -1205,7 +1208,7 @@ class Proform_mcp {
         { 
             $validation_rules = $this->_filter_array($this->config_overrides['validation_rules'], $validation_rules); 
         }
-          
+        
         $types = array(
             'field_id'          => 'read_only',
             'field_label'       => 'input',

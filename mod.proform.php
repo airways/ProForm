@@ -39,8 +39,13 @@ class Proform {
 
     var $return_data    = '';
     var $var_pairs = array('fieldrows', 'fields', 'errors');
+
+    public function Proform()
+    {
+        $this->__construct();
+    }
     
-    function Proform()
+    public function __construct()
     {
         prolib($this, 'proform');
 
@@ -60,7 +65,7 @@ class Proform {
     /*
      * Provides data to render a named form
      */
-    function form()
+    public function form()
     {
         // Display a form and accept input
         $this->EE->load->helper('url');
@@ -240,7 +245,21 @@ class Proform {
                         'onsubmit'          => '',
                         'enctype'           => 'multipart/form-data');    
                 
-                $form = $this->EE->functions->form_declaration($form_details);
+                if($form_obj->form_type != 'saef')
+                {
+                    $form = $this->EE->functions->form_declaration($form_details);
+                } else {
+                    $this->EE->load->library('api');
+                    $this->EE->api->instantiate('channel_structure');
+                    $channel_info = $this->EE->api_channel_structure->get_channel_info($form_obj->safecracker_channel_id);
+                    var_dump($channel_info);
+                    
+                    $form = <<<SAEF
+{exp:channel:entry_form channel="$channel_name" return="site/index" preview="site/entry"}
+    
+{/exp:channel:entry_form}
+SAEF;
+                }
                 
                 
                 ////////////////////
@@ -410,12 +429,12 @@ class Proform {
         {
             show_error("{exp:proform:form} form not found: $form_name");
         }
-    }
+    } // function form()
     
     /*
      * Provide form post results on a success page (usually the thank you page)
      */
-    function results()
+    public function results()
     {
         $this->EE->load->library('formslib');
 
@@ -459,7 +478,7 @@ class Proform {
     /*
      * List entries entered into a form
      */
-    function entries() 
+    public function entries() 
     {
         // List entries posted to a form
         $this->EE->load->library('formslib');
@@ -633,7 +652,7 @@ class Proform {
         return $this->return_data;
     }
     
-    function insert()
+    public function insert()
     {
         // Directly insert data
         $this->EE->load->library('formslib');
@@ -708,7 +727,7 @@ class Proform {
         }
     }
     
-    function debug()
+    public function debug()
     {
         var_dump($this->EE->TMPL->tagdata);
         exit;
@@ -727,7 +746,7 @@ class Proform {
     // Actions
     ////////////////////////////////////////////////////////////////////////////////
     
-    function _copy_post(&$form_obj, &$form_session)
+    private function _copy_post(&$form_obj, &$form_session)
     {
         
         $form_session->values = array();
@@ -778,7 +797,7 @@ class Proform {
         }
     }
     
-    function _process_form(&$form_obj, &$form_session, &$result)
+    private function _process_form(&$form_obj, &$form_session, &$result)
     {
         $result = FALSE;
         
@@ -887,7 +906,7 @@ class Proform {
     // Processing Helpers
     ////////////////////////////////////////////////////////////////////////////////
 
-    function _process_secure_fields(&$form_obj, &$form_session, &$data)
+    private function _process_secure_fields(&$form_obj, &$form_session, &$data)
     {
         // set secure fields values from the session or other backend sources
         foreach($form_obj->fields() as $field)
@@ -908,7 +927,7 @@ class Proform {
         // */
     }
 
-    function _process_uploads(&$form_obj, &$form_session, &$data)
+    private function _process_uploads(&$form_obj, &$form_session, &$data)
     {
         if($form_obj->save_entries_on == 'y')
         {
@@ -952,7 +971,7 @@ class Proform {
         } // save_entries_on == 'y'
     } // function _process_uploads
     
-    function _process_captcha(&$form_obj, &$form_session, &$data)
+    private function _process_captcha(&$form_obj, &$form_session, &$data)
     {
         if ( ! isset($_POST['captcha']) OR $_POST['captcha'] == '')
         {
@@ -977,7 +996,7 @@ class Proform {
                     OR date < UNIX_TIMESTAMP()-7200");
     } // function _process_captch
     
-    function _process_validation(&$form_obj, &$form_session, &$data)
+    private function _process_validation(&$form_obj, &$form_session, &$data)
     {
         $this->EE->lang->loadfile('proform');
         
@@ -1091,13 +1110,13 @@ class Proform {
         //exit('end of validation');
     } // function _process_validation
 
-    function _process_duplicates(&$form_obj, &$form_session, &$data)
+    private function _process_duplicates(&$form_obj, &$form_session, &$data)
     {
         // TODO: check for duplicates
         // TODO: make sure encryption is taken into account for duplicates checks
     } // function _process_duplicates
 
-    function _process_insert(&$form_obj, &$form_session, &$data)
+    private function _process_insert(&$form_obj, &$form_session, &$data)
     {
         $data['dst_enabled'] = $this->prolib->dst_enabled ? 'y' : 'n';
         
@@ -1164,7 +1183,7 @@ class Proform {
         
     } // function _process_insert
     
-    function _process_mailinglist(&$form_obj, &$form_session, &$data)
+    private function _process_mailinglist(&$form_obj, &$form_session, &$data)
     {
         //$data['form:entry_id']
         if(!class_exists('Mailinglist'))
@@ -1259,7 +1278,7 @@ class Proform {
     // Helpers
     ////////////////////////////////////////////////////////////////////////////////
 
-    function create_fields_array($form_obj, $field_errors = array(), $field_values = array(), $field_checked_flags = array(), $create_field_rows = TRUE)
+    private function create_fields_array($form_obj, $field_errors = array(), $field_values = array(), $field_checked_flags = array(), $create_field_rows = TRUE)
     {
 
         if(is_object($field_values))
@@ -1362,7 +1381,7 @@ class Proform {
     /**
       *  Fetch pagination data
       */
-    function fetch_pagination_data()
+    private function fetch_pagination_data()
     {
         if (strpos($this->EE->TMPL->tagdata, LD.'paginate'.RD) === FALSE) return;
 

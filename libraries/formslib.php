@@ -39,7 +39,7 @@ class Formslib
     var $prefs_mgr;
     var $session_mgr;
 
-    var $form_types = array('form' => 'Entry Form');
+    var $form_types = array('form' => 'Entry Form', 'saef' => 'SAEF Form', 'share' => 'Share Form');
     
     function Formslib()
     {
@@ -58,7 +58,7 @@ class Formslib
         $forge = &$this->EE->dbforge;
         
         // Check and clean up data array
-        assert('$data["form_name"]');
+        assert($data["form_name"]);
         $data['form_name'] = strtolower(str_replace(' ', '_', $data['form_name']));
         $form_name = $data['form_name'];
         
@@ -72,19 +72,23 @@ class Formslib
         // Insert new form
         $this->EE->db->insert('proform_forms', $data);
         
-        // Create FORM table for storing actual form entries
-        $fields = array(
-            'form_entry_id'     => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE, 'auto_increment' => TRUE),
-            'updated'           => array('type' => 'timestamp'),
-            'ip_address'        => array('type' => 'varchar', 'constraint' => '128'),
-            'user_agent'        => array('type' => 'varchar', 'constraint' => '255'),
-            'dst_enabled'       => array('type' => 'varchar', 'constraint' => '1'),
-        );
+        // Create the table for this form if it isn't a SAEF or Share form
+        if($data['form_type'] == 'form')
+        {
+            // Create FORM table for storing actual form entries
+            $fields = array(
+                'form_entry_id'     => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE, 'auto_increment' => TRUE),
+                'updated'           => array('type' => 'timestamp'),
+                'ip_address'        => array('type' => 'varchar', 'constraint' => '128'),
+                'user_agent'        => array('type' => 'varchar', 'constraint' => '255'),
+                'dst_enabled'       => array('type' => 'varchar', 'constraint' => '1'),
+            );
         
-        $forge->add_field($fields);
-        $forge->add_key('form_entry_id', TRUE);
-        $forge->add_key('updated');
-        $forge->create_table(BM_Form::make_table_name($data['form_name']));
+            $forge->add_field($fields);
+            $forge->add_key('form_entry_id', TRUE);
+            $forge->add_key('updated');
+            $forge->create_table(BM_Form::make_table_name($data['form_name']));
+        }
         
         $form_obj = $this->get_form($form_name);
         return $form_obj;
@@ -566,7 +570,19 @@ class BM_Form extends BM_RowInitialized {
 
     function count_entries()
     {
-        return $this->__EE->db->count_all($this->table_name());
+        $result = 0;
+        switch($this->form_type)
+        {
+            case 'form':
+                $result = $this->__EE->db->count_all($this->table_name());
+                break;
+            case 'saef':
+                $result = $this->__EE->db
+                            ->where('channel_id', $this->safecracker_channel_id)
+                            ->count_all_results('exp_channel_titles');
+                break;
+        }
+        return $result;
     }
 
     function entries($start_row = 0, $limit = 0, $count = FALSE)
@@ -801,7 +817,7 @@ class BM_Field extends BM_RowInitialized
     var $field_id = FALSE;
     var $field_label = FALSE;
     var $field_name = FALSE;
-    var $type = FALSE;
+    var $type = 'string';
     var $length = FALSE;
     var $validation = FALSE;
     var $upload_pref_id = FALSE;

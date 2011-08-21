@@ -43,7 +43,7 @@ class Proform_upd {
         ////////////////////////////////////////
         // Register module
         $data = array(
-            'module_name'       => PROFORM_NAME,
+            'module_name'       => PROFORM_CLASS,
             'module_version'    => PROFORM_VERSION,
             'has_cp_backend'    => 'y');
         $this->EE->db->insert('modules', $data);
