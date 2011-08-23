@@ -165,8 +165,8 @@ $lang = array(
     
     'field_pref_notification_template_group' => 'Notification Template Group',
     'field_pref_notification_template_group_desc' => 'Template group containing e-mail notification templates',
-    'field_pref_from_address' => 'Default From Address',
-    'field_pref_from_address_desc' => 'Default E-mail address notifications are sent from, should match the actual mail settings used to send mail',
+    'field_pref_from_address' => 'From Address',
+    'field_pref_from_address_desc' => 'E-mail address notifications are sent from, should match the actual mail settings used to send mail',
     'field_pref_safecracker_integration_on' => 'SafeCracker Integration',
     'field_pref_safecracker_integration_on_desc' => 'Enable SafeCracker Integration to allow form data to be saved into entries.',
     'field_pref_safecracker_field_group_id' => 'SafeCracker: Field Group',

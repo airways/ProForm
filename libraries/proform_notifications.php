@@ -184,13 +184,13 @@ class Proform_notifications
         foreach($notification_list as $to_email)
         {
             $this->EE->bm_email->initialize();
-            if($form->from_address)
-            {
-                $this->EE->bm_email->from($form->from_address);
-            } else {
+            // if($form->from_address)
+            // {
+            //     $this->EE->bm_email->from($form->from_address);
+            // } else {
                 if(!$this->default_from_address) return FALSE;
                 $this->EE->bm_email->from($this->default_from_address);
-            }
+            // }
             $this->EE->bm_email->to($to_email);
             $this->EE->bm_email->subject($subject);
 
@@ -317,6 +317,7 @@ class Proform_notifications
     }
 }
 
+/*
 class Bm_Template extends BM_RowInitialized 
 {
     var $__lib_name = "proform_notifications";
@@ -340,3 +341,4 @@ class Bm_Template extends BM_RowInitialized
     }
 
 }
+*/

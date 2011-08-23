@@ -836,6 +836,8 @@ SAEF;
             // data to be inserted into form table
             $data = array();
 
+            $this->_process_data($form_obj, $form_session, $data);
+            
             $this->_process_uploads($form_obj, $form_session, $data);
 
             if($form_config['use_captcha'])
@@ -906,6 +908,20 @@ SAEF;
     // Processing Helpers
     ////////////////////////////////////////////////////////////////////////////////
 
+    private function _process_data(&$form_obj, &$form_session, &$data)
+    {
+        // copy all values from the form_session into the data array prior to insert
+        foreach($form_obj->fields() as $field)
+        {
+            if(!array_key_exists($field->field_name, $data))
+            {
+                $data[$field->field_name] = $form_session->values[$field->field_name];
+            }
+        }
+
+
+    }
+    
     private function _process_secure_fields(&$form_obj, &$form_session, &$data)
     {
         // set secure fields values from the session or other backend sources
@@ -1011,6 +1027,27 @@ SAEF;
         $validation_rules = array();
         foreach($form_obj->fields() as $field)
         {
+            if($field->type == 'list')
+            {
+                // Check that the value submitted is one of the available options
+                $list = explode("\n", $field->settings['type_list']);
+                $valid = FALSE;
+                foreach($list as $option)
+                {
+                    $option = explode(':', $option);
+                    if($data[$field->fielname] == trim($option[0]))
+                    {
+                        $valid = TRUE;
+                        break;
+                    }
+                }
+                
+                if(!$valid)
+                {
+                    $form_session->add_error($field->field_name, 'Value for '.htmlentities($field->field_name).' is not amongst options presented.');
+                }
+            }
+            
             if($field->type != 'file')
             {
                 $checked_rules = '';
@@ -1122,15 +1159,6 @@ SAEF;
         
         if($form_obj->save_entries_on == 'y')
         {
-            foreach($form_obj->fields() as $field)
-            {
-                // files are saved previously because they cannot be automatically re-uploaded from an errored form
-                if(!array_key_exists($field->field_name, $data))
-                {
-                    $data[$field->field_name] = $form_session->values[$field->field_name];
-                }
-            }
-        
             if ($this->EE->extensions->active_hook('proform_insert_start') === TRUE)
             {
                 $data = $this->EE->extensions->call('proform_insert_start', $this, $data);
@@ -1296,7 +1324,7 @@ SAEF;
             
             // handle normal posted fields
             $field_array = array(
-                    'field_callback'    => function($data, $key=FALSE) { return time(); },
+                    //'field_callback'    => function($data, $key=FALSE) { return time(); },
                     'field_id'          => $field->field_id,
                     'field_name'        => $field->field_name,
                     'field_label'       => $field->field_label,
@@ -1323,11 +1351,23 @@ SAEF;
                     if($k == 'list')
                     {
                         $v = explode("\n", $v);
+                        foreach($v as $q => $r)
+                        {
+                            // Check for Value : Label syntax
+                            $a = explode(':', $r);
+                            if(count($a) > 1)
+                            {
+                                // Remove old index
+                                unset($v[$q]);
+                                
+                                // Add back to array under key value
+                                $v[trim($a[0])] = trim($a[1]);
+                            }
+                        }
                     }
-
                     $field_array['field_setting_'.$k] = $v;
                 }
-            }
+            }            
             
             /*if($field_array['field_type'] == 'list')
             {
