@@ -133,11 +133,16 @@ class Formslib
         return $form;
     }
     
-    function get_forms() 
+    function get_forms($limit=0, $offset=0) 
     {
         $result = array();
+        if($limit)
+        {
+            $this->EE->db->limit($limit, $offset);
+        }
+        
         $query = $this->EE->db->select('form_name')->get('proform_forms');
-    
+        
         if($query->num_rows > 0) 
         {
             foreach($query->result() as $row) 
@@ -146,6 +151,11 @@ class Formslib
             }
         }
         return $result;
+    }
+    
+    function count_forms()
+    {
+        return $this->EE->db->count_all('proform_forms');
     }
     
     function get_forms_with_field($field)

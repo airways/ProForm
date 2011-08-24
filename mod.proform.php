@@ -733,11 +733,143 @@ SAEF;
         exit;
     }
     
-    /*function forms()
+    function forms()
     {
         // List available forms
-        // Filter by extended form properties
-    }*/
+        $this->EE->load->library('formslib');
+        
+        // Get params
+        $form_name      = $this->EE->TMPL->fetch_param('form_name');
+        $paginate       = $this->EE->TMPL->fetch_param('paginate');
+        $paginate_base  = $this->EE->TMPL->fetch_param('paginate_base');
+        $p_page         = $this->EE->TMPL->fetch_param('page');
+        $page           = $p_page > 0 ? $p_page : 1;
+        $limit          = $this->EE->TMPL->fetch_param('limit');
+        
+        // Check required input
+        // if(!$form_name)
+        // {
+        //     show_error("{exp:proform:form} requires name param.");
+        //     //return $this->EE->output->show_user_error('general', array('exp:proform:form requires form_name param'));
+        // }
+        
+        if($paginate)
+        {
+            // fetch and remove the {paginate} pair from tagdata
+            $this->fetch_pagination_data();
+        }
+        
+        $this->return_data = "";
+        
+        // Get all form data for the requested form
+        $forms = $this->EE->formslib->get_forms($limit, ($page-1) * $limit);
+        $total_forms = $this->EE->formslib->count_forms();
+        
+        if ($this->EE->extensions->active_hook('proform_forms_start') === TRUE)
+        {
+            $forms = $this->EE->extensions->call('proform_forms_start', $this, $forms);
+        }
+        
+        if($forms && count($forms) > 0)
+        {
+            $tagdata = $this->EE->TMPL->tagdata;
+            
+            $row_i = 1;
+            $count = count($forms);
+            if($limit > 0)
+            {
+                $total_pages = ceil($total_forms / $limit);
+            } else {
+                $total_pages = 1;
+            }
+                
+            foreach($forms as $row)
+            {
+                $row_vars = array();
+                $row_vars['total_forms'] = $total_forms;
+                $row_vars['total_pages'] = $total_pages;
+                $row_vars['current_page'] = $page;
+
+                // add row data that isn't part of the form
+                foreach($row as $key => $value)
+                {
+                    if(!array_key_exists($key, $row_vars) && !is_object($value) && !is_array($value))
+                    {
+                        $row_vars[$key] = $value;
+                    }
+                }
+                
+                // add additional variables needed in the iteration
+                $row_vars['row_number'] = $row_i;
+                $row_vars['forms_count'] = $count;
+                $row_vars['forms_no_results'] = FALSE;
+
+                // parse the row
+                if ($this->EE->extensions->active_hook('proform_forms_row') === TRUE)
+                {
+                    $row_vars = $this->EE->extensions->call('proform_forms_row', $this, $form_obj, $row_vars);
+                }
+                
+                $rowdata = $this->EE->bm_parser->parse_variables($tagdata, $row_vars, array());
+
+                $this->return_data .= $rowdata;
+                
+                $row_i ++;
+            }
+        }
+        else
+        {
+            // parse a single fake row and add it to the result:
+            //   - row number 1, count 0, no_results = true
+            $total_pages = 0;
+            $row_vars = array();
+            $row_vars['row_number'] = 1;
+            $row_vars['forms_count'] = 0;
+            $row_vars['forms_no_results'] = TRUE;
+            
+            $rowdata = $this->EE->bm_parser->parse_variables($tagdata, $row_vars, array());
+            
+            $this->return_data .= $rowdata;
+        }
+        
+        if ($this->EE->extensions->active_hook('proform_forms_end') === TRUE)
+        {
+            $this->return_data = $this->EE->extensions->call('proform_forms_end', $this, $forms, $this->return_data);
+        }
+        
+        // add pagination links
+        if($paginate)
+        {
+            $pages = array();
+            for($n = 1; $n <= $total_pages; $n++)
+            {
+                $pages[] = array(
+                    'page'      => $n,
+                    'current'   => $n == $page,
+                    'first'     => $n > 1 ? 'yes' : '',
+                    'last'      => $n == $total_pages ? 'yes' : '',
+                );
+            }
+            
+            $pagination_vars = array(
+                'current_page'  => $page,
+                'first_page'    => 1,
+                'last_page'     => $total_pages,
+                'total_pages'   => $total_pages,
+                'pages'         => $pages
+            );
+            $this->paginate_data = $this->EE->bm_parser->parse_variables($this->paginate_data, $pagination_vars, array('pages'));
+            
+            if($paginate == 'top')
+            {
+                $this->return_data = $this->paginate_data.$this->return_data;
+            } else {
+                $this->return_data = $this->return_data.$this->paginate_data;
+            }
+        }
+
+        return $this->return_data;
+    }
     
     
     
