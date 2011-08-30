@@ -33,8 +33,8 @@
 require_once PATH_THIRD.'prolib/prolib.php';
 require_once PATH_THIRD.'proform/config.php';
 
-error_reporting(E_ALL);
-ini_set('display_errors', '1');
+// error_reporting(E_ALL);
+// ini_set('display_errors', '1');
 class Proform {
 
     var $return_data    = '';
