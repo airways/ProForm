@@ -124,6 +124,10 @@ var bm_forms_layout = {
             }
         });
 
+        function make_name(s) {
+            return s.toLowerCase().replace(' ', '_').replace(/[^a-zA-Z0-9]+/g, '_');
+        }
+        
         var update_field_label = function() { $('input[name=field_name]').val(make_name($(this).val())); }
         $('input[name=field_label]').keydown(update_field_label).keyup(update_field_label).change(update_field_label);
 
@@ -133,9 +137,7 @@ var bm_forms_layout = {
    }
 };
 
-function make_name(s) {
-    return s.toLowerCase().replace(' ', '_').replace(/[^a-zA-Z0-9]+/g, '_');
-}
+
 
 $(document).ready(function() {
     bm_forms_layout.bind_events();
