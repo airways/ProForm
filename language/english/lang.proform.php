@@ -27,14 +27,15 @@ $lang = array(
     'display_forms_field_instructions' => 'Select what form to display on this page.',
     
     // Table headings
-    'heading_form_name' => 'Form Name',
+    'heading_form_label' => 'Form Label',
+    'heading_form_name' => 'Form Short Name',
     'heading_entries_count' => 'Entries Count',
     'heading_edit_fields' => 'Edit Layout',
     'heading_edit_preset_values' => 'Edit Preset Values',
     'heading_property' => 'Property',
     'heading_value' => 'Value',
     'heading_list_entries' => 'View Entries',
-    'heading_delete_form' => 'Delete Form',
+    'heading_delete_form' => 'Delete',
     'heading_field_name' => 'Field Name',
     'heading_delete_field' => 'Delete Field',
     'heading_remove_field' => 'Remove Field',
@@ -96,7 +97,7 @@ $lang = array(
     'tab_delete_template' => 'Delete Template',
     
     // Fields
-    'field_form_name' => 'Form Name',
+    'field_form_name' => 'Form Short Name',
     'field_form_name_desc' => 'Single word, no spaces, used in templates',
     'field_form_label' => 'Full Form Name',
     'field_form_label_desc' => 'human friendly form name, used in UI',

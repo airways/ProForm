@@ -45,9 +45,10 @@
 //    form_open($action_url, '', $form_hidden);
     $this->table->set_template($cp_table_template);
     $this->table->set_heading(
+        lang('heading_form_label'),
         lang('heading_form_name'),
         lang('heading_entries_count'),
-        lang('heading_commands')
+        '','',''
         );
         //form_checkbox('select_all', 'true', FALSE, 'class="toggle_all" id="select_all"'));
 
@@ -55,12 +56,12 @@
     foreach($forms as $form)
     {
         $this->table->add_row(
+                '<a href="'.$form->edit_link.'">'.$form->form_label.'</a>',
                 '<a href="'.$form->edit_link.'">'.$form->form_name.'</a>',
                 $form->entries_count,
-                '<a href="'.$form->edit_fields_link.'">'.ico_layout(lang('heading_edit_fields')).'</a>
-
-                <a href="'.$form->list_entries_link.'">'.ico_entries(lang('heading_list_entries')).'</a>
-                <a href="'.$form->delete_link.'">'.ico_delete(lang('heading_delete_form')).'</a>'
+                '<a href="'.$form->edit_fields_link.'">'.lang('heading_edit_fields').'</a>',
+                '<a href="'.$form->list_entries_link.'">'.lang('heading_list_entries').'</a>',
+                '<a href="'.$form->delete_link.'">'.lang('heading_delete_form').'</a>'
                 //<a href="'.$form->edit_preset_values_link.'">'.ico_defaults(lang('heading_edit_preset_values')).'</a>
                 //form_checkbox($form->toggle)
             );
