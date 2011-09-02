@@ -243,22 +243,23 @@ class Proform {
                         'hidden_fields'     => array('__conf' => $form_config_enc),
                         'secure'            => TRUE,
                         'onsubmit'          => '',
-                        'enctype'           => 'multipart/form-data');    
+                        'enctype'           => 'multipart/form-data');
                 
-                if($form_obj->form_type != 'saef')
+                if($form_obj->form_type == 'form' || $form_obj->form_type == 'share')
                 {
                     $form = $this->EE->functions->form_declaration($form_details);
                 } else {
                     $this->EE->load->library('api');
                     $this->EE->api->instantiate('channel_structure');
-                    $channel_info = $this->EE->api_channel_structure->get_channel_info($form_obj->safecracker_channel_id);
-                    var_dump($channel_info);
+                    $channel_result = $this->EE->api_channel_structure->get_channel_info($form_obj->safecracker_channel_id);
+                    if($channel_result && $channel_result->num_rows() > 0)
+                    {
+                        $channel_info = $channel_result->row();
+                    } else {
+                        show_error('Invalid channel on form "'.htmlentities($form_name).'": '.intval($form_obj->safecracker_channel_id).' (possibly it has been deleted)');
+                    }
                     
-                    $form = <<<SAEF
-{exp:channel:entry_form channel="$channel_name" return="site/index" preview="site/entry"}
-    
-{/exp:channel:entry_form}
-SAEF;
+                    $form = '{exp:channel:entry_form channel="'.$channel_info->channel_name.'" return="site/index" preview="site/entry"}';
                 }
                 
                 
@@ -408,7 +409,12 @@ SAEF;
                 $form .= $this->EE->bm_parser->parse_variables($tagdata, $variables, $this->var_pairs);
                 
                 // Close form
-                $form .= form_close();
+                if($form_obj->form_type == 'form' || $form_obj->form_type == 'share')
+                {
+                    $form .= form_close();
+                } else {
+                    $form .= '{/exp:channel:entry_form}';
+                }
                 
                 ////////////////////
                 // Return result

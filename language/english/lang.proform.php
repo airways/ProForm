@@ -189,6 +189,7 @@ $lang = array(
     'field_already_exists' => 'A field with that name already exists.',
     'no_unassigned_fields_available' => 'No unassigned fields available.',
     'no_entries' => 'No entries in this form.',
+    'no_field_group_setting' => 'You have not selected a SafeCracker Field Group in ProForm module settings',
     
     'missing_form_id' => 'Internal error: missing form_id',
     'missing_form_name' => 'Missing require field Form Name.',

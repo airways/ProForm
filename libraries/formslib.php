@@ -114,7 +114,6 @@ class Formslib
         if($query->num_rows > 0) 
         {
             $form = new BM_Form($query->row());
-            
             $form_id = $form->form_id;
             $form_name = $form->form_name;
             
@@ -170,18 +169,6 @@ class Formslib
             }
         }
         return $result;
-        
-        /*$forms = $this->get_forms();
-        $result = array();
-    
-        foreach($forms as $form) 
-        {
-            if(array_key_exists($field, $form->fields()))
-            {
-                $result[] = $form;
-            }
-        }
-        return $result;*/
     }
     
     function save_form($form) 
@@ -467,9 +454,9 @@ class Formslib
      * 
      * @return array
      */
-    function get_channel_options($field_group_id = FALSE)
+    function get_channel_options($field_group_id = FALSE, $default = array())
     {
-        $result = array();
+        $result = $default;
         if($field_group_id)
         {
             $this->EE->db->where('field_group', $field_group_id);
@@ -537,22 +524,8 @@ class BM_Form extends BM_RowInitialized {
 
         if(!$this->__fields) 
         {
-			#echo "fetch fields<br/>";
             $this->__fields = array();
-            /*$query = $this->EE->db->select('*')
-                                  ->from('exp_proform_fields')
-                                  ->join('exp_proform_form_fields', 'exp_proform_fields.field_id = exp_proform_form_fields.field_id')
-                                  ->where('exp_bm_form_fields.form_id', $this->form_id)
-                                  ->get();
-			echo "query 1:<br/>";
-			var_dump($query);
-			*/
-			$query = $this->__EE->db->query('SELECT * FROM exp_proform_fields JOIN exp_proform_form_fields ON exp_proform_fields.field_id = exp_proform_form_fields.field_id WHERE exp_proform_form_fields.form_id = ' . ((int)$this->form_id) . ' ORDER BY exp_proform_form_fields.field_order');
-			/*
-			echo "query 2:<br/>";
-			var_dump($query);
-			echo $this->form_id . "<br/>";
-			*/
+            $query = $this->__EE->db->query('SELECT * FROM exp_proform_fields JOIN exp_proform_form_fields ON exp_proform_fields.field_id = exp_proform_form_fields.field_id WHERE exp_proform_form_fields.form_id = ' . ((int)$this->form_id) . ' ORDER BY exp_proform_form_fields.field_order');
             if($query->num_rows > 0) 
             {
                 foreach($query->result() as $row) 
@@ -597,23 +570,35 @@ class BM_Form extends BM_RowInitialized {
 
     function entries($start_row = 0, $limit = 0, $count = FALSE)
     {
-        $this->__EE->db->select('*');
-        
-        if($start_row >= 0 AND $limit > 0) {
-            $this->__EE->db->limit($limit, $start_row); // yes it is reversed compared to MySQL
-        }
-        
-        $query = $this->__EE->db->get($this->table_name());
-        
-        $this->__entries = array();
-        if($query->num_rows > 0) 
+        switch($this->form_type)
         {
-            foreach($query->result() as $row) 
-            {
-                $this->__entries[] = $row;
-            }
+            case 'form':
+                $this->__EE->db->select('*');
+                
+                if($start_row >= 0 AND $limit > 0) {
+                    $this->__EE->db->limit($limit, $start_row); // yes it is reversed compared to MySQL
+                }
+                
+                $query = $this->__EE->db->get($this->table_name());
+                
+                $this->__entries = array();
+                if($query->num_rows > 0) 
+                {
+                    foreach($query->result() as $row) 
+                    {
+                        $this->__entries[] = $row;
+                    }
+                }
+                return $this->__entries;
+                break;
+            case 'saef':
+                // TODO: get channel entries data for SAEF forms
+                break;
+            case 'share':
+                // There will never be any entries
+                return array();
+                break;
         }
-        return $this->__entries;
     }
 
     function delete_entry($entry_id)
@@ -625,64 +610,146 @@ class BM_Form extends BM_RowInitialized {
     {
         // add an existing field to this form/table
         
-        // create the physical field
-        $this->__EE->load->dbforge();
-        $forge = &$this->__EE->dbforge;
-        
-        if(array_key_exists($field->type, BM_Field::$types['mysql']))
-        {
-            $typedef = BM_Field::$types['mysql'][$field->type];
-
-            $fields = array(
-                $field->field_name       => array('type' => $typedef['type'])
-            );
-
-            // if there is a constraint set on the type definition, this always overrides anything
-            // set by the user
-            if(isset($typedef['constraint']))
-            {
-                if($typedef['constraint'])
-                {
-                    $fields[$field->field_name]['constraint'] = $typedef['constraint'];
-                }
-            } else {
-                if($field->length)
-                {
-                    $fields[$field->field_name]['constraint'] = $field->length;
-                }
-            }
-
-            // check if the length specified is too long, if so, promote to the next data type
-            if(isset($typedef['limit'])
-                && is_numeric($fields[$field->field_name]['constraint'])
-                && $fields[$field->field_name]['constraint'] > $typedef['limit'])
-            {
-                if(!isset($typedef['limit_promote']))
-                {
-                    exit('Field constraint exceeds '.$typedef['limit'].' but has no promote type.');
-                } else {
-                    $fields[$field->field_name]['type'] = $typedef['limit_promote'];
-                }
-            }
-            
-            $do_forge = TRUE;
-        } else {
-            exit('Invalid field type for mysql ' . $field->type);
-            $do_forge = FALSE;
-        }
-        
         // check if the field is already associated with the form
         $query = $this->__EE->db->get_where('exp_proform_form_fields', array('form_id' => $this->form_id, 'field_id' => $field->field_id));
         if($query->num_rows() == 0)
         {
-            if($do_forge)
-            {
-                // new column to the form's table
-                $forge->add_column($this->table_name(), $fields);
-            }
+            $new_assignment = TRUE;
+            $assignment_row = $query->row();
+        } else {
+            $new_assignment = FALSE;
+            $assignment_row = null;
+        }
+        
+        switch($this->form_type)
+        {
+            case 'form':
+                // create the physical field
+                $this->__EE->load->dbforge();
+                $forge = &$this->__EE->dbforge;
+        
+                if(array_key_exists($field->type, BM_Field::$types['mysql']))
+                {
+                    $typedef = BM_Field::$types['mysql'][$field->type];
+
+                    $fields = array(
+                        $field->field_name       => array('type' => $typedef['type'])
+                    );
+
+                    // if there is a constraint set on the type definition, this always overrides anything
+                    // set by the user
+                    if(isset($typedef['constraint']))
+                    {
+                        if($typedef['constraint'])
+                        {
+                            $fields[$field->field_name]['constraint'] = $typedef['constraint'];
+                        }
+                    } else {
+                        if($field->length)
+                        {
+                            $fields[$field->field_name]['constraint'] = $field->length;
+                        }
+                    }
+
+                    // check if the length specified is too long, if so, promote to the next data type
+                    if(isset($typedef['limit'])
+                        && is_numeric($fields[$field->field_name]['constraint'])
+                        && $fields[$field->field_name]['constraint'] > $typedef['limit'])
+                    {
+                        if(!isset($typedef['limit_promote']))
+                        {
+                            exit('Field constraint exceeds '.$typedef['limit'].' but has no promote type.');
+                        } else {
+                            $fields[$field->field_name]['type'] = $typedef['limit_promote'];
+                        }
+                    }
+                    
+                    $do_forge = TRUE;
+                } else {
+                    exit('Invalid field type for mysql ' . $field->type);
+                    $do_forge = FALSE;
+                }
+                
+                if($new_assignment)
+                {
+                    // add new column to the form's table
+                    if($do_forge)
+                    {
+                        $forge->add_column($this->table_name(), $fields);
+                    }
+                } else {
+                    // rename the column on the table
+                    
+                    // move old field name to new field name in field definition array
+                    if($assignment_row->field_name != $field->field_name)
+                    {
+                        $fields[$assignment_row->field_name] = $fields[$field->field_name];
+                        // remove old field name
+                        unset($fields[$field->field_name]);
+                    }
+                    
+                    // add new field name to definition
+                    $fields[$assignment_row->field_name]['name'] = $field->field_name;
+                    
+                    if($do_forge)
+                    {
+                        $forge->modify_column($this->table_name(), $fields);
+                    }
             
+                }
+                break; // case 'form':
+            case 'saef':
+                $group_id = $this->__EE->formslib->ini('safecracker_field_group_id');
+                if(!$group_id)
+                {
+                    show_error(lang('no_field_group_setting'));
+                }
+                
+                // TODO: maybe this should be done when the field is created?
+                if(!$this->__EE->bm_channel_fields->field_exists($group_id, $field->field_name))
+                {
+                    $data = array(
+                        'field_name' => $field->field_name,
+                        'field_type' => 'textarea',
+                        'field_maxl' => 255,
+                        'field_ta_rows' => 6,
+                        'field_search' => 'y',
+                        'field_order' => $field->field_id+1000,
+                        'field_required' => 'n',
+                        'field_list_items' => '',
+                        'field_instructions' => '',
+                        'field_label' => $field->field_label,
+                        'field_pre_populate' => 'n',
+                        'field_pre_field_id' => '0',
+                        'field_text_direction' => 'ltr',
+                        'field_is_hidden' => 'n',
+                        'field_fmt' => 'none',
+                        'field_show_fmt' => 'n',
+                        'field_content_type' => 'any',
+                        'field_settings' => base64_encode(serialize(array()))
+                        
+                    );
+                    
+                    $custom_field = $this->__EE->bm_channel_fields->new_field($group_id, $data);
+                    
+                    if(!$custom_field)
+                    {
+                        show_error('There was an error creating the new Custom Field.');
+                    }
+                }
+                break; //case 'saef':
+            case 'share':
+                // We don't save the data from a share form, so there's nothing to do
+                break; //case 'share':
+            
+            
+        }
+        
+        // associate the field with this form or update it's association
+        if($new_assignment)
+        {
             // get last field_order value so we can add the new field at the end
-            $max = $this->__EE->db->query($sql = "SELECT MAX(field_order) AS field_order, MAX(field_row) AS field_row FROM exp_proform_form_fields WHERE form_id = {$this->form_id}");
+            $max = $this->__EE->db->query($sql = 'SELECT MAX(field_order) AS field_order, MAX(field_row) AS field_row FROM exp_proform_form_fields WHERE form_id = '.intval($this->form_id));
             $field_order = $max->row()->field_order + 1;
             $field_row = $max->row()->field_row + 1;
             
@@ -698,25 +765,6 @@ class BM_Form extends BM_RowInitialized {
             
             $this->__EE->db->insert('exp_proform_form_fields', $data);
         } else {
-            // get assignment row so we know the old field name for this form
-            $assignment = $query->row();
-            
-            // move old field name to new field name in field definition array
-            if($assignment->field_name != $field->field_name)
-            {
-                $fields[$assignment->field_name] = $fields[$field->field_name];
-                // remove old field name
-                unset($fields[$field->field_name]);
-            }
-            
-            // add new field name to definition
-            $fields[$assignment->field_name]['name'] = $field->field_name;
-
-            if($do_forge)
-            {
-                $forge->modify_column($this->table_name(), $fields);
-            }
-            
             // update assignment saved field_name so this will work next time
             $data  = array(
                 'field_name' => $field->field_name,
@@ -761,8 +809,12 @@ class BM_Form extends BM_RowInitialized {
         $this->__EE->load->dbforge();
         $forge = &$this->__EE->dbforge;
         
-        // remove the physical column
-        $forge->drop_column($this->table_name(), $field->field_name);
+        // Remove the physical column for normal forms - do not delete custom fields for SAEF
+        // forms as they may be used by other forms or channels that are assigned to the group.
+        if($this->form_type == 'form')
+        {
+            $forge->drop_column($this->table_name(), $field->field_name);
+        }
         
         // remove the association between the form and the field
         $data = array(

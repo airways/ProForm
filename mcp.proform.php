@@ -190,7 +190,6 @@ class Proform_mcp {
                                     'id'        => 'edit_box_'.$form->form_id,
                                     'value'     => $form->form_id,
                                     'class'     =>'toggle');
-            
             $vars['forms'][$form->form_id] = $form;
             
         }
@@ -401,8 +400,7 @@ class Proform_mcp {
         //unset($form_fields->form_id);
         unset($form_fields->settings);
         
-        $channel_options = $this->EE->formslib->get_channel_options($this->EE->formslib->ini('safecracker_field_group_id'));
-        $channel_options = array_merge(array(0 => 'None'), $channel_options);
+        $channel_options = $this->EE->formslib->get_channel_options($this->EE->formslib->ini('safecracker_field_group_id'), array(0 => 'None'));
         
         $types = array(
             'form_id' => 'read_only', 
@@ -432,32 +430,8 @@ class Proform_mcp {
 
         $this->EE->load->library('table');
 
-        //var_dump($vars['message']);echo '<br/>';
-        //var_dump($vars);
-        //exit;
         $this->_get_flashdata($vars);
-        
-        /*
-        var $encryption_on = 'n';
-        var $safecracker_on = 'n';
-        var $safecracker_channel_id = 0;
 
-        var $admin_notification_on = 'y';
-        var $notification_template;
-        var $notification_list;
-        var $subject;
-
-        var $submitter_notification_on = 'n';
-        var $submitter_notification_template;
-        var $submitter_notification_subject;
-        var $submitter_email_field;
-
-        var $share_notification_on = 'n';
-        var $share_notification_template;
-        var $share_notification_subject;
-        var $share_email_field;
-        */
-        
         switch($form_fields->form_type)
         {
             case 'form':
