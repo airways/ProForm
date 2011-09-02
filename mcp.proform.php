@@ -1167,7 +1167,8 @@ class Proform_mcp {
             $vars['editing'] = TRUE;
             $vars['hidden'] = array('field_id' => $field_id);
         } else {
-            $field = new BM_Field(FALSE);
+            $row = FALSE;
+            $field = new BM_Field($row);
         }
         
         $upload_prefs = $this->EE->bm_uploads->get_upload_prefs();
