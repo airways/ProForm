@@ -385,7 +385,8 @@ class Proform_mcp {
         
             $form_fields = $query->row();
         } else {
-            $form_fields = new BM_Form(FALSE);
+            $form = FALSE;
+            $form_fields = new BM_Form($form);
             $form_fields->form_type = $vars['new_type'];
             $vars['hidden']['form_type'] = $vars['new_type'];
             $vars['editing'] = FALSE;
