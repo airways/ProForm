@@ -58,7 +58,7 @@ class Formslib
         $forge = &$this->EE->dbforge;
         
         // Check and clean up data array
-        assert($data["form_name"]);
+        
         $data['form_name'] = strtolower(str_replace(' ', '_', $data['form_name']));
         $form_name = $data['form_name'];
         
@@ -612,12 +612,13 @@ class BM_Form extends BM_RowInitialized {
         
         // check if the field is already associated with the form
         $query = $this->__EE->db->get_where('exp_proform_form_fields', array('form_id' => $this->form_id, 'field_id' => $field->field_id));
-        if($query->num_rows() == 0)
+
+        if($query->num_rows() > 0)
         {
-            $new_assignment = TRUE;
+            $new_assignment = FALSE;
             $assignment_row = $query->row();
         } else {
-            $new_assignment = FALSE;
+            $new_assignment = TRUE;
             $assignment_row = null;
         }
         
