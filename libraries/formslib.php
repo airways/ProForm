@@ -568,7 +568,7 @@ class BM_Form extends BM_RowInitialized {
         return $result;
     }
 
-    function entries($start_row = 0, $limit = 0, $count = FALSE)
+    function entries($start_row = 0, $limit = 0, $orderby = FALSE, $sort = FALSE)
     {
         switch($this->form_type)
         {
@@ -577,6 +577,11 @@ class BM_Form extends BM_RowInitialized {
                 
                 if($start_row >= 0 AND $limit > 0) {
                     $this->__EE->db->limit($limit, $start_row); // yes it is reversed compared to MySQL
+                }
+                
+                if($orderby AND $sort)
+                {
+                    $this->__EE->db->order_by($orderby, $sort);
                 }
                 
                 $query = $this->__EE->db->get($this->table_name());

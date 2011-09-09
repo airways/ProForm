@@ -496,6 +496,10 @@ class Proform {
         $p_page         = $this->EE->TMPL->fetch_param('page');
         $page           = $p_page > 0 ? $p_page : 1;
         $limit          = $this->EE->TMPL->fetch_param('limit');
+
+        $orderby        = $this->EE->TMPL->fetch_param('orderby');
+        $sort           = strtolower($this->EE->TMPL->fetch_param('sort'));
+        if($sort != 'asc' AND $sort != 'desc') $sort = 'asc';
         
         // Check required input
         if(!$form_name)
@@ -525,7 +529,7 @@ class Proform {
             $tagdata = $this->EE->TMPL->tagdata;
             
             // if $limit != 0 then the results wil be paginated
-            if($entries = $form_obj->entries(($page - 1) * $limit, $limit))
+            if($entries = $form_obj->entries(($page - 1) * $limit, $limit, $orderby, $sort))
             {
                 $row_i = 1;
                 $count = count($entries);
