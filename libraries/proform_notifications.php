@@ -166,58 +166,62 @@ class Proform_notifications
     
     function _send_notifications($type, $template_name, &$form, &$data, $subject, $notification_list)
     {
+        $result = FALSE;
         $template = $this->get_template($template_name);
         
-        // parse data from the entry
-        $message = $this->EE->parser->parse_string($template, $data, TRUE);
-        $subject = $this->EE->parser->parse_string($subject, $data, TRUE);
+        if($template)
+        {
+            // parse data from the entry
+            $message = $this->EE->parser->parse_string($template, $data, TRUE);
+            $subject = $this->EE->parser->parse_string($subject, $data, TRUE);
 
-        // parse the template for EE tags, conditionals, etc.
-        $this->EE->template->template = &$message;
-        $this->EE->template->parse($message);
+            // parse the template for EE tags, conditionals, etc.
+            $this->EE->template->template = &$message;
+            $this->EE->template->parse($message);
         
-        // final output to send
-        $message = $this->EE->template->final_template;
+            // final output to send
+            $message = $this->EE->template->final_template;
        
 
-        $result = TRUE;
-        foreach($notification_list as $to_email)
-        {
-            $this->EE->bm_email->initialize();
-            // if($form->from_address)
-            // {
-            //     $this->EE->bm_email->from($form->from_address);
-            // } else {
-                if(!$this->default_from_address) return FALSE;
-                $this->EE->bm_email->from($this->default_from_address);
-            // }
-            $this->EE->bm_email->to($to_email);
-            $this->EE->bm_email->subject($subject);
-
-            // need to call entities_to_ascii() for text mode email w/ entry encoded data
-            $this->EE->bm_email->message(entities_to_ascii($message));
-
-            $this->EE->bm_email->send = TRUE;
-            if ($this->EE->extensions->active_hook('proform_notification_message') === TRUE)
+            $result = TRUE;
+            foreach($notification_list as $to_email)
             {
-                $this->EE->extensions->call('proform_notification_message', $type, $form, $this->EE->bm_email, $this);
-                if($this->EE->extensions->end_script) return;
-            }
-            
-            if($this->EE->bm_email->send)
-            {
-                $result = $result && $this->EE->bm_email->Send();
+                $this->EE->bm_email->initialize();
+                // if($form->from_address)
+                // {
+                //     $this->EE->bm_email->from($form->from_address);
+                // } else {
+                    if(!$this->default_from_address) return FALSE;
+                    $this->EE->bm_email->from($this->default_from_address);
+                // }
+                $this->EE->bm_email->to($to_email);
+                $this->EE->bm_email->subject($subject);
 
-                if(!$result)
+                // need to call entities_to_ascii() for text mode email w/ entry encoded data
+                $this->EE->bm_email->message(entities_to_ascii($message));
+
+                $this->EE->bm_email->send = TRUE;
+                if ($this->EE->extensions->active_hook('proform_notification_message') === TRUE)
                 {
-                    $this->EE->bm_email->print_debugger();
-                    echo $this->EE->bm_email->_debug_msg;
-                    var_dump($this->EE->bm_email);
+                    $this->EE->extensions->call('proform_notification_message', $type, $form, $this->EE->bm_email, $this);
+                    if($this->EE->extensions->end_script) return;
                 }
+            
+                if($this->EE->bm_email->send)
+                {
+                    $result = $result && $this->EE->bm_email->Send();
+
+                    if(!$result)
+                    {
+                        $this->EE->bm_email->print_debugger();
+                        echo $this->EE->bm_email->_debug_msg;
+                        var_dump($this->EE->bm_email);
+                    }
+                }
+                //echo $message;
+                //var_dump($this->EE->bm_email);
+                //die;*/
             }
-            //echo $message;
-            //var_dump($this->EE->bm_email);
-            //die;*/
         }
 
         return $result;
@@ -290,27 +294,32 @@ class Proform_notifications
 
 
         $query = $this->EE->db->query($sql = "SELECT group_id FROM exp_template_groups WHERE group_name = '" . $this->EE->db->escape_str($this->template_group_name) . "';");
-        $group_id = $query->row()->group_id;
-
-        $sql = "SELECT * FROM exp_templates WHERE group_id = {$group_id} AND template_name = '" . $this->EE->db->escape_str($template_name) . "';";
-        $query = $this->EE->db->query($sql);
         if($query->num_rows() > 0)
         {
-            $row = $query->row();
-            if($row->save_template_file == 'y')
+            $group_id = $query->row()->group_id;
+
+            $sql = "SELECT * FROM exp_templates WHERE group_id = {$group_id} AND template_name = '" . $this->EE->db->escape_str($template_name) . "';";
+            $query = $this->EE->db->query($sql);
+            if($query->num_rows() > 0)
             {
-                // we need to load data from the template file
-                $template_file = $this->EE->config->slash_item('tmpl_file_basepath')
-                                . $this->EE->config->slash_item('site_short_name')
-                                . $this->template_group_name.'.group/'
-                                . $template_name.'.html';
+                $row = $query->row();
+                if($row->save_template_file == 'y')
+                {
+                    // we need to load data from the template file
+                    $template_file = $this->EE->config->slash_item('tmpl_file_basepath')
+                                    . $this->EE->config->slash_item('site_short_name')
+                                    . $this->template_group_name.'.group/'
+                                    . $template_name.'.html';
 
-                $template_data = file_get_contents($template_file);
+                    $template_data = file_get_contents($template_file);
+                } else {
+                    $template_data = $query->row()->template_data;
+                }
+
+                return $template_data;
             } else {
-                $template_data = $query->row()->template_data;
+                return FALSE;
             }
-
-            return $template_data;
         } else {
             return FALSE;
         }

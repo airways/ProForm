@@ -1087,7 +1087,7 @@ class Proform {
 
     private function _process_uploads(&$form_obj, &$form_session, &$data)
     {
-        if($form_obj->save_entries_on == 'y')
+        if($form_obj->form_type == 'form')
         {
             // Save uploaded files
             foreach($form_obj->fields() as $field)
@@ -1299,7 +1299,7 @@ class Proform {
     {
         $data['dst_enabled'] = $this->prolib->dst_enabled ? 'y' : 'n';
         
-        if($form_obj->save_entries_on == 'y')
+        if($form_obj->form_type == 'form')
         {
             if ($this->EE->extensions->active_hook('proform_insert_start') === TRUE)
             {

@@ -336,6 +336,10 @@ class Proform_mcp {
     
     function process_new_form()
     {
+        if(!$this->EE->input->post('admin_notification_on')) $_POST['admin_notification_on'] = 'n';
+        if(!$this->EE->input->post('submitter_notification_on')) $_POST['submitter_notification_on'] = 'n';
+        if(!$this->EE->input->post('share_notification_on')) $_POST['share_notification_on'] = 'n';
+        
         $data = array();
         $this->prolib->copy_post($data, "BM_Form");
         
@@ -459,7 +463,11 @@ class Proform_mcp {
     function process_edit_form()
     {
         $this->EE->load->library('formslib');
-
+        
+        if(!$this->EE->input->post('admin_notification_on')) $_POST['admin_notification_on'] = 'n';
+        if(!$this->EE->input->post('submitter_notification_on')) $_POST['submitter_notification_on'] = 'n';
+        if(!$this->EE->input->post('share_notification_on')) $_POST['share_notification_on'] = 'n';
+        
         // find form
         $form_id = trim($this->EE->input->post('form_id'));
         if(!$form_id || $form_id <= 0) show_error(lang('missing_form_id'));
