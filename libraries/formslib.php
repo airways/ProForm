@@ -129,6 +129,11 @@ class Formslib
             $query = $this->EE->db->get_where('proform_forms', array('form_name' => $form_name));
         }
         
+        if(!$form->form_type)
+        {
+            $form->form_type = 'form';
+        }
+        
         return $form;
     }
     

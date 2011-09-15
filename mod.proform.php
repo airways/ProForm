@@ -1177,7 +1177,7 @@ class Proform {
                 foreach($list as $option)
                 {
                     $option = explode(':', $option);
-                    if($data[$field->fielname] == trim($option[0]))
+                    if($data[$field->fieldname] == trim($option[0]))
                     {
                         $valid = TRUE;
                         break;
