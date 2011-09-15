@@ -1465,6 +1465,20 @@ class Proform {
             //if($field->type == 'member_data') continue;
             
             // handle normal posted fields
+            $is_required = $field->is_required == 'y';
+            if(!$is_required)
+            {
+                // look for the always required value in the field's validation rules
+                $field_rules = explode('|', $field->validation);
+                foreach($field_rules as $rule)
+                {
+                    if($rule == 'required')
+                    {
+                        $is_required = TRUE;
+                    }
+                }
+            }
+            
             $field_array = array(
                     //'field_callback'    => function($data, $key=FALSE) { return time(); },
                     'field_id'          => $field->field_id,
@@ -1472,7 +1486,7 @@ class Proform {
                     'field_label'       => $field->field_label,
                     'field_type'        => $field->type,
                     'field_length'      => $field->length,
-                    'field_is_required' => $field->is_required == 'y' ? 'y' : '',
+                    'field_is_required' => $is_required ? 'y' : '',
                     'field_validation'  => $field->validation,
                     'field_error'       => array_key_exists($field->field_name, $field_errors) ? $field_errors[$field->field_name] : '',
                     'field_value'       => array_key_exists($field->field_name, $field_values) ? $field_values[$field->field_name] : '',
