@@ -96,8 +96,9 @@ class Proform {
         // Check required input
         if(!$form_name) 
         {
-            show_error("{exp:proform:form} requires name param.");
+            //show_error("{exp:proform:form} requires name param.");
             //return $this->EE->output->show_user_error('general', array('exp:proform:form requires form_name param'));
+            return '';
         }
         
         // Get optional params
@@ -504,8 +505,9 @@ class Proform {
         // Check required input
         if(!$form_name)
         {
-            show_error("{exp:proform:form} requires name param.");
+            //show_error("{exp:proform:entries} requires name param.");
             //return $this->EE->output->show_user_error('general', array('exp:proform:form requires form_name param'));
+            return '';
         }
         
         if($paginate)

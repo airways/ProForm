@@ -41,6 +41,9 @@ class Formslib
 
     var $form_types = array('form' => 'Entry Form', 'saef' => 'SAEF Form', 'share' => 'Share Form');
     
+    // Fields that will not be encrypted or decrypted
+    var $no_encryption = array('dst_enabled');
+    
     function Formslib()
     {
         #$this->EE = &get_instance();
@@ -403,6 +406,8 @@ class Formslib
         $this->EE->load->library('encrypt');
         foreach($data as $k => $v)
         {
+            if(array_search($k, $this->no_encryption) !== FALSE) continue;
+            
             if(is_array($data))
             {
                 $result[$k] = $this->EE->encrypt->encode($v);
@@ -432,6 +437,8 @@ class Formslib
         $mcrypt_installed = function_exists('mcrypt_encrypt');
         foreach($data as $k => $v)
         {
+            if(array_search($k, $this->no_encryption) !== FALSE) continue;
+            
             // properly encrypted strings should have == at the end of their values
             // unless they are XOR encoded, which is only used if mcrypt isn't installed
             if(($mcrypt_installed && substr($v, -1) == '=') || !$mcrypt_installed)
