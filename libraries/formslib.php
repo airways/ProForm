@@ -406,13 +406,21 @@ class Formslib
         $this->EE->load->library('encrypt');
         foreach($data as $k => $v)
         {
-            if(array_search($k, $this->no_encryption) !== FALSE) continue;
-            
-            if(is_array($data))
+            if(array_search($k, $this->no_encryption) !== FALSE)
             {
-                $result[$k] = $this->EE->encrypt->encode($v);
+                if(is_array($data))
+                {
+                    $result[$k] = $v;
+                } else {
+                    $result->{$k} = $v;
+                }
             } else {
-                $result->{$k} = $this->EE->encrypt->encode($v);
+                if(is_array($data))
+                {
+                    $result[$k] = $this->EE->encrypt->encode($v);
+                } else {
+                    $result->{$k} = $this->EE->encrypt->encode($v);
+                }
             }
         }
         return $result;
@@ -437,24 +445,32 @@ class Formslib
         $mcrypt_installed = function_exists('mcrypt_encrypt');
         foreach($data as $k => $v)
         {
-            if(array_search($k, $this->no_encryption) !== FALSE) continue;
-            
-            // properly encrypted strings should have == at the end of their values
-            // unless they are XOR encoded, which is only used if mcrypt isn't installed
-            if(($mcrypt_installed && substr($v, -1) == '=') || !$mcrypt_installed)
+            if(array_search($k, $this->no_encryption) !== FALSE)
             {
-                if(is_array($data))
-                {
-                    $result[$k] = $this->EE->encrypt->decode($v);
-                } else {
-                    $result->{$k} = $this->EE->encrypt->decode($v);
-                }
-            } else {
                 if(is_array($data))
                 {
                     $result[$k] = $v;
                 } else {
                     $result->{$k} = $v;
+                }
+            } else {
+                // properly encrypted strings should have == at the end of their values
+                // unless they are XOR encoded, which is only used if mcrypt isn't installed
+                if(($mcrypt_installed && substr($v, -1) == '=') || !$mcrypt_installed)
+                {
+                    if(is_array($data))
+                    {
+                        $result[$k] = $this->EE->encrypt->decode($v);
+                    } else {
+                        $result->{$k} = $this->EE->encrypt->decode($v);
+                    }
+                } else {
+                    if(is_array($data))
+                    {
+                        $result[$k] = $v;
+                    } else {
+                        $result->{$k} = $v;
+                    }
                 }
             }
         }
