@@ -224,7 +224,7 @@ class Proform {
             $form_obj = $this->EE->extensions->call('proform_form_start', $this, $form_obj);
         }
         
-        if($form_obj)
+        if($form_obj && is_object($form_obj))
         {
             if($form_obj->fields())
             {
