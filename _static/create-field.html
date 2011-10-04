@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+
+	<title>New Field | ExpressionEngine</title>
+	<link rel="stylesheet" href="http://metasushi.net/dev/anorlen/ee/themes/cp_themes/default/css/jquery-ui-1.7.2.custom.css?v=1312216958" type="text/css" media="screen" />
+	<link rel="stylesheet" href="http://metasushi.net/dev/anorlen/ee/themes/cp_themes/default/css/global.css?v=1312216958" type="text/css" media="screen" />
+	<link rel="stylesheet" href="assets/css/screen.css" type="text/css" media="screen" />
+
+		<!--[if lte IE 7]><link rel="stylesheet" href="http://metasushi.net/dev/anorlen/ee/themes/cp_themes/default/css/iefix.css?v=1312216958" type="text/css" media="screen" />
+<![endif]-->
+
+	<script type="text/javascript" charset="utf-8">
+// <![CDATA[
+
+			document.documentElement.className += "js";
+
+			if (typeof console === "undefined" || ! console.log) {
+				console = { log: function() { return false; }};
+			}
+			
+			if (typeof EE === "undefined" || ! EE) {
+				var EE = {"SESS_TIMEOUT":3600000,"XID_TIMEOUT":14400000,"SESS_TYPE":"cs","BASE":"index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&D=cp","XID":"aaa0e4e14c2202cbedbb64f5192aa25fce4a5426","PATH_CP_GBL_IMG":"http:\/\/metasushi.net\/dev\/anorlen\/ee\/themes\/cp_global_images\/","CP_SIDEBAR_STATE":"n","username":"anorlen","router_class":"addons_modules","lang":{"logout_confirm":"Are you sure you want to log-out?","logout":"Log-out","search":"Search","session_timeout":"Your session is about to expire due to inactivity","session_expiring":"Your Session has expired.  Please log back in to avoid data loss","username":"Username","password":"Password","login":"Login"},"THEME_URL":"http:\/\/metasushi.net\/dev\/anorlen\/ee\/themes\/cp_themes\/default\/"};
+			}
+		
+// ]]>
+
+</script>
+	
+	<script type="text/javascript" src="http://metasushi.net/dev/anorlen/ee/themes/javascript/compressed/jquery/jquery.js?v=1312216960"></script>
+	
+		<script charset="utf-8" type="text/javascript" src="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=javascript&amp;M=load&amp;file=css&amp;theme=default&amp;v=1312216958"></script>
+	
+	<link rel="stylesheet" href="http://metasushi.net/dev/anorlen/ee/themes/third_party/proform/styles/main.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="http://metasushi.net/dev/anorlen/ee/themes/third_party/proform/styles/jquery.contextMenu.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="http://metasushi.net/dev/anorlen/ee/themes/third_party/prolib/styles/prolib.css" type="text/css" media="screen" />
+<script type="text/javascript" src="http://metasushi.net/dev/anorlen/ee/themes/third_party/prolib/javascript/prolib.js"></script>
+<script type="text/javascript" src="http://metasushi.net/dev/anorlen/ee/themes/third_party/proform/javascript/jquery.tablednd_0_5.js"></script>
+<!-- <script type="text/javascript" src="http://metasushi.net/dev/anorlen/ee/themes/third_party/proform/javascript/global.js"></script> -->
+
+<script type="text/javascript" src="http://metasushi.net/dev/anorlen/ee/themes/third_party/proform/javascript/jquery.contextMenu.js"></script>
+<script type="text/javascript" src="http://metasushi.net/dev/anorlen/ee/themes/third_party/proform/javascript/jquery.form.js"></script>
+
+<script type="text/javascript" src="assets/scripts/global-module.js"></script>
+</head>
+<body>
+<noscript>
+<div class="js_notification" style="top: 0;">
+	<div class="notice_inner js_error">
+		<span>Javascript must be enabled in order for this theme to function properly.  Please check your browser settings.</span>
+	</div>
+</div>
+</noscript>
+<!--[if lte IE 6]>
+<div class="js_notification" style="top: 0;">
+	<div class="notice_inner js_error">
+		<span>ie_6_warning</span>
+	</div>
+</div>
+<![endif]-->
+<div id="branding"></div>
+
+<div id="mainMenu">
+	<ul id="navigationTabs">
+		<li class="home"><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp" title="CP Home" class="first_level"><img src="http://metasushi.net/dev/anorlen/ee/themes/cp_themes/default/images/home_icon.png" width="12" height="13" alt="CP Home" /></a></li>
+
+		<li class="parent "><a href="#" class="first_level">Content</a><ul class="">
+<li class="parent "><a href="#" class="">Publish</a><ul class="">
+<li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=content_publish&amp;M=entry_form&amp;channel_id=2" class="">Information Pages</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=content_publish&amp;M=entry_form&amp;channel_id=1" class="">News</a></li>
+</ul></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=content_edit" class="">Edit</a></li><li class="parent "><a href="#" class="">Files</a><ul class="">
+<li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=content_files" class="">File Manager</a></li><li class="nav_divider"></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=content_files&amp;M=file_upload_preferences" class="">File Upload Preferences</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=content_files&amp;M=watermark_preferences" class="">Watermark Preferences</a></li>
+</ul></li><li class="nav_divider"></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=content" class="">Overview</a></li>
+
+</ul></li><li class="parent "><a href="#" class="first_level">Design</a><ul class="">
+<li class="parent "><a href="#" class="">Templates</a><ul class="">
+<li class="parent "><a href="#" class="">Edit</a><ul class="">
+<li class="parent "><a href="#" class="">about</a><ul class="">
+<li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=edit_template&amp;id=2" class="">404</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=edit_template&amp;id=3" class="">contact</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=edit_template&amp;id=1" class="">index</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=manager&amp;tgpref=1" class="">...see more</a></li><li class="nav_divider"></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=manager&amp;tgpref=1" class="">Edit Template Group</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=new_template&amp;group_id=1" class="">Create Template</a></li>
+</ul></li><li class="parent "><a href="#" class="">global_embeds</a><ul class="">
+
+<li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=edit_template&amp;id=5" class="">.page_header</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=edit_template&amp;id=6" class="">.top_nav</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=edit_template&amp;id=7" class="">css_screen-ie6</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=edit_template&amp;id=8" class="">css_screen-ie7</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=edit_template&amp;id=4" class="">index</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=edit_template&amp;id=9" class="">site_css</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=manager&amp;tgpref=2" class="">...see more</a></li><li class="nav_divider"></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=manager&amp;tgpref=2" class="">Edit Template Group</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=new_template&amp;group_id=2" class="">Create Template</a></li>
+</ul></li><li class="parent "><a href="#" class="">news</a><ul class="">
+<li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=edit_template&amp;id=11" class="">archives</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=edit_template&amp;id=12" class="">atom</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=edit_template&amp;id=14" class="">comments</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=edit_template&amp;id=13" class="">comment_preview</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=edit_template&amp;id=10" class="">index</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=edit_template&amp;id=15" class="">rss</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=manager&amp;tgpref=3" class="">...see more</a></li><li class="nav_divider"></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=manager&amp;tgpref=3" class="">Edit Template Group</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=new_template&amp;group_id=3" class="">Create Template</a></li>
+
+</ul></li><li class="parent "><a href="#" class="">search</a><ul class="">
+<li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=edit_template&amp;id=16" class="">index</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=edit_template&amp;id=17" class="">no_results</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=edit_template&amp;id=18" class="">results</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=manager&amp;tgpref=4" class="">...see more</a></li><li class="nav_divider"></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=manager&amp;tgpref=4" class="">Edit Template Group</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=new_template&amp;group_id=4" class="">Create Template</a></li>
+</ul></li><li class="nav_divider"></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=new_template_group" class="">Create Group</a></li>
+</ul></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=manager" class="">Template Manager</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=sync_templates" class="">Synchronize Templates</a></li><li class="nav_divider"></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=snippets" class="">Snippets</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=global_variables" class="">Global Variables</a></li><li class="nav_divider"></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=template_preferences_manager" class="">Template Preferences</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=global_template_preferences" class="">Global Preferences</a></li>
+
+</ul></li><li class="parent "><a href="#" class="">Message Pages</a><ul class="">
+<li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=email_notification" class="">Email Notifications</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=user_message" class="">User Messages</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=system_offline" class="">Offline Template</a></li>
+</ul></li><li class="parent "><a href="#" class="">Themes</a><ul class="">
+<li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design&amp;M=member_profile_templates" class="">Member Profile Templates</a></li>
+</ul></li><li class="nav_divider"></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=design" class="">Overview</a></li>
+</ul></li><li class="parent "><a href="#" class="first_level">Add-Ons</a><ul class="">
+<li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=addons_modules" class="">Modules</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=addons_accessories" class="">Accessories</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=addons_extensions" class="">Extensions</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=addons_fieldtypes" class="">Fieldtypes</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=addons_plugins" class="">Plugins</a></li><li class="nav_divider"></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=addons" class="">Overview</a></li>
+
+</ul></li><li class="parent "><a href="#" class="first_level">Members</a><ul class="">
+<li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=members&amp;M=view_all_members" class="">View All</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=members&amp;M=member_group_manager" class="">Member Groups</a></li><li class="nav_divider"></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=members&amp;M=ip_search" class="">IP Search</a></li><li class="nav_divider"></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=members&amp;M=new_member_form" class="">Register Member</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=members&amp;M=member_banning" class="">User Banning</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=members&amp;M=member_validation" class="">Activate Pending</a></li><li class="nav_divider"></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=members&amp;M=custom_profile_fields" class="">Member Fields</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=members&amp;M=member_config" class="">Preferences</a></li><li class="nav_divider"></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=members" class="">Overview</a></li>
+</ul></li><li class="parent "><a href="#" class="first_level">Admin</a><ul class="">
+<li class="parent "><a href="#" class="">Channel Administration</a><ul class="">
+<li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=admin_content&amp;M=channel_management" class="">Channels</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=admin_content&amp;M=field_group_management" class="">Channel Fields</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=admin_content&amp;M=status_group_management" class="">Statuses</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=admin_content&amp;M=category_management" class="">Categories</a></li><li class="nav_divider"></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=admin_content&amp;M=global_channel_preferences" class="">Global Preferences</a></li>
+
+</ul></li><li class="nav_divider"></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=admin_system&amp;M=general_configuration" class="">General Configuration</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=admin_system&amp;M=localization_settings" class="">Localization Settings</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=admin_system&amp;M=email_configuration" class="">Email Configuration</a></li><li class="nav_divider"></li><li class="parent "><a href="#" class="">Content Administration</a><ul class="">
+<li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=admin_content&amp;M=default_ping_servers" class="">Default Ping Servers</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=admin_content&amp;M=default_html_buttons" class="">Default HTML Buttons</a></li>
+</ul></li><li class="parent "><a href="#" class="">System Administration</a><ul class="">
+<li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=admin_system&amp;M=database_settings" class="">Database Settings</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=admin_system&amp;M=output_debugging_preferences" class="">Output and Debugging</a></li><li class="nav_divider"></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=admin_system&amp;M=image_resizing_preferences" class="">Image Resizing Preferences</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=admin_system&amp;M=emoticon_preferences" class="">Emoticon Preferences</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=admin_system&amp;M=search_log_configuration" class="">Search Log Configuration</a></li><li class="nav_divider"></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=admin_system&amp;M=config_editor" class="">Config File Editor</a></li>
+
+</ul></li><li class="parent "><a href="#" class="">Security and Privacy</a><ul class="">
+<li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=admin_system&amp;M=security_session_preferences" class="">Security and Sessions</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=admin_system&amp;M=cookie_settings" class="">Cookie Settings</a></li><li class="nav_divider"></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=admin_system&amp;M=word_censoring" class="">Word Censoring</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=admin_system&amp;M=tracking_preferences" class="">Tracking Preferences</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=admin_system&amp;M=captcha_preferences" class="">CAPTCHA Preferences</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=admin_system&amp;M=throttling_configuration" class="">Throttling Preferences</a></li>
+</ul></li><li class="nav_divider"></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=admin_system" class="">Overview</a></li>
+</ul></li><li class="parent "><a href="#" class="first_level">Tools</a><ul class="">
+<li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=tools_communicate" class="">Communicate</a></li><li class="nav_divider"></li><li class="parent "><a href="#" class="">Utilities</a><ul class="">
+<li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=tools_utilities&amp;M=translation_tool" class="">Translation Utility</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=tools_utilities&amp;M=import_utilities" class="">Import Utilities</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=tools_utilities&amp;M=php_info" class="">PHP Info</a></li>
+
+</ul></li><li class="parent "><a href="#" class="">Data</a><ul class="">
+<li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=tools_data&amp;M=sql_manager" class="">SQL Manager</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=tools_data&amp;M=clear_caching" class="">Clear Caching</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=tools_data&amp;M=search_and_replace" class="">Search and Replace</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=tools_data&amp;M=recount_stats" class="">Recount Statistics</a></li>
+</ul></li><li class="parent "><a href="#" class="">Logs</a><ul class="">
+<li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=tools_logs&amp;M=view_cp_log" class="">Control Panel Log</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=tools_logs&amp;M=view_search_log" class="">Search Log</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=tools_logs&amp;M=view_throttle_log" class="">Throttle Log</a></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=tools_logs&amp;M=view_email_log" class="">Email Console Log</a></li>
+</ul></li><li class="nav_divider"></li><li class=""><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=tools" class="">Overview</a></li>
+</ul></li><li class=""><a href="cp/add-ons/module_manager.html" rel="external" class="first_level">Help</a></li><li class="msm_sites"><a href="http://metasushi.net/dev/anorlen/ee/?URL=http://metasushi.net/dev/anorlen/ee/" class="first_level">EE2</a></li>
+
+		<li><a class="addTab first_level" id="addQuickTab" href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=myaccount&amp;M=main_menu_manager_add&amp;link=C--addons_modules/M--show_module_cp/module--proform/method--new_field&amp;linkt=TmV3IEZpZWxk" title="+ Add">+ Add</a></li>
+	</ul>
+	<div class="clear"></div>
+</div>
+
+<div id="mainWrapper"><div id="sideBar">
+	<div id="activeUser">
+		<a class="userName" href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=myaccount" title="My Account">Angela Norlen</a>
+		<a class="logOutButton" href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=login&amp;M=logout" title="Log-out">Log-out</a>
+
+	</div>
+	
+	<div style="display:none" id="sidebarContent">
+
+		<div id="siteLogo">
+			<a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=myaccount&amp;M=edit_avatar" id="user_avatar"><img src="http://metasushi.net/dev/anorlen/ee/themes/cp_themes/default/images/site_logo.gif" width="50" alt="Site Logo" /></a>
+			<p>
+				<strong>anorlen</strong>
+				<span>Super Admins</span>
+
+				<a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=myaccount">My Account</a>
+			</p>
+			<div class="clear_left"></div>
+		</div> <!-- my account -->
+
+		<div id="notePad">
+		<form action="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=myaccount&amp;M=notepad_update" method="post" id="notepad_form">
+
+<input type="hidden" name="redirect_to" value="C=addons_modules&amp;amp;M=show_module_cp&amp;amp;module=proform&amp;amp;method=new_field" />
+
+<input type="hidden" name="XID" value="aaa0e4e14c2202cbedbb64f5192aa25fce4a5426" />
+
+		
+			<h4>
+				Notepad				<span id="sidebar_notepad_edit_desc" class="sidebar_hover_desc">Click to Edit</span>
+			</h4>
+
+			<p id="notePadText" class="js_show">No Notepad Entry. Click to create one.</p>
+			<textarea name="notePadTextEdit" cols="50" rows="12" id="notePadTextEdit" class="js_hide" ></textarea>			
+			<p id="notePadControls" class="js_hide"><br />
+
+				<input type="submit" class="submit" value="Save" />
+				<a class="cancel" href="#">Cancel</a>
+				<img src="http://metasushi.net/dev/anorlen/ee/themes/cp_themes/default/images/indicator.gif" id="notePadSaveIndicator" alt="Notepad Save Indicator" style="display: none;" width="16" height="16" />
+			</p>
+
+		</form>		</div> <!-- notepad -->
+
+		<div id="search">
+
+			<h4>Search</h4>
+			<form action="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=search" method="post" id="cp_search_form">
+
+<input type="hidden" name="XID" value="aaa0e4e14c2202cbedbb64f5192aa25fce4a5426" />
+
+				<input type="text" id="cp_search_keywords" name="cp_search_keywords" placeholder="Search" value="" maxlength="80" class="input" />
+				<input type="image" src="http://metasushi.net/dev/anorlen/ee/themes/cp_themes/default/images/search_button.gif" class="searchButton" />
+				<input type="image" src="http://metasushi.net/dev/anorlen/ee/themes/cp_themes/default/images/indicator.gif" id="cp_search_ajax_indicator" class="searchButton" style="display: none;" />
+			</form>		</div> <!-- search -->
+
+		<!-- quickLinks -->
+		<div id="quickLinks">
+	<h4>
+		Quick Links		<span id="sidebar_quick_links_edit_desc" class="sidebar_hover_desc">Click to Edit</span>
+	</h4>
+
+	<ul class="bullets">
+				<li><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=myaccount&amp;M=quicklinks&amp;id=2">Quick Links Manager</a></li>
+
+	</ul>
+</div> 
+
+		
+	</div> <!-- sidebar_state -->
+	
+	<div id="sidebarControl">
+		<a href="#" id="hideSidebarLink">hide sidebar</a>
+		<a href="#" id="revealSidebarLink">reveal sidebar</a>
+	</div>
+</div> <!-- sideBar --><div id="breadCrumb">
+
+		<ol>
+			<li>EE2</li>
+						<li><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp">CP Home</a></li>
+			<li><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=addons_modules">Modules</a></li>
+<li><a href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=addons_modules&amp;M=show_module_cp&amp;module=proform&amp;&amp;module=proform&amp;">ProForm</a></li>
+		
+			<li class="last">New Field</li>
+
+		</ol>
+		<div class="clear_left"></div>
+
+</div>
+<div id="mainContent" style="width:100%; display:block">
+	<div class="rightNav">
+	<div style="float: left; width: 100%;">
+			<span class="button"><a title="Module Settings" class="submit" href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=addons_modules&amp;M=show_module_cp&amp;module=proform&amp;method=global_form_preferences"> Settings</a></span>
+			<span class="button"><a title="Module Settings" class="submit" href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=addons_modules&amp;M=show_module_cp&amp;module=proform&amp;method=global_form_preferences"> Form Entries</a></span>
+			<span class="button"><a title="Fields" class="submit" href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=addons_modules&amp;M=show_module_cp&amp;module=proform&amp;method=list_fields">Form Fields</a></span>
+
+			<span class="button"><a title="Home" class="submit" href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=addons_modules&amp;M=show_module_cp&amp;module=proform&amp;">Forms</a></span>
+		</div>
+	<div class="clear_left"></div>
+</div>
+	<div class="contents">
+		
+		<div class="heading">
+			<h2 class="edit"><span id="filter_ajax_indicator" style="visibility:hidden; float:right;"><img src="http://metasushi.net/dev/anorlen/ee/themes/cp_themes/default/images/indicator2.gif" style="padding-right:20px;" /></span>
+			ProForm: Create Field</h2>
+		</div>
+		<div class="pageContents">
+
+
+<div class="editForm" id="field_edit">
+<form action="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=addons_modules&amp;M=show_module_cp&amp;module=proform&amp;method=new_field" method="post" class="generic_edit">
+
+<input type="hidden" name="auto_add_form_id" value="" />
+<input type="hidden" name="XID" value="aaa0e4e14c2202cbedbb64f5192aa25fce4a5426" />
+
+<table class="mainTable" border="0" cellspacing="0" cellpadding="0">
+<thead>
+<tr>
+<th>Property</th><th>Value</th></tr>
+
+</thead>
+<tbody>
+<tr class="even">
+<td width="50%"><label>Full Field Name (Label)</label><br />human friendly form name, used in UI</td><td width="50%"><input type="text" name="field_label" value=""  /></td></tr>
+<tr class="odd">
+<td><label>Field Name</label><br />Single word, no spaces, used in templates</td><td><input type="text" name="field_name" value=""  /></td></tr>
+<tr class="even">
+<td width="50%"><label>Type</label><br /></td><td width="50%"><select name="type">
+<option value="checkbox">Checkbox</option>
+<option value="date">Date</option>
+
+<option value="datetime">Date and Time</option>
+<option value="file">File</option>
+<option value="string" selected="selected">String</option>
+<option value="text">Text</option>
+<optgroup label="Number">
+<option value="int">Integer</option>
+<option value="float">Float</option>
+<option value="currency">Currency</option>
+</optgroup>
+<option value="list">List</option>
+
+<option value="mailinglist">Mailing List Subscription</option>
+<option value="hidden">Hidden</option>
+<option value="member_data">Member Data</option>
+</select><div id="type_list" class="edit_settings"><div>
+    <label>List Options</label> 
+    <span class="message label_message">ex/ every_day : Everyday</span>
+    <textarea name="type_list" cols="90" rows="12" ></textarea></div></div><div id="type_member_data" class="edit_settings"><div><label>Field</label> <select name="type_member_data">
+<option value="username">username</option>
+<option value="screen_name">screen_name</option>
+<option value="email">email</option>
+
+<option value="url">url</option>
+<option value="location">location</option>
+<option value="language">language</option>
+<option value="timezone">timezone</option>
+<option value="daylight_savings">daylight_savings</option>
+<option value="time_format">time_format</option>
+<option value="group_id">group_id</option>
+<option value="access_cp">access_cp</option>
+<option value="last_visit">last_visit</option>
+
+<option value="is_banned">is_banned</option>
+<option value="ignore_list">ignore_list</option>
+<option value="member_id">member_id</option>
+<option value="password">password</option>
+<option value="salt">salt</option>
+<option value="unique_id">unique_id</option>
+<option value="remember_me">remember_me</option>
+<option value="authcode">authcode</option>
+<option value="occupation">occupation</option>
+
+<option value="interests">interests</option>
+<option value="bday_d">bday_d</option>
+<option value="bday_m">bday_m</option>
+<option value="bday_y">bday_y</option>
+<option value="aol_im">aol_im</option>
+<option value="yahoo_im">yahoo_im</option>
+<option value="msn_im">msn_im</option>
+<option value="icq">icq</option>
+<option value="bio">bio</option>
+
+<option value="signature">signature</option>
+<option value="avatar_filename">avatar_filename</option>
+<option value="avatar_width">avatar_width</option>
+<option value="avatar_height">avatar_height</option>
+<option value="photo_filename">photo_filename</option>
+<option value="photo_width">photo_width</option>
+<option value="photo_height">photo_height</option>
+<option value="sig_img_filename">sig_img_filename</option>
+<option value="sig_img_width">sig_img_width</option>
+
+<option value="sig_img_height">sig_img_height</option>
+<option value="private_messages">private_messages</option>
+<option value="accept_messages">accept_messages</option>
+<option value="last_view_bulletins">last_view_bulletins</option>
+<option value="last_bulletin_date">last_bulletin_date</option>
+<option value="ip_address">ip_address</option>
+<option value="join_date">join_date</option>
+<option value="last_activity">last_activity</option>
+<option value="total_entries">total_entries</option>
+
+<option value="total_comments">total_comments</option>
+<option value="total_forum_topics">total_forum_topics</option>
+<option value="total_forum_posts">total_forum_posts</option>
+<option value="last_entry_date">last_entry_date</option>
+<option value="last_comment_date">last_comment_date</option>
+<option value="last_forum_post_date">last_forum_post_date</option>
+<option value="last_email_date">last_email_date</option>
+<option value="in_authorlist">in_authorlist</option>
+<option value="accept_admin_email">accept_admin_email</option>
+
+<option value="accept_user_email">accept_user_email</option>
+<option value="notify_by_default">notify_by_default</option>
+<option value="notify_of_pm">notify_of_pm</option>
+<option value="display_avatars">display_avatars</option>
+<option value="display_signatures">display_signatures</option>
+<option value="parse_smileys">parse_smileys</option>
+<option value="smart_notifications">smart_notifications</option>
+<option value="localization_is_site_default">localization_is_site_default</option>
+<option value="cp_theme">cp_theme</option>
+
+<option value="profile_theme">profile_theme</option>
+<option value="forum_theme">forum_theme</option>
+<option value="tracker">tracker</option>
+<option value="template_size">template_size</option>
+<option value="notepad">notepad</option>
+<option value="notepad_size">notepad_size</option>
+<option value="quick_links">quick_links</option>
+<option value="quick_tabs">quick_tabs</option>
+<option value="show_sidebar">show_sidebar</option>
+
+<option value="pmember_id">pmember_id</option>
+<option value="site_id">site_id</option>
+<option value="group_title">group_title</option>
+<option value="group_description">group_description</option>
+<option value="is_locked">is_locked</option>
+<option value="can_view_offline_system">can_view_offline_system</option>
+<option value="can_view_online_system">can_view_online_system</option>
+<option value="can_access_cp">can_access_cp</option>
+<option value="can_access_content">can_access_content</option>
+
+<option value="can_access_publish">can_access_publish</option>
+<option value="can_access_edit">can_access_edit</option>
+<option value="can_access_files">can_access_files</option>
+<option value="can_access_fieldtypes">can_access_fieldtypes</option>
+<option value="can_access_design">can_access_design</option>
+<option value="can_access_addons">can_access_addons</option>
+<option value="can_access_modules">can_access_modules</option>
+<option value="can_access_extensions">can_access_extensions</option>
+<option value="can_access_accessories">can_access_accessories</option>
+
+<option value="can_access_plugins">can_access_plugins</option>
+<option value="can_access_members">can_access_members</option>
+<option value="can_access_admin">can_access_admin</option>
+<option value="can_access_sys_prefs">can_access_sys_prefs</option>
+<option value="can_access_content_prefs">can_access_content_prefs</option>
+<option value="can_access_tools">can_access_tools</option>
+<option value="can_access_comm">can_access_comm</option>
+<option value="can_access_utilities">can_access_utilities</option>
+<option value="can_access_data">can_access_data</option>
+
+<option value="can_access_logs">can_access_logs</option>
+<option value="can_admin_channels">can_admin_channels</option>
+<option value="can_admin_upload_prefs">can_admin_upload_prefs</option>
+<option value="can_admin_design">can_admin_design</option>
+<option value="can_admin_members">can_admin_members</option>
+<option value="can_delete_members">can_delete_members</option>
+<option value="can_admin_mbr_groups">can_admin_mbr_groups</option>
+<option value="can_admin_mbr_templates">can_admin_mbr_templates</option>
+<option value="can_ban_users">can_ban_users</option>
+
+<option value="can_admin_modules">can_admin_modules</option>
+<option value="can_admin_templates">can_admin_templates</option>
+<option value="can_admin_accessories">can_admin_accessories</option>
+<option value="can_edit_categories">can_edit_categories</option>
+<option value="can_delete_categories">can_delete_categories</option>
+<option value="can_view_other_entries">can_view_other_entries</option>
+<option value="can_edit_other_entries">can_edit_other_entries</option>
+<option value="can_assign_post_authors">can_assign_post_authors</option>
+<option value="can_delete_self_entries">can_delete_self_entries</option>
+
+<option value="can_delete_all_entries">can_delete_all_entries</option>
+<option value="can_view_other_comments">can_view_other_comments</option>
+<option value="can_edit_own_comments">can_edit_own_comments</option>
+<option value="can_delete_own_comments">can_delete_own_comments</option>
+<option value="can_edit_all_comments">can_edit_all_comments</option>
+<option value="can_delete_all_comments">can_delete_all_comments</option>
+<option value="can_moderate_comments">can_moderate_comments</option>
+<option value="can_send_email">can_send_email</option>
+<option value="can_send_cached_email">can_send_cached_email</option>
+
+<option value="can_email_member_groups">can_email_member_groups</option>
+<option value="can_email_mailinglist">can_email_mailinglist</option>
+<option value="can_email_from_profile">can_email_from_profile</option>
+<option value="can_view_profiles">can_view_profiles</option>
+<option value="can_edit_html_buttons">can_edit_html_buttons</option>
+<option value="can_delete_self">can_delete_self</option>
+<option value="mbr_delete_notify_emails">mbr_delete_notify_emails</option>
+<option value="can_post_comments">can_post_comments</option>
+<option value="exclude_from_moderation">exclude_from_moderation</option>
+
+<option value="can_search">can_search</option>
+<option value="search_flood_control">search_flood_control</option>
+<option value="can_send_private_messages">can_send_private_messages</option>
+<option value="prv_msg_send_limit">prv_msg_send_limit</option>
+<option value="prv_msg_storage_limit">prv_msg_storage_limit</option>
+<option value="can_attach_in_private_messages">can_attach_in_private_messages</option>
+<option value="can_send_bulletins">can_send_bulletins</option>
+<option value="include_in_authorlist">include_in_authorlist</option>
+<option value="include_in_memberlist">include_in_memberlist</option>
+
+<option value="include_in_mailinglists">include_in_mailinglists</option>
+<option value="total_forum_replies">total_forum_replies</option>
+<option value="display_photos">display_photos</option>
+<option value="assigned_channels">assigned_channels</option>
+<option value="assigned_modules">assigned_modules</option>
+<option value="assigned_template_groups">assigned_template_groups</option>
+<option value="assigned_sites">assigned_sites</option>
+<option value="session_id">session_id</option>
+<option value="admin_sess">admin_sess</option>
+
+<option value="user_agent">user_agent</option>
+</select></div></div></td></tr>
+<tr class="odd">
+<td><label>Length</label><br />If encryption is on, this will cause each field to need about 2.6 times as many characters (minimum 88 characters), so make sure to plan for this in field constraints.</td><td><input type="text" name="length" value=""  /></td></tr>
+<tr class="even">
+<td width="50%">
+    
+<label>Validation</label><br /></td><td width="50%"><div id="field_validation" class="bm_grid" data-key="validation">
+    <table id="gridrow_validation" class="plain"><tbody><tr>
+           <h4>Add a Validation Rule</h4>
+           <select name="addgridrow_validation" id="addgridrow_validation">
+        <option value="required">Always Required</option>
+        <option value="matches_value">Matches Value</option>
+
+        <option value="matches">Matches Field</option>
+        <option value="min_length">Min Length</option>
+        <option value="max_length">Max Length</option>
+        <option value="exact_length">Exact Length</option>
+        <option value="alpha">Alpha Characters Only</option>
+        <option value="alphanumeric">Alpha Numeric Characters Only</option>
+        <option value="alpha_dash">Alpha Numeric Characters, Underscores and Dashes Only</option>
+        <option value="numeric">Numeric Characters Only</option>
+        <option value="numeric_dash">Numeric Characters and Dashes Only</option>
+
+        <option value="integer">Integer Number</option>
+        <option value="is_natural">Natural Number</option>
+        <option value="is_natural_no_zero">Natural Number other than zero</option>
+        <option value="valid_email">Valid E-mail Address</option>
+        <option value="valid_emails">Valid E-mail Addresses separated by commas</option>
+        <option value="valid_id">Valid IP Address</option>
+        <option value="valid_base64">Valid Base 64 Encoded Value</option>
+        <option value="strip_tags">Strip HTML (filter)</option>
+        <option value="trim">Trim (filter)</option>
+
+        <option value="base64_encode">Base 64 Encode (filter)</option>
+        <option value="base64_decode">Base 64 Decode (filter)</option>
+        <option value="urlencode">URL Encode (filter)</option>
+        <option value="urldecode">URL Decode (filter)</option>
+        <option value="parse_url">Parse URL Component (filter)</option>
+        </select>
+         <a href="#" name="addgridrow_validation" id="addgridrow_validation" class="button form-btn">Add a Rule</a>
+         <div class="message">You have not added any validation rules.</div>
+        <th>Rule</th>
+        <th>Param</th>
+        <th>Remove</th>
+        </tr>
+        <tr class="grid_row"><td>Alpha Numeric Characters, Underscores and Dashes Only</td><td><span class="help"></span></td><td><a data-opt="alpha_dash" data-key="validation" class="action-item" href="#">Remove</a></td></tr><tr class="grid_row"><td>Exact Length</td><td><input type="text" class="grid_param" size="5" data-opt="exact_length" data-key="validation"><span class="help"></span></td><td><a data-opt="exact_length" data-key="validation" class="action-item " href="#">Remove</a></td></tr><tr class="grid_row"><td>Natural Number other than zero</td><td><span class="help"></span></td><td><a data-opt="is_natural_no_zero" data-key="validation" class="" href="#" class="action-item">Remove</a></td></tr>
+        </tbody>
+        </table>
+<input type="hidden" name="validation" value="" /><script type="text/javascript">bm_grid.options["validation"] = {"required":{"label":"Always Required"},"matches_value":{"label":"Matches Value","flags":"has_param"},"matches":{"label":"Matches Field","flags":"has_param"},"min_length":{"label":"Min Length","flags":"has_param"},"max_length":{"label":"Max Length","flags":"has_param"},"exact_length":{"label":"Exact Length","flags":"has_param"},"alpha":{"label":"Alpha Characters Only"},"alphanumeric":{"label":"Alpha Numeric Characters Only"},"alpha_dash":{"label":"Alpha Numeric Characters, Underscores and Dashes Only"},"numeric":{"label":"Numeric Characters Only"},"numeric_dash":{"label":"Numeric Characters and Dashes Only"},"integer":{"label":"Integer Number"},"is_natural":{"label":"Natural Number"},"is_natural_no_zero":{"label":"Natural Number other than zero"},"valid_email":{"label":"Valid E-mail Address"},"valid_emails":{"label":"Valid E-mail Addresses separated by commas"},"valid_id":{"label":"Valid IP Address"},"valid_base64":{"label":"Valid Base 64 Encoded Value"},"strip_tags":{"label":"Strip HTML (filter)"},"trim":{"label":"Trim (filter)"},"base64_encode":{"label":"Base 64 Encode (filter)"},"base64_decode":{"label":"Base 64 Decode (filter)"},"urlencode":{"label":"URL Encode (filter)"},"urldecode":{"label":"URL Decode (filter)"},"parse_url":{"label":"Parse URL Component (filter)","flags":"has_param","help":"scheme, host, port, user, pass, path, or query"}};bm_grid.help["validation"] = {"required":"","matches_value":"","matches":"","min_length":"","max_length":"","exact_length":"","alpha":"","alphanumeric":"","alpha_dash":"","numeric":"","numeric_dash":"","integer":"","is_natural":"","is_natural_no_zero":"","valid_email":"","valid_emails":"","valid_id":"","valid_base64":"","strip_tags":"","trim":"","base64_encode":"","base64_decode":"","urlencode":"","urldecode":"","parse_url":"scheme, host, port, user, pass, path, or query"};bm_grid.data["validation"] = [];bm_grid.bind_events("validation", "gridrow_validation");</script></div></td></tr>
+<tr class="odd">
+<td><label>Upload Directory</label><br /></td><td><select name="upload_pref_id">
+<option value="0" selected="selected">None</option>
+
+<option value="1">Main Upload Directory</option>
+<option value="2">About</option>
+</select></td></tr>
+<tr class="even">
+<td width="50%"><label>Mailing List</label><br /></td><td width="50%"><select name="mailinglist_id">
+<option value="0" selected="selected">None</option>
+</select></td></tr>
+</tbody>
+</table>    
+    <div class="tableFooter">
+        <input type="submit" name="submit" value="Create Field" class="submit"  />    </div>
+
+    </form></div>
+		</div>
+
+	</div> <!-- contents -->
+</div> <!-- mainContent -->
+
+<!-- accessories (footer tabs) -->
+<div id="accessoriesDiv">
+
+		<div id="accessoryTabs">
+		<ul>
+
+						<li><a href="#" class="expressionengine_info">ExpressionEngine Info<span class="accessoryHandle">&nbsp;</span></a></li>
+					</ul>
+	</div> <!-- accessoryTabs -->
+	
+		<div id="expressionengine_info" class="accessory">
+		
+				<div class="accessorySection">
+			<h5>Resources</h5>
+			
+			
+		<ul>
+
+			<li><a href="http://metasushi.net/dev/anorlen/ee/?URL=http://expressionengine.com/user_guide">User Guide</a></li>
+			<li><a href="http://metasushi.net/dev/anorlen/ee/?URL=http://expressionengine.com/support/support_policy/">Technical Support</a></li>
+			<li><a href="http://metasushi.net/dev/anorlen/ee/?URL=https://secure.expressionengine.com/download.php">My ExpressionEngine Downloads</a></li>
+		</ul>
+				</div> <!-- accessorySection -->
+				<div class="accessorySection">
+			<h5>Current Version</h5>
+
+			
+			ExpressionEngine is up to date (2.2.2)		</div> <!-- accessorySection -->
+				
+		<div class="clear"></div>
+	</div> <!-- expressionengine_info -->
+		
+</div> <!-- accessories --></div>
+
+<div id="footer">
+	<a rel="external" href="http://metasushi.net/dev/anorlen/ee/?URL=http://expressionengine.com/"><img src="http://metasushi.net/dev/anorlen/ee/themes/cp_themes/default/images/ee_logo_footer.gif" alt="ExpressionEngine" width="109" height="15" /></a>
+	 v2.2.2  - Build: date&nbsp;&nbsp;20110801 - &copy; Copyright 2003 - 2011 <a href="http://metasushi.net/dev/anorlen/ee/?URL=http://ellislab.com/" rel="external">EllisLab, Inc.</a><br />
+
+	
+	Script executed in 0.5935 seconds - 18 SQL queries used</div> <!-- footer -->
+
+<script type="text/javascript" charset="utf-8" src="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=javascript&amp;M=combo_load&amp;ui=core,widget,mouse,position,sortable,dialog&amp;plugin=ee_focus,ee_notice,ee_txtarea,tablesorter,ee_navigation&amp;file=cp/global&amp;effect=core&amp;v=1312216960"></script>
+<div id="notice_container">
+	<div id="notice_texts_container">
+		<a id="close_notice" href="javascript:jQuery.ee_notice.destroy();">&times;</a>
+		
+		<div class="notice_texts notice_success"></div>
+		<div class="notice_texts notice_alert"></div>
+		<div class="notice_texts notice_error"></div>
+
+		<div class="notice_texts notice_custom"></div>
+	</div>
+	<div id="notice_flag">
+		<p id="notice_counts">
+			<span class="notice_success"><img src="http://metasushi.net/dev/anorlen/ee/themes/cp_themes/default/images/success.png" alt="" width="14" height="14" /></span>
+			<span class="notice_alert"><img src="http://metasushi.net/dev/anorlen/ee/themes/cp_themes/default/images/alert.png" alt="" width="14" height="14" /></span>
+			<span class="notice_error"><img src="http://metasushi.net/dev/anorlen/ee/themes/cp_themes/default/images/error.png" alt="" width="14" height="14" /></span>
+			<span class="notice_info"><img src="http://metasushi.net/dev/anorlen/ee/themes/cp_themes/default/images/info.png" alt="" width="14" height="14" /></span>
+		</p>
+
+	</div>
+</div>
+
+</body>
+</html>

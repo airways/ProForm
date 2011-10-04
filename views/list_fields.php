@@ -30,11 +30,9 @@
  * 
  **/ ?>
 
-<!--start:bm_commands-->
-<div class="bm_commands" style="float: right;">
-    <span class="cp_button"><a href="<?php echo BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_field'; ?>"><?php echo lang('new_field'); ?></a></span>
+<div class="new_field">
+    <span class="button"><a href="<?php echo BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_field'; ?>"><?php echo lang('new_field'); ?></a></span>
 </div>
-<!--end:bm_commands-->
 
 <?php if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>'; ?>
 <?php if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>'; ?>

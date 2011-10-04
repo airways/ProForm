@@ -1,0 +1,538 @@
+/* ---------------------------------------------------------------------
+Original Author: Angela Norlen
+ProForm
+------------------------------------------------------------------------ */
+
+/* ---------------------------------------------------------------------
+General Overrides
+------------------------------------------------------------------------ */
+
+.pageContents a:link, 
+.pageContents a:visited  {
+	color: #555557;
+}
+
+.clear {
+	clear: both;
+	height: 0;
+}
+
+/* ---------------------------------------------------------------------
+Create Field
+------------------------------------------------------------------------ */
+
+#addgridrow_validation {
+	margin-bottom: 20px;
+}
+
+#field_validation h4 {
+	margin-bottom: 5px;
+}
+
+.message {
+	font-size: 12px;
+	font-style: italic;
+	margin-bottom: 20px;
+}
+
+.label_message {
+	display: inline-block;
+	margin: 0 0 5px 10px;
+}
+
+.edit_settings textarea,
+.pro_textarea {
+	height: 140px;
+}
+
+/* ---------------------------------------------------------------------
+Main Nav buttons
+------------------------------------------------------------------------ */
+
+.less_important_bttn,
+ .rightNav .submit,
+.heading .submit,
+.new_field .button,
+.btn-main,
+.submit,
+.form-btn {
+	color: #fff;
+	font-weight: bold;
+	border-radius: 3px 3px 3px 3px;
+	background: url('../images/bg-btn.jpg') 0 0 repeat-x;
+}
+
+.form-btn {
+	display: inline-block;
+	float: none;
+	padding: 5px 9px;
+	color: #fff;
+	margin-left: 10px;
+	font-weight: normal;
+}
+
+.content-btn {
+	float: none;
+	display: inline-block;
+	margin-bottom: 10px;
+}
+
+.less_important_bttn:hover,
+ .rightNav .submit:hover,
+.heading .submit:hover,
+.new_field .button:hover,
+.btn-main:hover,
+.submit:hover {
+	background: #505D68 !important;
+	text-decoration: none;
+}
+
+.pageContents span.button .submit,
+.rightNav span.button .submit,
+.new_field .button a,
+.heading .button .submit,
+.form-btn {
+	color: #ffffff !important;
+}
+
+.heading {
+	position: relative;
+	height: 33px;
+}
+
+table.mainTable tr td:first-child {
+	vertical-align: top;
+}
+.heading .edit {
+	float: left;
+}
+
+.heading .button {
+	float: right;
+	margin-top: 5px;
+	position: relative;
+	z-index: 50;
+}
+
+/* ---------------------------------------------------------------------
+Create Form
+------------------------------------------------------------------------ */
+
+.dropdown {
+	background: #505d68;
+	position: absolute;
+	top: 21px;
+	display: none;
+	left: 0;
+	width: 89px;
+	padding: 5px 3px;
+	-moz-border-radius: 0 0 3px 3px;
+}
+
+.dropdown a {
+	display: block;
+	color: #fff !important;
+	padding: 3px 9px;
+	font-size: 11px;
+}
+
+.dropdown a:hover {
+	text-decoration: underline;
+}
+
+.action-list a {
+	text-decoration: underline !important;
+	display: inline-block;
+	padding: 0 8px;
+	border-left: 1px solid #555557;	
+}
+
+.action-item {
+	text-decoration: underline !important;	
+}
+
+.action-list a:first-child {
+	border-left: 0;
+	padding-left: 0;
+}
+
+.breadcrumbs {
+	overflow: hidden;
+	margin-bottom: 20px;
+}
+
+.breadcrumbs li {
+	float: left;
+	font-weight: bold;
+}
+
+.breadcrumbs .active {
+	font-weight: normal;
+}
+
+table.mainTable td  {
+	background: #f1f1f2;
+}
+
+table.mainTable tr.even td {
+	background: #fff;
+}
+
+.new_field {
+	margin-bottom: 10px;
+	overflow: hidden;
+}
+
+.commandBar {
+	text-align: left;
+	margin-left: 0;
+}
+
+/* ---------------------------------------------------------------------
+Form Layout
+------------------------------------------------------------------------ */
+
+.form-layout {
+	float: left;
+	width: 65%;
+}
+
+.field-modifications {
+	float: right;
+	width: 30%;
+	min-width: 350px;
+}
+
+.section-header {
+	color: #fff;
+	background: #333e46;
+	padding: 7px 15px;
+	overflow: hidden;
+}
+
+#mainContent .section-header h3 {
+	color: #fff;
+	font-size: 14px;
+	float: left;
+	font-weight: normal;
+	margin-bottom: 0;
+}
+
+.grid-group {
+	overflow: hidden;
+}
+
+.label-message {
+	font-style: italic;
+	color: #a2b1bb;
+	font-size: 11px;
+	display: inline-block;
+	margin-left: 20px;
+}
+
+.section-body {
+	background-color: #f1f1f2;
+	padding: 10px;
+	border: 1px solid #f6f7f8;
+}
+
+#mainContent .pageContents {
+	background: #fafcfd;
+	border: 1px solid #ECF1F4;
+}
+
+#mainContent .tableFooter {
+	background: #fafcfd;	
+}
+
+.required {
+	color: #a32a38;
+}
+
+.required-field {
+	float: right;
+}
+
+.required-field label {
+	font-weight: normal;	
+}
+
+.section-body li {
+	margin-bottom: 10px;
+}
+
+.commandBar {
+	margin-bottom: 20px;
+}
+
+.action-group {
+	padding-bottom: 20px;
+	overflow: hidden;
+}
+
+.action-group .btn-main {
+	float: right;
+}
+
+.action-group select {
+	width: 154px;
+}
+
+.form-fields {
+	float: left;
+	margin-top: 3px;
+}
+
+/* ---------------------------------------------------------------------
+Form Layout > Fields
+------------------------------------------------------------------------ */
+
+.form-name {
+	margin-bottom: 20px;
+}
+
+.form-name input {
+	width: 40%;
+	display: block;
+}
+
+.pageContents li .label-checkbox {
+	display: inline-block;
+}
+
+.form-setup {
+	overflow: hidden;
+}
+
+.form-setup li {
+	padding: 10px 10px 10px 20px;
+	border: 1px solid transparent;
+	position: relative;
+	float: left;
+	width: 90%;
+	margin: 0 10px 10px 0;
+}
+
+.move-link {
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	width: 19px;
+	height: 19px;
+	display: inline-block;
+	display: none;
+	background: url(../images/icon_handle.gif) no-repeat;
+}
+
+.form-setup li:hover {
+	border: 1px solid #ccc;
+	cursor: pointer;
+}
+
+
+.form-setup li:hover .move-link {
+	display: block;
+}
+
+.action-link {
+	text-decoration: underline;
+	position: absolute;
+	top: 5px;
+	right: 65px;
+	display: none;
+}
+
+.delete {
+	right: 10px;
+	border-left: 1px solid #ccc;
+	padding-left: 10px;
+}
+
+.form-setup li:hover .action-link {
+	display: block;
+}
+
+.form-setup li.active {
+	background: #f1f1f2;
+	border: 1px solid #d0d6d9;
+}
+
+.form-setup textarea {
+	width: 80%;
+	height: 150px;
+}
+
+.mainTable textarea {
+	height: 150px;
+}
+
+#gridrow_validation {
+	border-collapse: collapse;
+}
+
+#gridrow_validation tr.even td {
+	background-color: #F4F6F6;
+}
+
+#gridrow_validation td:last-child {
+	width: 50px;
+}
+
+#gridrow_validation td {
+	border: 0 !important;
+	border-bottom: 1px solid #D0D7DF !important;
+	border-left: 1px solid #D0D7DF !important;
+}
+
+.pagination-btn {
+	display: inline-block;
+	margin-top: 5px;
+}
+
+.pag-last,
+.pag-first {
+	width: 11px;
+	height: 19px;
+	margin-top: 15px;
+	line-height: 20px;
+	background: url(../images/icon-last.png) 0 9px no-repeat;
+}
+
+.pag-next,
+.pag-prev {
+	width: 6px;
+	height: 19px;
+	margin-top: 15px;
+	line-height: 20px;
+	background: url(../images/icon-next.png) 0 9px no-repeat;
+}
+
+.pag-first {
+	background: url(../images/icon-first.png) 0 9px no-repeat;	
+}
+
+.pag-prev {
+	background: url(../images/icon-prev.png) 0 9px no-repeat;	
+}
+
+.info-link {
+	margin-bottom: 10px;
+	display: block;
+	text-decoration: underline !important;
+	text-align: right;
+}
+
+/* ---------------------------------------------------------------------
+Messages / Form Errors
+------------------------------------------------------------------------ */
+
+.warning span {
+	font-weight: bold;
+	color: #a43333;
+}
+
+.tabs {
+	overflow: hidden;
+	margin-bottom: 15px;
+	border-bottom: 1px solid #d1d7df;
+}
+
+.tabs li {
+	float: left;
+	height: 26px;
+	line-height: 26px;
+	background: #F1F1F2;
+	margin-right: 5px;
+	-webkit-border-radius: 3px 3px 0 0;
+	-moz-border-radius: 3px 3px 0 0;
+	border-radius: 3px 3px 0 0;
+	border: 1px solid #ededed;
+}
+
+.tab-content {
+	display: none;
+}
+
+#tab-content-settings {
+	display: block;
+}
+
+.pageContents .tabs li a {
+	display: block;
+	color: #333E46;	
+	font-weight: bold;
+	padding: 0 15px;
+}
+
+.tabs li:first-child {
+	border-left: 0;
+} 
+
+.tabs li.active {
+	border: 1px solid transparent;
+	height: 26px;
+	background: #2d363b url('../images/bg-btn.jpg') 0 0 repeat-x;
+}
+
+.tabs li.active a {
+	color: #fff;
+}
+
+input.form-error {
+	border: 1px solid #a32a38 !important;
+}
+
+label.form-error,
+.error-message {
+	color: #a32a38;
+}
+
+.error-message  {
+	padding: 10px 0 0;
+	font-style: italic;
+	margin-bottom: 10px;
+}
+
+textarea:focus, 
+textarea.markItUpEditor:focus,
+input[type="text"]:focus,
+input[type="email"]:focus, 
+input[type="url"]:focus, 
+input[type="number"]:focus,
+input[type="password"]:focus {
+	background: #f2f5f7;
+}
+
+.content-heading {
+	margin-bottom: 20px;
+	font-size: 16px;
+}
+
+.sub-heading,
+#mainContent h3.sub-heading {
+	font-size: 14px;
+}
+
+#mainContent h3.sub-heading {
+	margin-top: 10px;
+}
+
+/* ---------------------------------------------------------------------
+Create Form
+------------------------------------------------------------------------ */
+
+.content-title-group {
+	margin-bottom: 5px;
+}
+
+.dropdown-wrap {
+	position: relative;
+}
+
+.dropdown-wrap .submit:hover {
+	text-decoration: none;
+}
+
+
+
+

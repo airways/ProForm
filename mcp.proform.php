@@ -126,8 +126,8 @@ class Proform_mcp {
 
         $this->EE->cp->add_to_head('<link rel="stylesheet" href="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/styles/main.css" type="text/css" media="screen" />');
         $this->EE->cp->add_to_head('<link rel="stylesheet" href="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/styles/jquery.contextMenu.css" type="text/css" media="screen" />');
-
-        $this->EE->cp->add_to_head('<link rel="stylesheet" href="' . $this->EE->config->item('theme_folder_url') . 'third_party/prolib/styles/prolib.css" type="text/css" media="screen" />');
+        $this->EE->cp->add_to_head('<link rel="stylesheet" href="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/styles/screen.css" type="text/css" media="screen" />');
+	
         $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/prolib/javascript/prolib.js"></script>');
 
         $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/jquery.tablednd_0_5.js"></script>');
@@ -151,6 +151,8 @@ class Proform_mcp {
         
         $this->EE->cp->set_variable('cp_page_title', $this->EE->lang->line('proform_module_name'));
 
+        $this->sub_page('tab_forms');
+        
         //$vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_form';
         $vars['form_hidden'] = NULL;
         $vars['forms'] = array();
@@ -194,7 +196,10 @@ class Proform_mcp {
             
         }
 
-        
+        $vars['is_super_admin'] = $this->EE->session->userdata['group_id'] == 1;
+        $vars['mcrypt_warning'] = !function_exists('mcrypt_encrypt');
+        $vars['key_warning'] = !(strlen($this->EE->config->item('encryption_key')) >= 32);
+
         ////////////////////////////////////////
         // Pagination
         
@@ -409,7 +414,6 @@ class Proform_mcp {
         
         $types = array(
             'form_id' => 'read_only', 
-            'form_type' => array('static', lang($form_fields->form_type.'_desc')),
             'entries_count' => 'read_only', 
             'notification_template' => array('dropdown', $template_options), 
             'notification_list' => 'textarea',
@@ -424,14 +428,19 @@ class Proform_mcp {
             'safecracker_channel_id' => array('dropdown', $channel_options)
         );
         
-        $form = $this->EE->bm_forms->create_cp_form($form_fields, $types);
+        $extra = array(
+            'after' => array(
+                'encryption_on' => array(array('heading' => lang('notification_list_name'))),
+                'subject' => array(array('heading' => lang('field_submitter_notification_name'))),
+                'submitter_email_field' => array(array('heading' => lang('field_share_notification_name'))),
+            )
+        );
+        $form = $this->EE->bm_forms->create_cp_form($form_fields, $types, $extra);
 
         
         $vars['form'] = $form;
-
-        $vars['is_super_admin'] = $this->EE->session->userdata['group_id'] == 1;
-        $vars['mcrypt_warning'] = $form_fields->encryption_on && !function_exists('mcrypt_encrypt');
-        $vars['key_warning'] = $form_fields->encryption_on && !(strlen($this->EE->config->item('encryption_key')) >= 32);
+        $vars['_form_title'] = lang($form_fields->form_type.'_title');
+        $vars['_form_description'] = lang($form_fields->form_type.'_desc');
 
         $this->EE->load->library('table');
 
@@ -440,18 +449,18 @@ class Proform_mcp {
         switch($form_fields->form_type)
         {
             case 'form':
-                $vars['hidden_fields'] = array('form_id', 'safecracker_channel_id');
+                $vars['hidden_fields'] = array('form_id', 'form_type', 'safecracker_channel_id');
                 break;
             case 'saef':
                 $vars['hidden']['save_entries_on'] = 'y';
-                $vars['hidden_fields'] = array('form_id', 'encryption_on',
+                $vars['hidden_fields'] = array('form_id', 'form_type','encryption_on',
                 'admin_notification_on', 'notification_template', 'notification_list', 'subject',
                 'submitter_notification_on', 'submitter_notification_template', 'submitter_notification_subject', 'submitter_email_field',
                 'share_notification_on', 'share_notification_template', 'share_notification_subject', 'share_email_field',
                 );
                 break;
             case 'share':
-                $vars['hidden_fields'] = array('form_id', 'safecracker_channel_id', 'encryption_on',
+                $vars['hidden_fields'] = array('form_id', 'form_type','safecracker_channel_id', 'encryption_on',
                 );
                 break;
         }
@@ -958,6 +967,10 @@ class Proform_mcp {
         $this->EE->load->helper('form');
         
         $this->sub_page('tab_list_fields');
+        
+        /*$vars['buttons'] = array(
+            array('url' => '', 'label' => 'New Field')
+        );*/
         
         //$vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_form';
         $vars['form_hidden'] = NULL;
@@ -1576,7 +1589,7 @@ class Proform_mcp {
     function sub_page($page, $added_title = '')
     {
         $this->EE->cp->set_breadcrumb(ACTION_BASE.AMP.'module=proform'.AMP, $this->EE->lang->line('proform_module_name'));
-        $this->EE->cp->set_variable('cp_page_title', lang($page) . ($added_title != '' ? ' - ' . $added_title : ''));
+        $this->EE->cp->set_variable('cp_page_title', lang('proform_title') . ' ' . lang($page) . ($added_title != '' ? ' - ' . $added_title : ''));
         
     }
     

@@ -271,7 +271,27 @@ var bm_field_edit = {
 $(document).ready(function() {
     bm_field_edit.bind_events();
     bm_field_edit.update_settings_fields();
-});
+    
+    $('.dropdown-wrap .submit, .dropdown-wrap .dropdown').hover(function() {
+        $('.dropdown').show();
+    }, function() {
+        $('.dropdown').hide();
+    });
+    
+    console.log('test');
+    
+    $('.tabs li a').click(function() {
+        var currentTab = $(this).attr('href');
+        $('.tabs li a').parent('li').removeClass('active');
+        $(this).parent('li').addClass('active');
+        $('.tab-content').hide();
+        console.log(currentTab);
+        $(currentTab).show();
+        return false;
+    });
+    
+    $('#gridrow_validation tr:odd').addClass('even');
 
+});
 
 

@@ -30,28 +30,45 @@
  * 
  **/ ?>
 
-<?php echo validation_errors(); ?>
+<?php
 
-<?php if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>'; ?>
-<?php if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>'; ?>
+if(isset($_form_title))
+{
+    echo '<h2 class="content-heading content-title-group">'.$_form_title.'</h2>';
+}
 
-<?php if(isset($is_super_admin) && $is_super_admin && isset($mcrypt_warning) && $mcrypt_warning): ?>
-    <div style="color: black; background: yellow; margin: 10px; padding: 5px; border: 1px solid red;"><strong>Warning:</strong> Your server does not support mcrypt.<br/>Data stored with "encryption" turned on will use a simple XOR encoding cipher rather than the more secure encryption. It is <strong>strongly</strong> recommended that you install the mcrypt PHP extension.</div>
-<?php endif; ?>
+if(isset($_form_description))
+{
+    echo '<p>'.$_form_description.'</b>';
+}
 
-<?php if(isset($is_super_admin) && $is_super_admin && isset($key_warning) && $key_warning): ?>
-    <div style="color: black; background: yellow; margin: 10px; padding: 5px; border: 1px solid red;"><strong>Warning:</strong> You do not have a encryption_key value set.<br/>Encryption will not work until this value is set. It should be set to a complex string with upper and lower case letters, numbers, and symbols, 32 characters in length.</div>
-<?php endif; ?>
+echo validation_errors();
+
+if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>';
+if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>';
+?>
+
+<?php
+if(isset($buttons)):
+    foreach($buttons as $btn):
+?>
+<div class="new_field">
+    <span class="button"><a href="<?php echo $btn['url']; ?>"><?php echo $btn['label']; ?></a></span>
+</div>
+<?php
+    endforeach;
+endif;
+?>
+
 
 <div class="editForm" id="<?php if(isset($form_name)) echo $form_name; ?>">
 <?php
     echo form_open($action_url, array('class' => 'generic_edit'), isset($hidden) ? $hidden : array());
     $table_template = $cp_table_template;
     $table_template['cell_start'] = '<td width="50%">';
+    $table_heading = array(lang('heading_property'), lang('heading_value'));
     $this->table->set_template($table_template);
-    $this->table->set_heading(
-        lang('heading_property'),
-        lang('heading_value'));
+    $this->table->set_heading($table_heading);
 
 
     foreach($form as $field)
@@ -63,10 +80,21 @@
             die;
         }
         
+        if(array_key_exists('heading', $field))
+        {
+            echo $this->table->generate();
+            echo '<h3 class="sub-heading">'.$field['heading'].'</h3>';
+            $this->table->set_template($table_template);
+            $this->table->set_heading($table_heading);
+            continue;
+        }
+
         if(isset($hidden_fields) && array_search($field['lang_field'], $hidden_fields) !== FALSE)
         {
             continue;
         }
+        
+        
         // used to look up lang entries for this field
         $lang_field = 'field_' . $field['lang_field'];
     
