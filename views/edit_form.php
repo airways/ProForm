@@ -43,7 +43,7 @@
 </div>
 
 <!-- start edit form tab content -->
-<div id="tab-content-settings" class="tab-content ">
+<div class="tab-content tab-content-settings">
 
     <?php $generic_edit_embedded = TRUE; include(PATH_THIRD.'proform/views/generic_edit.php'); ?>
 
@@ -51,7 +51,7 @@
 <!-- end edit form tab content -->
 
 <!-- start tab content -->
-<div id="tab-content-layout" class="grid-group tab-content ">
+<div class="grid-group tab-content tab-content-layout">
 
 <?php echo form_open($assign_action_url, '', $form_hidden); ?>
 <div class="commandBar">

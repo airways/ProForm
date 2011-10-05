@@ -287,7 +287,7 @@ $(document).ready(function() {
         $(currentTab.replace('tab-', '').replace('#', '.')).addClass('active');
         $('.tab-content').hide();
         //console.log(currentTab);
-        $(currentTab).show();
+        $(currentTab.replace('#', '.')).show();
     }
     
     $('.tabs li a').click(function() {
