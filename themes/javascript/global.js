@@ -282,7 +282,7 @@ $(document).ready(function() {
     
     function activateTab(currentTab)
     {
-    
+        $('input[name=active_tab]').val(currentTab.replace('#', ''));
         $('.tabs li a').parent('li').removeClass('active');
         $(currentTab.replace('tab-', '').replace('#', '.')).addClass('active');
         $('.tab-content').hide();
@@ -298,8 +298,11 @@ $(document).ready(function() {
     
     $('#gridrow_validation tr:odd').addClass('even');
 
-    if(window.location.hash.indexOf('tab-content-layout') !== -1) activateTab('#tab-content-layout');
-    if(window.location.hash.indexOf('tab-content-settings') !== -1) activateTab('#tab-content-settings');
+    if(window.location.hash.indexOf('tab-content-layout') !== -1) {
+        activateTab('#tab-content-layout');
+    } else {
+        activateTab('#tab-content-settings');
+    }
     
     $('html, body').animate({ scrollTop: 0 }, 0);
 });

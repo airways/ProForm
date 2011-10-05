@@ -42,6 +42,9 @@
     </ul>
 </div>
 
+<?php echo form_open($action_url, '', $form_hidden); ?>
+<?php echo form_hidden('active_tab'); ?>
+
 <!-- start edit form tab content -->
 <div class="tab-content tab-content-settings">
 
@@ -53,7 +56,6 @@
 <!-- start tab content -->
 <div class="grid-group tab-content tab-content-layout">
 
-<?php echo form_open($assign_action_url, '', $form_hidden); ?>
 <div class="commandBar">
     <label for="field_id">Add Special</label>&nbsp;<?php
     if(count($special_options) > 0):
@@ -75,14 +77,13 @@
 
 <!--    &nbsp; <a href="<?php echo $new_field_url?>">New Field</a>-->
 </div>
-<?php echo form_close(); ?>
+
 
 
 <div class="formFields mouseUp">
 <?php
 
 if (count($fields) > 0):
-    echo form_open($action_url, '', $form_hidden);
 
     $cp_table_template['cell_start'] = '<td><div class="cellPad">';
     $cp_table_template['cell_end'] = '</div></td>';
@@ -149,10 +150,9 @@ if (count($fields) > 0):
 </div>
 
     <div class="tableFooter">
-        <?php echo form_submit(array('name' => 'submit', 'value' => lang('save_layout'), 'class' => 'submit')); ?>
+        <?php echo form_submit(array('name' => 'submit', 'value' => lang('save_form'), 'class' => 'submit')); ?>
     </div>
-    <?php echo form_close();
-
+<?php
     echo '<div id="defaultValueForm" class="defaultValueForm" style="display: none;">';
     echo form_open($default_value_action_url, '', $default_value_hidden);
     echo form_label('Default Value');
@@ -162,6 +162,7 @@ if (count($fields) > 0):
     echo '<br/><br/>'.form_button('save', 'Save', 'class="submit" id="defaultValueSubmit"');
     echo form_close();
     echo '</div>';
+
 
 else:
     echo '<div class="no_items_msg">' . lang('no_fields') . '</div>';

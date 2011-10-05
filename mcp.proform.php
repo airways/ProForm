@@ -363,7 +363,16 @@ class Proform_mcp {
         } 
         else 
         {
-            show_error(lang('invalid_submit'));
+            if(strlen($data['form_name']) == 0 || is_numeric($data['form_name']))
+            {
+                show_error(lang('invalid_form_name'));
+            }
+            
+            if(strlen($data['form_label']) == 0 || is_numeric($data['form_label']))
+            {
+                show_error(lang('invalid_form_label'));
+            }
+            
             return FALSE;
         }
     }
@@ -390,7 +399,7 @@ class Proform_mcp {
             
             if(!$form_id || !$form)
             {
-                show_error(lang('invalid_submit'));
+                show_error(lang('invalid_form_id').' [9]');
                 return FALSE;
             }
             
@@ -561,7 +570,7 @@ class Proform_mcp {
         if(!$this->EE->input->post('share_notification_on')) $_POST['share_notification_on'] = 'n';
         
         // find form
-        $form_id = trim($this->EE->input->post('form_id'));
+        $form_id = trim($this->EE->input->get_post('form_id'));
         if(!$form_id || $form_id <= 0) show_error(lang('missing_form_id'));
         
         $form = $this->EE->formslib->get_form($form_id);
@@ -574,8 +583,24 @@ class Proform_mcp {
         
         $form->save();
         
-        // go back to form listing
-        $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form->form_id);
+        //$this->sub_page('tab_edit_fields');
+        //$this->EE->load->library('formslib');
+        //$form_id = $this->EE->input->post('form_id');
+        //$form = $this->EE->formslib->get_form($form_id);
+        
+        foreach($form->fields() as $field)
+        {
+            $is_required = $this->EE->input->post('required_'.$field->field_name);
+            if($is_required != 'y') $is_required = 'n';
+            $form->assign_field($field, $is_required);
+        }
+        
+        $form->set_layout($this->EE->input->post('field_order'), $this->EE->input->post('field_row'));
+        $active_tab = $this->EE->input->post('active_tab');
+        
+        // go back to form edit
+        $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form->form_id.'#'.$active_tab);
+        
         return TRUE;
     }
     
@@ -620,36 +645,11 @@ class Proform_mcp {
         }
         else
         {
-            show_error(lang('invalid_submit'));
+            show_error(lang('invalid_form_id').' [10]');
             return FALSE;
         }
     }
     
-
-
-    function process_edit_form_fields()
-    {
-        $this->sub_page('tab_edit_fields');
-        $this->EE->load->library('formslib');
-        $form_id = $this->EE->input->post('form_id');
-        $form = $this->EE->formslib->get_form($form_id);
-        
-        if($form_id && $form)
-        {
-            foreach($form->fields() as $field)
-            {
-                $is_required = $this->EE->input->post('required_'.$field->field_name);
-                if($is_required != 'y') $is_required = 'n';
-                $form->assign_field($field, $is_required);
-            }
-        }
-
-        $form->set_layout($this->EE->input->post('field_order'), $this->EE->input->post('field_row'));
-        
-        $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form_id);
-        return TRUE;
-    }
-
     function set_default_value()
     {
         if($this->EE->input->post('form_id') !== FALSE
@@ -672,10 +672,10 @@ class Proform_mcp {
                     exit('Saved');
                 }
             } else {
-                exit(lang('invalid_submit') . " form_id or field_id invalid");
+                exit(lang('invalid_form_id_or_field_id') . " [4]");
             }
         } else {
-            exit(lang('invalid_submit') . " form_id or field_id missing");
+            exit(lang('invalid_form_id_or_field_id') . " [5]");
         }
     }
     
@@ -722,7 +722,7 @@ class Proform_mcp {
         } 
         else 
         {
-            show_error(lang('invalid_submit'));
+            show_error(lang('invalid_form_id').' [6]');
             return FALSE;
         }
     }
@@ -800,7 +800,7 @@ class Proform_mcp {
         } 
         else 
         {
-            show_error(lang('invalid_submit'));
+            show_error(lang('invalid_form_id').' [7]');
             return FALSE;
         }
     }
@@ -833,13 +833,13 @@ class Proform_mcp {
             } 
             else 
             {
-                show_error(lang('invalid_submit'));
+                show_error(lang('invalid_field_id'));
                 return FALSE;
             }
         } 
         else 
         {
-            show_error(lang('invalid_submit'));
+            show_error(lang('invalid_form_id').' [8]');
             return FALSE;
         }
     }
@@ -903,7 +903,7 @@ class Proform_mcp {
         } 
         else 
         {
-            show_error(lang('invalid_submit') . ' [1]');
+            show_error(lang('invalid_form_id_or_field_id') . ' [1]');
             return FALSE;
         }
     }
@@ -935,7 +935,7 @@ class Proform_mcp {
         } 
         else 
         {
-            show_error(lang('invalid_submit') . ' [2]');
+            show_error(lang('invalid_form_id_or_field_id') . ' [2]');
             return FALSE;
         }
     }
@@ -1076,7 +1076,7 @@ class Proform_mcp {
         
         if(strlen($field_type) < 1)
         {
-            show_error(lang('invalid_submit') . '[1]');
+            show_error(lang('invalid_field_type') . '[1]');
             return FALSE;
         }
         
@@ -1085,7 +1085,7 @@ class Proform_mcp {
         if(strlen($field_length) < 1)
         {
             $field_length = 255;
-            #show_error(lang('invalid_submit') . '[2]');
+            #show_error(lang('invalid_field_length') . '[2]');
             #return FALSE;
         }
         
@@ -1093,7 +1093,7 @@ class Proform_mcp {
 
         /*if(strlen($field_validation) < 1)
         {
-            show_error(lang('invalid_submit') . '[3]');
+            show_error(lang('invalid_validation') . '[3]');
             return FALSE;
         }*/
 
@@ -1244,7 +1244,7 @@ class Proform_mcp {
         $upload_pref_id = $this->EE->input->post('upload_pref_id');
         $mailinglist_id = $this->EE->input->post('mailinglist_id');
         
-        if(!$field_id || $field_id <= 0) show_error(lang('invalid_submit'));
+        if(!$field_id || $field_id <= 0) show_error(lang('invalid_field_id'));
         if(!$field_name) show_error(lang('missing_field_name'));
         if(!$type) show_error(lang('missing_type'));
         if(!$length) show_error(lang('missing_length'));
@@ -1330,7 +1330,7 @@ class Proform_mcp {
         }
         else
         {
-            show_error(lang('invalid_submit'));
+            show_error(lang('invalid_field_id'));
             return FALSE;
         }
     }

@@ -74,7 +74,7 @@ $lang = array(
     'list_templates' => 'Templates',
     'new_template' => 'Create New Template',
     'export_entries' => 'Export Entries',
-    'save_layout' => 'Save Layout',
+    'save_form' => 'Save Form',
     
     'form_title' => 'General Form',
     'form_desc' => 'A normal form that saves data in a database table. Good for contact forms and other forms that don\'t generally get turned into content on the site.',
@@ -191,9 +191,16 @@ $lang = array(
     
     // Errors
     'invalid_submit' => 'The form has invalid values.',
+    'invalid_form_id' => 'Invalid form ID.',
     'invalid_form_name' => 'Invalid form name.',
+    'invalid_form_label' => 'Invalid form label.',
     'invalid_field_name' => 'Invalid field name.',
     'invalid_field_label' => 'Invalid field label.',
+    'invalid_field_id' => 'Invalid fieldID.',
+    'invalid_form_id_or_field_id' => 'Invalid form or field ID.',
+    'invalid_field_type' => 'Invalid field type.',
+    'invalid_field_length' => 'Invalid field length.',
+    'invalid_validation' => 'Invalid validation rules.',
     'invalid_notification_list' => 'Invalid field notification list.',
     'invalid_subject' => 'Invalid subject.',
     'invalid_from_address' => 'Invalid from address.',
