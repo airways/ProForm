@@ -166,7 +166,6 @@ class Proform_mcp {
         {
             $rownum = 0;
         }
-
         
         //$query = $this->EE->db->order_by("form_name", "desc")->get('proform'); //, $rownum, $this->perpage
         // TODO: member access controls on data and form editing
@@ -178,8 +177,8 @@ class Proform_mcp {
         foreach($forms as $form)
         {
 
-            $form->edit_link                = ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form->form_id;
-            $form->edit_fields_link         = ACTION_BASE.AMP.'method=edit_form_fields'.AMP.'form_id='.$form->form_id;
+            $form->edit_link                = ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form->form_id.'#tab-content-settings';
+            $form->edit_fields_link         = ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form->form_id.'#tab-content-layout';
             $form->edit_preset_values_link  = ACTION_BASE.AMP.'method=edit_form_preset_values'.AMP.'form_id='.$form->form_id;
             $form->list_entries_link        = ACTION_BASE.AMP.'method=list_entries'.AMP.'form_id='.$form->form_id;
             $form->delete_link              = ACTION_BASE.AMP.'method=delete_form'.AMP.'form_id='.$form->form_id;
@@ -375,7 +374,7 @@ class Proform_mcp {
         
         if($editing && $this->EE->input->post('form_id') !== FALSE) 
         {
-            if($this->process_edit_form()) return;
+            if($this->process_edit_form() AND $this->process_edit_form_fields()) return;
         }
         
         $vars['hidden'] = array();
@@ -387,8 +386,14 @@ class Proform_mcp {
         
             $form_id = (int)$this->EE->input->get('form_id');
             $query = $this->EE->db->get_where('proform_forms', array('form_id' => $form_id));
-            $form_obj = $this->EE->formslib->get_form($form_id);
-
+            $form = $this->EE->formslib->get_form($form_id);
+            
+            if(!$form_id || !$form)
+            {
+                show_error(lang('invalid_submit'));
+                return FALSE;
+            }
+            
             $vars['editing'] = TRUE;
             $vars['hidden']['form_id'] = $form_id;
         
@@ -422,7 +427,7 @@ class Proform_mcp {
             'submitter_notification_template' => array('dropdown', $template_options),
             'share_notification_on' => array('checkbox', 'y'),
             'share_notification_template' => array('dropdown', $template_options),
-            'encryption_on' => (isset($form_obj) AND $form_obj AND $form_obj->count_entries())
+            'encryption_on' => (isset($form) AND $form AND $form->count_entries())
                                         ? array('read_only_checkbox', lang('encryption_toggle_disabled'))
                                         : array('checkbox', 'y'),
             'safecracker_channel_id' => array('dropdown', $channel_options)
@@ -435,10 +440,10 @@ class Proform_mcp {
                 'submitter_email_field' => array(array('heading' => lang('field_share_notification_name'))),
             )
         );
-        $form = $this->EE->bm_forms->create_cp_form($form_fields, $types, $extra);
+        $edit_form = $this->EE->bm_forms->create_cp_form($form_fields, $types, $extra);
 
         
-        $vars['form'] = $form;
+        $vars['form'] = $edit_form;
         $vars['_form_title'] = lang($form_fields->form_type.'_title');
         $vars['_form_description'] = lang($form_fields->form_type.'_desc');
 
@@ -466,7 +471,85 @@ class Proform_mcp {
         }
         
         
-        return $this->EE->load->view('generic_edit', $vars, TRUE);
+        
+        //$this->EE->load->library('formslib');
+        //$form_id = $this->EE->input->get('form_id');
+        //$this->sub_page('tab_edit_fields', $form->form_name);
+
+        $vars['form_hidden'] = array('form_id' => $form_id);
+        $vars['default_value_hidden'] = array('form_id' => $form_id, 'field_id' => 0);
+        //$vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_form_fields';
+        $vars['assign_action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=assign_field';
+        $vars['new_field_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_field';
+        $vars['default_value_action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=set_default_value';
+
+        $vars['special_options'] = array('step' => 'Step');
+
+        // list available fields to add to the form
+        $vars['field_options'] = array();
+        foreach($this->EE->formslib->get_fields() as $field) 
+        {
+            // don't show fields that are already on the form
+            if(!array_key_exists($field->field_name, $form->fields())) 
+            {
+                $vars['field_options'][$field->field_id] = $field->field_name;
+            }
+        }
+        $vars['field_options'][-1] = "New Field";
+        
+        
+        //$query = $this->EE->db->order_by("field_name", "desc")->get_where('proform_fields', array('form_id' => $form_id));
+        $vars['form_id'] = $form_id;
+        $vars['form_name'] = $form->form_name;
+        
+        ////////////////////////////////////////
+        // Generate table of fields
+        $vars['fields'] = array();
+        
+        foreach($form->fields() as $field) 
+        {
+            $row_array = (array)$field;
+            
+            $row_array['edit_link']     = ACTION_BASE.AMP.'method=edit_field'.AMP.'field_id='.$field->field_id;
+            $row_array['remove_link']   = ACTION_BASE.AMP.'method=remove_field'.AMP.'form_id='.$form_id.AMP.'field_id='.$field->field_id;
+            $row_array['is_required']   = $field->is_required;
+
+            // Toggle checkbox
+            $row_array['toggle'] = array(
+                                    'name'      => 'toggle[]',
+                                    'id'        => 'edit_box_'.$field->field_id,
+                                    'value'     => $field->field_id,
+                                    'class'     =>'toggle');
+            
+            $vars['fields'][$field->field_id] = $row_array;
+        }
+        
+        ////////////////////////////////////////
+        // Javascript
+        
+        $save_order_url = '';
+        $this->EE->javascript->output(array(
+            '$(document).ready(function() {
+                $("#formFields table").sortable({
+                  handle : ".handle",
+                  update : function () {
+                      var order = $("#formFields table").sortable("serialize");
+                    $("#info").load("' . $save_order_url . '?"+order);
+                  }
+                });
+            });'
+        ));
+
+        $this->EE->cp->add_js_script(array('plugin' => 'dataTables'));
+        //$this->EE->javascript->output($this->ajax_filters('edit_items_ajax_filter', 4));
+        $this->EE->javascript->compile();
+        
+        $this->EE->load->library('table');
+
+        $vars['presets'] = $form->get_presets();
+        $this->_get_flashdata($vars);
+        //return $this->EE->load->view('edit_form_fields', $vars, TRUE);
+        return $this->EE->load->view('edit_form', $vars, TRUE);
     }
     
     function process_edit_form()
@@ -542,105 +625,7 @@ class Proform_mcp {
         }
     }
     
-    function edit_form_fields()
-    {
-        if($this->EE->input->post('form_id') !== FALSE)
-        {
-            if($this->process_edit_form_fields()) return;
-        }
 
-
-        $this->EE->load->library('formslib');
-        $form_id = $this->EE->input->get('form_id');
-        $form = $this->EE->formslib->get_form($form_id);
-
-        $this->sub_page('tab_edit_fields', $form->form_name);
-
-        $vars = array(
-            'form_hidden' => array('form_id' => $form_id),
-            'default_value_hidden' => array('form_id' => $form_id, 'field_id' => 0),
-            'action_url'  => 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_form_fields',
-            'assign_action_url' => 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=assign_field',
-            'new_field_url' => 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_field',
-            'default_value_action_url' => 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=set_default_value',
-        );
-
-        $vars['special_options'] = array(
-            'step' => 'Step'
-        );
-
-        // list available fields to add to the form
-        $vars['field_options'] = array();
-        foreach($this->EE->formslib->get_fields() as $field) 
-        {
-            // don't show fields that are already on the form
-            if(!array_key_exists($field->field_name, $form->fields())) 
-            {
-                $vars['field_options'][$field->field_id] = $field->field_name;
-            }
-        }
-        $vars['field_options'][-1] = "New Field";
-        
-        if($form_id && $form)
-        {
-            //$query = $this->EE->db->order_by("field_name", "desc")->get_where('proform_fields', array('form_id' => $form_id));
-            $vars['form_id'] = $form_id;
-            $vars['form_name'] = $form->form_name;
-            
-            ////////////////////////////////////////
-            // Generate table of fields
-            $vars['fields'] = array();
-            
-            foreach($form->fields() as $field) 
-            {
-                $row_array = (array)$field;
-                
-                $row_array['edit_link']     = ACTION_BASE.AMP.'method=edit_field'.AMP.'field_id='.$field->field_id;
-                $row_array['remove_link']   = ACTION_BASE.AMP.'method=remove_field'.AMP.'form_id='.$form_id.AMP.'field_id='.$field->field_id;
-                $row_array['is_required']   = $field->is_required;
-
-                // Toggle checkbox
-                $row_array['toggle'] = array(
-                                        'name'      => 'toggle[]',
-                                        'id'        => 'edit_box_'.$field->field_id,
-                                        'value'     => $field->field_id,
-                                        'class'     =>'toggle');
-                
-                $vars['fields'][$field->field_id] = $row_array;
-            }
-            
-            ////////////////////////////////////////
-            // Javascript
-            
-            $save_order_url = '';
-            $this->EE->javascript->output(array(
-                '$(document).ready(function() {
-                    $("#formFields table").sortable({
-                      handle : ".handle",
-                      update : function () {
-                          var order = $("#formFields table").sortable("serialize");
-                        $("#info").load("' . $save_order_url . '?"+order);
-                      }
-                    });
-                });'
-            ));
-
-            $this->EE->cp->add_js_script(array('plugin' => 'dataTables'));
-            //$this->EE->javascript->output($this->ajax_filters('edit_items_ajax_filter', 4));
-            $this->EE->javascript->compile();
-            
-            $this->EE->load->library('table');
-
-            $vars['presets'] = $form->get_presets();
-            $this->_get_flashdata($vars);
-            return $this->EE->load->view('edit_form_fields', $vars, TRUE);
-        } 
-        else 
-        {
-            show_error(lang('invalid_submit'));
-            return FALSE;
-        }
-    }
 
     function process_edit_form_fields()
     {
@@ -661,7 +646,7 @@ class Proform_mcp {
 
         $form->set_layout($this->EE->input->post('field_order'), $this->EE->input->post('field_row'));
         
-        $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form_fields'.AMP.'form_id='.$form_id);
+        $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form_id);
         return TRUE;
     }
 
@@ -843,7 +828,7 @@ class Proform_mcp {
             
                 // go back to edit field assignments listing for this form
                 $this->EE->session->set_flashdata('message', lang('msg_field_added'));
-                $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form_fields'.AMP.'form_id='.$form_id);
+                $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form_id);
                 return TRUE;
             } 
             else 
@@ -945,7 +930,7 @@ class Proform_mcp {
             
             // go back to edit field assignments listing for this form
             $this->EE->session->set_flashdata('message', lang('msg_field_removed'));
-            $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form_fields'.AMP.'form_id='.$form_id);
+            $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form_id);
             return TRUE;
         } 
         else 

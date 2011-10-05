@@ -30,8 +30,28 @@
  * 
  **/ ?>
 
+<h2 class="content-heading">Editing <em><?php echo $form_name; ?></em></h2>
+
 <?php if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>'; ?>
 <?php if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>'; ?>
+
+<div class="tabs">
+    <ul>
+        <li class="active content-settings"><a href="#tab-content-settings">Form Settings</a></li>
+        <li class="content-layout"><a href="#tab-content-layout">Form Layout</a></li>
+    </ul>
+</div>
+
+<!-- start edit form tab content -->
+<div id="tab-content-settings" class="tab-content ">
+
+    <?php $generic_edit_embedded = TRUE; include(PATH_THIRD.'proform/views/generic_edit.php'); ?>
+
+</div>
+<!-- end edit form tab content -->
+
+<!-- start tab content -->
+<div id="tab-content-layout" class="grid-group tab-content ">
 
 <?php echo form_open($assign_action_url, '', $form_hidden); ?>
 <div class="commandBar">
@@ -126,7 +146,7 @@ if (count($fields) > 0):
     ?>
 </div>
 
-
+</div>
 
     <div class="tableFooter">
         <?php echo form_submit(array('name' => 'submit', 'value' => lang('save_layout'), 'class' => 'submit')); ?>

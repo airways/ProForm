@@ -63,7 +63,10 @@ endif;
 
 <div class="editForm" id="<?php if(isset($form_name)) echo $form_name; ?>">
 <?php
-    echo form_open($action_url, array('class' => 'generic_edit'), isset($hidden) ? $hidden : array());
+    if(!isset($generic_edit_embedded) || !$generic_edit_embedded)
+    {
+        echo form_open($action_url, array('class' => 'generic_edit'), isset($hidden) ? $hidden : array());
+    }
     $table_template = $cp_table_template;
     $table_template['cell_start'] = '<td width="50%">';
     $table_heading = array(lang('heading_property'), lang('heading_value'));
@@ -128,10 +131,15 @@ endif;
     }
     
     echo $this->table->generate();
-    ?>
     
-    <div class="tableFooter">
-        <?php echo form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit'))?>
-    </div>
-    <?php echo form_close(); ?>
+    if(!isset($generic_edit_embedded) || !$generic_edit_embedded)
+    {
+        ?>
+    
+        <div class="tableFooter">
+            <?php echo form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit'))?>
+        </div>
+        <?php echo form_close(); 
+    }
+    ?>
 </div>

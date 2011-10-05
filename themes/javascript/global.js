@@ -278,20 +278,30 @@ $(document).ready(function() {
         $('.dropdown').hide();
     });
     
-    console.log('test');
+    //console.log('test');
+    
+    function activateTab(currentTab)
+    {
+    
+        $('.tabs li a').parent('li').removeClass('active');
+        $(currentTab.replace('tab-', '').replace('#', '.')).addClass('active');
+        $('.tab-content').hide();
+        //console.log(currentTab);
+        $(currentTab).show();
+    }
     
     $('.tabs li a').click(function() {
         var currentTab = $(this).attr('href');
-        $('.tabs li a').parent('li').removeClass('active');
-        $(this).parent('li').addClass('active');
-        $('.tab-content').hide();
-        console.log(currentTab);
-        $(currentTab).show();
+        activateTab(currentTab);
         return false;
     });
     
     $('#gridrow_validation tr:odd').addClass('even');
 
+    if(window.location.hash.indexOf('tab-content-layout') !== -1) activateTab('#tab-content-layout');
+    if(window.location.hash.indexOf('tab-content-settings') !== -1) activateTab('#tab-content-settings');
+    
+    $('html, body').animate({ scrollTop: 0 }, 0);
 });
 
 
