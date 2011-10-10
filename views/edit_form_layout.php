@@ -138,7 +138,7 @@ endif;
                     <label for="field_id">Select form field to add</label>&nbsp;
                     <?php echo form_dropdown('add_field_id', $field_options); ?>
                 </div>
-                &nbsp; <input type="submit" class="submit btn-main" name="add_field" value="Add">
+                &nbsp; <input type="submit" class="submit btn-main" name="add_field" value="Add" />
             </div>
             
             <div class="section-header">
@@ -151,31 +151,31 @@ endif;
             <ul class="section-body">
                 <li>
                     <label for="">Field Label <span class="required">*</span></label>
-                    <input type="text" id="field-label">
+                    <input type="text" id="field-label" />
                 </li>
                 <li>
                     <label for="">Field Default Value</label>
-                    <input type="text" id="field-preset-value">
+                    <input type="text" id="field-preset-value" />
                 </li>
                 <li>
                     <label for="">Force Default Value</label>
-                    <input type="checkbox" id="field-preset-forced">
+                    <input type="checkbox" id="field-preset-forced" />
                 </li>
                 <li>
                     <label for="">Field Id</label>
-                    <input type="text" id="field-html-id">
+                    <input type="text" id="field-html-id" />
                 </li>
                 <li>
                     <label for="">Field Class</label>
-                    <input type="text" id="field-html-class">
+                    <input type="text" id="field-html-class" />
                 </li>
                 <li>
                     <label for="">Extra 1</label>
-                    <input type="text" id="field-extra1">
+                    <input type="text" id="field-extra1" />
                 </li>
                 <li>
                     <label for="">Extra 2</label>
-                    <input type="text" id="field-extra2">
+                    <input type="text" id="field-extra2" />
                 </li>
             </ul>
         </div> <!-- end .field-modifications -->

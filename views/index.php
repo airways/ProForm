@@ -42,7 +42,7 @@
 
 <h2 class="content-heading">Forms</h2>
 
-<span class="button content-btn"><a title="Create a Form" class="submit" href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=addons_modules&amp;M=show_module_cp&amp;module=proform&amp;method=global_form_preferences"><?php echo lang('new_form'); ?></a></span>
+<span class="button content-btn"><a title="Create a Form" class="submit" href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=addons_modules&amp;M=show_module_cp&amp;module=proform&amp;method=new_form"><?php echo lang('new_form'); ?></a></span>
 
 <div class="bm_commands" style="float: right;">
     <span class="cp_button"><a href="<?php echo BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_form'.AMP.'type=form'; ?>"><?php echo lang('new_form'); ?></a></span>

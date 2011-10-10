@@ -485,8 +485,16 @@ class Proform_mcp {
         //$form_id = $this->EE->input->get('form_id');
         //$this->sub_page('tab_edit_fields', $form->form_name);
 
-        $vars['form_hidden'] = array('form_id' => $form_id);
-        $vars['default_value_hidden'] = array('form_id' => $form_id, 'field_id' => 0);
+        $vars['form_hidden'] = array();
+        $vars['default_value_hidden'] = array('form_id' => 0, 'field_id' => 0);
+        if($form)
+        {
+            $vars['form_id'] = $form_id;
+            $vars['form_name'] = $form->form_name;
+            $vars['form_hidden']['form_id'] = $form_id;
+            $vars['default_value_hidden']['form_id'] = $form_id;
+        }
+        
         //$vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_form_fields';
         $vars['assign_action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=assign_field';
         $vars['new_field_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_field';
@@ -500,17 +508,12 @@ class Proform_mcp {
         foreach($this->EE->formslib->get_fields() as $field) 
         {
             // don't show fields that are already on the form
-            if(!array_key_exists($field->field_name, $form->fields())) 
+            if(!$form OR !array_key_exists($field->field_name, $form->fields())) 
             {
                 $vars['field_options'][$field->field_id] = $field->field_label . ' (' . $field->field_name . ')';
             }
         }
         $vars['field_options'][-1] = "New Field";
-        
-        
-        //$query = $this->EE->db->order_by("field_name", "desc")->get_where('proform_fields', array('form_id' => $form_id));
-        $vars['form_id'] = $form_id;
-        $vars['form_name'] = $form->form_name;
         
         ////////////////////////////////////////
         // Generate table of fields
@@ -518,23 +521,26 @@ class Proform_mcp {
         
         //$presets = $form->get_presets();
         
-        foreach($form->fields() as $field) 
+        if($form)
         {
-            $row_array = (array)$field;
+            foreach($form->fields() as $field) 
+            {
+                $row_array = (array)$field;
             
-            $row_array['settings']      = $field->form_field_settings;
-            $row_array['edit_link']     = ACTION_BASE.AMP.'method=edit_field'.AMP.'field_id='.$field->field_id;
-            $row_array['remove_link']   = ACTION_BASE.AMP.'method=remove_field'.AMP.'form_id='.$form_id.AMP.'field_id='.$field->field_id;
-            $row_array['is_required']   = $field->is_required;
+                $row_array['settings']      = $field->form_field_settings;
+                $row_array['edit_link']     = ACTION_BASE.AMP.'method=edit_field'.AMP.'field_id='.$field->field_id;
+                $row_array['remove_link']   = ACTION_BASE.AMP.'method=remove_field'.AMP.'form_id='.$form_id.AMP.'field_id='.$field->field_id;
+                $row_array['is_required']   = $field->is_required;
 
-            // Toggle checkbox
-            $row_array['toggle'] = array(
-                                    'name'      => 'toggle[]',
-                                    'id'        => 'edit_box_'.$field->field_id,
-                                    'value'     => $field->field_id,
-                                    'class'     =>'toggle');
+                // Toggle checkbox
+                $row_array['toggle'] = array(
+                                        'name'      => 'toggle[]',
+                                        'id'        => 'edit_box_'.$field->field_id,
+                                        'value'     => $field->field_id,
+                                        'class'     =>'toggle');
             
-            $vars['fields'][$field->field_id] = $row_array;
+                $vars['fields'][$field->field_id] = $row_array;
+            }
         }
         
         ////////////////////////////////////////

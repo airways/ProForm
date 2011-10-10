@@ -30,7 +30,11 @@
  * 
  **/ ?>
 
+<?php if(isset($form_name)): ?>
 <h2 class="content-heading">Editing <em><?php echo $form_name; ?></em></h2>
+<?php else: ?>
+<h2 class="content-heading">New Form</h2>
+<?php endif; ?>
 
 <?php if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>'; ?>
 <?php if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>'; ?>

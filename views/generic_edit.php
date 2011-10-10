@@ -42,14 +42,14 @@ if(isset($_form_description))
     echo '<p>'.$_form_description.'</b>';
 }
 
-echo validation_errors();
+echo validation_errors('<div class="message error-message">', '</div>');
 
-if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>';
-if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>';
+if(isset($message) && $message != FALSE) echo '<div class="message error-message">'.$message.'</div>';
+if(isset($error) && $error != FALSE) echo '<div class="message error-message">'.$error.'</div>';
 ?>
-            <div class="message error-message">
-                Please complete the highlighted fields below.
-            </div>
+<!-- <div class="message error-message">
+    Please complete the highlighted fields below.
+</div> -->
 <?php
 if(isset($buttons)):
     foreach($buttons as $btn):
