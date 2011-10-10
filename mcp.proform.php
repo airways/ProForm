@@ -491,7 +491,7 @@ class Proform_mcp {
         {
             $vars['form_id'] = $form_id;
             $vars['form_name'] = $form->form_name;
-            $vars['form_hidden']['form_id'] = $form_id;
+            $vars['hidden']['form_id'] = $form_id;
             $vars['default_value_hidden']['form_id'] = $form_id;
         }
         
@@ -599,25 +599,30 @@ class Proform_mcp {
         $form->save();
         
         // process layout and field customization for the form
-        foreach($form->fields() as $field)
+        $field_order = $this->EE->input->post('field_order');
+        
+        if($field_order)
         {
-            $is_required = $this->EE->input->post('required_'.$field->field_name);
-            if($is_required != 'y') $is_required = 'n';
-            $form->assign_field($field, $is_required);
+            foreach($form->fields() as $field)
+            {
+                $is_required = $this->EE->input->post('required_'.$field->field_name);
+                if($is_required != 'y') $is_required = 'n';
+                $form->assign_field($field, $is_required);
+            }
+            
+            $form->set_layout($field_order, $this->EE->input->post('field_row'));
+            
+            $settings_map = array(
+                'label'         => $this->EE->input->post('field_label'),
+                'preset_value'  => $this->EE->input->post('field_preset_value'),
+                'preset_forced' => $this->EE->input->post('field_preset_forced'),
+                'html_id'       => $this->EE->input->post('field_html_id'),
+                'html_class'    => $this->EE->input->post('field_html_class'),
+                'extra1'        => $this->EE->input->post('field_extra1'),
+                'extra2'        => $this->EE->input->post('field_extra2'),
+            );
+            $form->set_all_form_field_settings($this->EE->input->post('field_order'), $settings_map);
         }
-        
-        $form->set_layout($this->EE->input->post('field_order'), $this->EE->input->post('field_row'));
-        
-        $settings_map = array(
-            'label'         => $this->EE->input->post('field_label'),
-            'preset_value'  => $this->EE->input->post('field_preset_value'),
-            'preset_forced' => $this->EE->input->post('field_preset_forced'),
-            'html_id'       => $this->EE->input->post('field_html_id'),
-            'html_class'    => $this->EE->input->post('field_html_class'),
-            'extra1'        => $this->EE->input->post('field_extra1'),
-            'extra2'        => $this->EE->input->post('field_extra2'),
-        );
-        $form->set_all_form_field_settings($this->EE->input->post('field_order'), $settings_map);
         
         // process adding a field
         $field_id = trim($this->EE->input->get_post('add_field_id'));

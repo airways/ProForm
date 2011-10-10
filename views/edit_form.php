@@ -42,11 +42,13 @@
 <div class="tabs">
     <ul>
         <li class="active content-settings"><a href="#tab-content-settings">Form Settings</a></li>
+<?php if(isset($form_id) AND $form_id): ?>
         <li class="content-layout"><a href="#tab-content-layout">Form Layout</a></li>
+<?php endif; ?>
     </ul>
 </div>
 
-<?php echo form_open($action_url, array('id' => 'main_form'), $form_hidden); ?>
+<?php echo form_open($action_url, array('id' => 'main_form'), isset($hidden) ? $hidden : array()); ?>
 <?php echo form_hidden('active_tab'); ?>
 
 <!-- start edit form tab content -->
@@ -57,6 +59,7 @@
 </div>
 <!-- end edit form tab content -->
 
+<?php if(isset($form_id) AND $form_id): ?>
 
 <!-- start tab content -->
 <div class="grid-group tab-content tab-content-layout">
@@ -64,6 +67,8 @@
     <?php include(PATH_THIRD.'proform/views/edit_form_layout.php'); ?>
 
 </div>
+
+<?php endif; ?>
 
 <?php echo form_submit(array('name' => 'submit', 'value' => lang('save_form'), 'class' => 'submit')); ?>
 <?php echo form_close(); ?>

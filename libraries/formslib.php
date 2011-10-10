@@ -90,6 +90,9 @@ class Formslib
             $forge->add_field($fields);
             $forge->add_key('form_entry_id', TRUE);
             $forge->add_key('updated');
+            // var_dump($data);
+            //             var_dump($fields);
+            //             exit;
             $forge->create_table(BM_Form::make_table_name($data['form_name']));
         }
         
@@ -654,7 +657,10 @@ class BM_Form extends BM_RowInitialized {
         switch($this->form_type)
         {
             case 'form':
-                $result = $this->__EE->db->count_all($this->table_name());
+                if($this->__EE->db->table_exists($this->table_name()))
+                {
+                    $result = $this->__EE->db->count_all($this->table_name());
+                }
                 break;
             case 'saef':
                 $result = $this->__EE->db
