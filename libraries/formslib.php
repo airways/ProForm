@@ -547,6 +547,17 @@ class BM_Form extends BM_RowInitialized {
     
     var $settings;
     
+    
+    public static $default_form_field_settings = array(
+        'label'         => '',
+        'preset_value'  => '',
+        'preset_forced' => 'n',
+        'html_id'       => '',
+        'html_class'    => '',
+        'extra1'        => '',
+        'extra2'        => '',
+    );
+    
     function fields() 
     {
 
@@ -561,13 +572,29 @@ class BM_Form extends BM_RowInitialized {
                     $this->__fields[$row->field_name] = new BM_Field($row);
                     if(isset($this->__fields[$row->field_name]->settings))
                         $this->__fields[$row->field_name]->settings = unserialize($this->__fields[$row->field_name]->settings);
+                    
+                    $this->__fields[$row->field_name]->form_field_settings = $this->get_form_field_settings($row->form_field_settings);
                 }
             }
         }
         
         return $this->__fields;
     }
-
+    
+    // unserialize settings for a form field assignment row and merge with default values
+    function get_form_field_settings($settings='')
+    {
+        if($settings)
+        {
+            $settings = unserialize($settings);
+        } else {
+            $settings = array();
+        }
+        $settings = array_merge(BM_Form::$default_form_field_settings, $settings);
+        
+        return $settings;
+    }
+    
     function set_layout($field_order, $field_rows)
     {
         $i = 1;
@@ -578,7 +605,49 @@ class BM_Form extends BM_RowInitialized {
             $i ++;
         }
     }
-
+    
+    function get_field($field_id)
+    {
+        foreach($this->__fields as $field)
+        {
+            if($field->field_id == $field_id)
+            {
+                return $field;
+            }
+        }
+        return NULL;
+    }
+    
+    function set_all_form_field_settings($field_order, $settings_map)
+    {
+        // if needed, load field for this form
+        if(!$this->__fields)
+        {
+            $this->fields();
+        }
+        
+        // var_dump($field_order, $settings_map);exit;
+        
+        // loop over all fields provided and save their settings
+        foreach($field_order as $i => $field_id)
+        {
+            //$field = $this->__fields[$field_id];
+            $field = &$this->get_field($field_id);
+            
+            foreach($settings_map as $setting => $values)
+            {
+                $field->form_field_settings[$setting] = $values[$i];
+            }
+            
+            $data = array(
+                'form_field_settings' => serialize($field->form_field_settings)
+            );
+            
+            $this->__EE->db->where(array('field_id' => $field_id, 'form_id' => $this->form_id))
+                           ->update('proform_form_fields', $data);
+        }
+    }
+    
     function count_entries()
     {
         $result = 0;
@@ -811,6 +880,7 @@ class BM_Form extends BM_RowInitialized {
         $this->__fields = FALSE;
     }
     
+    /*
     function update_preset($field, $preset_value, $preset_forced)
     {
         // update assignment record with new preset values
@@ -836,7 +906,7 @@ class BM_Form extends BM_RowInitialized {
             $result[$row->field_id] = array('value' => $row->preset_value, 'forced' => $row->preset_forced);
         }
         return $result;
-    }
+    }*/
 
     function remove_field($field) 
     {
@@ -922,6 +992,7 @@ class BM_Field extends BM_RowInitialized
     
     function save()
     {
+        $this->settings = $this->settings();
         $this->__EE->formslib->save_field($this);
     }
 

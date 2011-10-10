@@ -47,7 +47,9 @@ echo validation_errors();
 if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>';
 if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>';
 ?>
-
+            <div class="message error-message">
+                Please complete the highlighted fields below.
+            </div>
 <?php
 if(isset($buttons)):
     foreach($buttons as $btn):

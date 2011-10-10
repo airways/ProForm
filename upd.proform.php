@@ -133,8 +133,7 @@ class Proform_upd {
             'field_row'     => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE),
             'field_name'    => array('type' => 'varchar', 'constraint' => '32'),
             'is_required'   => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'),
-            'preset_value'  => array('type' => 'text'),
-            'preset_forced' => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'),
+            'form_field_settings'      => array('type' => 'blob'),
         );
         $this->EE->dbforge->add_field($fields);
         $forge->add_key('field_id');
@@ -246,7 +245,27 @@ class Proform_upd {
     
     function update($current = '')
     {
-        return FALSE;
+        if ($current == $this->version)
+        {
+            return FALSE;
+        }
+
+        $this->EE->load->dbforge();
+        $forge = &$this->EE->dbforge;
+        
+        if($current < 0.28)
+        {
+            if(!$this->EE->db->field_exists('form_field_settings', 'proform_form_fields'))
+            {
+                $fields = array('form_field_settings' => array('type' => 'blob'));
+                $forge->add_column('proform_form_fields', $fields);
+            }
+            if($this->EE->db->field_exists('settings', 'proform_form_fields')) $forge->drop_column('proform_form_fields', 'settings');
+            if($this->EE->db->field_exists('preset_value', 'proform_form_fields')) $forge->drop_column('proform_form_fields', 'preset_value');
+            if($this->EE->db->field_exists('preset_forced', 'proform_form_fields')) $forge->drop_column('proform_form_fields', 'preset_forced');
+        }
+        
+        return TRUE;
     }
     
     function tabs()

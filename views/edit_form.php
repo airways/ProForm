@@ -42,7 +42,7 @@
     </ul>
 </div>
 
-<?php echo form_open($action_url, '', $form_hidden); ?>
+<?php echo form_open($action_url, array('id' => 'main_form'), $form_hidden); ?>
 <?php echo form_hidden('active_tab'); ?>
 
 <!-- start edit form tab content -->
@@ -53,117 +53,25 @@
 </div>
 <!-- end edit form tab content -->
 
+
 <!-- start tab content -->
 <div class="grid-group tab-content tab-content-layout">
 
-<div class="commandBar">
-    <label for="field_id">Add Special</label>&nbsp;<?php
-    if(count($special_options) > 0):
-        echo form_dropdown('special_id', $special_options); ?>
-            &nbsp; <input type="submit" class="submit" name="add_special" value="Add" />
-    <?php
-    else: 
-        echo lang('no_unassigned_fields_available'); 
-    endif; ?>
+    <?php include(PATH_THIRD.'proform/views/edit_form_layout.php'); ?>
 
-    <label for="field_id">Add Field</label>&nbsp;<?php
-    if(count($field_options) > 0):
-        echo form_dropdown('field_id', $field_options); ?>
-            &nbsp; <input type="submit" class="submit" name="add_field" value="Add" />
-    <?php
-    else:
-        echo lang('no_unassigned_fields_available');
-    endif; ?>
-
-<!--    &nbsp; <a href="<?php echo $new_field_url?>">New Field</a>-->
 </div>
 
-
-
-<div class="formFields mouseUp">
+<?php echo form_submit(array('name' => 'submit', 'value' => lang('save_form'), 'class' => 'submit')); ?>
+<?php echo form_close(); ?>
 <?php
-
-if (count($fields) > 0):
-
-    $cp_table_template['cell_start'] = '<td><div class="cellPad">';
-    $cp_table_template['cell_end'] = '</div></td>';
-    $cp_table_template['cell_alt_start'] = $cp_table_template['cell_start'];
-    $cp_table_template['cell_alt_end'] = $cp_table_template['cell_end'];
-
-    $this->table->set_template($cp_table_template);
-    $this->table->set_heading(
-        lang('heading_field_name')
-        /*,
-        form_checkbox('select_all', 'true', FALSE, 'class="toggle_all" id="select_all"')*/
-    );
-
-    $last_field_row = -1;
-    $alt = FALSE;
-
-    echo '<ul class="fieldRow targetRow"></ul>';
-    foreach($fields as $field)
-    {
-        /*$this->table->add_row(
-                '<div class="moveHandle">' .
-                        form_checkbox('required_'.$field['field_name'], 'y', $field['is_required'] == 'y') .
-                        ' <input type="hidden" name="field_order[]" value="' . $field['field_id'] . '" /><a class="fieldName" href="'.$field['edit_link'].'">'.$field['field_name'].'</a>'.
-                        '<span class="btn"><a href="'.$field['remove_link'].'">x</a></span>'.
-                '</div>'
-                //,
-                //form_checkbox($field['toggle'])
-            );*/
-
-        if($last_field_row != $field['field_row'])
-        {
-            if($last_field_row != -1)
-            {
-                echo '</ul><ul class="fieldRow targetRow"></ul>';
-            }
+    // echo '<div id="defaultValueForm" class="defaultValueForm" style="display: none;">';
+    // echo form_open($default_value_action_url, '', $default_value_hidden);
+    // echo form_label('Default Value');
+    // echo form_textarea('default_value', '', 'class="value"');
+    // echo form_checkbox('forced', 'y', $field['preset_forced'] == 'y','id="forced"').
+    //             ' <label for="forced">'.lang('heading_field_forced').'</label>';
+    // echo '<br/><br/>'.form_button('save', 'Save', 'class="submit" id="defaultValueSubmit"');
+    // echo form_close();
+    // echo '</div>';
 
 
-            echo '<ul class="fieldRow' . ($alt ? ' alt' : '') . '">';
-            $alt = !$alt;
-
-            $last_field_row = $field['field_row'];
-        }
-
-        echo '<li class="moveHandle">' .
-            //form_checkbox('required_'.$field['field_name'], 'y', $field['is_required'] == 'y') .
-            '<span class="fieldWidget' . ($field['is_required'] == 'y' ? ' isRequired' : '') . '">'.
-            '<input type="hidden" name="required_'.$field['field_name'].'" value="'.$field['is_required'].'" class="requiredFieldFlag" />'.
-            '<input type="hidden" name="default_'.$field['field_name'].'" value="'.$presets[$field['field_id']]['value'].'" class="defaultValue" />'.
-            '<input type="hidden" name="forced_'.$field['field_name'].'" value="'.$presets[$field['field_id']]['forced'].'" class="forcedValue" />'.
-            '<input type="hidden" name="field_id[]" value="'.$field['field_id'].'" class="fieldId" />'.
-            '<input type="hidden" name="field_order[]" value="' . $field['field_id'] . '" />'.
-            '<input type="hidden" name="field_row[]" value="' . $field['field_row'] . '" class="fieldRowFlag" />'.
-            '<input type="hidden" class="removeLink" value="' . $field['remove_link'] . '"<span class="fieldName"><a href="'.$field['edit_link'].'">'.$field['field_name'].'</a><span class="requiredTag">*</span></span></span>'.
-            //'<span class="btns"><span class="btn"><a href="'.$field['remove_link'].'">x</a></span></span></span>'.
-            '</li>';
-    }
-
-    echo '</ul><ul class="fieldRow targetRow"></ul>';
-    
-    //echo $this->table->generate();
-    ?>
-</div>
-
-</div>
-
-    <div class="tableFooter">
-        <?php echo form_submit(array('name' => 'submit', 'value' => lang('save_form'), 'class' => 'submit')); ?>
-    </div>
-<?php
-    echo '<div id="defaultValueForm" class="defaultValueForm" style="display: none;">';
-    echo form_open($default_value_action_url, '', $default_value_hidden);
-    echo form_label('Default Value');
-    echo form_textarea('default_value', '', 'class="value"');
-    echo form_checkbox('forced', 'y', $field['preset_forced'] == 'y','id="forced"').
-                ' <label for="forced">'.lang('heading_field_forced').'</label>';
-    echo '<br/><br/>'.form_button('save', 'Save', 'class="submit" id="defaultValueSubmit"');
-    echo form_close();
-    echo '</div>';
-
-
-else:
-    echo '<div class="no_items_msg">' . lang('no_fields') . '</div>';
-endif;

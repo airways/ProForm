@@ -71,10 +71,10 @@ var bm_forms_layout = {
         // setup drag and drop
         $('ul.fieldRow').sortable({
             connectWith: 'ul.fieldRow',
-            start: function() {
+            start: function(event, ui) {
                 $('.formFields').removeClass('mouseUp');
                 $('.formFields').addClass('mouseDown');
-            }, stop: function() {
+            }, stop: function(event, ui) {
                 $('.formFields').removeClass('mouseDown');
                 $('.formFields').addClass('mouseUp');
 
@@ -110,8 +110,30 @@ var bm_forms_layout = {
 
                 // setup binding
                 bm_forms_layout.bind_events();
+            }, over: function(event, ui) {
+                update_widths($(event.target));
+            }, out: function(event, ui) {
+                update_widths($(event.target));
             }
         });
+        
+        $('ul.fieldRow').each(function() {
+            update_widths($(this));
+        });
+        
+        function update_widths($parent)
+        {
+            var items = $parent.find('li');
+            count = items.length;
+            items.each(function() {
+                if(count == 1)
+                {
+                    $(this).width('90%');
+                } else {
+                    $(this).width(80/count+'%');
+                }
+            });
+        }
         
         $('input[name=save_entries_on]').change(function() {
             var new_val = $(this).is(':checked');
@@ -288,6 +310,7 @@ $(document).ready(function() {
         $('.tab-content').hide();
         //console.log(currentTab);
         $(currentTab.replace('#', '.')).show();
+        window.location.hash = currentTab;
     }
     
     $('.tabs li a').click(function() {
@@ -304,7 +327,57 @@ $(document).ready(function() {
         activateTab('#tab-content-settings');
     }
     
-    $('html, body').animate({ scrollTop: 0 }, 0);
+    
+    var $active_field = 0;
+    function save_meta()
+    {
+        if($active_field)
+        {
+            $active_field.find('.fieldRequired').val($('#field-required').is(':checked') ? 'y' : 'n');
+            $active_field.find('.fieldLabel').val($('#field-label').val());
+            $active_field.find('.fieldPresetValue').val($('#field-preset-value').val());
+            $active_field.find('.fieldPresetForced').val($('#field-preset-forced').is(':checked') ? 'y' : 'n');
+            $active_field.find('.fieldHtmlId').val($('#field-html-id').val());
+            $active_field.find('.fieldHtmlClass').val($('#field-html-class').val());
+            $active_field.find('.fieldExtra1').val($('#field-extra1').val());
+            $active_field.find('.fieldExtra2').val($('#field-extra2').val());
+        }
+    }
+
+    function load_meta()
+    {
+        if($active_field)
+        {
+            $('#field-required').attr('checked', $active_field.find('.fieldRequired').val() == 'y');
+            $('#field-label').val($active_field.find('.fieldLabel').val());
+            $('#field-preset-value').val($active_field.find('.fieldPresetValue').val());
+            $('#field-preset-forced').attr('checked', $active_field.find('.fieldPresetForced').val() == 'y');
+            $('#field-html-id').val($active_field.find('.fieldHtmlId').val());
+            $('#field-html-class').val($active_field.find('.fieldHtmlClass').val());
+            $('#field-extra1').val($active_field.find('.fieldExtra1').val());
+            $('#field-extra2').val($active_field.find('.fieldExtra2').val());
+        }
+    }
+    
+    // disable all property inspector inputs until a field is selected
+    $('.field-modifications input').attr('disabled', 'disabled');
+    
+    $('.form-setup li').click(function() {
+        save_meta();
+        $('.form-setup li').removeClass('active');
+        
+        $active_field = $(this);
+        $(this).addClass('active');
+        load_meta();
+        
+        $('#edit-field-name').text($active_field.find('.fieldLabel'));
+        $('.field-modifications input').removeAttr('disabled');
+        
+    });
+    
+    $('#main_form').submit(function() {
+        save_meta();
+    });
 });
 
 

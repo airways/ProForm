@@ -300,6 +300,105 @@ Form Layout > Fields
 	display: inline-block;
 }
 
+.tab-content-layout {
+    min-width: 1040px;
+}
+
+/* -- begin old -- */
+
+
+ul.fieldRow.alt {
+/*    background: #e2edf4;*/
+}
+
+ul.fieldRow {
+/*    background: #cddde7;*/
+    padding-left: 10px;
+/*    height: 60px;*/
+    padding-top: 2px;
+    padding-bottom: 2px;
+    clear: both;
+}
+
+ul.fieldRow li {
+    float: left;
+    width: 25%;
+/*    height: 15px;*/
+    overflow: hidden;
+    
+}
+
+ul.targetRow {
+    min-height: 15px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    background: #FFF;
+}
+
+ul.fieldRow .ui-sortable-placeholder,
+ul.targetRow .ui-sortable-placeholder {
+/*    background: #9ab8cb;*/
+/*    height: 74px !important;*/
+    border: 2px dashed #9ab8cb;
+}
+
+
+/*
+.mouseDown ul.fieldRow {
+    padding-left: 5px;
+    height: 15px;
+}
+
+.mouseDown ul.fieldRow li {
+    float: left;
+    width: 140px;
+    height: 15px;
+    overflow: hidden;
+}
+*/
+.mouseUp .targetRow {
+    
+   
+}
+.mouseDown .targetRow {
+    
+    
+
+}
+
+.formFields {
+    
+}
+
+/*.ui-sortable-placeholder {
+    
+    background: #9ab8cb;
+    visibility: visible !important;
+}*/
+
+.ui-sortable-helper {
+    width: 400px !important;
+}
+
+.fieldWidget a {
+    color: #000 !important;
+}
+
+.fieldWidget .requiredTag {
+    display: none;
+}
+
+.isRequired a {
+
+}
+
+.isRequired .requiredTag {
+    display: inline;
+    color: #F00;
+    margin-left: 5px;
+}
+/* -- end old -- */
+
 .form-setup {
 	overflow: hidden;
 }
@@ -311,6 +410,7 @@ Form Layout > Fields
 	float: left;
 	width: 90%;
 	margin: 0 10px 10px 0;
+	background: white;
 }
 
 .move-link {
@@ -323,6 +423,7 @@ Form Layout > Fields
 	display: none;
 	background: url(../images/icon_handle.gif) no-repeat;
 }
+
 
 .form-setup li:hover {
 	border: 1px solid #ccc;
@@ -352,9 +453,11 @@ Form Layout > Fields
 	display: block;
 }
 
-.form-setup li.active {
-	background: #f1f1f2;
-	border: 1px solid #d0d6d9;
+.form-setup li.active,
+.ui-sortable-placeholder {
+	background: #f1f1f2 !important;
+	border: 1px solid #d0d6d9 !important;
+	visibility: visible !important;
 }
 
 .form-setup textarea {
