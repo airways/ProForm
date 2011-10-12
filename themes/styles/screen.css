@@ -362,7 +362,6 @@ ul.targetRow {
     min-height: 15px;
     padding-top: 0px;
     padding-bottom: 0px;
-    background: #FFF;
 }
 
 ul.fieldRow .ui-sortable-placeholder,
@@ -440,7 +439,6 @@ ul.targetRow .ui-sortable-placeholder {
 	float: left;
 	width: 90%;
 	margin: 0 10px 10px 0;
-	background: white;
 }
 
 .move-link {
