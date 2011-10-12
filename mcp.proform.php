@@ -442,13 +442,15 @@ class Proform_mcp {
             'safecracker_channel_id' => array('dropdown', $channel_options)
         );
         
-        $extra = array(
-            'after' => array(
-                'encryption_on' => array(array('heading' => lang('notification_list_name'))),
-                'subject' => array(array('heading' => lang('field_submitter_notification_name'))),
-                'submitter_email_field' => array(array('heading' => lang('field_share_notification_name'))),
-            )
-        );
+        $extra = array('after' => array());
+        
+        if($form_fields->form_type == 'form')
+            $extra['after']['encryption_on'] = array(array('heading' => lang('notification_list_name')));
+        if($form_fields->form_type == 'form' OR $form_fields->form_type == 'share')
+            $extra['after']['subject'] = array(array('heading' => lang('field_submitter_notification_name')));
+        if($form_fields->form_type == 'form' OR $form_fields->form_type == 'share')
+            $extra['after']['submitter_email_field'] = array(array('heading' => lang('field_share_notification_name')));
+        
         $edit_form = $this->EE->bm_forms->create_cp_form($form_fields, $types, $extra);
 
         
@@ -699,13 +701,14 @@ class Proform_mcp {
         
         $vars = array();
         $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=delete_form';
-        $vars['form_name'] = $form->form_name;
-        $vars['form_id'] = $form->form_id;
+        $vars['object_type'] = 'form';
+        $vars['object_name'] = $form->form_name;
+        $vars['hidden'] = array('form_id' => $form->form_id);
         
         $this->sub_page('tab_delete_form');
         
         $this->EE->load->library('table');
-        return $this->EE->load->view('delete_form', $vars, TRUE);
+        return $this->EE->load->view('delete', $vars, TRUE);
     }
     
     
@@ -1313,13 +1316,14 @@ class Proform_mcp {
         
         $vars = array();
         $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=delete_field';
-        $vars['field_name'] = $field->field_name;
-        $vars['field_id'] = $field->field_id;
+        $vars['object_type'] = 'field';
+        $vars['object_name'] = $field->field_name;
+        $vars['hidden'] = array('field_id' => $field->field_id);
         
         $this->sub_page('tab_delete_field');
         
         $this->EE->load->library('table');
-        return $this->EE->load->view('delete_field', $vars, TRUE);
+        return $this->EE->load->view('delete', $vars, TRUE);
     }
     
     

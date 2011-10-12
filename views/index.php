@@ -42,12 +42,15 @@
 
 <h2 class="content-heading">Forms</h2>
 
-<span class="button content-btn"><a title="Create a Form" class="submit" href="index.php?S=d6ba3bc6a850cd72d4afbaf6011821f293c22fd3&amp;D=cp&amp;C=addons_modules&amp;M=show_module_cp&amp;module=proform&amp;method=new_form"><?php echo lang('new_form'); ?></a></span>
-
-<div class="bm_commands" style="float: right;">
-    <span class="cp_button"><a href="<?php echo BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_form'.AMP.'type=form'; ?>"><?php echo lang('new_form'); ?></a></span>
-    <span class="cp_button"><a href="<?php echo BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_form'.AMP.'type=saef'; ?>"><?php echo lang('new_saef'); ?></a></span>
-    <span class="cp_button"><a href="<?php echo BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_form'.AMP.'type=share'; ?>"><?php echo lang('new_share'); ?></a></span>
+<div class="dropdown-wrap">
+        		<span class="button content-btn"><a title="Create a Form" class="submit" href="#"> Create a Form</a></span>
+    <div class="dropdown">
+        <ul>
+            <li><a href="<?php echo BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_form'.AMP.'type=form'; ?>">Basic Form</a></li>
+            <li><a href="<?php echo BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_form'.AMP.'type=saef'; ?>">SAEF Form</a></li>
+            <li><a href="<?php echo BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_form'.AMP.'type=share'; ?>">Share Form</a></li>
+        </ul>
+    </div> <!-- end dropdown -->
 </div>
 
 <?php if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>'; ?>
@@ -76,6 +79,8 @@
     }
     
     echo $this->table->generate();
+    
+if($pagination):
     ?>
     
     <div class="tableFooter">
@@ -83,6 +88,7 @@
         <span class="pagination"><?=$pagination?></span>
     </div>
     <?php
+endif;
    // form_close();
 
 else:

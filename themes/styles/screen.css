@@ -78,6 +78,7 @@ Main Nav buttons
 }
 
 .less_important_bttn:hover,
+.less_important_btn:hover,
  .rightNav .submit:hover,
 .heading .submit:hover,
 .new_field .button:hover,
@@ -118,15 +119,32 @@ table.mainTable tr td:first-child {
 Create Form
 ------------------------------------------------------------------------ */
 
+.dropdown-wrap {
+    display: inline;
+	position: relative;
+}
+
+.dropdown-wrap .submit:hover {
+	text-decoration: none;
+}
+
 .dropdown {
 	background: #505d68;
 	position: absolute;
-	top: 21px;
+	top: 17px;
 	display: none;
 	left: 0;
-	width: 89px;
+	width: 90px;
 	padding: 5px 3px;
 	-moz-border-radius: 0 0 3px 3px;
+}
+
+.dropdown-wrap:hover {
+
+}
+
+.dropdown-wrap:hover .dropdown {
+    display: visible ;
 }
 
 .dropdown a {
@@ -141,14 +159,14 @@ Create Form
 }
 
 .action-list a {
-	text-decoration: underline !important;
+/*  text-decoration: underline !important;*/
 	display: inline-block;
 	padding: 0 8px;
 	border-left: 1px solid #555557;	
 }
 
 .action-item {
-	text-decoration: underline !important;	
+/*  text-decoration: underline !important;  */
 }
 
 .action-list a:first-child {
@@ -176,6 +194,18 @@ table.mainTable td  {
 
 table.mainTable tr.even td {
 	background: #fff;
+}
+
+table.mainTable th:first-child {
+    -moz-border-top-left-radius: 5px;
+    -webkit-border-top-left-radius: 5px;
+    border-top-left-radius: 5px 5px;
+}
+
+table.mainTable th:last-child {
+    -moz-border-top-right-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    border-top-right-radius: 5px 5px;
 }
 
 .new_field {
@@ -626,14 +656,6 @@ Create Form
 
 .content-title-group {
 	margin-bottom: 5px;
-}
-
-.dropdown-wrap {
-	position: relative;
-}
-
-.dropdown-wrap .submit:hover {
-	text-decoration: none;
 }
 
 

@@ -29,7 +29,7 @@
  * to this clause.
  * 
  **/ ?>
-
+<div class="edit_form">
 <?php if(isset($form_name)): ?>
 <h2 class="content-heading">Editing <em><?php echo $form_name; ?></em></h2>
 <?php else: ?>
@@ -69,7 +69,7 @@
 </div>
 
 <?php endif; ?>
-
+<br/>
 <?php echo form_submit(array('name' => 'submit', 'value' => lang('save_form'), 'class' => 'submit')); ?>
 <?php echo form_close(); ?>
 <?php
@@ -82,5 +82,6 @@
     // echo '<br/><br/>'.form_button('save', 'Save', 'class="submit" id="defaultValueSubmit"');
     // echo form_close();
     // echo '</div>';
-
+?>
+</div>
 

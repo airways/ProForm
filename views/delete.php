@@ -30,23 +30,9 @@
  * 
  **/ ?>
 
-<?php echo validation_errors(); ?>
-<div class="editForm">
-<?php
-    echo form_open($action_url, '', array('template_id' => $template_id));
-    ?>
-    <p>Are you sure you want to delete this TEMPLATE?</p>
-    <p>This cannot be undone.</p>
-    <p style="color: red;">
-        <b>About to delete:</b><br/>
-        TEMPLATE: <?php echo $template_name; ?>
-    </p>
-    <div class="tableFooter">
-        <div class="tableSubmit">
-            <?php echo form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit')); ?>
-        </div>
-        
-        
-    </div>
-    <? echo form_close(); ?>
+<?php echo form_open($action_url, '', $hidden); ?>
+<p class="warning">Are you sure you want to delete the <?php echo $object_type; ?> <span><?php echo $object_name; ?></span>? This cannot be undone.</p>
+<div class="tableFooter">
+    <?php echo form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit')); ?>
 </div>
+<? echo form_close(); ?>

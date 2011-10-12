@@ -49,7 +49,7 @@
     {
         $this->table->add_row(
                 '<a href="'.$field->edit_link.'">'.$field->name.'</a>',
-                '<a href="'.$field->delete_link.'">'.ico_delete(lang('heading_delete_field')).'</a>'
+                '<a href="'.$field->delete_link.'">'.lang('heading_delete_field').'</a>'
             );
     }
     
