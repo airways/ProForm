@@ -62,7 +62,6 @@ if(isset($buttons)):
 endif;
 ?>
 
-
 <div class="editForm" id="<?php if(isset($form_name)) echo $form_name; ?>">
 <?php
     if(!isset($generic_edit_embedded) || !$generic_edit_embedded)
