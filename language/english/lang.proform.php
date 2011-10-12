@@ -107,7 +107,7 @@ $lang = array(
     'field_form_name' => 'Form Short Name',
     'field_form_name_desc' => 'Single word, no spaces, used in templates',
     'field_form_label' => 'Full Form Name',
-    'field_form_label_desc' => 'human friendly form name, used in UI',
+    'field_form_label_desc' => 'Human friendly form name, used in UI',
     'field_form_id' => 'Form ID',
     'field_form_type' => 'Form Type',
     'field_notification_list' => 'Notification List',
@@ -121,7 +121,7 @@ $lang = array(
     'field_type' => 'Type',
     'field_validation' => 'Validation',
     'field_length' => 'Length',
-    'field_length_desc' => 'If encryption is on, this will cause each field to need about 2.6 times as many characters (minimum 88 characters), so make sure to plan for this in field constraints.',
+    'field_length_desc' => '',
     'field_template_id' => 'Template ID',
     'field_template_name' => 'Template Name',
     'field_template' => 'Template Code',
@@ -161,7 +161,7 @@ $lang = array(
     'field_share_email_field_desc' => 'Field on the form containing the e-mail address to send notifications to',
     
     'field_encryption_on' => 'Encrypt Data',
-    'field_encryption_on_desc' => 'Encrypt data stored in the form\'s database table. This will cause each field to need about 2.6 times as many characters (minimum 88 characters), so make sure to plan for this in field constraints.',
+    'field_encryption_on_desc' => 'Encrypt data stored in the form\'s database table and force minimal DB column length',
     'encryption_toggle_disabled' => 'Encryption cannot be turned on or off if there are already entries in the form.',
     
     'field_safecracker_on' => 'SafeCracker Integration',

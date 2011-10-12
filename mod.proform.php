@@ -1485,7 +1485,9 @@ class Proform {
                     //'field_callback'    => function($data, $key=FALSE) { return time(); },
                     'field_id'          => $field->field_id,
                     'field_name'        => $field->field_name,
-                    'field_label'       => $field->field_label,
+                    'field_label'       => (array_key_exists('label', $field->form_field_settings) 
+                                            AND trim($field->form_field_settings['label']) != '')
+                                            ? $field->form_field_settings['label'] : $field->field_label,
                     'field_type'        => $field->type,
                     'field_length'      => $field->length,
                     'field_is_required' => $is_required ? 'y' : '',

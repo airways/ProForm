@@ -149,8 +149,9 @@ endif;
                 </div>
             </div>
             <ul class="section-body">
+                <li>Override values for this field on this particular form. All values are optional.</li>
                 <li>
-                    <label for="">Field Label <span class="required">*</span></label>
+                    <label for="">Field Label</label>
                     <input type="text" id="field-label" />
                 </li>
                 <li>

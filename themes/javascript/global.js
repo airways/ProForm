@@ -360,7 +360,7 @@ $(document).ready(function() {
     }
     
     // disable all property inspector inputs until a field is selected
-    $('.field-modifications input').attr('disabled', 'disabled');
+    $('.field-modifications input[type=text],.field-modifications input[type=checkbox]').attr('disabled', 'disabled');
     
     $('.form-setup li').click(function() {
         save_meta();

@@ -30,11 +30,11 @@
  * 
  **/ ?>
 
-<!--start:bm_commands-->
-<div class="bm_commands" style="float: right;">
-    <span class="cp_button"><a href="<?php echo BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=export_entries'.AMP.'form_id='.$form_id; ?>"><?php echo lang('export_entries'); ?></a></span>
+
+<div class="new_field">
+    <span class="button"><a href="<?php echo BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=export_entries'.AMP.'form_id='.$form_id; ?>"><?php echo lang('export_entries'); ?></a></span>
 </div>
-<!--end:bm_commands-->
+
 
 <?php if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>'; ?>
 <?php if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>'; ?>
@@ -51,6 +51,11 @@
         {
             if(array_search($field, $hidden_columns) === FALSE)
             {
+                if(strlen($value) > 300)
+                {
+                    $value = substr($value, 0, 300).'...';
+                }
+                
                 if($field == 'form_entry_id')
                 {
                     $row[] = '<a href="'.$edit_entry_url.'&entry_id='.$value.'">'.htmlspecialchars($value).'</a>';

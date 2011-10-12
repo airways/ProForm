@@ -758,6 +758,12 @@ class BM_Form extends BM_RowInitialized {
                         {
                             $fields[$field->field_name]['constraint'] = $field->length;
                         }
+                        
+                        // if the form has encryption turned on, force at least a minimum size of 255
+                        if($form->encryption_on == 'y' AND $field->length < 255)
+                        {
+                            $fields[$field->field_name]['constraint'] = 255;
+                        }
                     }
 
                     // check if the length specified is too long, if so, promote to the next data type
