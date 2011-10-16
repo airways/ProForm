@@ -88,6 +88,10 @@
     correspond to the various field types. Additional types provide programatic functionality such as subscribing to mailing
     lists.</p>
     
+    <p>Note that the Default HTML Control values provided here are based on the <a href="form_sample_template.html">Sample Template</a>,
+    and can easily be changed by simply modifying the template you use to generate your forms. <dfn>ProForm</dfn> does not generate
+    any markup itself - it leaves all of the display of your forms to your exact specifications.</p>
+    
     <h4>Field Types</h4>
     <table>
         <tr>
@@ -189,6 +193,54 @@ value</pre>
         </tr>
     </table>
     
+    <h2><a name="validation">Validation</a></h2>
+    
+    <p><dfn>ProForm</dfn> provides a robust set of validation and filtering rules based on the CodeIgniter Form Validation class.</p>
+    
+    <h4>Validation Rules</h4>
+    <p>The following validation rules can be applied to a field.</p>
+    
+    <table>
+        <th>Rule</td><th>Description</th><th>Requires Param</th></tr>
+        <tr><td>Always Required</td><td>Marks the field as required on all forms that it is used on.</td><td>None</td></tr>
+        <tr><td>Matches Value</td><td>Fails if the field's value does not match the value specified.</td><td>Value</td></tr>
+        <tr><td>Matches Field</td><td>Fails if the field's value does not match the value of another field.</td><td>Field name</td></tr>
+        <tr><td>Min Length</td><td>Fails if the field's value is not of the required length.</td><td>Length</td></tr>
+        <tr><td>Max Length</td><td>Fails if the field's value is longer than the set length.</td><td>Length</td></tr>
+        <tr><td>Exact Length</td><td>Fails if the field's value is shorter or longer than the set length.</td><td>Length</td></tr>
+        <tr><td>Alpha Characters Only</td><td>Fails if any characters not in the alphabet are used in the field's value.</td><td>None</td></tr>
+        <tr><td>Alpha Numeric Characters Only</td><td>Fails if any characters not in the alphabet or the counting numbers (0-9) are used in the field's value.</td><td>None</td></tr>
+        <tr><td>Alpha Numeric Characters, Underscores and Dashes Only</td><td>Fails if any characters not in the alphabet, the counting numbers (0-9), or underscores (_) or dashes (-) are used in the field's value.</td><td>None</td></tr>
+        <tr><td>Numeric Characters Only</td><td>Fails if any characters other than the counting numbers (0-9) are used in the field's value.</td><td>None</td></tr>
+        <tr><td>Numeric Characters and Dashes Only</td><td>Fails if any characters other than the counting numbers (0-9), or dashes (-) are used in the field's value.</td><td>None</td></tr>
+        <tr><td>Integer Number</td><td>Fails if the field's value is not an integer number.</td><td>None</td></tr>
+        <tr><td>Natural Number</td><td>Fails if the field's value is not a natural number.</td><td>None</td></tr>
+        <tr><td>Natural Number other than zero</td><td>Fails if the field's value is not a natural number above or below zero.</td><td>None</td></tr>
+        <tr><td>Valid E-mail Address</td><td>Fails if the field's value is not a properly formatted email address.</td><td>None</td></tr>
+        <tr><td>Valid E-mail Addresses separated by commas</td><td>Fails if the field's value is not list of one or more properly formatted email address separated by commas.</td><td>None</td></tr>
+        <tr><td>Valid IP Address</td><td>Fails if the field's value is not a properly formatted IPv4 dotted decimal address.</td><td>None</td></tr>
+        <tr><td>Valid Base 64 Encoded Value</td><td>Fails if the value is not a valid Base 64 value.</td><td>None</td></tr>
+    </table>
+    
+    <h4>Filters</h4>
+    
+    <p>In addition to the validation rules, the following filters can be applied to the data before or after any validation to
+    modify submitted values to match the expected values.</p>
+    
+    <table>
+        <th>Rule</td><th>Description</th><th>Requires Param</th></tr>
+        <tr><td>Strip HTML (filter)</td><td>Removes all HTML tags from the value.</td><td>None</td></tr>
+        <tr><td>Trim (filter)</td><td>Removes any whitespace from the beginning and ending of the value.</td><td>None</td></tr>
+        <tr><td>Base 64 Encode (filter)</td><td>Encodes the value as Base 64.</td><td>None</td></tr>
+        <tr><td>Base 64 Decode (filter)</td><td>Decodes the value from Base 64.</td><td>None</td></tr>
+        <tr><td>URL Encode (filter)</td><td>Encodes the value according to URL specifications.</td><td>None</td></tr>
+        <tr><td>URL Decode (filter)</td><td>Decodes value from URL encoding.</td><td>None</td></tr>
+        <!-- <tr><td>Parse URL Component (filter)</td><td></td><td>None</td></tr> -->
+    </table>
+
+    
+
+
     <h2><a name="delete_form">Deleting a Field</a></h2>
     
     <p>Deleting a field removes all of it's settings, removes it from all forms that it is assigned to, deletes all of it's data
