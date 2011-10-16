@@ -1,0 +1,204 @@
+<html>
+<head>
+    <title>ProForm - Field Management</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js" type="text/javascript"></script>
+    <style type="text/css" media="screen,print">@import url(docs_assets/main.css);</style>
+    <style type="text/css" media="screen,print">@import url(docs_assets/docs.css);</style>
+</head>
+<body>
+<div id="header">
+    <p><a href="http://metasushi.com/ee/">&larr; MetaSushi ExpressionEngine Add-ons</a></p>
+    <!-- <div id="title">ProForm Module</div> -->
+</div>
+<div id="content">
+
+    <h1>Field Management</h1>
+        
+    <p>The Fields page in <dfn>ProForm</dfn> provides a list of all of the fields that are available to be used in forms.</p>
+    
+    <h3>Contents</h3>
+    
+    <ul>
+        <li><a href="#create_field">Creating a New Field</a></li>
+        <li><a href="#field_settings">Field Settings</a></li>
+        <li><a href="#types">Field Types</a></li>
+        <li><a href="#validation">Validation</a></li>
+        <li><a href="#delete_field">Deleting a Field</a></li>
+    </ul>
+
+    <h2><a name="create_field">Creating a New Field</a></h2>
+
+    <p>To create a new field, use the <kbd>Create a Field</kbd> button on the Fields page.</p>
+    
+    <p>A field can also be created directly from the Form Layout view of a form through the Add button. If you would
+    like to create a new field and immediately add it to a form, go to the form's Form Layout then select New Field from
+    the Add a Field drop down and click Add. This will begin the New Field form, and return you to the form's layout
+    after creating the new field.</p>
+    
+    <p>In either case, when creating a field you will be asked for the settings in the following section.</p>
+    
+    <h2><a name="field_settings">Field Settings</a></h2>
+    
+    <p>After creating a new field, the same settings that are set when it is initially created can be updated at any
+    time by clicking either the Edit link for the field from a form's layout, or by clicking the field's name on the Fields
+    page.</p>
+    
+    <p>The following settings are available for fields.</p>
+    
+    <h4>Field Settings</h4>
+    <table>
+        <tr>
+            <th width="170">Field</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><b>Full Field Name (Label)</b></td>
+            <td>Human friendly field name, used in UI and used to label the field in the default template.</td>
+        </tr>
+        <tr>
+            <td><b>Field Name</b></td>
+            <td>Short field name which must be used as the actual name of the input or other HTML element in the form template.</td>
+        </tr>
+        <tr>
+            <td><b>Type</b></td>
+            <td>The type of the field. Most fields can be set as String fields. See the Field Types section below for more information.</td>
+        </tr>
+        <tr>
+            <td><b>Length</b></td>
+            <td>Length limit on the field. If the length is not specified, it will be set to 255 characters. Settings the limit
+            to longer than this may cause a slight performance degradation as a different database column must be used for
+            longer values.</td>
+        </tr>
+        <tr>
+            <td><b>Validation</b></td>
+            <td>Allows configuration of a large number of validation rules and filters to be applied to the value. This ensures
+            that data entered matches expected patterns. See the Validation section below for more information on the types of
+            rules available.</td>
+        </tr>
+    </table>
+    
+    <p class="important"><strong>Warning</strong> If data has already been entered into any of the forms that use a field, changing
+    the length of the field to be shorter than it was previously will likely cause data loss as any values that are too long
+    will be truncated.</p>
+    
+    <h2><a name="types">Field Types</a></h2>
+    
+    <p><dfn>ProForm</dfn> supports multiple field types. Most fields can safely use the String type, however other field types
+    can optimize the column chosen to store the data and work well with the default template code to suggest input types to
+    correspond to the various field types. Additional types provide programatic functionality such as subscribing to mailing
+    lists.</p>
+    
+    <h4>Field Types</h4>
+    <table>
+        <tr>
+            <th width="120">Type</th>
+            <th width="190">Default HTML Control</th>
+            <th>Description</th>
+            <th width="100">Database Type</th>
+        </tr>
+        <tr>
+            <td><b>Checkbox</b></td>
+            <td>&ltinput type="checkbox"  ... /&gt;</td>
+            <td>A simple boolean value stored as a y or n.</td>
+            <td>VARCHAR</td>
+        </tr>
+        <tr>
+            <td><b>Date</b></td>
+            <td>&ltinput type="input"  ... /&gt;</td>
+            <td>A date field containing year, month, and day.</td>
+            <td>DATE</td>
+        </tr>
+        <tr>
+            <td><b>Date and Time</b></td>
+            <td>&ltinput type="input"  ... /&gt;</td>
+            <td>A date field containing year, month, day as well as hours, minutes and seconds.</td>
+            <td>DATETIME</td>
+        </tr>
+        <tr>
+            <td><b>File</b></td>
+            <td>&ltinput type="file"  ... /&gt;</td>
+            <td>A file upload field. When selected, an additional option is available:<br/><br/>
+                <b>Upload Directory</b> - Directory to upload files into.</td>
+            <td>VARHCAR</td>
+        </tr>
+        <tr>
+            <td><b>String</b></td>
+            <td>&ltinput type="input"  ... /&gt; or<br/>
+                &lt;textarea&gt;</td>
+            <td>A simple text value. The length of the field determines which Database Type is used to store this field. If the
+                length is 255 or less, a VARCHAR field is used, otherwise a TEXT field is used.</td>
+            <td>VARCHAR or TEXT</td>
+        </tr>
+        <tr>
+            <td><b>Text</b></td>
+            <td>&lt;textarea&gt;</td>
+            <td>A simple text value, for longer form values such as messages.</td>
+            <td>TEXT</td>
+        </tr>
+        <tr>
+            <td><b>Number: Integer</b></td>
+            <td>&ltinput type="input"  ... /&gt;</td>
+            <td>An integer numeric value.</td>
+            <td>INT</td>
+        </tr>
+        <tr>
+            <td><b>Number: Float</b></td>
+            <td>&ltinput type="input"  ... /&gt;</td>
+            <td>A floating point numeric value.</td>
+            <td>FLOAT</td>
+        </tr>
+        <tr>
+            <td><b>Number: Currency</b></td>
+            <td>&ltinput type="input"  ... /&gt;</td>
+            <td>A currency value with a fixed point.</td>
+            <td>DECIMAL</td>
+        </tr>
+        <tr>
+            <td><b>List</b></td>
+            <td>&lt;select&gt;</td>
+            <td>A select box allowing the visitor to choose between options.  When selected, an additional option is available:<br/><br/>
+                <b>Options</b> - A list of options available to the user. Uses either of the following formats for options, with
+                one option on each line:
+                <pre>value : label
+value</pre>
+                </td>
+            <td>VARCHAR</td>
+        </tr>
+        <tr>
+            <td><b>Mailing List Subscription</b></td>
+            <td>&ltinput type="checkbox"  ... /&gt;</td>
+            <td>When this checkbox is selected, the user will be subscribed to the mailing list selected. When this type is selected, an
+                additional option is available:<br/><br/>
+                <b>Mailing List</b> - The list to subscribe the user to when this checkbox is set.</td></td>
+            <td>VARHCAR</td>
+        </tr>
+        <tr>
+            <td><b>Hidden</b></td>
+            <td>&ltinput type="hidden"  ... /&gt;</td>
+            <td>A simple text field rendered as a hidden input field. This can be used to attach additional data to the form.</td>
+            <td>VARCHAR</td>
+        </tr>
+        <tr>
+            <td><b>Member Data</b></td>
+            <td>&ltinput type="hidden"  ... /&gt;</td>
+            <td>Stores a piece of member information associated with the logged in user along with the form fields. Fields with this
+            type cannot be set through the field POST, but are always set on the backend to the active user's information. When
+            selected, an additional option is available:<br/><br/>
+                <b>Field</b> - Select the Member Field you wish to save into this form field on submission.</td></td>
+            <td>VARCHAR</td>
+        </tr>
+    </table>
+    
+    <h2><a name="delete_form">Deleting a Field</a></h2>
+    
+    <p>Deleting a field removes all of it's settings, removes it from all forms that it is assigned to, deletes all of it's data
+    from all forms in the database.</p>
+    
+    <p>You can delete a field and all of it's data through the Delete command on the Fields page. You must confirm the deletion
+    in the following page.</p>
+    
+    <p class="important"><strong>Warning</strong> Deleting a field cannot be undone. Remember that <strong>all</strong> forms that
+    have this field assigned will lose any data saved into it.</p>
+</div>
+</body>
+</html>
