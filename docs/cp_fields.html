@@ -166,7 +166,7 @@
                 <pre>value : label
 value</pre>
                 </td>
-            <td>VARCHAR</td>
+            <td>TEXT</td>
         </tr>
         <tr>
             <td><b>Mailing List Subscription</b></td>
@@ -179,15 +179,16 @@ value</pre>
         <tr>
             <td><b>Hidden</b></td>
             <td>&ltinput type="hidden"  ... /&gt;</td>
-            <td>A simple text field rendered as a hidden input field. This can be used to attach additional data to the form.</td>
+            <td>A simple text field rendered as a hidden input field. This can be used to attach additional data to the form. This field
+            type is always set to an internal length limit of 255.</td>
             <td>VARCHAR</td>
         </tr>
         <tr>
             <td><b>Member Data</b></td>
             <td>&ltinput type="hidden"  ... /&gt;</td>
             <td>Stores a piece of member information associated with the logged in user along with the form fields. Fields with this
-            type cannot be set through the field POST, but are always set on the backend to the active user's information. When
-            selected, an additional option is available:<br/><br/>
+            type cannot be set through the field POST, but are always set on the backend to the active user's information. This field
+            type is always set to an internal length limit of 255. When selected, an additional option is available:<br/><br/>
                 <b>Field</b> - Select the Member Field you wish to save into this form field on submission.</td></td>
             <td>VARCHAR</td>
         </tr>
