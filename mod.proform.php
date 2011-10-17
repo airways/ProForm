@@ -1501,6 +1501,7 @@ class Proform {
             
             if(is_array($field->form_field_settings))
             {
+                // var_dump($field->form_field_settings);
                 foreach($field->form_field_settings as $k => $v)
                 {
                     // Don't override defaults if there is no value provided in the override

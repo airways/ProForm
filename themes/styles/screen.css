@@ -474,7 +474,7 @@ ul.targetRow .ui-sortable-placeholder {
 .delete {
 	right: 10px;
 	border-left: 1px solid #ccc;
-	padding-left: 10px;
+	padding-left: 3px;
 }
 
 .form-setup li:hover .action-link {

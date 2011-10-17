@@ -4,8 +4,8 @@
     .error {
         color: red;
     }
-    .required {
-        border: 1px solid blue;
+    span.required {
+        color: red;
     }
     .fieldRow {
         clear:both;
@@ -176,23 +176,29 @@
 
                 {fields}
                     {if field_control != 'hidden'}{!-- skip hidden fields --}
-                        <li id="{field_html_id}" class="{if field_error}error{/if} {if field_is_required}required{/if} {field_html_class} ">
+                        <li id="{field_html_id}" class="{if field_error}error{/if} {if field_is_required}required{/if} {field_html_class}">
                             {field_extra_1}
-                            {field_label} {if field_is_required}*{/if}
+                            <label for="{field_name}">
+                                {field_label}
+                                {if field_is_required}
+                                    <span class="required">*</span>
+                                {/if}
+                            </label>
 
                             {if field_control == 'textarea'}
-                                <textarea name="{field_name}" cols="40" rows="10">{field_value}</textarea>
+                                <textarea name="{field_name}" id="{field_name}" cols="40" rows="10">{field_value}{if error_count == 0}{field_preset_value}{/if}</textarea>
                             {if:elseif field_control == 'checkbox'}
-                                <input type="{field_control}" name="{field_name}" value="y" {field_checked} />
+                                <input type="{field_control}" id="{field_name}" name="{field_name}" value="y" {field_checked} 
+                                    {if field_preset_value == 'y' AND error_count == 0}checked="checked" class="default" {/if} />
                             {if:elseif field_control == 'select'}
 
-                                <select name="{field_name}">
+                                <select id="{field_name}" name="{field_name}">
                                     {field_setting_list}
                                         <option value="{row}">{row}</option>
                                     {/field_setting_list}
                                 </select>
                             {if:else}
-                                <input type="{field_control}" name="{field_name}" value="{field_value}" />
+                                <input type="{field_control}" id="{field_name}" name="{field_name}" value="{field_value}{if error_count == 0}{field_preset_value}{/if}" />
                             {/if}
                             {field_error}
                             {field_extra_2}
