@@ -173,13 +173,12 @@
                  rendered it's fields. --}
             {if fieldrow:count > fieldrow:hidden_count}
                 <ul class="fieldRow">
-                    <li>Count: {fieldrow:count}, {fieldrow:hidden_count} hidden</li>
 
                 {fields}
                     {if field_control != 'hidden'}{!-- skip hidden fields --}
-                        <li class="{if field_error}error{/if} {if field_is_required}required{/if}">
-
-                            {field_label} {if field_is_required}*{/if} {field_no} {field_callback}
+                        <li id="{field_html_id}" class="{if field_error}error{/if} {if field_is_required}required{/if} {field_html_class} ">
+                            {field_extra_1}
+                            {field_label} {if field_is_required}*{/if}
 
                             {if field_control == 'textarea'}
                                 <textarea name="{field_name}" cols="40" rows="10">{field_value}</textarea>
@@ -196,6 +195,7 @@
                                 <input type="{field_control}" name="{field_name}" value="{field_value}" />
                             {/if}
                             {field_error}
+                            {field_extra_2}
                         </li>
                     {/if}
                 {/fields}

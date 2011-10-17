@@ -1498,7 +1498,24 @@ class Proform {
                                                           && $field_checked_flags[$field->field_name]) ? 'checked="checked"' : '',
                     'field_control'     => $field->get_control()
                 );
-
+            
+            if(is_array($field->form_field_settings))
+            {
+                foreach($field->form_field_settings as $k => $v)
+                {
+                    // Don't override defaults if there is no value provided in the override
+                    if(trim($v) != '' OR !isset($field_array['field_'.$k]))
+                    {
+                        $field_array['field_'.$k] = $v;
+                        
+                        if(substr($k, 0, 5) == 'extra')
+                        {
+                            $field_array['field_'.str_replace('extra', 'extra_', $k)] = $v;
+                        }
+                    }
+                }
+            }
+            
             if(is_array($field->settings))
             {
                 foreach($field->settings as $k => $v)
