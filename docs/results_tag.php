@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>ProForm - Hooks</title>
+    <title>ProForm - Results Tag</title>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js" type="text/javascript"></script>
     <style type="text/css" media="screen,print">@import url(docs_assets/main.css);</style>
     <style type="text/css" media="screen,print">@import url(docs_assets/docs.css);</style>
@@ -12,7 +12,7 @@
 </div>
 <div id="content">
 
-    <h1>Hooks (BETA)</h1>
+    <h1>Results Tag (BETA)</h1>
 
     <p><a href="index.html">&larr; ProForm Docs Index</a></p>
 

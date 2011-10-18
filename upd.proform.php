@@ -194,9 +194,9 @@ class Proform_upd {
         $prefs = array(
             array('preference_name' => 'notification_template_group',       'value' => 'notifications'),
             array('preference_name' => 'from_address',                      'value' => 'admin@example.com'),
-            array('preference_name' => 'safecracker_integration_on',        'value' => 'n'),
-            array('preference_name' => 'safecracker_field_group_id',        'value' => '0'),
-            array('preference_name' => 'safecracker_separate_channels_on',  'value' => 'y'),
+            // array('preference_name' => 'safecracker_integration_on',        'value' => 'n'),
+            // array('preference_name' => 'safecracker_field_group_id',        'value' => '0'),
+            // array('preference_name' => 'safecracker_separate_channels_on',  'value' => 'y'),
         );
 
         foreach($prefs as $pref)

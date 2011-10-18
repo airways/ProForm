@@ -225,8 +225,11 @@ img {
 #content h5 {
 	color: #333;
 	font-size: 13px;
-	margin: 16px 0 -5px 0;
+	margin: 30px 0 0 15px;
 	padding: 0;
+/*  font-weight: bold;*/
+    font-style: italic;
+    border-bottom: 1px solid #999;
 	}
 	
 #content .subhead {

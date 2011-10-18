@@ -377,6 +377,7 @@ class Proform {
                 */
 
                 $variables['fields:count'] = count($variables['fields']);
+                $variables['fields_count'] = count($variables['fields']);
                 $variables['complete'] = $complete;
                 if($form_session->processed)
                 {
