@@ -1,5 +1,5 @@
 {embed="global/_header"}
-        TEST!
+
 <style type="text/css">
     .error {
         color: red;
@@ -219,65 +219,5 @@
 {/if}
 {/exp:proform:form}
 
-<h3>Dynamic Fields Loop Entries</h3>
-page: {get:page}
-<table border="1">
-{exp:proform:entries form_name="{segment_2}" paginate="bottom" limit="10" page="{get:page}"}
-    {paginate}
-        <p>Page {current_page} of {total_pages} pages <a href="?page={first_page}">First</a> {pages}<a href="?page={page}">{page}</a> {/pages} <a href="?page={last_page}">Last</a></p>
-    {/paginate}
-    
-    {if row:number == 1}
-    <tr>
-        <th>Row Number</th>
-        <th>Form Entry ID</th>
-        <th>Created / Updated</th>
-        <th>User Agent</th>
-        <th>IP Address</th>
-        {fields}
-        <th>{field_label}</th>
-        {/fields}
-    </tr>
-    {/if}
-    {if entries:no_results}
-    <tr>
-       <td colspan="{exp:will_hunting:solve exp='{fields:count} + 2'}" class="error">No entries!</td>
-    </tr>
-    {if:else}
-    <tr>
-        <td>{row:number}</td>
-        <td>{value:form_entry_id}</td>
-        <td>{value:updated} {value:updated format="%Y-%m-%d %H:%i:%s"}</td>
-        <td>{value:user_agent}</td>
-        <td>{value:ip_address}</td>
-        {fields}
-            {if field_type == 'file'}
-                {if field_value}
-                    <td><img src="{field_value}" /></td>
-                {if:else}
-                    <td></td>
-                {/if}
-            {if:else}
-                <td>{field_value}</td>
-            {/if}
-        {/fields}
-    </tr>
-    {/if}
-    {!-- we want the footer row to show up even if there were no entries, so we
-         add entries:count == 0 to the conditional here --}
-    {if row:number == entries:count || entries:count == 0}
-    <tr>
-        <th>Row Number</th>
-        <th>Form Entry ID</th>
-        <th>User Agent</th>
-        <th>IP Address</th>
-        {fieldrows}
-        {fields}
-        <th>{field_label}</th>
-        {/fields}
-        {/fieldrows}
-    </tr>
-    {/if}
-{/exp:proform:entries}
-</table>
+
 {embed="global/_footer"}
