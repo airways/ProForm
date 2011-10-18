@@ -69,27 +69,25 @@
 
     <p>All of the <a href="form_tag.html#variable_pairs">variable pairs</a> available in the <kbd>Form Tag</kbd> are also available in the <dfn>Entries Tag</dfn>.</p>
     
+    <p>Some additional values are available within these variable pairs.</p>
+    
     <h3><a name="forms">{fields}</a></h3>
     
-    <p>In addition to the normal variables available within the {fields} variables, both at the root of the <dfn>Entries Tag</dfn> and within the {fieldrow} variable pair, the <dfn>Entries Tag</dfn> provides the following additional variables.</p>
+    <p>In addition to the normal variables available within the {fields} variable pair, both at the root of the <dfn>Entries Tag</dfn> and within the {fieldrow} variable pair, the <dfn>Entries Tag</dfn> provides the following additional variables.</p>
     
     <ul>
         <li><a href="#var_value_form_entry_id">{value:form_entry_id}</a></li>
+        <li><a href="#var_value_set">{value:*}</a></li>
     </ul>
 
     <h5><a name="var_value_form_entry_id">{value:form_entry_id}</a></h5>
-
     <p>Provides the unique ID of the current entry in the entries loop.</p>
 
-    <!-- <p>Additionally, the following variable pairs are available inside the <dfn>Entries Tag</dfn> as well as notification templates:</p>
+    <h5><a name="var_value_set">{value:*}</a></h5>
+    <p>One variable is created for each field that is submitted to the form. For instance, if you have a <kbd>first_name</kbd> field, a variable named <kbd>{value:first_name}</kbd> would be created to provide it's value.</p>
+    
+    <p>Note however that it is often easier to use the {field_name} and {field_value} variables provided by the <a href="form_tag.html#var_fields">{fields} variable pair</a> to render a template with values from the entry. This way, a single template can render entries for any of your forms.</p>
 
-    <ul>
-        <li><a href="#var_fields">{fields}</a></li>
-        <li><a href="#var_fieldrows">{fieldrows}</a></li>
-    </ul>
-
-    <h3><a name="var_fields">{fields}</a></h3>
-    <p>The <b>fields</b> variable pair provides a list of all of the fields in the selected form, regardless of the row they are set on.</p> -->
 
     <h2><a name="sample_template">Sample Template Code</a></h2>
 

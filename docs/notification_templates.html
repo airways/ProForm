@@ -22,6 +22,17 @@
     build any page on your site. Because of this, they can make use of any installed Module or Plugin, and have full
     conditionals support.</p>
 
+    <p>If you do not need a fancy display or other information about the entry, this is probably all you will need - a
+    single template can render notifications for any form submitted to <dfn>ProForm</dfn>.</p>
+
+    <h2>Single Variables</h2>
+    <p>All of the <a href="entries_tag.html#variables">variables</a> available in the <kbd>Entries Tag</kbd> are available in
+    the notification template when notifications are generated for a newly created entry.</p>
+
+    <h2>Variable Pairs</h2>
+    <p>Similarly, all of the <a href="entries_tag.html#variable_pairs">variable pairs</a> available in the <kbd>Entries Tag</kbd> are
+    available in the notification template when notifications are generated for a newly created entry.</p>
+
     <h2>Sample Template</h2>
     <p>One of the simplest possible notification templates looks like this:</p>
     <pre>
@@ -30,13 +41,6 @@ Someone submitted the {form_name} form:
 {fields}
     {field_label}: {field_value}
 {/fields}</pre>
-
-    <p>If you do not need a fancy display or other information about the entry, this is probably all you will need - a
-    single template can render notifications for any form submitted to <dfn>ProForm</dfn>.</p>
-
-    <h2>Variables</h2>
-    <p>All of the variables available in the <a href="entries_tag.html#variables">Entries Tag</a> are available in
-    the notification template when notifications are generated for a newly created entry.</p>
 
 </div>
 </body>
