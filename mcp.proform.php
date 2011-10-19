@@ -424,7 +424,8 @@ class Proform_mcp {
         //unset($form_fields->form_id);
         unset($form_fields->settings);
         
-        $channel_options = $this->EE->formslib->get_channel_options($this->EE->formslib->ini('safecracker_field_group_id'), array(0 => 'None'));
+        // $channel_options = $this->EE->formslib->get_channel_options($this->EE->formslib->ini('safecracker_field_group_id'), array(0 => 'None'));
+        $channel_options = array();
         
         $types = array(
             'form_id' => 'read_only', 

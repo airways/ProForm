@@ -814,44 +814,45 @@ class BM_Form extends BM_RowInitialized {
                 }
                 break; // case 'form':
             case 'saef':
-                $group_id = $this->__EE->formslib->ini('safecracker_field_group_id');
-                if(!$group_id)
-                {
-                    show_error(lang('no_field_group_setting'));
-                }
-                
-                // TODO: maybe this should be done when the field is created?
-                if(!$this->__EE->bm_channel_fields->field_exists($group_id, $field->field_name))
-                {
-                    $data = array(
-                        'field_name' => $field->field_name,
-                        'field_type' => 'textarea',
-                        'field_maxl' => 255,
-                        'field_ta_rows' => 6,
-                        'field_search' => 'y',
-                        'field_order' => $field->field_id+1000,
-                        'field_required' => 'n',
-                        'field_list_items' => '',
-                        'field_instructions' => '',
-                        'field_label' => $field->field_label,
-                        'field_pre_populate' => 'n',
-                        'field_pre_field_id' => '0',
-                        'field_text_direction' => 'ltr',
-                        'field_is_hidden' => 'n',
-                        'field_fmt' => 'none',
-                        'field_show_fmt' => 'n',
-                        'field_content_type' => 'any',
-                        'field_settings' => base64_encode(serialize(array()))
-                        
-                    );
-                    
-                    $custom_field = $this->__EE->bm_channel_fields->new_field($group_id, $data);
-                    
-                    if(!$custom_field)
-                    {
-                        show_error('There was an error creating the new Custom Field.');
-                    }
-                }
+                show_error('There was an error creating the new Custom Field. SAEF not yet supported.');
+                // $group_id = $this->__EE->formslib->ini('safecracker_field_group_id');
+                // if(!$group_id)
+                // {
+                //     show_error(lang('no_field_group_setting'));
+                // }
+                // 
+                // // TODO: maybe this should be done when the field is created?
+                // if(!$this->__EE->bm_channel_fields->field_exists($group_id, $field->field_name))
+                // {
+                //     $data = array(
+                //         'field_name' => $field->field_name,
+                //         'field_type' => 'textarea',
+                //         'field_maxl' => 255,
+                //         'field_ta_rows' => 6,
+                //         'field_search' => 'y',
+                //         'field_order' => $field->field_id+1000,
+                //         'field_required' => 'n',
+                //         'field_list_items' => '',
+                //         'field_instructions' => '',
+                //         'field_label' => $field->field_label,
+                //         'field_pre_populate' => 'n',
+                //         'field_pre_field_id' => '0',
+                //         'field_text_direction' => 'ltr',
+                //         'field_is_hidden' => 'n',
+                //         'field_fmt' => 'none',
+                //         'field_show_fmt' => 'n',
+                //         'field_content_type' => 'any',
+                //         'field_settings' => base64_encode(serialize(array()))
+                //         
+                //     );
+                //     
+                //     $custom_field = $this->__EE->bm_channel_fields->new_field($group_id, $data);
+                //     
+                //     if(!$custom_field)
+                //     {
+                //         show_error('There was an error creating the new Custom Field.');
+                //     }
+                // }
                 break; //case 'saef':
             case 'share':
                 // We don't save the data from a share form, so there's nothing to do
