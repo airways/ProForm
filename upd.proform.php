@@ -191,18 +191,9 @@ class Proform_upd {
         // Create default preferences
         $this->EE->load->library('formslib');
 
-        $prefs = array(
-            array('preference_name' => 'notification_template_group',       'value' => 'notifications'),
-            array('preference_name' => 'from_address',                      'value' => 'admin@example.com'),
-            // array('preference_name' => 'safecracker_integration_on',        'value' => 'n'),
-            // array('preference_name' => 'safecracker_field_group_id',        'value' => '0'),
-            // array('preference_name' => 'safecracker_separate_channels_on',  'value' => 'y'),
-        );
-
-        foreach($prefs as $pref)
-        {
-            $this->EE->formslib->new_preference($pref);
-        }
+        // save default preferences as set in $default_prefs on Formslib
+        $this->EE->formslib->prefs_mgr->save_preferences(array());
+        
         
         return TRUE;
     }

@@ -18,6 +18,22 @@ endif;*/
 
 #echo '<div class="formFields mouseUp">';
 
+function print_hidden($field)
+{
+    echo '<input type="hidden" class="removeLink" value="' . $field['remove_link'] . '">'.
+         '<input type="hidden" name="required_'.$field['field_name'].'" value="'.$field['is_required'].'" class="fieldRequired" />'.
+         '<input type="hidden" name="field_id[]" value="'.$field['field_id'].'" class="fieldId" />'.
+         '<input type="hidden" name="field_order[]" value="' . $field['field_id'] . '" />'.
+         '<input type="hidden" name="field_row[]" value="' . $field['field_row'] . '" class="fieldRowFlag" />'.
+         '<input type="hidden" name="field_label[]" value="' . $field['settings']['label'] . '" class="fieldLabel" />'.
+         '<input type="hidden" name="field_preset_value[]" value="' . $field['settings']['preset_value'] . '" class="fieldPresetValue" />'.
+         '<input type="hidden" name="field_preset_forced[]" value="' . $field['settings']['preset_forced'] . '" class="fieldPresetForced" />'.
+         '<input type="hidden" name="field_html_id[]" value="' . $field['settings']['html_id'] . '" class="fieldHtmlId" />'.
+         '<input type="hidden" name="field_html_class[]" value="' . $field['settings']['html_class'] . '" class="fieldHtmlClass" />'.
+         '<input type="hidden" name="field_extra1[]" value="' . $field['settings']['extra1'] . '" class="fieldExtra1" />'.
+         '<input type="hidden" name="field_extra2[]" value="' . $field['settings']['extra1'] . '" class="fieldExtra2" />'
+         ;
+}
 if (count($fields) > 0):
     $cp_table_template['cell_start'] = '<td><div class="cellPad">';
     $cp_table_template['cell_end'] = '</div></td>';
@@ -39,6 +55,8 @@ if (count($fields) > 0):
 <?php
     // echo '<ul class="fieldRow targetRow"></ul>';
     foreach($fields as $field):
+        if($field['type'] == 'hidden' OR $field['type'] == 'member_data') continue;
+        
         if($last_field_row != $field['field_row'])
         {
             if($last_field_row != -1)
@@ -52,19 +70,8 @@ if (count($fields) > 0):
             $last_field_row = $field['field_row'];
         }
         
-        echo '<li><input type="hidden" class="removeLink" value="' . $field['remove_link'] . '">'.
-             '<input type="hidden" name="required_'.$field['field_name'].'" value="'.$field['is_required'].'" class="fieldRequired" />'.
-             '<input type="hidden" name="field_id[]" value="'.$field['field_id'].'" class="fieldId" />'.
-             '<input type="hidden" name="field_order[]" value="' . $field['field_id'] . '" />'.
-             '<input type="hidden" name="field_row[]" value="' . $field['field_row'] . '" class="fieldRowFlag" />'.
-             '<input type="hidden" name="field_label[]" value="' . $field['settings']['label'] . '" class="fieldLabel" />'.
-             '<input type="hidden" name="field_preset_value[]" value="' . $field['settings']['preset_value'] . '" class="fieldPresetValue" />'.
-             '<input type="hidden" name="field_preset_forced[]" value="' . $field['settings']['preset_forced'] . '" class="fieldPresetForced" />'.
-             '<input type="hidden" name="field_html_id[]" value="' . $field['settings']['html_id'] . '" class="fieldHtmlId" />'.
-             '<input type="hidden" name="field_html_class[]" value="' . $field['settings']['html_class'] . '" class="fieldHtmlClass" />'.
-             '<input type="hidden" name="field_extra1[]" value="' . $field['settings']['extra1'] . '" class="fieldExtra1" />'.
-             '<input type="hidden" name="field_extra2[]" value="' . $field['settings']['extra1'] . '" class="fieldExtra2" />'
-             ;
+        echo '<li>';
+        print_hidden($field);
         
         ?>
         <span class="move-link"></span>
@@ -126,6 +133,36 @@ endif;
 
 
             </ul>
+            
+            <ol class="form-setup">
+            <?php
+            // echo '<ul class="fieldRow targetRow"></ul>';
+            $hidden_fields = array();
+            foreach($fields as $field)
+            {
+                if($field['type'] == 'hidden' OR $field['type'] == 'member_data')
+                {
+                    $hidden_fields[$field['field_name']] = $field;
+                }
+            }
+            
+            ksort($hidden_fields);
+            
+            if(count($hidden_fields) > 0): ?>
+                <h3>Hidden & Member Data Fields</h3>
+                <?php
+                foreach($hidden_fields as $field):
+                    echo '<li>';
+                    print_hidden($field); ?>
+                        <label><?php echo $field['field_name']; ?></label>
+                        <a href="<?php echo $field['edit_link']; ?>" class="edit action-link">Edit</a>
+                        <a href="<?php echo $field['remove_link']; ?>" class="delete action-link">Remove</a>
+                    <?php
+                    echo '</li>';
+                endforeach;
+            endif;
+            ?>
+
         </div> <!-- end .form-layout -->
         
         <div class="field-modifications">

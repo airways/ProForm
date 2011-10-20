@@ -30,7 +30,6 @@
  *
  **/
 
-#require_once(dirname(__FILE__).'/../../prolib/libraries/bm_handle_mgr.php');
 require_once PATH_THIRD.'prolib/prolib.php';
 
 if(!class_exists('Formslib')) {
@@ -43,14 +42,21 @@ class Formslib
     
     // Fields that will not be encrypted or decrypted
     var $no_encryption = array('dst_enabled');
-    
+
+    var $default_prefs = array(
+        'notification_template_group' => 'notifications',
+        'from_address' => 'admin@example.com',
+        'reply_to_address' => 'admin@example.com',
+    );
+
     function Formslib()
     {
-        #$this->EE = &get_instance();
         prolib($this, "proform");
         
+        $this->prefs_mgr = new Bm_prefs("proform_preferences", FALSE, $this->default_prefs);
+        
         $this->EE->db->cache_off();
-        $this->prefs_mgr = new Bm_handle_mgr("proform_preferences", "preference", "BM_Preference");
+        
         //$this->session_mgr = new Bm_handle_mgr("proform_sessions", "session", "BM_FormSession", array('values', 'errors'));
     }
     
@@ -352,13 +358,13 @@ class Formslib
      *
      * Wraps the bm_handle_mgr for this module's preference values.
      * ------------------------------------------------------------ */
-    function new_preference($data) { return $this->prefs_mgr->new_object($data); }
+    function new_preference($data) { return $this->prefs_mgr->new_preference($data); }
 
     /**
      * @param  $handle
      * @return Bm_preference
      */
-    function get_preference($handle) { return $this->prefs_mgr->get_object($handle); }
+    function get_preference($handle) { return $this->prefs_mgr->get_preference($handle); }
 
     /**
      * Get a preference setting from the database, or return the default if the preference
@@ -379,9 +385,9 @@ class Formslib
 
         return $result;
     }
-    function get_preferences() { return $this->prefs_mgr->get_objects(FALSE, FALSE, 'preference_id'); }
-    function save_preference($object)  { return $this->prefs_mgr->save_object($object); }
-    function delete_preference($object)  { return $this->prefs_mgr->delete_object($object); }
+    function get_preferences() { return $this->prefs_mgr->get_preferences(); }
+    function save_preference($object)  { return $this->prefs_mgr->save_preference($object); }
+    function delete_preference($object)  { return $this->prefs_mgr->delete_preference($object); }
 
 
 
@@ -1081,17 +1087,3 @@ class BM_FormSession
 }
 }
 
-/*if(!class_exists('BM_Preference')) {
-class BM_ProformPreference extends BM_RowInitialized
-{
-    var $preference_id = FALSE;
-    var $preference_name = FALSE;
-    var $value = FALSE;
-
-    function save()
-    {
-        $this->__EE->formslib->save_preference($this);
-    }
-
-}
-}*/

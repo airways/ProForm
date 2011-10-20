@@ -75,6 +75,7 @@ class Proform {
         $this->EE->load->library('proform_notifications');
         
         $this->EE->proform_notifications->default_from_address = $this->EE->formslib->ini('from_address');
+        $this->EE->proform_notifications->default_reply_to_address = $this->EE->formslib->ini('reply_to_address');
         $this->EE->proform_notifications->template_group_name = $this->EE->formslib->ini('notification_template_group');
         
         if(strlen($this->EE->config->item('encryption_key')) < 32) 

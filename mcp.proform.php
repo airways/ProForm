@@ -257,27 +257,27 @@ class Proform_mcp {
         $this->EE->load->library('proform_notifications');
         $prefs = $this->EE->formslib->get_preferences();
 
-        foreach($prefs as $pref)
+        foreach($prefs as $pref => $value)
         {
-            $f_name = 'pref_' . $pref->preference_name;
+            $f_name = 'pref_' . $pref;
             
             switch($f_name)
             {
                 case 'pref_notification_template_group':
                     $groups = $this->EE->proform_notifications->get_template_group_names();
                     $groups = array_merge(array(0 => 'None'), $groups);
-                    $control = form_dropdown($f_name, $groups, $pref->value);
+                    $control = form_dropdown($f_name, $groups, $value);
                     break;
                 case 'pref_safecracker_integration_on':
                 case 'pref_safecracker_separate_channels_on':
-                    $control = form_checkbox($f_name, 'y', $pref->value == 'y');
+                    $control = form_checkbox($f_name, 'y', $value == 'y');
                     break;
                 case 'pref_safecracker_field_group_id':
                     $groups = $this->EE->formslib->get_field_group_options();
-                    $control = form_dropdown($f_name, $groups, $pref->value);
+                    $control = form_dropdown($f_name, $groups, $value);
                     break;
                 default:
-                    $control = form_input($f_name, $pref->value);
+                    $control = form_input($f_name, $value);
             }
             $vars['form'][] = array('lang_field' => $f_name, 'label' => lang($f_name), 'control' => $control);
         }
@@ -292,22 +292,25 @@ class Proform_mcp {
     function process_global_form_preferences()
     {
         $this->EE->load->library('formslib');
-        $prefs = $this->EE->formslib->get_preferences();
-
-        foreach($prefs as $pref)
+        // returns an array of preferences as name => value pairs
+        $prefs = $this->EE->formslib->prefs_mgr->get_preferences();
+        foreach($prefs as $pref => $existing_value)
         {
-            $f_name = 'pref_' . $pref->preference_name;
-            if($this->EE->input->post($f_name) !== FALSE)
+            $f_name = 'pref_' . $pref;
+            $value = $this->EE->input->post($f_name);
+            if($value != $existing_value)
             {
-                $pref->value = $this->EE->input->post($f_name);
-                $pref->save();
-            } else {
-                switch($f_name)
+                if($value)
                 {
-                    case 'pref_safecracker_integration_on':
-                    case 'pref_safecracker_separate_channels_on':
-                        $pref->value = 'n';
-                        $pref->save();
+                    $value = $this->EE->input->post($f_name);
+                    $this->EE->formslib->prefs_mgr->set($pref, $value);
+                } else {
+                    switch($f_name)
+                    {
+                        case 'pref_safecracker_integration_on':
+                        case 'pref_safecracker_separate_channels_on':
+                            $this->EE->formslib->prefs_mgr->set($pref, 'n');
+                    }
                 }
             }
         }
