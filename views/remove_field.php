@@ -35,22 +35,9 @@
 <?php if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>'; ?>
 <?php if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>'; ?>
 
-<div class="deleteForm">
-<?php
-    echo form_open($action_url, '', $form_hidden);
-    ?>
-    <p>Are you sure you want to REMOVE this FIELD from form <?php echo $form_name; ?>?</p>
-    <p>This field will be removed and all of the data in this form for this field will be permanently deleted.</p>
-    <p>This cannot be undone.</p>
-    <p style="color: red;">
-        <b>About to remove:</b><br/>
-        FIELD: <?php echo $field_name; ?><br/>
-        from FORM: <?php echo $form_name; ?>
-    </p>
-    <div class="tableFooter">
-        <div class="tableSubmit">
-            <?php echo form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit')); ?>
-        </div>
-    </div>
-    <?php echo form_close(); ?>
+<?php echo form_open($action_url, '', $form_hidden); ?>
+<p class="warning">Are you sure you want to remove field <span><?php echo $field_name; ?></span> from the form <span><?php echo $form_name; ?></span>? This cannot be undone.</p>
+<div class="tableFooter">
+    <?php echo form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit')); ?>
 </div>
+<?php echo form_close(); ?>

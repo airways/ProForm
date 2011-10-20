@@ -66,46 +66,42 @@ if (count($fields) > 0):
              '<input type="hidden" name="field_extra2[]" value="' . $field['settings']['extra1'] . '" class="fieldExtra2" />'
              ;
         
-        
+        ?>
+        <span class="move-link"></span>
+        <a href="<?php echo $field['edit_link']; ?>" class="edit action-link">Edit</a>
+        <a href="<?php echo $field['remove_link']; ?>" class="delete action-link">Remove</a>
+        <?php
         switch($field['type']):
             case 'string': ?>
-            
-            <span class="move-link"></span>
-            <a href="<?php echo $field['edit_link']; ?>" class="edit action-link">Edit</a>
-            <a href="<?php echo $field['remove_link']; ?>" class="delete action-link">Remove</a>
             <label for="" class=""><?php echo $field['field_label']; ?></label>
             <input type="text" class="" disabled="disabled" />
         <?php
             break;
             case 'checkbox': ?>
-            
-            <span class="move-link"></span>
-            <a href="" class="edit action-link">Edit</a>
-            <a href="" class="delete action-link">Delete</a>
             <input type="checkbox" disabled="disabled" />
-            <label for="" class="label-checkbox">This is a required field</label>
+            <label for="" class="label-checkbox"><?php echo $field['field_label']; ?></label>
         <?php
             break;
             case 'radio': ?>
-            
-            <span class="move-link"></span>
-            <a href="" class="edit action-link">Edit</a>
-            <a href="" class="delete action-link">Delete</a>
             <input type="radio" disabled="disabled" />
-            <label for="" class="label-checkbox">This is a radio button</label>
+            <label for="" class="label-checkbox"><?php echo $field['field_label']; ?></label>
         <?php
             break;
             case 'list': ?>
-            
-            <span class="move-link"></span>
-            <a href="" class="edit action-link">Edit</a>
-            <a href="" class="delete action-link">Delete</a>
-            <label for="" class="label-checkbox">Select the option</label>
+            <label for="" class="label-checkbox"><?php echo $field['field_label']; ?></label>
             <select name="" id="" disabled="disabled" />
-                <option value="">Option 1</option>
-                <option value="">Option 2</option>
-                <option value="">Option 3</option>
-                <option value="">Option 4</option>
+                <?php
+                if(isset($field['settings']['type_list'])):
+                    foreach(explode("\n", $field['settings']['type_list']) as $option): 
+                    $option = explode(':', $option);
+                    if(count($option) == 1) $option[1] = $option[0];
+                    ?>
+                <option value="<?php echo $option[0]; ?>"><?php echo $option[1]; ?></option>
+                <?php
+                    endforeach;
+                endif;
+                ?>
+                
             </select>
         <?php
             break;

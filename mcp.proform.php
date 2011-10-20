@@ -529,8 +529,8 @@ class Proform_mcp {
             foreach($form->fields() as $field) 
             {
                 $row_array = (array)$field;
-            
-                $row_array['settings']      = $field->form_field_settings;
+                
+                $row_array['settings']      = array_merge($field->settings, $field->form_field_settings);
                 $row_array['edit_link']     = ACTION_BASE.AMP.'method=edit_field'.AMP.'field_id='.$field->field_id;
                 $row_array['remove_link']   = ACTION_BASE.AMP.'method=remove_field'.AMP.'form_id='.$form_id.AMP.'field_id='.$field->field_id;
                 $row_array['is_required']   = $field->is_required;
@@ -585,6 +585,7 @@ class Proform_mcp {
         $form = $this->EE->formslib->get_form($form_id);
         
         // set defaults for checkboxes
+        if(!$this->EE->input->post('encryption_on')) $_POST['encryption_on'] = 'n';
         if(!$this->EE->input->post('admin_notification_on')) $_POST['admin_notification_on'] = 'n';
         if(!$this->EE->input->post('submitter_notification_on')) $_POST['submitter_notification_on'] = 'n';
         if(!$this->EE->input->post('share_notification_on')) $_POST['share_notification_on'] = 'n';

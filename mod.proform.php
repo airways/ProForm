@@ -902,7 +902,7 @@ class Proform {
         {
             if($field->type != 'file')
             {
-                if($field->preset_forced == 'y')
+                if($field->form_field_settings['preset_forced'] == 'y')
                 {
                     $value = $field->preset_value;
                     $_POST[$field->field_name] = $field->preset_value;

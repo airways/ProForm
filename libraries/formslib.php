@@ -1005,7 +1005,7 @@ class BM_Field extends BM_RowInitialized
     
     function save()
     {
-        $this->settings = $this->settings();
+        // $this->settings = $this->settings();
         $this->__EE->formslib->save_field($this);
     }
 
