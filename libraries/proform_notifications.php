@@ -44,6 +44,8 @@ class Proform_notifications
      * @var Bm_handler_mgr
      */
     var $template_mgr;
+    var $debug = FALSE;
+    var $debug_str = '<b>Debug Output</b><br/>';
     
     function __construct()
     {
@@ -51,12 +53,17 @@ class Proform_notifications
         $this->mgr = new Bm_handle_mgr();
     }
     
+    function _debug($msg)
+    {
+        $this->debug_str .= $msg . '<br/>';
+    }
 
     function has_notifications($form, $data, $config)
     {
 
         if ($this->EE->extensions->active_hook('proform_notification_exists') === TRUE)
         {
+            $this->_debug('Calling proform_notification_exists');
             if(!$this->EE->extensions->call('proform_notification_exists', $form, $this, $config))
             {
                 return FALSE;
@@ -65,6 +72,7 @@ class Proform_notifications
 
         if(strlen(trim($form->notification_list)) > 0 || (isset($config['notify']) && count($config['notify']) > 0))
         {
+            $this->_debug('Notifications exist for '.$form->form_name);
             return TRUE;
         }
 
@@ -95,6 +103,7 @@ class Proform_notifications
 
         if($this->EE->extensions->active_hook('proform_notification_start') === TRUE)
         {
+            $this->_debug('Calling proform_notification_start - result so far ' . ($result ? 'yes' : 'no'));
             $this->EE->extensions->call('proform_notification_start', $form, $this);
             if($this->EE->extensions->end_script) return;
         }
@@ -126,27 +135,33 @@ class Proform_notifications
             // fix keys again
             sort($notification_list);
             
+            $this->_debug('Final notification list ' . print_r($notification_list, TRUE));
             $result = TRUE;
             
             // send email to the admin
-            if($form->admin_notification_on == 'y')
+            if($form->admin_notification_on == 'y' AND count($notification_list) > 0)
             {
+                $this->_debug('Sending admin notifications - result so far ' . ($result ? 'yes' : 'no'));
                 $result &= $this->_send_notifications('admin', $form->notification_template, $form, $data, $form->subject, $notification_list);
             }
             
             // send email to the submitter
+            $this->_debug('submitter_notification '. ($form->submitter_notification_on == 'y' ? 'on' : 'off'));
             if($form->submitter_notification_on == 'y' && $form->submitter_email_field 
                 && isset($data[$form->submitter_email_field]) && $data[$form->submitter_email_field])
             {
+                $this->_debug('Sending submitter_notification - result so far ' . ($result ? 'yes' : 'no'));
                 $submitter_email = $data[$form->submitter_email_field];
                 $result &= $this->_send_notifications('submitter', $form->submitter_notification_template, 
                     $form, $data, $form->submitter_notification_subject ? $form->submitter_notification_subject : $form->subject, array($submitter_email));
             }
 
             // send share emails ("tell a friend", etc)
+            $this->_debug('share_notification '. ($form->share_notification_on == 'y' ? 'on' : 'off'));
             if($form->share_notification_on == 'y' && $form->share_email_field 
                 && isset($data[$form->share_email_field]) && $data[$form->share_email_field])
             {
+                $this->_debug('Sending share_notification - result so far ' . ($result ? 'yes' : 'no'));
                 $share_email = $data[$form->share_email_field];
                 $result &= $this->_send_notifications('share', $form->share_notification_template, 
                     $form, $data, $form->share_notification_subject ? $form->share_notification_subject : $form->subject, array($share_email));
@@ -154,12 +169,22 @@ class Proform_notifications
             
             if($this->EE->extensions->active_hook('proform_notification_end') === TRUE)
             {
+                $this->_debug('Calling proform_notification_end - result so far ' . ($result ? 'yes' : 'no'));
                 $this->EE->extensions->call('proform_notification_end', $form, $this);
             }
             
+            $this->_debug('Final result ' . ($result ? 'yes' : 'no'));
+            
+            if($this->debug)
+            {
+                echo $this->debug_str;
+            }
             return $result;
         } else {
-            
+            if($this->debug)
+            {
+                echo $this->debug_str;
+            }
             return FALSE;
         }
     }
