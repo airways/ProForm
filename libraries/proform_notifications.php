@@ -212,16 +212,11 @@ class Proform_notifications
             foreach($notification_list as $to_email)
             {
                 $this->EE->bm_email->initialize();
-                // if($form->from_address)
-                // {
-                //     $this->EE->bm_email->from($form->from_address);
-                // } else {
-                    //if(!$this->default_from_address) return FALSE;
+
                 if($this->default_from_address)
                 {
                     $this->EE->bm_email->from($this->default_from_address);
                 }
-                // }
                 
                 if(array_key_exists('reply_to_address', $form->settings) AND $form->settings['reply_to_address'])
                 {
@@ -246,38 +241,13 @@ class Proform_notifications
                 if($this->EE->bm_email->send)
                 {
                     $result = $result && $this->EE->bm_email->Send();
-
-                    if(!$result)
-                    {
-                        $this->EE->bm_email->print_debugger();
-                        echo $this->EE->bm_email->_debug_msg;
-                        var_dump($this->EE->bm_email);
-                    }
                 }
-                //echo $message;
-                //var_dump($this->EE->bm_email);
-                //die;*/
+
             }
         }
 
         return $result;
     }
-    /* template manager interface */
-    /*function new_template($data) { return $this->template_mgr->new_object($data); }
-    function get_template($handle) { return $this->template_mgr->get_object($handle); }
-    function get_templates() { return $this->template_mgr->get_objects(); }
-    function save_template($object)  { return $this->template_mgr->save_object($object); }
-    function delete_template($object)  { return $this->template_mgr->delete_object($object); }
-    
-    function get_template_names()
-    {
-        $templates = $this->get_templates();
-        $template_names = array();
-        foreach($templates as $template) {
-            $template_names[$template->template_name] = $template->template_name;
-        }
-        return $template_names;
-    }*/
 
     /**
      * Get a list of EE template group names from the database. These will be used as the options
@@ -361,29 +331,3 @@ class Proform_notifications
         }
     }
 }
-
-/*
-class Bm_Template extends BM_RowInitialized 
-{
-    var $__lib_name = "proform_notifications";
-    var $template_id = FALSE;
-    var $template_name = FALSE;
-    var $from_address = FALSE;
-    var $subject = FALSE;
-    var $template = FALSE;
-    var $settings = FALSE;
-    
-    function __construct($row)
-    {
-        parent::__construct($row);
-        $this->__EE->load->library($this->__lib_name);
-        $this->__lib = $this->__EE->{strtolower($this->__lib_name)};
-    }
-    
-    function save()
-    {
-        $this->__lib->save_template($this);
-    }
-
-}
-*/

@@ -112,32 +112,12 @@ class Proform {
         $notify             = explode('|', $this->EE->TMPL->fetch_param('notify', ''));
         $download_url       = $this->EE->TMPL->fetch_param('download_url',  '');
         $download_label     = $this->EE->TMPL->fetch_param('download_label',  '');
+        $debug              = $this->EE->TMPL->fetch_param('debug',  'false') == 'yes';
 
 
         $tagdata = $this->EE->TMPL->tagdata;
         
         $complete = FALSE;
-        // Get existing form session from database - this will contain our currently entered field values
-        //$form_session_name = $this->EE->input->get_post('FS', FALSE);
-        /*if(isset($_SESSION['bm_form']['FS']))
-        {
-            $form_session_name = $_SESSION['bm_form']['FS'];
-        } else {
-            $form_session_name = FALSE;
-        }
-        
-        if($form_session_name) {
-            $form_session = $this->EE->formslib->get_session($form_session_name);
-            if($form_session)
-            {
-                $this->EE->formslib->delete_session($form_session);
-                unset($_SESSION['bm_form']['FS']);
-                $form_session_name = FALSE;
-            } else {
-                unset($_SESSION['bm_form']['FS']);
-            }
-        } else
-            $form_session = FALSE;*/
         
         $form_session = $this->EE->formslib->new_session();
         $form_session->processed = FALSE;
@@ -195,6 +175,7 @@ class Proform {
             'download_url'      => $download_url,
             'download_label'    => $download_label,
             'referrer_url'      => $this->EE->agent->is_referral() ? $this->EE->agent->referrer() : '',
+            'debug'             => $debug,
         );
         
         // copy everything else the user may have added
@@ -268,7 +249,9 @@ class Proform {
                 ////////////////////
                 // Setup variables
                 $varsets = array();
-
+                
+                $variables['use_captcha'] = $use_captcha;
+                
                 if(count($form_obj->settings) > 0)
                 {
                     $varsets[] = array('formpref', $form_obj->settings);
@@ -339,7 +322,7 @@ class Proform {
                 $varsets[] = array('error', $field_errors);
                 
                 // Turn various arrays of values into variables
-                $variables = array();
+                // $variables = array();
                 
                 $this->prolib->copy_values($form_obj, $variables);
                 
@@ -726,7 +709,7 @@ class Proform {
                 $data['fieldrows'] = $fieldrows;
                 $data['fields'] = $fields;
 
-                $this->EE->proform_notifications->send_notifications($form_obj, $data, $config);
+                $this->_process_notifications($form_obj, $data);
             }
             
             if ($this->EE->extensions->active_hook('proform_insert_end') === TRUE)
@@ -1003,12 +986,8 @@ class Proform {
             // return any errors to the form template
             if(count($form_session->errors) > 0)
             {
+                
                 return $form_session;
-                /*
-                $form_session->save();
-                $_SESSION['bm_form']['FS'] = $form_session_name;
-                $this->EE->functions->redirect($form_config['error_url']);
-                */
             } else {
 
                 // if no errors - insert data
@@ -1017,19 +996,7 @@ class Proform {
                 $data['user_agent'] = $this->EE->agent->agent_string();
 
                 $this->_process_insert($form_obj, $form_session, $data);
-
-                if($this->EE->proform_notifications->has_notifications($form_obj, $data, $form_config))
-                {
-                    $fieldrows = $this->create_fields_array($form_obj, array(), $data, array(), TRUE);
-                    $fields = $this->create_fields_array($form_obj, array(), $data, array(), FALSE);
-                    $data['fieldrows'] = $fieldrows;
-                    $data['fields'] = $fields;
-
-                    if(!$this->EE->proform_notifications->send_notifications($form_obj, $data, $form_config))
-                    {
-                        show_error("{exp:proform:form} could not send notifications for form: ".$form_obj->form_name);
-                    }
-                }
+                $this->_process_notifications($form_obj, $data);
                 
                 if ($this->EE->extensions->active_hook('proform_process_end') === TRUE)
                 {
@@ -1049,6 +1016,36 @@ class Proform {
         }
     }
     
+    
+    private function _process_notifications(&$form_obj, &$data)
+    {
+        if($this->EE->proform_notifications->has_notifications($form_obj, $data, $form_config))
+        {
+            $fieldrows = $this->create_fields_array($form_obj, array(), $data, array(), TRUE);
+            $fields = $this->create_fields_array($form_obj, array(), $data, array(), FALSE);
+            $data['fieldrows'] = $fieldrows;
+            $data['fields'] = $fields;
+
+            if(!$this->EE->proform_notifications->send_notifications($form_obj, $data, $form_config))
+            {
+                if($form_config['debug'])
+                {
+                    echo '<b>{exp:proform:form} could not send notifications for form: '.$form_obj->form_name.'</b><p/>';
+                    echo $this->EE->proform_notifications->debug;
+                    echo '<hr/>';
+                    $this->EE->bm_email->print_debugger();
+                    echo '<hr/>';
+                    foreach($this->EE->bm_email->_debug_msg as $row)
+                    {
+                        echo $row.'<br/>';
+                    }
+                    exit;
+                } else {
+                    show_error("{exp:proform:form} could not send notifications for form: ".$form_obj->form_name);
+                }
+            }
+        }
+    }
 
     ////////////////////////////////////////////////////////////////////////////////
     // Processing Helpers
