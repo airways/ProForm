@@ -659,6 +659,7 @@ class Proform {
         $form_name = $this->EE->TMPL->fetch_param('form_name', FALSE);
         $send_notification = $this->EE->TMPL->fetch_param('send_notification', FALSE);
         if(!$send_notification) $send_notification = 'yes';
+        $debug = $this->EE->TMPL->fetch_param('debug', 'false') == 'yes';
         
         // Make both newlines and pipes valid delimiters - useful if the value comes from Low Variables or similar
         $notify = explode("\n", implode("\n", explode('|', $this->EE->TMPL->fetch_param('notify', ''))));
@@ -700,8 +701,9 @@ class Proform {
             // Send notifications
             if($send_notification == 'yes') {
                 $data['entry_id'] = $this->EE->db->insert_id();
-                $config = array(
-                    'notify' => $notify
+                $form_config = array(
+                    'notify' => $notify,
+                    'debug' => $debug,
                 );
 
                 $fieldrows = $this->create_fields_array($form_obj, array(), $data, array(), TRUE);
@@ -709,7 +711,7 @@ class Proform {
                 $data['fieldrows'] = $fieldrows;
                 $data['fields'] = $fields;
 
-                $this->_process_notifications($form_obj, $data);
+                $this->_process_notifications($form_obj, $form_config, $data);
             }
             
             if ($this->EE->extensions->active_hook('proform_insert_end') === TRUE)
@@ -996,7 +998,7 @@ class Proform {
                 $data['user_agent'] = $this->EE->agent->agent_string();
 
                 $this->_process_insert($form_obj, $form_session, $data);
-                $this->_process_notifications($form_obj, $data);
+                $this->_process_notifications($form_obj, $form_config, $data);
                 
                 if ($this->EE->extensions->active_hook('proform_process_end') === TRUE)
                 {
@@ -1017,7 +1019,7 @@ class Proform {
     }
     
     
-    private function _process_notifications(&$form_obj, &$data)
+    private function _process_notifications(&$form_obj, &$form_config, &$data)
     {
         if($this->EE->proform_notifications->has_notifications($form_obj, $data, $form_config))
         {

@@ -269,7 +269,7 @@ Form Layout
 #mainContent .pageContents {
 	background: #fafcfd;
 	border: 1px solid #ECF1F4;
-	width: 95%
+/*  width: 95%*/
 }
 
 #mainContent .tableFooter {

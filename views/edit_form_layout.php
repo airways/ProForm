@@ -1,23 +1,5 @@
 <?php
 
-/*echo '<label for="field_id">Add Special</label>&nbsp;';
-if(count($special_options) > 0):
-    echo form_dropdown('special_id', $special_options)
-        .'&nbsp; <input type="submit" class="submit" name="add_special" value="Add" />';
-else: 
-    echo lang('no_unassigned_fields_available'); 
-endif;
-
-echo '<label for="field_id">Add Field</label>&nbsp;';
-if(count($field_options) > 0):
-    echo form_dropdown('field_id', $field_options)
-        .'&nbsp; <input type="submit" class="submit" name="add_field" value="Add" />';
-else:
-    echo lang('no_unassigned_fields_available');
-endif;*/
-
-#echo '<div class="formFields mouseUp">';
-
 function print_hidden($field)
 {
     echo '<input type="hidden" class="removeLink" value="' . $field['remove_link'] . '">'.
@@ -34,6 +16,7 @@ function print_hidden($field)
          '<input type="hidden" name="field_extra2[]" value="' . $field['settings']['extra1'] . '" class="fieldExtra2" />'
          ;
 }
+
 if (count($fields) > 0):
     $cp_table_template['cell_start'] = '<td><div class="cellPad">';
     $cp_table_template['cell_end'] = '</div></td>';
@@ -45,123 +28,120 @@ if (count($fields) > 0):
     
     $last_field_row = -1;
     $alt = FALSE;
-?>
-
-
-<div class="grid-group">
-        <div class="form-layout">
-
-        <ul class="form-setup">
-<?php
-    // echo '<ul class="fieldRow targetRow"></ul>';
-    foreach($fields as $field):
-        if($field['type'] == 'hidden' OR $field['type'] == 'member_data') continue;
-        
-        if($last_field_row != $field['field_row'])
-        {
-            if($last_field_row != -1)
-            {
-                echo '</ul><ul class="form-setup fieldRow targetRow"></ul>';
-            }
-            
-            echo '<ul class="form-setup fieldRow' . ($alt ? ' alt' : '') . '">';
-            $alt = !$alt;
-            
-            $last_field_row = $field['field_row'];
-        }
-        
-        echo '<li>';
-        print_hidden($field);
-        
-        ?>
-        <span class="move-link"></span>
-        <a href="<?php echo $field['edit_link']; ?>" class="edit action-link">Edit</a>
-        <a href="<?php echo $field['remove_link']; ?>" class="delete action-link">Remove</a>
-        <?php
-        switch($field['type']):
-            case 'string': ?>
-            <label for="" class=""><?php echo $field['field_label']; ?></label>
-            <input type="text" class="" disabled="disabled" />
-        <?php
-            break;
-            case 'checkbox': ?>
-            <input type="checkbox" disabled="disabled" />
-            <label for="" class="label-checkbox"><?php echo $field['field_label']; ?></label>
-        <?php
-            break;
-            case 'radio': ?>
-            <input type="radio" disabled="disabled" />
-            <label for="" class="label-checkbox"><?php echo $field['field_label']; ?></label>
-        <?php
-            break;
-            case 'list': ?>
-            <label for="" class="label-checkbox"><?php echo $field['field_label']; ?></label>
-            <select name="" id="" disabled="disabled" />
-                <?php
-                if(isset($field['settings']['type_list'])):
-                    foreach(explode("\n", $field['settings']['type_list']) as $option): 
-                    $option = explode(':', $option);
-                    if(count($option) == 1) $option[1] = $option[0];
-                    ?>
-                <option value="<?php echo $option[0]; ?>"><?php echo $option[1]; ?></option>
-                <?php
-                    endforeach;
-                endif;
-                ?>
-                
-            </select>
-        <?php
-            break;
-            case 'textarea': ?>
-            
-            <span class="move-link"></span>
-            <a href="" class="edit action-link">Edit</a>
-            <a href="" class="delete action-link">Delete</a>
-            <label for="">Comment</label>
-            <textarea name="" id="" cols="30" rows="10" disabled="disabled"></textarea>
-            
-            <?php
-            break;
-        endswitch;
-        echo '</li>';
-    endforeach;
-    
-    echo '</ul><ul class="form-setup fieldRow targetRow"></ul>';
-    
-endif;
     ?>
-
-
+    
+    
+    <div class="grid-group">
+        <div class="form-layout">
+        
+            <ul class="form-setup">
+                <?php
+                // echo '<ul class="fieldRow targetRow"></ul>';
+                foreach($fields as $field):
+                    if($field['type'] == 'hidden' OR $field['type'] == 'member_data') continue;
+                    
+                    if($last_field_row != $field['field_row'])
+                    {
+                        if($last_field_row != -1)
+                        {
+                            echo '</ul><ul class="form-setup fieldRow targetRow"></ul>';
+                        }
+                        
+                        echo '<ul class="form-setup fieldRow' . ($alt ? ' alt' : '') . '">';
+                        $alt = !$alt;
+                        
+                        $last_field_row = $field['field_row'];
+                    }
+                    
+                    echo '<li>';
+                    print_hidden($field);
+                    
+                    ?>
+                    <span class="move-link"></span>
+                    <a href="<?php echo $field['edit_link']; ?>" class="edit action-link">Edit</a>
+                    <a href="<?php echo $field['remove_link']; ?>" class="delete action-link">Remove</a>
+                    <?php
+                    switch($field['type']):
+                        case 'string': ?>
+                        <label for="" class=""><?php echo $field['field_label']; ?></label>
+                        <input type="text" class="" disabled="disabled" />
+                    <?php
+                        break;
+                        case 'checkbox': ?>
+                        <input type="checkbox" disabled="disabled" />
+                        <label for="" class="label-checkbox"><?php echo $field['field_label']; ?></label>
+                    <?php
+                        break;
+                        case 'radio': ?>
+                        <input type="radio" disabled="disabled" />
+                        <label for="" class="label-checkbox"><?php echo $field['field_label']; ?></label>
+                    <?php
+                        break;
+                        case 'list': ?>
+                        <label for="" class="label-checkbox"><?php echo $field['field_label']; ?></label>
+                        <select name="" id="" disabled="disabled" />
+                            <?php
+                            if(isset($field['settings']['type_list'])):
+                                foreach(explode("\n", $field['settings']['type_list']) as $option): 
+                                $option = explode(':', $option);
+                                if(count($option) == 1) $option[1] = $option[0];
+                                ?>
+                            <option value="<?php echo $option[0]; ?>"><?php echo $option[1]; ?></option>
+                            <?php
+                                endforeach;
+                            endif;
+                            ?>
+                
+                        </select>
+                    <?php
+                        break;
+                        case 'textarea': ?>
+            
+                        <span class="move-link"></span>
+                        <a href="" class="edit action-link">Edit</a>
+                        <a href="" class="delete action-link">Delete</a>
+                        <label for="">Comment</label>
+                        <textarea name="" id="" cols="30" rows="10" disabled="disabled"></textarea>
+            
+                        <?php
+                        break;
+                    endswitch;
+                    echo '</li>';
+                endforeach;
+    
+                echo '</ul><ul class="form-setup fieldRow targetRow"></ul>';
+                ?>
             </ul>
             
             <ol class="form-setup">
-            <?php
-            // echo '<ul class="fieldRow targetRow"></ul>';
-            $hidden_fields = array();
-            foreach($fields as $field)
-            {
-                if($field['type'] == 'hidden' OR $field['type'] == 'member_data')
-                {
-                    $hidden_fields[$field['field_name']] = $field;
-                }
-            }
-            
-            ksort($hidden_fields);
-            
-            if(count($hidden_fields) > 0): ?>
-                <h3>Hidden & Member Data Fields</h3>
                 <?php
-                foreach($hidden_fields as $field):
-                    echo '<li>';
-                    print_hidden($field); ?>
-                        <label><?php echo $field['field_name']; ?></label>
-                        <a href="<?php echo $field['edit_link']; ?>" class="edit action-link">Edit</a>
-                        <a href="<?php echo $field['remove_link']; ?>" class="delete action-link">Remove</a>
+                // echo '<ul class="fieldRow targetRow"></ul>';
+                $hidden_fields = array();
+                foreach($fields as $field)
+                {
+                    if($field['type'] == 'hidden' OR $field['type'] == 'member_data')
+                    {
+                        $hidden_fields[$field['field_name']] = $field;
+                    }
+                }
+        
+                ksort($hidden_fields);
+        
+                if(count($hidden_fields) > 0): ?>
+                    <h3>Hidden & Member Data Fields</h3>
                     <?php
-                    echo '</li>';
-                endforeach;
-            endif;
-            ?>
+                    foreach($hidden_fields as $field):
+                        echo '<li>';
+                        print_hidden($field); ?>
+                            <label><?php echo $field['field_name']; ?></label>
+                            <a href="<?php echo $field['edit_link']; ?>" class="edit action-link">Edit</a>
+                            <a href="<?php echo $field['remove_link']; ?>" class="delete action-link">Remove</a>
+                        <?php
+                        echo '</li>';
+                    endforeach;
+                endif;
+                ?>
+            </ol>
 
         </div> <!-- end .form-layout -->
         
@@ -173,7 +153,7 @@ endif;
                 </div>
                 &nbsp; <input type="submit" class="submit btn-main" name="add_field" value="Add" />
             </div>
-            
+        
             <div class="section-header">
                 <h3><strong>Edit Field:</strong> <span id="edit-field-name"></span></h3> 
                 <div class="required-field">
@@ -213,4 +193,6 @@ endif;
                 </li>
             </ul>
         </div> <!-- end .field-modifications -->
-    </div>
+    </div><!-- end .grid-group -->
+    
+<?php endif; /* if (count($fields) > 0): */ ?>
