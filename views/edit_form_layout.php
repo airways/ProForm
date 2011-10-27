@@ -13,7 +13,7 @@ function print_hidden($field)
          '<input type="hidden" name="field_html_id[]" value="' . $field['settings']['html_id'] . '" class="fieldHtmlId" />'.
          '<input type="hidden" name="field_html_class[]" value="' . $field['settings']['html_class'] . '" class="fieldHtmlClass" />'.
          '<input type="hidden" name="field_extra1[]" value="' . $field['settings']['extra1'] . '" class="fieldExtra1" />'.
-         '<input type="hidden" name="field_extra2[]" value="' . $field['settings']['extra1'] . '" class="fieldExtra2" />'
+         '<input type="hidden" name="field_extra2[]" value="' . $field['settings']['extra2'] . '" class="fieldExtra2" />'
          ;
 }
 
