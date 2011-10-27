@@ -224,13 +224,14 @@ Form Layout
 
 .form-layout {
 	float: left;
-	width: 65%;
+	width: 60%;
+	min-width: 600px;
 }
 
 .field-modifications {
 	float: right;
-	width: 30%;
-	min-width: 350px;
+	width: 350px;
+/* min-width: 250px;*/
 }
 
 .section-header {
@@ -332,7 +333,7 @@ Form Layout > Fields
 }
 
 .tab-content-layout {
-    min-width: 1040px;
+    min-width: 900px;
 }
 
 /* -- begin old -- */
@@ -344,7 +345,7 @@ ul.fieldRow.alt {
 
 ul.fieldRow {
 /*    background: #cddde7;*/
-    padding-left: 10px;
+/*    padding-left: 10px;*/
 /*    height: 60px;*/
     padding-top: 2px;
     padding-bottom: 2px;
@@ -434,12 +435,16 @@ ul.targetRow .ui-sortable-placeholder {
 }
 
 .form-setup li {
-	padding: 10px 10px 10px 20px;
+	padding: 10px;
 	border: 1px solid transparent;
 	position: relative;
 	float: left;
 	width: 90%;
 	margin: 0 10px 10px 0;
+}
+
+.form-setup li label {
+    padding-left: 10px;
 }
 
 .move-link {

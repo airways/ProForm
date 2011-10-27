@@ -17,7 +17,6 @@ function print_hidden($field)
          ;
 }
 
-if (count($fields) > 0):
     $cp_table_template['cell_start'] = '<td><div class="cellPad">';
     $cp_table_template['cell_end'] = '</div></td>';
     $cp_table_template['cell_alt_start'] = $cp_table_template['cell_start'];
@@ -33,8 +32,9 @@ if (count($fields) > 0):
     
     <div class="grid-group">
         <div class="form-layout">
-        
+        <?php if (count($fields) > 0): ?>
             <ul class="form-setup">
+                
                 <?php
                 // echo '<ul class="fieldRow targetRow"></ul>';
                 foreach($fields as $field):
@@ -143,6 +143,7 @@ if (count($fields) > 0):
                 ?>
             </ol>
 
+        <?php endif; /* if (count($fields) > 0): */ ?>
         </div> <!-- end .form-layout -->
         
         <div class="field-modifications">
@@ -195,4 +196,4 @@ if (count($fields) > 0):
         </div> <!-- end .field-modifications -->
     </div><!-- end .grid-group -->
     
-<?php endif; /* if (count($fields) > 0): */ ?>
+
