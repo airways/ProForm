@@ -21,7 +21,7 @@
     }
 </style>
 
-{exp:proform:form form_name="{segment_2}"}
+{exp:proform:form form_name="{segment_2}" debug="yes"}
     
     <h1>{form_label}</h1>
     
@@ -86,8 +86,7 @@
             {/if}
         {/fieldrows}
 
-
-        {if captcha}
+        {if use_captcha}
         <p>
             Enter this word: {captcha}<br/>
             <input type="text" name="captcha" />{if error:captcha}<span class="error">{error:captcha}</span>{/if}
