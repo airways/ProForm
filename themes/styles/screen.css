@@ -230,8 +230,7 @@ Form Layout
 
 .field-modifications {
 	float: right;
-	width: 350px;
-/* min-width: 250px;*/
+	width: 300px;
 }
 
 .section-header {
@@ -307,7 +306,7 @@ Form Layout
 }
 
 .action-group select {
-	width: 154px;
+	width: 144px;
 }
 
 .form-fields {
