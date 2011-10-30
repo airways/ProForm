@@ -139,6 +139,8 @@ $lang = array(
     'field_from_address_desc' => 'Email address notifications are sent from, should match the actual mail settings used to send mail',
     'field_upload_pref_id' => 'Upload Directory',
     'field_mailinglist_id' => 'Mailing List',
+    'field_reply_to_field' => 'Reply-To Field',
+    'field_reply_to_field_desc' => 'Field on the form containing the email address to set as this notification\'s Reply-To',
     
     'field_submitter_notification_name' => 'Notification Field Settings - A',
     'field_submitter_notification_on' => 'Enable Group',
@@ -149,7 +151,9 @@ $lang = array(
     'field_submitter_notification_subject_desc' => 'Subject line used in notification emails sent to this group',
     'field_submitter_email_field' => 'Email Field',
     'field_submitter_email_field_desc' => 'Field on the form containing the email address to send notifications to',
-    
+    'field_submitter_reply_to_field' => 'Reply-To Field',
+    'field_submitter_reply_to_field_desc' => 'Field on the form containing the email address to set as this notification\'s Reply-To',
+
     'field_share_notification_name' => 'Notification Field Settings - B',
     'field_share_notification_on' => 'Enable Group',
     'field_share_notification_on_desc' => 'Enable this notification group',
@@ -159,7 +163,10 @@ $lang = array(
     'field_share_notification_subject_desc' => 'Subject line used in notification emails sent to this group',
     'field_share_email_field' => 'Email Field',
     'field_share_email_field_desc' => 'Field on the form containing the email address to send notifications to',
-    
+    'field_share_reply_to_field' => 'Reply-To Field',
+    'field_share_reply_to_field_desc' => 'Field on the form containing the email address to set as this notification\'s Reply-To',
+
+
     'field_encryption_on' => 'Encrypt Data',
     'field_encryption_on_desc' => 'Encrypt data stored in the form\'s database table and force minimal DB column length',
     'encryption_toggle_disabled' => 'Encryption cannot be turned on or off if there are already entries in the form.',

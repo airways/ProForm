@@ -142,7 +142,16 @@ class Proform_notifications
             if($form->admin_notification_on == 'y' AND count($notification_list) > 0)
             {
                 $this->_debug('Sending admin notifications - result so far ' . ($result ? 'yes' : 'no'));
-                $result &= $this->_send_notifications('admin', $form->notification_template, $form, $data, $form->subject, $notification_list);
+                
+                if(trim($form->reply_to_field) != '' AND trim($data[$form->reply_to_field]) != '')
+                {
+                    $reply_to = $data[$form->reply_to_field];
+                } else {
+                    $reply_to = FALSE;
+                }
+                
+                $result &= $this->_send_notifications('admin', $form->notification_template, $form, $data,
+                                                        $form->subject, $notification_list, $reply_to);
             }
             
             // send email to the submitter
@@ -152,8 +161,18 @@ class Proform_notifications
             {
                 $this->_debug('Sending submitter_notification - result so far ' . ($result ? 'yes' : 'no'));
                 $submitter_email = $data[$form->submitter_email_field];
+                
+                if(trim($form->submitter_reply_to_field) != '' AND trim($data[$form->submitter_reply_to_field]) != '')
+                {
+                    $reply_to = $data[$form->submitter_reply_to_field];
+                } else {
+                    $reply_to = FALSE;
+                }
+
                 $result &= $this->_send_notifications('submitter', $form->submitter_notification_template, 
-                    $form, $data, $form->submitter_notification_subject ? $form->submitter_notification_subject : $form->subject, array($submitter_email));
+                    $form, $data, $form->submitter_notification_subject 
+                                        ? $form->submitter_notification_subject : $form->subject,
+                    array($submitter_email), $reply_to);
             }
 
             // send share emails ("tell a friend", etc)
@@ -163,8 +182,17 @@ class Proform_notifications
             {
                 $this->_debug('Sending share_notification - result so far ' . ($result ? 'yes' : 'no'));
                 $share_email = $data[$form->share_email_field];
+                
+                if(trim($form->share_reply_to_field) != '' AND trim($data[$form->share_reply_to_field]) != '')
+                {
+                    $reply_to = $data[$form->share_reply_to_field];
+                } else {
+                    $reply_to = FALSE;
+                }
+                
                 $result &= $this->_send_notifications('share', $form->share_notification_template, 
-                    $form, $data, $form->share_notification_subject ? $form->share_notification_subject : $form->subject, array($share_email));
+                    $form, $data, $form->share_notification_subject ? $form->share_notification_subject : $form->subject,
+                    array($share_email), $reply_to);
             }
             
             if($this->EE->extensions->active_hook('proform_notification_end') === TRUE)
@@ -189,7 +217,7 @@ class Proform_notifications
         }
     }
     
-    function _send_notifications($type, $template_name, &$form, &$data, $subject, $notification_list)
+    function _send_notifications($type, $template_name, &$form, &$data, $subject, $notification_list, $reply_to=FALSE)
     {
         $result = FALSE;
         $template = $this->get_template($template_name);
@@ -218,11 +246,16 @@ class Proform_notifications
                     $this->EE->bm_email->from($this->default_from_address);
                 }
                 
-                if(array_key_exists('reply_to_address', $form->settings) AND $form->settings['reply_to_address'])
+                if($reply_to)
                 {
-                    $this->EE->bm_email->reply_to($form->settings['reply_to_address']);
-                } elseif($this->default_reply_to_address) {
-                    $this->EE->bm_email->reply_to($this->default_reply_to_address);
+                    $this->EE->bm_email->reply_to($reply_to);
+                } else {
+                    if(array_key_exists('reply_to_address', $form->settings) AND $form->settings['reply_to_address'])
+                    {
+                        $this->EE->bm_email->reply_to($form->settings['reply_to_address']);
+                    } elseif($this->default_reply_to_address) {
+                        $this->EE->bm_email->reply_to($this->default_reply_to_address);
+                    }
                 }
                 
                 $this->EE->bm_email->to($to_email);
