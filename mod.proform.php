@@ -106,9 +106,9 @@ class Proform {
         $in_place_errors    = $this->EE->TMPL->fetch_param('in_place_errors', 'yes');
         $form_id            = $this->EE->TMPL->fetch_param('form_id', $form_name . '_proform');
         $form_class         = $this->EE->TMPL->fetch_param('form_class', $form_name . '_proform');
-        $form_url           = $this->EE->TMPL->fetch_param('form_url', $_SERVER['REQUEST_URI']);
+        $form_url           = $this->EE->TMPL->fetch_param('form_url', $this->EE->functions->remove_double_slashes($_SERVER['REQUEST_URI']));
         $error_url          = $this->EE->TMPL->fetch_param('error_url', $form_url);
-        $thank_you_url      = $this->EE->TMPL->fetch_param('thank_you_url',  $_SERVER['REQUEST_URI']);
+        $thank_you_url      = $this->EE->TMPL->fetch_param('thank_you_url',  $form_url);
         $notify             = explode('|', $this->EE->TMPL->fetch_param('notify', ''));
         $download_url       = $this->EE->TMPL->fetch_param('download_url',  '');
         $download_label     = $this->EE->TMPL->fetch_param('download_label',  '');
@@ -219,7 +219,7 @@ class Proform {
                 $base_url = $form_config['form_url'];
                 
                 $form_details = array(
-                        'action'            => $base_url,
+                        'action'            => $this->EE->functions->remove_double_slashes($base_url),
                         'name'              => $form_name,
                         'id'                => $form_id,
                         'class'             => $form_class,
