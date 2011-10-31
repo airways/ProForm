@@ -250,9 +250,9 @@ class Proform_notifications
                 {
                     $this->EE->bm_email->reply_to($reply_to);
                 } else {
-                    if(array_key_exists('reply_to_address', $form->settings) AND $form->settings['reply_to_address'])
+                    if(trim($form->reply_to_address) != '')
                     {
-                        $this->EE->bm_email->reply_to($form->settings['reply_to_address']);
+                        $this->EE->bm_email->reply_to($form->reply_to_address);
                     } elseif($this->default_reply_to_address) {
                         $this->EE->bm_email->reply_to($this->default_reply_to_address);
                     }

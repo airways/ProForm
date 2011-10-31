@@ -449,7 +449,7 @@ class Proform_mcp {
         $extra = array('after' => array());
         
         if($form_obj->form_type == 'form')
-            $extra['after']['encryption_on'] = array(array('heading' => lang('notification_list_name')));
+            $extra['after']['reply_to_address'] = array(array('heading' => lang('notification_list_name')));
         if($form_obj->form_type == 'form' OR $form_obj->form_type == 'share')
             $extra['after']['reply_to_field'] = array(array('heading' => lang('field_submitter_notification_name')));
         if($form_obj->form_type == 'form' OR $form_obj->form_type == 'share')
