@@ -74,22 +74,26 @@ class Proform_upd {
             'form_type'                         => array('type' => 'varchar', 'constraint' => '10', 'default' => 'form'),
             'encryption_on'                     => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'),
             'safecracker_channel_id'            => array('type' => 'int', 'constraint' => '10', 'default' => 0),
+            'reply_to_address'                  => array('type' => 'varchar', 'constraint' => '32'),
             'settings'                          => array('type' => 'blob'),
             
             'admin_notification_on'             => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'),
             'notification_template'             => array('type' => 'varchar', 'constraint' => '50'),
             'notification_list'                 => array('type' => 'text'),
             'subject'                           => array('type' => 'varchar', 'constraint' => '128'),
-            
+            'reply_to_field'                    => array('type' => 'varchar', 'constraint' => '32'),
+
             'submitter_notification_on'         => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'),
             'submitter_notification_template'   => array('type' => 'varchar', 'constraint' => '50'),
             'submitter_notification_subject'    => array('type' => 'varchar', 'constraint' => '128'),
             'submitter_email_field'             => array('type' => 'varchar', 'constraint' => '32'),
+            'submitter_reply_to_field'          => array('type' => 'varchar', 'constraint' => '32'),
 
             'share_notification_on'             => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'),
             'share_notification_template'       => array('type' => 'varchar', 'constraint' => '50'),
             'share_notification_subject'        => array('type' => 'varchar', 'constraint' => '128'),
             'share_email_field'                 => array('type' => 'varchar', 'constraint' => '32'),
+            'share_reply_to_field'              => array('type' => 'varchar', 'constraint' => '32'),
             
         );
         $forge->add_field($fields);
@@ -138,22 +142,7 @@ class Proform_upd {
         $this->EE->dbforge->add_field($fields);
         $forge->add_key('field_id');
         $forge->add_key('form_id');
-        $forge->create_table('proform_form_fields');
-        
-        /*
-        // Create FORM SESSIONS table
-        $fields = array(
-            'session_id'    => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE, 'auto_increment' => TRUE),
-            'session_name'  => array('type' => 'varchar', 'constraint' => '16'),
-            'settings'      => array('type' => 'blob'),
-            'values'        => array('type' => 'blob'),
-            'errors'        => array('type' => 'blob'));
-        $forge->add_field($fields);
-        $forge->add_key('session_id', TRUE);
-        $forge->add_key('session_name');
-        $forge->create_table('proform_sessions');
-        */
-
+        $forge->create_table('proform_form_fields'); 
 
         // Create PREFS table
         $fields = array(
@@ -167,21 +156,6 @@ class Proform_upd {
         $forge->add_key('preference_name');
         $forge->create_table('proform_preferences');
 
-        // Create NOTIFICATION TEMPLATE table
-        /*
-        $fields = array(
-            'template_id'       => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE, 'auto_increment' => TRUE),
-            'template_name'     => array('type' => 'varchar', 'constraint' => '64'),
-            'from_address'      => array('type' => 'varchar', 'constraint' => '64'),
-            'subject'           => array('type' => 'varchar', 'constraint' => '128'),
-            'template'          => array('type' => 'text'),
-            'settings'          => array('type' => 'blob'));
-        $forge->add_field($fields);
-        $forge->add_key('template_id', TRUE);
-        $forge->add_key('template_name');
-        $forge->create_table('proform_templates');
-        */
-        
         ////////////////////////////////////////
         // Register tab
         //$this->EE->load->library('layout');
@@ -220,9 +194,6 @@ class Proform_upd {
         $this->EE->dbforge->drop_table('proform_forms');
         $this->EE->dbforge->drop_table('proform_display_entries');
         $this->EE->dbforge->drop_table('proform_fields');
-        //$this->EE->dbforge->drop_table('bm_fields');
-        //$this->EE->dbforge->drop_table('proform_sessions');
-        //$this->EE->dbforge->drop_table('proform_templates');
         $this->EE->dbforge->drop_table('proform_form_fields');
         $this->EE->dbforge->drop_table('proform_preferences');
         
@@ -256,6 +227,26 @@ class Proform_upd {
             if($this->EE->db->field_exists('preset_forced', 'proform_form_fields')) $forge->drop_column('proform_form_fields', 'preset_forced');
         }
         
+        if($current < 0.38)
+        {
+            if(!$this->EE->db->field_exists('reply_to_address', 'proform_forms'))
+            {
+                $fields = array(
+                    'reply_to_address'          => array('type' => 'varchar', 'constraint' => '32'),
+                );
+                $forge->add_column('proform_forms', $fields);
+            }
+            
+            if(!$this->EE->db->field_exists('reply_to_field', 'proform_forms'))
+            {
+                $fields = array(
+                    'reply_to_field'            => array('type' => 'varchar', 'constraint' => '32'),
+                    'submitter_reply_to_field'  => array('type' => 'varchar', 'constraint' => '32'),
+                    'share_reply_to_field'      => array('type' => 'varchar', 'constraint' => '32'),
+                );
+                $forge->add_column('proform_forms', $fields);
+            }
+        }
         return TRUE;
     }
     

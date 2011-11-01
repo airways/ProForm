@@ -538,21 +538,25 @@ class BM_Form extends BM_RowInitialized {
     var $form_name;
     var $encryption_on = 'n';
     var $safecracker_channel_id = 0;
+    var $reply_to_address;
     
     var $admin_notification_on = 'y';
     var $notification_template;
     var $notification_list;
     var $subject;
+    var $reply_to_field;
     
     var $submitter_notification_on = 'n';
     var $submitter_notification_template;
     var $submitter_notification_subject;
     var $submitter_email_field;
-
+    var $submitter_reply_to_field;
+    
     var $share_notification_on = 'n';
     var $share_notification_template;
     var $share_notification_subject;
     var $share_email_field;
+    var $share_reply_to_field;
     
     var $settings;
     
