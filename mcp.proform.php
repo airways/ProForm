@@ -1406,8 +1406,13 @@ class Proform_mcp {
         
         $headings = array('ID');
         $fields = $form->fields();
+
+        $vars['fields'] = array();
+        
         foreach($fields as $field)
         {
+            $vars['fields'][] = $field->field_name;
+            
             if(array_search($field->field_name, $vars['hidden_columns']) === FALSE)
             {
                 // Prepare headings from lang file and from Field configs
