@@ -33,7 +33,7 @@
 require_once PATH_THIRD.'prolib/prolib.php';
 require_once PATH_THIRD.'proform/config.php';
 
-// error_reporting(E_ALL);
+// error_reporting(E_STRICT);
 // ini_set('display_errors', '1');
 class Proform {
 
@@ -879,7 +879,6 @@ class Proform {
     
     private function _copy_post(&$form_obj, &$form_session)
     {
-        
         $form_session->values = array();
         $form_session->checked_flags = array();
         
@@ -890,8 +889,8 @@ class Proform {
             {
                 if($field->form_field_settings['preset_forced'] == 'y')
                 {
-                    $value = $field->preset_value;
-                    $_POST[$field->field_name] = $field->preset_value;
+                    $value = $field->form_field_settings['preset_value'];
+                    $_POST[$field->field_name] = $field->form_field_settings['preset_value'];
                 } else {
                     $value = $this->EE->input->get_post($field->field_name);
                 
@@ -908,10 +907,10 @@ class Proform {
                 {
                     $form_session->values[$field->field_name] = $value;
                 } else {
-                    if($field->preset_value)
+                    if($field->form_field_settings['preset_value'])
                     {
-                        $form_session->values[$field->field_name] = $field->preset_value;
-                        $_POST[$field->field_name] = $field->preset_value;
+                        $form_session->values[$field->field_name] = $field->form_field_settings['preset_value'];
+                        $_POST[$field->field_name] = $field->form_field_settings['preset_value'];
                     }
                 }
                 
@@ -1060,7 +1059,12 @@ class Proform {
         {
             if(!array_key_exists($field->field_name, $data))
             {
-                $data[$field->field_name] = $form_session->values[$field->field_name];
+                if(array_key_exists($field->field_name, $form_session->values))
+                {
+                    $data[$field->field_name] = $form_session->values[$field->field_name];
+                } else {
+                    $data[$field->field_name] = '';
+                }
             }
         }
 
