@@ -33,7 +33,7 @@
 require_once PATH_THIRD.'prolib/prolib.php';
 require_once PATH_THIRD.'proform/config.php';
 
-// error_reporting(E_ALL);
+// error_reporting(E_STRICT);
 // ini_set('display_errors', '1');
 class Proform {
 
@@ -106,9 +106,9 @@ class Proform {
         $in_place_errors    = $this->EE->TMPL->fetch_param('in_place_errors', 'yes');
         $form_id            = $this->EE->TMPL->fetch_param('form_id', $form_name . '_proform');
         $form_class         = $this->EE->TMPL->fetch_param('form_class', $form_name . '_proform');
-        $form_url           = $this->EE->TMPL->fetch_param('form_url', $_SERVER['REQUEST_URI']);
+        $form_url           = $this->EE->TMPL->fetch_param('form_url', $this->EE->functions->remove_double_slashes($_SERVER['REQUEST_URI']));
         $error_url          = $this->EE->TMPL->fetch_param('error_url', $form_url);
-        $thank_you_url      = $this->EE->TMPL->fetch_param('thank_you_url',  $_SERVER['REQUEST_URI']);
+        $thank_you_url      = $this->EE->TMPL->fetch_param('thank_you_url',  $form_url);
         $notify             = explode('|', $this->EE->TMPL->fetch_param('notify', ''));
         $download_url       = $this->EE->TMPL->fetch_param('download_url',  '');
         $download_label     = $this->EE->TMPL->fetch_param('download_label',  '');
@@ -219,7 +219,7 @@ class Proform {
                 $base_url = $form_config['form_url'];
                 
                 $form_details = array(
-                        'action'            => $base_url,
+                        'action'            => $this->EE->functions->remove_double_slashes($base_url),
                         'name'              => $form_name,
                         'id'                => $form_id,
                         'class'             => $form_class,
@@ -879,7 +879,6 @@ class Proform {
     
     private function _copy_post(&$form_obj, &$form_session)
     {
-        
         $form_session->values = array();
         $form_session->checked_flags = array();
         
@@ -890,8 +889,8 @@ class Proform {
             {
                 if($field->form_field_settings['preset_forced'] == 'y')
                 {
-                    $value = $field->preset_value;
-                    $_POST[$field->field_name] = $field->preset_value;
+                    $value = $field->form_field_settings['preset_value'];
+                    $_POST[$field->field_name] = $field->form_field_settings['preset_value'];
                 } else {
                     $value = $this->EE->input->get_post($field->field_name);
                 
@@ -908,10 +907,10 @@ class Proform {
                 {
                     $form_session->values[$field->field_name] = $value;
                 } else {
-                    if($field->preset_value)
+                    if($field->form_field_settings['preset_value'])
                     {
-                        $form_session->values[$field->field_name] = $field->preset_value;
-                        $_POST[$field->field_name] = $field->preset_value;
+                        $form_session->values[$field->field_name] = $field->form_field_settings['preset_value'];
+                        $_POST[$field->field_name] = $field->form_field_settings['preset_value'];
                     }
                 }
                 
@@ -1060,7 +1059,12 @@ class Proform {
         {
             if(!array_key_exists($field->field_name, $data))
             {
-                $data[$field->field_name] = $form_session->values[$field->field_name];
+                if(array_key_exists($field->field_name, $form_session->values))
+                {
+                    $data[$field->field_name] = $form_session->values[$field->field_name];
+                } else {
+                    $data[$field->field_name] = '';
+                }
             }
         }
 

@@ -45,10 +45,13 @@
     
     foreach($entries as $entry)
     {
-        $row = array();
+        $row = array($entry->form_entry_id);
+        
         //$row[] = '<a href="'.$field->edit_link.'">'.entry->id.'</a>';
-        foreach($entry as $field => $value)
+        foreach($fields as $field)
         {
+            $value = $entry->$field;
+            
             if(array_search($field, $hidden_columns) === FALSE)
             {
                 if(strlen($value) > 300)

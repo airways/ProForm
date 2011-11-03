@@ -409,11 +409,11 @@ class Proform_mcp {
             $vars['editing'] = TRUE;
             $vars['hidden']['form_id'] = $form_id;
         
-            $form_fields = $query->row();
+            $form_obj = $form;//$query->row();
         } else {
             $form = FALSE;
-            $form_fields = new BM_Form($form);
-            $form_fields->form_type = $vars['new_type'];
+            $form_obj = new BM_Form($form);
+            $form_obj->form_type = $vars['new_type'];
             $vars['hidden']['form_type'] = $vars['new_type'];
             $vars['editing'] = FALSE;
         }
@@ -424,8 +424,8 @@ class Proform_mcp {
             $this->EE->formslib->ini('notification_template_group', 'notifications'));
         $template_options = array_merge(array(0 => 'None'), $template_options);
         
-        //unset($form_fields->form_id);
-        unset($form_fields->settings);
+        //unset($form_obj->form_id);
+        unset($form_obj->settings);
         
         // $channel_options = $this->EE->formslib->get_channel_options($this->EE->formslib->ini('safecracker_field_group_id'), array(0 => 'None'));
         $channel_options = array();
@@ -448,25 +448,25 @@ class Proform_mcp {
         
         $extra = array('after' => array());
         
-        if($form_fields->form_type == 'form')
-            $extra['after']['encryption_on'] = array(array('heading' => lang('notification_list_name')));
-        if($form_fields->form_type == 'form' OR $form_fields->form_type == 'share')
-            $extra['after']['subject'] = array(array('heading' => lang('field_submitter_notification_name')));
-        if($form_fields->form_type == 'form' OR $form_fields->form_type == 'share')
-            $extra['after']['submitter_email_field'] = array(array('heading' => lang('field_share_notification_name')));
+        if($form_obj->form_type == 'form')
+            $extra['after']['reply_to_address'] = array(array('heading' => lang('notification_list_name')));
+        if($form_obj->form_type == 'form' OR $form_obj->form_type == 'share')
+            $extra['after']['reply_to_field'] = array(array('heading' => lang('field_submitter_notification_name')));
+        if($form_obj->form_type == 'form' OR $form_obj->form_type == 'share')
+            $extra['after']['submitter_reply_to_field'] = array(array('heading' => lang('field_share_notification_name')));
         
-        $edit_form = $this->EE->bm_forms->create_cp_form($form_fields, $types, $extra);
+        $edit_form = $this->EE->bm_forms->create_cp_form($form_obj, $types, $extra);
 
         
         $vars['form'] = $edit_form;
-        $vars['_form_title'] = lang($form_fields->form_type.'_title');
-        $vars['_form_description'] = lang($form_fields->form_type.'_desc');
+        $vars['_form_title'] = lang($form_obj->form_type.'_title');
+        $vars['_form_description'] = lang($form_obj->form_type.'_desc');
 
         $this->EE->load->library('table');
 
         $this->_get_flashdata($vars);
 
-        switch($form_fields->form_type)
+        switch($form_obj->form_type)
         {
             case 'form':
                 $vars['hidden_fields'] = array('form_id', 'form_type', 'safecracker_channel_id');
@@ -1406,8 +1406,13 @@ class Proform_mcp {
         
         $headings = array('ID');
         $fields = $form->fields();
+
+        $vars['fields'] = array();
+        
         foreach($fields as $field)
         {
+            $vars['fields'][] = $field->field_name;
+            
             if(array_search($field->field_name, $vars['hidden_columns']) === FALSE)
             {
                 // Prepare headings from lang file and from Field configs
@@ -1444,9 +1449,9 @@ class Proform_mcp {
             $vars['editing'] = TRUE;
             $vars['hidden'] = array('form_id' => $form_id, 'form_entry_id' => $form_entry_id);
             
-            $form_fields = $query->row();
+            $form_obj = $query->row();
             
-            unset($form_fields->settings);
+            unset($form_obj->settings);
             
             $types = array(
                 'form_entry_id' => 'read_only',
@@ -1462,8 +1467,8 @@ class Proform_mcp {
             }
             $vars['field_names'] = $field_names;
             
-            //var_dump($form_fields);
-            $form = $this->EE->bm_forms->create_cp_form($form_fields, $types);
+            //var_dump($form_obj);
+            $form = $this->EE->bm_forms->create_cp_form($form_obj, $types);
             //var_dump($form);die;
             $vars['form'] = $form;
             
@@ -1603,11 +1608,11 @@ class Proform_mcp {
         return FALSE;
     }
     
-    /*function _create_cp_form($form_fields, $types)
+    /*function _create_cp_form($form_obj, $types)
     {
         $form = array();
         
-        foreach($form_fields as $key => $value) 
+        foreach($form_obj as $key => $value) 
         {
             if(substr($key, 0, 2) != "__") {
                 if(array_key_exists($key, $types)) {
