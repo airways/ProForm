@@ -585,6 +585,8 @@ class BM_Form extends BM_RowInitialized {
                     $this->__fields[$row->field_name] = new BM_Field($row);
                     if(isset($this->__fields[$row->field_name]->settings))
                         $this->__fields[$row->field_name]->settings = unserialize($this->__fields[$row->field_name]->settings);
+                    else
+                        $this->__fields[$row->field_name]->settings = array();
                     
                     $this->__fields[$row->field_name]->form_field_settings = $this->get_form_field_settings($row->form_field_settings);
                 }
