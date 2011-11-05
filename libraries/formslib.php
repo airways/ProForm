@@ -681,12 +681,41 @@ class BM_Form extends BM_RowInitialized {
         return $result;
     }
 
-    function entries($start_row = 0, $limit = 0, $orderby = FALSE, $sort = FALSE)
+    function entries($search=array(), $start_row = 0, $limit = 0, $orderby = FALSE, $sort = FALSE)
     {
+        $this->__EE->lang->loadfile('proform');
         switch($this->form_type)
         {
             case 'form':
                 $this->__EE->db->select('*');
+                
+                if(is_array($search) AND count($search) > 0)
+                {
+                    foreach($search as $field => $val)
+                    {
+                        if(!$this->__fields) $this->fields();
+                        if(array_search($field, array_keys($this->__fields)) === FALSE)
+                        {
+                            show_error($this->__EE->lang->line('invalid_field_name').': "'.$field.'"');
+                        }
+                        
+                        if(preg_match("/([|<|>|!|=|]+)/i", $val, $matches))
+                        {
+                            // delete old field pair
+                            unset($search[$field]);
+                            
+                            // remove the operator from value
+                            $val = str_replace($matches[1], '', $val);
+                            
+                            // move it to the end of the field name
+                            $field = $field.' '.$matches[1];
+                            
+                            // set new pair
+                            $search[$field] = $val;
+                        }
+                    }
+                    $this->__EE->db->where($search);
+                }
                 
                 if($start_row >= 0 AND $limit > 0) {
                     $this->__EE->db->limit($limit, $start_row); // yes it is reversed compared to MySQL
@@ -717,6 +746,17 @@ class BM_Form extends BM_RowInitialized {
                 return array();
                 break;
         }
+    }
+    
+    function _has_operator($str)
+    {
+        $str = trim($str);
+        if ( ! preg_match("/(\s|<|>|!|=|is null|is not null)/i", $str))
+        {
+            return FALSE;
+        }
+
+        return TRUE;
     }
 
     function delete_entry($entry_id)

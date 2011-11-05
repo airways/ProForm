@@ -39,7 +39,9 @@ class Proform {
 
     var $return_data    = '';
     var $var_pairs = array('fieldrows', 'fields', 'errors');
-
+    var $paginate = FALSE;
+    var $paginate_data = '';
+    
     public function Proform()
     {
         $this->__construct();
@@ -486,6 +488,8 @@ class Proform {
         $orderby        = $this->EE->TMPL->fetch_param('orderby');
         $sort           = strtolower($this->EE->TMPL->fetch_param('sort'));
         if($sort != 'asc' AND $sort != 'desc') $sort = 'asc';
+
+        $search = $this->prolib->bm_parser->fetch_param_group('search');
         
         // Check required input
         if(!$form_name)
@@ -516,7 +520,7 @@ class Proform {
             $tagdata = $this->EE->TMPL->tagdata;
             
             // if $limit != 0 then the results wil be paginated
-            if($entries = $form_obj->entries(($page - 1) * $limit, $limit, $orderby, $sort))
+            if($entries = $form_obj->entries($search, ($page - 1) * $limit, $limit, $orderby, $sort))
             {
                 $row_i = 1;
                 $count = count($entries);

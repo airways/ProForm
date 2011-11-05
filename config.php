@@ -1,6 +1,8 @@
 <?php
 
 // @version 0.38
+// @prolib 0.24
+
 define('PROFORM_VERSION', '0.38');
 define('PROFORM_NAME', 'ProForm');
 define('PROFORM_CLASS', 'Proform'); // must match module class name

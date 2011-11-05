@@ -20,11 +20,11 @@
 $lang = array(
     // Modules page info
     'proform_module_name' => 'ProForm',
-    'proform_module_description' => 'Drag and drop public form module.',
+    'proform_module_description' => 'Drag and drop public form module',
     
     // Publish tab and instructions
     'display_forms' => 'Display Forms',
-    'display_forms_field_instructions' => 'Select what form to display on this page.',
+    'display_forms_field_instructions' => 'Select what form to display on this page',
     
     // Table headings
     'heading_form_label' => 'Form Label',
@@ -53,10 +53,10 @@ $lang = array(
     'heading_actions' => 'Actions',
     
     // Table results
-    'no_forms' => 'No forms created yet.',
-    'no_fields' => 'This form has no fields assigned.',
-    'no_fields_defined' => 'There are no fields defined yet.',
-    'no_templates' => 'There are no templates defined yet.',
+    'no_forms' => 'No forms created yet',
+    'no_fields' => 'This form has no fields assigned',
+    'no_fields_defined' => 'There are no fields defined yet',
+    'no_templates' => 'There are no templates defined yet',
     
     // Dropdown options
     'edit_selected' => 'Edit Selected',
@@ -77,11 +77,11 @@ $lang = array(
     'save_form' => 'Save Form',
     
     'form_title' => 'General Form',
-    'form_desc' => 'A normal form that saves data in a database table. Good for contact forms and other forms that don\'t generally get turned into content on the site.',
+    'form_desc' => 'A normal form that saves data in a database table. Good for contact forms and other forms that don\'t generally get turned into content on the site',
     'saef_title' => 'Stand Alone Entry Form',
-    'saef_desc' => 'A Stand Alone Entry Form form designed to work through SafeCracker and stores it\'s data in a Channel. Good for forms who\'s values end up as content on the site.',
+    'saef_desc' => 'A Stand Alone Entry Form form designed to work through SafeCracker and stores it\'s data in a Channel. Good for forms who\'s values end up as content on the site',
     'share_title' => 'Share Form',
-    'share_desc' => 'A form for sending email notifiacations only - does not store submitted data anywhere.',
+    'share_desc' => 'A form for sending email notifiacations only - does not store submitted data anywhere',
     
     // "Tab" / subpages in CP
     'proform_title' => 'ProForm: ',
@@ -171,10 +171,10 @@ $lang = array(
 
     'field_encryption_on' => 'Encrypt Data',
     'field_encryption_on_desc' => 'Encrypt data stored in the form\'s database table and force minimal DB column length',
-    'encryption_toggle_disabled' => 'Encryption cannot be turned on or off if there are already entries in the form.',
+    'encryption_toggle_disabled' => 'Encryption cannot be turned on or off if there are already entries in the form',
     
     'field_safecracker_on' => 'SafeCracker Integration',
-    'field_safecracker_on_desc' => 'Store data from this form in a channel through the use of SafeCracker. Note that encryption <strong>cannot</strong> be used when this option is turned on.',
+    'field_safecracker_on_desc' => 'Store data from this form in a channel through the use of SafeCracker. Note that encryption <strong>cannot</strong> be used when this option is turned on',
     'field_safecracker_channel_id' => 'SafeCracker Channel',
     'field_safecracker_channel_id_desc' => 'Channel to store data in',
     'safecracker_toggle_disabled_entries' => 'SafeCracker option cannot be turned on or off if there are already entries',
@@ -190,7 +190,7 @@ $lang = array(
     'field_pref_reply_to_address' => 'Reply-To Address',
     'field_pref_reply_to_address_desc' => 'Email to set in email Reply-To header, you can override this in each form\'s settings',
     'field_pref_safecracker_integration_on' => 'SafeCracker Integration',
-    'field_pref_safecracker_integration_on_desc' => 'Enable SafeCracker Integration to allow form data to be saved into entries.',
+    'field_pref_safecracker_integration_on_desc' => 'Enable SafeCracker Integration to allow form data to be saved into entries',
     'field_pref_safecracker_field_group_id' => 'SafeCracker: Field Group',
     'field_pref_safecracker_separate_channels_on' => 'SafeCracker: Separate Channel Per Form',
     
@@ -201,50 +201,50 @@ $lang = array(
     'field_user_agent' => 'User Agent',
     
     // Errors
-    'invalid_submit' => 'The form has invalid values.',
-    'invalid_form_id' => 'Invalid form ID.',
-    'invalid_form_name' => 'Invalid form name.',
-    'invalid_form_label' => 'Invalid form label.',
-    'invalid_field_name' => 'Invalid field name.',
-    'invalid_field_label' => 'Invalid field label.',
-    'invalid_field_id' => 'Invalid fieldID.',
-    'invalid_form_id_or_field_id' => 'Invalid form or field ID.',
-    'invalid_field_type' => 'Invalid field type.',
-    'invalid_field_length' => 'Invalid field length.',
-    'invalid_validation' => 'Invalid validation rules.',
-    'invalid_notification_list' => 'Invalid field notification list.',
-    'invalid_subject' => 'Invalid subject.',
-    'invalid_from_address' => 'Invalid from address.',
-    'field_already_exists' => 'A field with that name already exists.',
-    'no_unassigned_fields_available' => 'No unassigned fields available.',
-    'no_entries' => 'No entries in this form.',
+    'invalid_submit' => 'The form has invalid values',
+    'invalid_form_id' => 'Invalid form ID',
+    'invalid_form_name' => 'Invalid form name',
+    'invalid_form_label' => 'Invalid form label',
+    'invalid_field_name' => 'Invalid field name',
+    'invalid_field_label' => 'Invalid field label',
+    'invalid_field_id' => 'Invalid fieldID',
+    'invalid_form_id_or_field_id' => 'Invalid form or field ID',
+    'invalid_field_type' => 'Invalid field type',
+    'invalid_field_length' => 'Invalid field length',
+    'invalid_validation' => 'Invalid validation rules',
+    'invalid_notification_list' => 'Invalid field notification list',
+    'invalid_subject' => 'Invalid subject',
+    'invalid_from_address' => 'Invalid from address',
+    'field_already_exists' => 'A field with that name already exists',
+    'no_unassigned_fields_available' => 'No unassigned fields available',
+    'no_entries' => 'No entries in this form',
     'no_field_group_setting' => 'You have not selected a SafeCracker Field Group in ProForm module settings',
     
     'missing_form_id' => 'Internal error: missing form_id',
-    'missing_form_name' => 'Missing require field Form Name.',
-    'missing_form_label' => 'Missing require field Form Label.',
-    'missing_notification_template' => 'Missing require field Notifcation Template.',
-    'missing_notification_list' => 'Missing require field Notification List.',
-    'missing_subject' => 'Missing require field Subject.',
-    'missing_from_address' => 'Missing require field From Address.',
-    'missing_field_name' => 'Missing require field Field Name.',
-    'missing_type' => 'Missing require field Type.',
-    'missing_length' => 'Missing require field Length.',
-    'missing_validation' => 'Missing require field Validation.',
-    'missing_template_name' => 'Missing require field Template Name.',
-    'missing_subject' => 'Missing require field Subject.',
-    'missing_template' => 'Missing require field Template.',
+    'missing_form_name' => 'Missing require field Form Name',
+    'missing_form_label' => 'Missing require field Form Label',
+    'missing_notification_template' => 'Missing require field Notifcation Template',
+    'missing_notification_list' => 'Missing require field Notification List',
+    'missing_subject' => 'Missing require field Subject',
+    'missing_from_address' => 'Missing require field From Address',
+    'missing_field_name' => 'Missing require field Field Name',
+    'missing_type' => 'Missing require field Type',
+    'missing_length' => 'Missing require field Length',
+    'missing_validation' => 'Missing require field Validation',
+    'missing_template_name' => 'Missing require field Template Name',
+    'missing_subject' => 'Missing require field Subject',
+    'missing_template' => 'Missing require field Template',
     
     // Messages
-    'msg_form_created' => 'New form successfully created.',
-    'msg_form_deleted' => 'Form successfully deleted.',
+    'msg_form_created' => 'New form successfully created',
+    'msg_form_deleted' => 'Form successfully deleted',
 
-    'msg_field_created' => 'New field successfully created.',
-    'msg_field_deleted' => 'Field successfully deleted.',
-    'msg_field_created_added' => 'New field successfully created and added to the form.',
-    'msg_field_deleted' => 'Field successfully deleted.',
-    'msg_field_added' => 'Field successfully added to the form.',
-    'msg_field_removed' => 'Field successfully removed from the form.',
+    'msg_field_created' => 'New field successfully created',
+    'msg_field_deleted' => 'Field successfully deleted',
+    'msg_field_created_added' => 'New field successfully created and added to the form',
+    'msg_field_deleted' => 'Field successfully deleted',
+    'msg_field_added' => 'Field successfully added to the form',
+    'msg_field_removed' => 'Field successfully removed from the form',
     
     // End
     '' => ''
