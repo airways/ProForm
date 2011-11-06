@@ -1070,9 +1070,43 @@ class Proform {
                     $data[$field->field_name] = '';
                 }
             }
+            
+            // reformat date and datetime values into a format that can be stored in the database
+            switch($field->type)
+            {
+                case 'date':
+                    $date = $this->_datetime($data[$field->field_name]);
+                    if($date)
+                    {
+                        $data[$field->field_name] = date('Y-m-d', $date);
+                    }
+                    break;
+                case 'datetime':
+                    $date = $this->_datetime($data[$field->field_name]);
+                    if($date)
+                    {
+                        $data[$field->field_name] = date('Y-m-d H:i:s', $date);
+                    }
+                    break;
+            }
         }
 
 
+    }
+    
+    private function _datetime($value)
+    {
+        $timestamp = '';
+        if(trim($value) != '' AND !is_numeric($value))
+        {
+            // attempt to convert the value
+            $timestamp = strtotime($value);
+            
+            // reset a failed conversion to a blank string - otherwise we will be storing
+            // the familiar 1970-01-01 instead of a blank date ("0000-00-00")
+            if(!$timestamp) $timestamp = '';
+        }
+        return $timestamp;
     }
     
     private function _process_secure_fields(&$form_obj, &$form_session, &$data)
