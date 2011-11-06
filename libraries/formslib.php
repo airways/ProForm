@@ -229,26 +229,16 @@ class Formslib
         return $form;
     }
 
-    function new_field($name, $label, $type, $length, $validation, $upload_pref_id, $mailinglist_id, $settings)
+    function new_field($data)
     {
         // create a new field that can be assigned to forms
-
-        $settings = serialize($settings);
+        if(!array_key_exists('settings', $data)) $data['settings'] = array();
+        $data['settings'] = serialize($data['settings']);
 
         // insert the field record
-        $data = array(
-            'field_name' => $name,
-            'field_label' => $label,
-            'type' => $type,
-            'length' => $length,
-            'validation' => $validation,
-            'upload_pref_id' => $upload_pref_id,
-            'mailinglist_id' => $mailinglist_id,
-            'settings' => $settings
-        );
         $this->EE->db->insert('proform_fields', $data);
         
-        $field_obj = $this->get_field($name);
+        $field_obj = $this->get_field($data['field_name']);
         return $field_obj;
     }
     
@@ -817,6 +807,7 @@ class BM_Form extends BM_RowInitialized {
                     }
 
                     // check if the length specified is too long, if so, promote to the next data type
+                    var_dump($fields[$field->field_name]);
                     if(isset($typedef['limit'])
                         && is_numeric($fields[$field->field_name]['constraint'])
                         && $fields[$field->field_name]['constraint'] > $typedef['limit'])
