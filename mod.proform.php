@@ -372,7 +372,7 @@ class Proform {
                     {
                         foreach($errors as $error)
                         {
-                            $variables['errors'][] = array('field' => $field, 'error' => $error);
+                            $variables['errors'][] = array('field' => $field, 'error' => $error, 'error_message' => $error);
                         }
                     }
                     $variables['error_count'] = count($form_session->errors);
