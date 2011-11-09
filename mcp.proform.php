@@ -320,9 +320,6 @@ class Proform_mcp {
     
     function new_form()
     {
-        //echo "E_ALL: " . E_ALL;
-        //echo "error reporting: " . error_reporting();
-        //exit;
         if($this->EE->input->post('form_name') !== FALSE)
         {
             if($this->process_new_form()) return;
@@ -343,41 +340,21 @@ class Proform_mcp {
     
     function process_new_form()
     {
-        if(!$this->EE->input->post('admin_notification_on')) $_POST['admin_notification_on'] = 'n';
-        if(!$this->EE->input->post('submitter_notification_on')) $_POST['submitter_notification_on'] = 'n';
-        if(!$this->EE->input->post('share_notification_on')) $_POST['share_notification_on'] = 'n';
+        // run form validation
+        $this->_run_validation('edit_form');
         
         $data = array();
         $this->prolib->copy_post($data, "BM_Form");
         
-        if(
-            (strlen($data['form_name']) > 1 && !is_numeric($data['form_name'])) &&
-            (strlen($data['form_label']) > 1 && !is_numeric($data['form_label']))
-        ) 
-        {
-            // create new form and table
-            $this->EE->load->library('formslib');
-            $form = $this->EE->formslib->new_form($data);
-            
-            // go back to form edit page
-            $this->EE->session->set_flashdata('message', lang('msg_form_created'));
-            $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form->form_id);
-            return TRUE;
-        } 
-        else 
-        {
-            if(strlen($data['form_name']) == 0 || is_numeric($data['form_name']))
-            {
-                show_error(lang('invalid_form_name'));
-            }
-            
-            if(strlen($data['form_label']) == 0 || is_numeric($data['form_label']))
-            {
-                show_error(lang('invalid_form_label'));
-            }
-            
-            return FALSE;
-        }
+        // create new form and table
+        $this->EE->load->library('formslib');
+        $form = $this->EE->formslib->new_form($data);
+        
+        // go back to form edit page
+        $this->EE->session->set_flashdata('message', lang('msg_form_created'));
+        $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form->form_id);
+        
+        return TRUE;
     }
     
     function edit_form($editing=TRUE, $vars=array())
@@ -427,7 +404,8 @@ class Proform_mcp {
         //unset($form_obj->form_id);
         unset($form_obj->settings);
         
-        // $channel_options = $this->EE->formslib->get_channel_options($this->EE->formslib->ini('safecracker_field_group_id'), array(0 => 'None'));
+        // $channel_options = $this->EE->formslib->get_channel_options($this->EE->formslib->ini('safecracker_field_group_id'),
+        //                                                              array(0 => 'None'));
         $channel_options = array();
         
         $types = array(
@@ -485,12 +463,6 @@ class Proform_mcp {
                 break;
         }
         
-        
-        
-        //$this->EE->load->library('formslib');
-        //$form_id = $this->EE->input->get('form_id');
-        //$this->sub_page('tab_edit_fields', $form->form_name);
-
         $vars['form_hidden'] = array();
         $vars['default_value_hidden'] = array('form_id' => 0, 'field_id' => 0);
         if($form)
@@ -524,8 +496,6 @@ class Proform_mcp {
         ////////////////////////////////////////
         // Generate table of fields
         $vars['fields'] = array();
-        
-        //$presets = $form->get_presets();
         
         if($form)
         {
@@ -566,14 +536,11 @@ class Proform_mcp {
         ));
 
         $this->EE->cp->add_js_script(array('plugin' => 'dataTables'));
-        //$this->EE->javascript->output($this->ajax_filters('edit_items_ajax_filter', 4));
         $this->EE->javascript->compile();
         
         $this->EE->load->library('table');
 
-        //$vars['presets'] = $form->get_presets();
         $this->_get_flashdata($vars);
-        //return $this->EE->load->view('edit_form_fields', $vars, TRUE);
         return $this->EE->load->view('edit_form', $vars, TRUE);
     }
     
@@ -581,29 +548,15 @@ class Proform_mcp {
     {
         $this->EE->load->library('formslib');
         
+        // run form validation
+        $this->_run_validation('edit_form');
+        
         // find form
         $form_id = trim($this->EE->input->get_post('form_id'));
         if(!$form_id || $form_id <= 0) show_error(lang('missing_form_id'));
         
         $form = $this->EE->formslib->get_form($form_id);
         
-        // set defaults for checkboxes
-        if(!$this->EE->input->post('encryption_on')) $_POST['encryption_on'] = 'n';
-        if(!$this->EE->input->post('admin_notification_on')) $_POST['admin_notification_on'] = 'n';
-        if(!$this->EE->input->post('submitter_notification_on')) $_POST['submitter_notification_on'] = 'n';
-        if(!$this->EE->input->post('share_notification_on')) $_POST['share_notification_on'] = 'n';
-        
-        // copy post values defined on the form class to it
-        $this->prolib->copy_post($form);
-        
-        // check for required fields
-        if(!$form->form_name) show_error(lang('missing_form_name'));
-        if(!$form->form_label) show_error(lang('missing_form_label'));
-        if(strlen($form->form_name) < 1 || is_numeric($form->form_name)) show_error(lang('invalid_form_name'));
-        if(strlen($form->form_label) < 1 || is_numeric($form->form_label)) show_error(lang('invalid_form_label'));
-        
-        // done editing the form itself
-        $form->save();
         
         // process layout and field customization for the form
         $field_order = $this->EE->input->post('field_order');
@@ -650,6 +603,31 @@ class Proform_mcp {
             }
         }
         
+        // check that the reply_to field names are valid
+        $fields = $form->fields();
+        $field_names = array_keys($fields);
+        $check_fields = array('reply_to_field', 'submitter_reply_to_field', 'share_reply_to_field');
+        foreach($check_fields as $field)
+        {
+            $search_field_name = $this->EE->input->post('$field');
+            if(trim($search_field_name) != '')
+            {
+                if(!array_search($search_field_name, $field_names))
+                {
+                    show_error(lang('invalid_field_name').': '.$search_field_name);
+                }
+            }
+        }
+        
+        // set defaults for checkboxes
+        if(!$this->EE->input->post('encryption_on')) $_POST['encryption_on'] = 'n';
+        if(!$this->EE->input->post('admin_notification_on')) $_POST['admin_notification_on'] = 'n';
+        if(!$this->EE->input->post('submitter_notification_on')) $_POST['submitter_notification_on'] = 'n';
+        if(!$this->EE->input->post('share_notification_on')) $_POST['share_notification_on'] = 'n';
+        
+        // copy post values defined on the form class to it and save it
+        $this->prolib->copy_post($form);
+        $form->save();
         
         // go back to the form edit tab that was active
         $active_tab = $this->EE->input->post('active_tab');
@@ -660,39 +638,6 @@ class Proform_mcp {
         return TRUE;
     }
     
-    
-    // function process_assign_field() 
-    //     {
-    //         $form_id = trim($this->EE->input->get_post('form_id'));
-    //         $field_id = trim($this->EE->input->get_post('add_field_id'));
-    //         
-    //         if(is_numeric($form_id) && is_numeric($field_id)) 
-    //         {
-    //             $this->EE->load->library('formslib');
-    //             
-    //             $form = $this->EE->formslib->get_form($form_id);
-    //             $field = $this->EE->formslib->get_field($field_id);
-    //             
-    //             if($form && $field_id == -1)
-    //             {
-    //                 $this->EE->functions->redirect(ACTION_BASE.AMP.'method=new_field'.AMP.'auto_add_form_id='.$form_id);
-    //             }
-    //             
-    //             if($form && $field) 
-    //             {
-    //                 $form->assign_field($field);
-    //             
-    //                 // go back to edit field assignments listing for this form
-    //                 $this->EE->session->set_flashdata('message', lang('msg_field_added'));
-    //                 //$this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form_id.'#tab-content-layout');
-    //             } 
-    //             else 
-    //             {
-    //                 show_error(lang('invalid_field_id'));
-    //             }
-    //         }
-    //     }
-    //     
     function delete_form()
     {
         if($this->EE->input->post('form_id') !== FALSE)
@@ -740,119 +685,6 @@ class Proform_mcp {
         }
     }
     
-    /*
-    function set_default_value()
-    {
-        if($this->EE->input->post('form_id') !== FALSE
-        && $this->EE->input->post('field_id') !== FALSE)
-        {
-            $this->EE->load->library('formslib');
-            $form_id = $this->EE->input->post('form_id');
-            $form = $this->EE->formslib->get_form($form_id);
-
-            $field_id = $this->EE->input->post('field_id');
-            $field = $this->EE->formslib->get_field($field_id);
-
-            if($form_id && $form && $field_id && $field)
-            {
-                if($field->type != 'mailinglist' && $field->type != 'file' && $field->type != 'checkbox')
-                {
-                    $preset_value = $this->EE->input->post('default_value');
-                    $preset_forced = $this->EE->input->post('forced') ? 'y' : 'n';
-                    //$form->update_preset($field, $preset_value, $preset_forced);
-                    $settings = $field->settings();
-                    $settings['preset_value'] = $preset_value;
-                    $settings['preset_forced'] = $preset_forced;
-                    $field->save();
-                    exit('Saved');
-                }
-            } else {
-                exit(lang('invalid_form_id_or_field_id') . " [4]");
-            }
-        } else {
-            exit(lang('invalid_form_id_or_field_id') . " [5]");
-        }
-    }
-    
-    function edit_form_preset_values()
-    {
-        if($this->EE->input->post('form_id') !== FALSE)
-        {
-            if($this->process_edit_form_preset_values()) return;
-        }
-
-        $this->EE->load->library('formslib');
-        $form_id = $this->EE->input->get('form_id');
-        $form = $this->EE->formslib->get_form($form_id);
-
-        $this->sub_page('tab_form_preset_values', $form->form_name);
-
-        $vars = array(
-            'form_hidden' => array('form_id' => $form_id),
-            'action_url'  => 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_form_preset_values'.AMP.'form_id='.$form_id
-        );
-
-        if($form_id && $form)
-        {
-            //$query = $this->EE->db->order_by("field_name", "desc")->get_where('proform_fields', array('form_id' => $form_id));
-            $vars['form_id'] = $form_id;
-            $vars['form_name'] = $form->form_name;
-            
-            ////////////////////////////////////////
-            // Generate table of fields
-            $vars['fields'] = array();
-            
-            foreach($form->fields() as $field) 
-            {
-                if($field->type != 'mailinglist' && $field->type != 'file' && $field->type != 'checkbox')
-                {
-                    $row_array = (array)$field;
-                    
-                    $vars['fields'][$field->field_id] = $row_array;
-                }
-            }
-            
-            $this->EE->load->library('table');
-            return $this->EE->load->view('edit_preset_values', $vars, TRUE);
-        } 
-        else 
-        {
-            show_error(lang('invalid_form_id').' [6]');
-            return FALSE;
-        }
-    }
-    
-    function process_edit_form_preset_values()
-    {
-        $this->sub_page('tab_edit_fields');
-        $this->EE->load->library('formslib');
-        $form_id = $this->EE->input->post('form_id');
-        $form = $this->EE->formslib->get_form($form_id);
-        
-        if($form_id && $form)
-        {
-            foreach($form->fields() as $field)
-            {
-                if($field->type != 'mailinglist' && $field->type != 'file' && $field->type != 'checkbox')
-                {
-                    
-                    $preset_value = $this->EE->input->post('field_'.$field->field_name);
-                    $preset_forced = $this->EE->input->post('forced_'.$field->field_name) ? 'y' : 'n';
-                    
-                    //echo $field->field_name . " forced = $preset_forced<br/>";
-                    
-                    $form->update_preset($field, $preset_value, $preset_forced);
-                }
-            }
-        }
-
-        $form->set_layout($this->EE->input->post('field_order'), $this->EE->input->post('field_row'));
-        
-        $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form_preset_values'.AMP.'form_id='.$form_id);
-        return TRUE;
-    }*/
-    
-    
     function remove_field() 
     {
         if($this->EE->input->post('form_id') !== FALSE) 
@@ -870,13 +702,6 @@ class Proform_mcp {
         $form = $this->EE->formslib->get_form($form_id);
         $field = $this->EE->formslib->get_field($field_id);
         
-        /*
-        echo $form_id . "<br/>";
-        echo $field_id . "<br/>";
-        $form->dump();
-        $field->dump();
-        die;
-        */
         
         if(is_numeric($form_id) && is_numeric($field_id) && $form && $field) 
         {
@@ -927,11 +752,6 @@ class Proform_mcp {
         $form = $this->EE->formslib->get_form($form_id);
         $field = $this->EE->formslib->get_field($field_id);
         
-        /*
-        $form->dump();
-        $field->dump();
-        */
-        
         if(is_numeric($form_id) && is_numeric($field_id) && $form && $field)
         {
             $this->EE->load->library('formslib');
@@ -962,11 +782,6 @@ class Proform_mcp {
         
         $this->sub_page('tab_list_fields');
         
-        /*$vars['buttons'] = array(
-            array('url' => '', 'label' => 'New Field')
-        );*/
-        
-        //$vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_form';
         $vars['form_hidden'] = NULL;
         $vars['fields'] = array();
         
@@ -1033,118 +848,38 @@ class Proform_mcp {
         
         
         return $this->edit_field(FALSE, $vars);
-        /*
-        
-        $upload_prefs = $this->EE->bm_uploads->get_upload_prefs();
-        $upload_prefs = array_merge(array(0 => 'None'), $upload_prefs);
-        
-        $mailinglists = $this->_get_mailinglists();
-        $mailinglists = array_merge(array(0 => 'None'), $mailinglists);
-        
-        
-        $vars['form'] = array(
-            array('lang_field' => 'field_label',
-                  'control' => form_input(array('name' => 'field_label', 'value' => ''))),
-            array('lang_field' => 'field_name',
-                  'control' => form_input(array('name' => 'field_name', 'value' => ''))),
-            array('lang_field' => 'type',
-                  'control' => form_dropdown('field_type', $this->field_type_options, 'string')),
-            array('lang_field' => 'length',
-                  'control' => form_input(array('name' => 'field_length', 'value' => ''))),
-            array('lang_field' => 'validation',
-                  'control' => form_dropdown('field_validation', $this->field_validation_options, 'string')),
-            array('lang_field' => 'upload_pref_id',
-                  'control' => form_dropdown('field_upload_pref_id', $upload_prefs, '0')),
-            array('lang_field' => 'mailinglist_id',
-                  'control' => form_dropdown('mailinglist_id', $mailinglists, '0')),
-       );
-        
-        $this->EE->load->library('table');
-        return $this->EE->load->view('generic_edit', $vars, TRUE);*/
     }
     
     function process_new_field()
     {
-        $field_name = strtolower(trim($this->EE->input->post('field_name')));
-        
-        if(strlen($field_name) < 1 || is_numeric($field_name))
-        {
-            show_error(lang('invalid_field_name'));
-            return FALSE;
-        }
-        
-        $field_label = trim($this->EE->input->post('field_label'));
-        
-        if(strlen($field_label) < 1)
-        {
-            show_error(lang('invalid_field_label'));
-            return FALSE;
-        }
-        
-        $field_type = trim($this->EE->input->post('type'));
-        
-        if(strlen($field_type) < 1)
-        {
-            show_error(lang('invalid_field_type') . '[1]');
-            return FALSE;
-        }
-        
-        $field_length = trim($this->EE->input->post('length'));
-        
-        if(strlen($field_length) < 1)
-        {
-            $field_length = 255;
-            #show_error(lang('invalid_field_length') . '[2]');
-            #return FALSE;
-        }
-        
-        $field_validation = trim($this->EE->input->post('validation'));
-
-        /*if(strlen($field_validation) < 1)
-        {
-            show_error(lang('invalid_validation') . '[3]');
-            return FALSE;
-        }*/
-
-        $upload_pref_id = trim($this->EE->input->post('upload_pref_id'));
-
-        if(strlen($upload_pref_id) < 1 || !is_numeric($upload_pref_id))
-        {
-            $upload_pref_id = 0;
-        }
-        
-        $mailinglist_id = trim($this->EE->input->post('mailinglist_id'));
-        if(strlen($mailinglist_id) < 1 || !is_numeric($mailinglist_id))
-        {
-            $mailinglist_id = 0;
-        }
-        
         $this->EE->load->library('formslib');
         
+        // see if the field already exists
+        $field_name = strtolower(trim($this->EE->input->post('field_name')));
         $field = $this->EE->formslib->get_field($field_name);
+        if($field) show_error(lang('field_already_exists'));
         
-        if(!$field)
-        {
-            // add the field
-            $settings = array();
+        // reset invalid length so it is set to the default
+        if($this->EE->input->post('field_length') < 1) unset($_POST['field_length']);
+        
+        // run form validation
+        $this->_run_validation('edit_field');
+        
+        $data = array();
+        $this->prolib->copy_post($data, "BM_Field");
+        
+        // add the field
+        $settings = array();
 
-            if($this->EE->input->post('type_list'))
-                $settings['type_list'] = $this->EE->input->post('type_list');
-            if($this->EE->input->post('type_member_data'))
-                $settings['type_member_data'] = $this->EE->input->post('type_member_data');
-            
-            $this->EE->formslib->new_field($field_name, $field_label, $field_type, $field_length,
-                                           $field_validation, $upload_pref_id, $mailinglist_id,
-                                           $settings);
-            $field = $this->EE->formslib->get_field($field_name);
-        }
-        else
-        {
-            show_error(lang('field_already_exists'));
-            return FALSE;
-        }
+        if($this->EE->input->post('type_list'))
+            $settings['type_list'] = $this->EE->input->post('type_list');
+        if($this->EE->input->post('type_member_data'))
+            $settings['type_member_data'] = $this->EE->input->post('type_member_data');
         
-        
+        $this->EE->formslib->new_field($data);
+        $field = $this->EE->formslib->get_field($field_name);
+
+        // automatically add the field to a form?
         $auto_add_form_id = $this->EE->input->get_post('auto_add_form_id');
         
         if(!$auto_add_form_id)
@@ -1170,7 +905,6 @@ class Proform_mcp {
         
         return TRUE;
     }
-    
     
     function edit_field($editing=TRUE, $vars = array())
     {
@@ -1254,33 +988,13 @@ class Proform_mcp {
     
     function process_edit_field()
     {
+        // run form validation
+        $this->_run_validation('edit_field');
+        
         $field_id = $this->EE->input->post('field_id');
-        $field_name = $this->EE->input->post('field_name');
-        $field_label = $this->EE->input->post('field_label');
-        $type = $this->EE->input->post('type');
-        $length = $this->EE->input->post('length');
-        $validation = $this->EE->input->post('validation');
-        $upload_pref_id = $this->EE->input->post('upload_pref_id');
-        $mailinglist_id = $this->EE->input->post('mailinglist_id');
-        
         if(!$field_id || $field_id <= 0) show_error(lang('invalid_field_id'));
-        if(!$field_name) show_error(lang('missing_field_name'));
-        if(!$type) show_error(lang('missing_type'));
-        if(!$length) show_error(lang('missing_length'));
-        if(!$validation) $validation = 'none';
         
-        $field_name = trim($field_name);
-        $type = trim($type);
-        $length = trim($length);
-        $validation = trim($validation);
-        $upload_pref_id = trim($upload_pref_id);
-        
-        if(strlen($field_name) < 1 || is_numeric($field_name)) show_error(lang('invalid_field_name'));
-        if(strlen($type) < 1 || is_numeric($type)) show_error(lang('invalid_type'));
-        if(strlen($length) < 1 || !is_numeric($length)) show_error(lang('invalid_length'));
-        if(strlen($validation) < 1 || is_numeric($validation)) show_error(lang('invalid_validation'));
-        
-        // find form
+        // find field
         $this->EE->load->library('formslib');
         $field = $this->EE->formslib->get_field($field_id);
 
@@ -1293,13 +1007,8 @@ class Proform_mcp {
         if($this->EE->input->post('type_member_data'))
             $settings['type_member_data'] = $this->EE->input->post('type_member_data');
 
-        $field->field_label = $field_label;
-        $field->field_name = $field_name;
-        $field->type = $type;
-        $field->length = $length;
-        $field->validation = $validation;
-        $field->upload_pref_id = $upload_pref_id;
-        $field->mailinglist_id = $mailinglist_id;
+        // copy post values defined on the field class to it
+        $this->prolib->copy_post($field);
         $field->settings = $settings;
         $field->save();
         
@@ -1608,59 +1317,33 @@ class Proform_mcp {
         return FALSE;
     }
     
-    /*function _create_cp_form($form_obj, $types)
+    function _run_validation($group, $defaults=array())
     {
-        $form = array();
+        // include the validation configuration since the library can't find our config
+        // file in the third_party folder
+        include PATH_THIRD.'proform/config/form_validation.php';
         
-        foreach($form_obj as $key => $value) 
+        // get default values from config file, if needed
+        if(count($defaults) == 0 AND array_key_exists($group, $config_defaults))
         {
-            if(substr($key, 0, 2) != "__") {
-                if(array_key_exists($key, $types)) {
-                    $type = $types[$key];
-                } else {
-                    $type = "input";
-                }
-                
-                if(is_array($type)) {
-                    $options = $type[1];
-                    $type = $type[0];
-                } else {
-                    $options = array();
-                }
-                
-                switch($type)
-                {
-                    case 'read_only':
-                        $form[] = array('lang_field' => $key, 'control' => htmlentities(strip_tags($value)));
-                        break;
-                    case 'textarea':
-                        $form[] = array('lang_field' => $key, 'control' => form_textarea($key, $value));
-                        break;
-                    case 'dropdown':
-                        $form[] = array('lang_field' => $key, 'control' => form_dropdown($key, $options, $value));
-                        break;
-                    case 'grid':
-                        $field = array('lang_field' => $key, 'control' => $this->_render_grid($key, $options['headings'], $options['options'], $value));
-                        if(array_key_exists('flags', $options) && strpos($options['flags'], 'has_param'))
-                        {
-                            
-                        }
-                        
-                        $form[] = $field;
-                        break;
-                    case 'checkbox':
-                        $form[] = array('lang_field' => $key, 'control' => form_checkbox($key, 'y', $value == 'y'));
-                        break;
-                    default:
-                        $form[] = array('lang_field' => $key, 'control' => form_input($key, $value));
-                        break;
-                }
-            }
+            $defaults = $config_defaults[$group];
         }
         
-        return $form;
-    } // function _create_cp_form
-    */
+        // set default values for missing fields (mostly used for checkboxes)
+        foreach($defaults as $field => $default)
+        {
+            if(!$this->EE->input->post($field)) $_POST[$field] = $default;
+        }
+        
+        // run the requested validation group, display errors if any are found
+        $this->EE->load->library('form_validation', $config);
+        if(!$this->EE->form_validation->run($group))
+        {
+            show_error('Please correct these errors: '.validation_errors());
+        }
+        
+        return TRUE;
+    }
     
     
     function _render_grid($key, $headings, $options, $value)
