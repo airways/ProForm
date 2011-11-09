@@ -105,6 +105,15 @@ function print_hidden($field)
             
                         <?php
                         break;
+                    case 'file': ?>
+                        <label for="" class=""><?php echo $field['field_label']; ?></label>
+                        <input type="file" class="" disabled="disabled" />
+                    <?php
+                        break;
+                    default: ?>
+                        <label for="" class=""><?php echo $field['field_label']; ?></label>
+                        <input type="text" class="" disabled="disabled" />
+                    <?php
                     endswitch;
                     echo '</li>';
                 endforeach;
