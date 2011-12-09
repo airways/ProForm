@@ -665,7 +665,7 @@ class Proform_mcp {
     function process_delete_form()
     {
         $form_id = trim($this->EE->input->post('form_id'));
-        
+
         if(is_numeric($form_id))
         {
             $this->EE->load->library('formslib');

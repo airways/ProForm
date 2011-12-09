@@ -1026,12 +1026,17 @@ class Proform {
     {
         if($this->EE->proform_notifications->has_notifications($form_obj, $data, $form_config))
         {
+            $parse_data = array();
+            $this->prolib->copy_values($form_config, $parse_data);
+            $this->prolib->copy_values($data, $parse_data);
+            
             $fieldrows = $this->create_fields_array($form_obj, array(), $data, array(), TRUE);
             $fields = $this->create_fields_array($form_obj, array(), $data, array(), FALSE);
-            $data['fieldrows'] = $fieldrows;
-            $data['fields'] = $fields;
 
-            if(!$this->EE->proform_notifications->send_notifications($form_obj, $data, $form_config))
+            $parse_data['fieldrows'] = $fieldrows;
+            $parse_data['fields'] = $fields;
+
+            if(!$this->EE->proform_notifications->send_notifications($form_obj, $parse_data, $form_config))
             {
                 if($form_config['debug'])
                 {

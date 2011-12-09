@@ -808,8 +808,8 @@ class BM_Form extends BM_RowInitialized {
                         }
                     }
 
+
                     // check if the length specified is too long, if so, promote to the next data type
-                    var_dump($fields[$field->field_name]);
                     if(isset($typedef['limit'])
                         && is_numeric($fields[$field->field_name]['constraint'])
                         && $fields[$field->field_name]['constraint'] > $typedef['limit'])
