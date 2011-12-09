@@ -115,8 +115,13 @@ class Proform {
         $download_url       = $this->EE->TMPL->fetch_param('download_url',  '');
         $download_label     = $this->EE->TMPL->fetch_param('download_label',  '');
         $debug              = $this->EE->TMPL->fetch_param('debug',  'false') == 'yes';
-
-
+        $error_delimiters   = explode('|', $this->EE->TMPL->fetch_param('error_delimiters',  '<div class="error">|</div>'));
+        
+        if(count($error_delimiters) != 2)
+        {
+            $error_delimiters = array('<div class="error">', '</div>');
+        }
+        
         $tagdata = $this->EE->TMPL->tagdata;
         
         $complete = FALSE;
@@ -178,6 +183,7 @@ class Proform {
             'download_label'    => $download_label,
             'referrer_url'      => $this->EE->agent->is_referral() ? $this->EE->agent->referrer() : '',
             'debug'             => $debug,
+            'error_delimiters'  => $error_delimiters
         );
         
         // copy everything else the user may have added
@@ -981,7 +987,7 @@ class Proform {
 
             $this->_process_secure_fields($form_obj, $form_session, $data);
 
-            $this->_process_validation($form_obj, $form_session, $data);
+            $this->_process_validation($form_obj, $form_config, $form_session, $data);
 
             // check for duplicates
             $this->_process_duplicates($form_obj, $form_session, $data);
@@ -1204,7 +1210,7 @@ class Proform {
                     OR date < UNIX_TIMESTAMP()-7200");
     } // function _process_captch
     
-    private function _process_validation(&$form_obj, &$form_session, &$data)
+    private function _process_validation(&$form_obj, &$form_config, &$form_session, &$data)
     {
         $this->EE->lang->loadfile('proform');
         
@@ -1214,6 +1220,9 @@ class Proform {
         {
             $this->EE->extensions->call('proform_validation_start', $this, $form_obj, $form_session, $data);
         }
+        
+        // override delimiter values from form configuration
+        $this->EE->bm_validation->set_error_delimiters($form_config['error_delimiters'][0], $form_config['error_delimiters'][1]);
         
         // check rules for sanity then pass them on to the validation class
         $validation_rules = array();
