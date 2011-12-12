@@ -1,7 +1,11 @@
 <?php
 
 /**
- * Test creation and editing of forms.
+ * Test ProForm out a bit.
+ *
+ * Note that these tests do not work with a normal Testee installation. I find mock objects
+ * to be a lot more work than they are worth, so I have removed them from the version of testee
+ * that I use.
  *
  * @package     ProForm
  * @author      Isaac Raway <isaac.raway@gmail.com>
