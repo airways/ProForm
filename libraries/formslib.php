@@ -146,6 +146,8 @@ class Formslib
             $form->form_type = 'form';
         }
         
+        $form->__original_name = $form->form_name;
+        
         return $form;
     }
     
@@ -193,6 +195,11 @@ class Formslib
         $form->settings = serialize($form->settings);
         $f = $this->remove_transitory($form);
 
+        if($form->__original_name != $form->form_name)
+        {
+            $this->EE->db->query("RENAME TABLE exp_".$form->original_table_name()." TO exp_".$form->table_name());
+        }
+        
         $query = $this->EE->db->where('form_id', $form->form_id)
                               ->update('proform_forms', $f);
         
@@ -235,10 +242,19 @@ class Formslib
         if(!array_key_exists('settings', $data)) $data['settings'] = array();
         $data['settings'] = serialize($data['settings']);
 
+        if(!isset($data['length']) || is_null($data['length']) || $data['length'] <= 0)
+        {
+            $data['length'] = 255;
+        }
+
         // insert the field record
         $this->EE->db->insert('proform_fields', $data);
         
         $field_obj = $this->get_field($data['field_name']);
+        
+        // trigger some initialization
+        $field_obj->save();
+        
         return $field_obj;
     }
     
@@ -290,8 +306,14 @@ class Formslib
         return $this->EE->db->count_all('proform_fields');
     }
     
-    function save_field($field) 
+    function save_field(&$field) 
     {
+        // $this->settings = $this->settings();
+        if(is_null($field->length) || $field->length <= 0)
+        {
+            $field->length = 255;
+        }
+        
         $f = $this->remove_transitory($field);
 
         $f['settings'] = serialize($field->settings);
@@ -799,8 +821,10 @@ class BM_Form extends BM_RowInitialized {
                         if($field->length)
                         {
                             $fields[$field->field_name]['constraint'] = $field->length;
+                        } else {
+                            $fields[$field->field_name]['constraint'] = 255;
                         }
-                        
+
                         // if the form has encryption turned on, force at least a minimum size of 255
                         if($this->encryption_on == 'y' AND $field->length < 255)
                         {
@@ -1003,6 +1027,11 @@ class BM_Form extends BM_RowInitialized {
         return BM_Form::make_table_name($this->form_name);
     }
     
+    function original_table_name()
+    {
+        return BM_Form::make_table_name($this->__original_name);
+    }
+    
     function save()
     {
         $this->__EE->load->library('formslib');
@@ -1048,7 +1077,6 @@ class BM_Field extends BM_RowInitialized
     
     function save()
     {
-        // $this->settings = $this->settings();
         $this->__EE->formslib->save_field($this);
     }
 

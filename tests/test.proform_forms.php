@@ -73,6 +73,47 @@ class Proform_forms extends Proform_test_base {
         $this->assertEqual($db_form->share_reply_to_field, '');
     }
 
+    function test_rename_form()
+    {
+        $data = array(
+            'form_type' => 'form',
+            'form_label' => 'Contact',
+            'form_name' => 'test_form_2',
+            'reply_to_address' => 'isaac.raway+default@gmail.com',
+            'admin_notification_on' => 'y',
+            'notification_template' => 'default',
+            'notification_list' => 'isaac.raway@gmail.com',
+            'subject' => 'Admin notification: {form_name}',
+            'reply_to_field' => 'email',
+
+            'submitter_notification_on' => 'n',
+            'submitter_notification_template' => '',
+            'submitter_notification_subject' => '',
+            'submitter_email_field' => '',
+            'submitter_reply_to_field' => '',
+            
+            'share_notification_on' => 'n',
+            'share_notification_template' => '',
+            'share_notification_subject' => '',
+            'share_email_field' => '',
+            'share_reply_to_field' => '',
+        );
+        $save_form = $this->EE->formslib->new_form($data);
+
+        $save_form->form_name = 'test_form_2_renamed';
+        $save_form->save();
+        
+        $db_form = $this->EE->formslib->get_form('test_form_2_renamed');
+        
+        $this->assertNotEqual($db_form, FALSE);
+        $this->assertTrue($db_form instanceof BM_Form);
+        
+        $this->assertEqual($db_form->form_type, 'form');
+        $this->assertEqual($db_form->form_label, 'Contact');
+        $this->assertEqual($db_form->form_name, 'test_form_2_renamed');
+
+    }
+    
     function test_create_field()
     {
         $data = array(
@@ -93,6 +134,7 @@ class Proform_forms extends Proform_test_base {
         $this->assertEqual($db_field->type, 'string');
         $this->assertEqual($db_field->field_label, 'First Name');
         $this->assertEqual($db_field->field_name, 'first_name');
+        $this->assertEqual($db_field->length, '255');
     }
     
     function test_create_list_field()
@@ -131,6 +173,38 @@ class Proform_forms extends Proform_test_base {
 
         $this->assertEqual($options_keys[1], 'complex_option');
         $this->assertEqual($options['complex_option'], 'Complex Option');
+    }
+    
+    
+    function test_assign_field()
+    {
+        $this->test_create_form();
+        $this->test_create_field();
+        
+        $form = $this->EE->formslib->get_form('test_form_1');
+        $field = $this->EE->formslib->get_field('first_name');
+        
+        $form->assign_field($field);
+        
+        $field_keys = array_keys($form->fields());
+        $this->assertEqual($field_keys[0], 'first_name');
+        
+    }
+    
+    function test_rename_form_then_assign_field()
+    {
+        $this->test_create_form();
+        $this->test_create_field();
+        $this->test_rename_form();
+        
+        $form = $this->EE->formslib->get_form('test_form_2_renamed');
+        $field = $this->EE->formslib->get_field('first_name');
+        
+        $form->assign_field($field);
+
+        $field_keys = array_keys($form->fields());
+        $this->assertEqual($field_keys[0], 'first_name');
+        
     }
     
 }

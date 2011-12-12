@@ -28,17 +28,23 @@ class Proform_test_base extends Testee_unit_test_case {
             $query = $this->EE->db->query("SHOW TABLES LIKE 'real_exp_proform_%'");
             if($query->num_rows())
             {
-                $this->load_classes();
-                return;
-            }
+                $query = $this->EE->db->query("SHOW TABLES LIKE 'exp_proform_%'");
+                foreach ($query->result_array() as $table)
+                {
+                    $keys = array_keys($table);
+                    $table = $table[$keys[0]];
+                    $this->EE->db->query("DROP TABLE ".$table);
+                }
+            } else {
             
-            // Rename tables to not get in the way
-            $query = $this->EE->db->query("SHOW TABLES LIKE 'exp_proform_%'");
-            foreach ($query->result_array() as $table)
-            {
-                $keys = array_keys($table);
-                $table = $table[$keys[0]];
-                $this->EE->db->query("RENAME TABLE ".$table." TO real_".$table);
+                // Rename tables to not get in the way
+                $query = $this->EE->db->query("SHOW TABLES LIKE 'exp_proform_%'");
+                foreach ($query->result_array() as $table)
+                {
+                    $keys = array_keys($table);
+                    $table = $table[$keys[0]];
+                    $this->EE->db->query("RENAME TABLE ".$table." TO real_".$table);
+                }
             }
             
             // Uninstall ProForm so we can install a clean copy
