@@ -876,6 +876,8 @@ class Proform_mcp {
         if($this->EE->input->post('type_member_data'))
             $settings['type_member_data'] = $this->EE->input->post('type_member_data');
         
+        $data['settings'] = $settings;
+        
         $this->EE->formslib->new_field($data);
         $field = $this->EE->formslib->get_field($field_name);
 

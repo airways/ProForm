@@ -1090,6 +1090,28 @@ class BM_Field extends BM_RowInitialized
                 
         }
     }
+    
+    function get_list_options()
+    {
+        $result = array();
+        
+        if(array_key_exists('type_list', $this->settings))
+        {
+            $list = explode("\n", $this->settings['type_list']);
+            $valid = FALSE;
+            foreach($list as $option)
+            {
+                if(strpos($option, ':') !== FALSE)
+                {
+                    $option = explode(':', $option);
+                    $result[trim($option[0])] = trim($option[1]);
+                } else {
+                    $result[$option] = $option;
+                }
+            }
+        }
+        return $result;
+    }
 
 }
 }

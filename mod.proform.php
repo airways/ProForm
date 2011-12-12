@@ -1231,17 +1231,8 @@ class Proform {
             if($field->type == 'list')
             {
                 // Check that the value submitted is one of the available options
-                $list = explode("\n", $field->settings['type_list']);
-                $valid = FALSE;
-                foreach($list as $option)
-                {
-                    $option = explode(':', $option);
-                    if($data[$field->field_name] == trim($option[0]))
-                    {
-                        $valid = TRUE;
-                        break;
-                    }
-                }
+                $options = $field->get_list_options();
+                $valid = array_key_exists($data[$field->field_name], $options);
                 
                 if(!$valid)
                 {
