@@ -3,8 +3,10 @@
 /**
  * Test ProForm out a bit.
  *
+ * Runs inside Testee http://experienceinternet.co.uk/software/testee/.
+ *
  * Note that these tests do not work with a normal Testee installation. I find mock objects
- * to be a lot more work than they are worth, so I have removed them from the version of testee
+ * to be a lot more work than they are worth, so I have removed them from the version of Testee
  * that I use.
  *
  * @package     ProForm
