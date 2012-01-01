@@ -111,6 +111,7 @@ class Proform_install
             'encryption_on'                     => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'),
             'safecracker_channel_id'            => array('type' => 'int', 'constraint' => '10', 'default' => 0),
             'reply_to_address'                  => array('type' => 'varchar', 'constraint' => '32'),
+            'reply_to_name'                     => array('type' => 'varchar', 'constraint' => '32'),
             'settings'                          => array('type' => 'blob'),
             
             'admin_notification_on'             => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'),
@@ -270,6 +271,15 @@ class Proform_install
                 $forge->add_column('proform_forms', $fields);
             }
         }
+
+        if($current < 0.42)
+        {
+            $fields = array(
+                'reply_to_name'                 => array('type' => 'varchar', 'constraint' => '32'),
+            );
+            $forge->add_column('proform_forms', $fields);
+        }
+
         return TRUE;
     } // function update
     

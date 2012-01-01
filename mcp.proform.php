@@ -34,7 +34,10 @@ require_once PATH_THIRD.'prolib/prolib.php';
 require_once PATH_THIRD.'proform/libraries/formslib.php';
 require_once PATH_THIRD.'proform/config.php';
 
-define('ACTION_BASE', BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP);
+if(!defined('ACTION_BASE'))
+{
+    define('ACTION_BASE', BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP);
+}
 
 class Proform_mcp {
     
@@ -43,10 +46,7 @@ class Proform_mcp {
     
     function Proform_mcp()
     {
-        //$this->EE = &get_instance();
         prolib($this, 'proform');
-        
-        //define('TAB_ACTION', BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP);
         
         $this->EE->cp->set_right_nav(array(
                 'home' => TAB_ACTION,
@@ -69,6 +69,7 @@ class Proform_mcp {
             'list'          => 'List',
             'mailinglist'   => 'Mailing List Subscription',
             'hidden'        => 'Hidden',
+            'secure'        => 'Secure Hidden',
             'member_data'   => 'Member Data',
         );
         
@@ -427,7 +428,7 @@ class Proform_mcp {
         $extra = array('after' => array());
         
         if($form_obj->form_type == 'form')
-            $extra['after']['reply_to_address'] = array(array('heading' => lang('notification_list_name')));
+            $extra['after']['reply_to_name'] = array(array('heading' => lang('notification_list_name')));
         if($form_obj->form_type == 'form' OR $form_obj->form_type == 'share')
             $extra['after']['reply_to_field'] = array(array('heading' => lang('field_submitter_notification_name')));
         if($form_obj->form_type == 'form' OR $form_obj->form_type == 'share')
@@ -1113,12 +1114,12 @@ class Proform_mcp {
 
         ////////////////////////////////////////
         // Table Headings
-        $vars['hidden_columns'] = array("updated", "ip_address", "user_agent", "dst_enabled");
+        $vars['hidden_columns'] = array("ip_address", "user_agent", "dst_enabled");
         
-        $headings = array('ID');
+        $headings = array('ID', 'Last Updated');
         $fields = $form->fields();
 
-        $vars['fields'] = array();
+        $vars['fields'] = array('updated');
         
         foreach($fields as $field)
         {

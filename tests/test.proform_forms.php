@@ -10,7 +10,7 @@
  * that I use.
  *
  * @package     ProForm
- * @author      Isaac Raway <isaac.raway@gmail.com>
+ * @author      Isaac Raway <test2@example.com>
  */
 
 if (!class_exists('Testee_addon')) { require_once PATH_THIRD.'testee/classes/Testee_addon'.EXT; }
@@ -25,10 +25,10 @@ class Proform_forms extends Proform_test_base {
             'form_type' => 'form',
             'form_label' => 'Contact',
             'form_name' => 'test_form_1',
-            'reply_to_address' => 'isaac.raway+default@gmail.com',
+            'reply_to_address' => 'test@example.com',
             'admin_notification_on' => 'y',
             'notification_template' => 'default',
-            'notification_list' => 'isaac.raway@gmail.com',
+            'notification_list' => 'test2@example.com',
             'subject' => 'Admin notification: {form_name}',
             'reply_to_field' => 'email',
 
@@ -49,6 +49,26 @@ class Proform_forms extends Proform_test_base {
         $this->assertNotEqual($save_form, FALSE);
         $this->assertTrue($save_form instanceof BM_Form);
         
+        $this->assertEqual($save_form->form_type, 'form');
+        $this->assertEqual($save_form->form_label, 'Contact');
+        $this->assertEqual($save_form->form_name, 'test_form_1');
+        $this->assertEqual($save_form->encryption_on, 'n');
+        $this->assertEqual($save_form->admin_notification_on, 'y');
+        $this->assertEqual($save_form->notification_template, 'default');
+        $this->assertEqual($save_form->notification_list, 'test2@example.com');
+        $this->assertEqual($save_form->subject, 'Admin notification: {form_name}');
+        $this->assertEqual($save_form->reply_to_field, 'email');
+        $this->assertEqual($save_form->submitter_notification_on, 'n');
+        $this->assertEqual($save_form->submitter_notification_template, '');
+        $this->assertEqual($save_form->submitter_notification_subject, '');
+        $this->assertEqual($save_form->submitter_email_field, '');
+        $this->assertEqual($save_form->submitter_reply_to_field, '');
+        $this->assertEqual($save_form->share_notification_on, 'n');
+        $this->assertEqual($save_form->share_notification_template, '');
+        $this->assertEqual($save_form->share_notification_subject, '');
+        $this->assertEqual($save_form->share_email_field, '');
+        $this->assertEqual($save_form->share_reply_to_field, '');
+
         $db_form = $this->EE->formslib->get_form('test_form_1');
         
         $this->assertNotEqual($db_form, FALSE);
@@ -60,7 +80,7 @@ class Proform_forms extends Proform_test_base {
         $this->assertEqual($db_form->encryption_on, 'n');
         $this->assertEqual($db_form->admin_notification_on, 'y');
         $this->assertEqual($db_form->notification_template, 'default');
-        $this->assertEqual($db_form->notification_list, 'isaac.raway@gmail.com');
+        $this->assertEqual($db_form->notification_list, 'test2@example.com');
         $this->assertEqual($db_form->subject, 'Admin notification: {form_name}');
         $this->assertEqual($db_form->reply_to_field, 'email');
         $this->assertEqual($db_form->submitter_notification_on, 'n');
@@ -81,10 +101,10 @@ class Proform_forms extends Proform_test_base {
             'form_type' => 'form',
             'form_label' => 'Contact',
             'form_name' => 'test_form_2',
-            'reply_to_address' => 'isaac.raway+default@gmail.com',
+            'reply_to_address' => 'test@example.com',
             'admin_notification_on' => 'y',
             'notification_template' => 'default',
-            'notification_list' => 'isaac.raway@gmail.com',
+            'notification_list' => 'test2@example.com',
             'subject' => 'Admin notification: {form_name}',
             'reply_to_field' => 'email',
 
