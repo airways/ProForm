@@ -114,6 +114,7 @@ class Proform {
         $download_label     = $this->EE->TMPL->fetch_param('download_label',  '');
         $debug              = $this->EE->TMPL->fetch_param('debug',  'false') == 'yes';
         $error_delimiters   = explode('|', $this->EE->TMPL->fetch_param('error_delimiters',  '<div class="error">|</div>'));
+        $error_messages     = $this->EE->bm_parser->fetch_param_group('message');
         
         if(count($error_delimiters) != 2)
         {
@@ -199,6 +200,7 @@ class Proform {
             'debug'             => $debug,
             'error_delimiters'  => $error_delimiters,
             'secure'            => $secure,
+            'error_messages'    => $error_messages,
         );
         
         // copy everything else the user may have added
@@ -1372,6 +1374,9 @@ class Proform {
 
         // send the compiled rules on to the validation class
         $this->EE->bm_validation->set_rules($validation_rules);
+
+        // set custom error messages as provided on the form tag
+        $this->EE->bm_validation->set_error_messages($form_config['error_messages']);
 
         // run the validation and see if we get any errors to add to the form_session
         if(!$this->EE->bm_validation->run())
