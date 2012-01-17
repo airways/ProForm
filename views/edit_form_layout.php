@@ -158,8 +158,8 @@ function print_hidden($field)
         <div class="field-modifications">
             <div class="action-group">
                 <div class="form-fields">
-                    <label for="field_id">Select field to add</label>&nbsp;
-                    <?php echo form_dropdown('add_field_id', $field_options); ?>
+                    <label for="add_item">Add item</label>&nbsp;
+                    <?php echo form_dropdown('add_item', $add_item_options, Proform_mcp::NONE, 'id="add_item"'); ?>
                 </div>
                 &nbsp; <input type="submit" class="submit btn-main" name="add_field" value="Add" />
             </div>
