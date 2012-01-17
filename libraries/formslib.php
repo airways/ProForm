@@ -45,8 +45,10 @@ class Formslib
 
     var $default_prefs = array(
         'notification_template_group' => 'notifications',
-        'from_address' => 'admin@example.com',
-        'reply_to_address' => 'admin@example.com',
+        'from_address' => '',
+        'from_name' => '',
+        'reply_to_address' => '',
+        'reply_to_name' => '',
     );
 
     function Formslib()
@@ -104,7 +106,7 @@ class Formslib
         
         $form_obj = $this->get_form($form_name);
         return $form_obj;
-    }
+    } // function new_form()
     
     function get_form($form_name) 
     {
@@ -146,8 +148,10 @@ class Formslib
             $form->form_type = 'form';
         }
         
+        $form->__original_name = $form->form_name;
+        
         return $form;
-    }
+    } // function get_form()
     
     function get_forms($limit=0, $offset=0) 
     {
@@ -167,12 +171,12 @@ class Formslib
             }
         }
         return $result;
-    }
+    } // function get_forms()
     
     function count_forms()
     {
         return $this->EE->db->count_all('proform_forms');
-    }
+    } // function count_forms()
     
     function get_forms_with_field($field)
     {
@@ -186,20 +190,25 @@ class Formslib
             }
         }
         return $result;
-    }
+    } // function get_forms_with_field()
     
     function save_form($form) 
     {
         $form->settings = serialize($form->settings);
         $f = $this->remove_transitory($form);
 
+        if($form->__original_name != $form->form_name)
+        {
+            $this->EE->db->query("RENAME TABLE exp_".$form->original_table_name()." TO exp_".$form->table_name());
+        }
+        
         $query = $this->EE->db->where('form_id', $form->form_id)
                               ->update('proform_forms', $f);
         
         $form->settings = unserialize($form->settings);
         
         return $form;
-    }
+    } // function save_form()
     
     
     function delete_form($form) 
@@ -227,7 +236,7 @@ class Formslib
         $form->settings = unserialize($form->settings);
         
         return $form;
-    }
+    } // function delete_form()
 
     function new_field($data)
     {
@@ -235,12 +244,21 @@ class Formslib
         if(!array_key_exists('settings', $data)) $data['settings'] = array();
         $data['settings'] = serialize($data['settings']);
 
+        if(!isset($data['length']) || is_null($data['length']) || $data['length'] <= 0)
+        {
+            $data['length'] = 255;
+        }
+
         // insert the field record
         $this->EE->db->insert('proform_fields', $data);
         
         $field_obj = $this->get_field($data['field_name']);
+        
+        // trigger some initialization
+        $field_obj->save();
+        
         return $field_obj;
-    }
+    } // function new_field()
     
     
     function get_field($name) 
@@ -263,7 +281,7 @@ class Formslib
         }
         
         return $field;
-    }
+    } // function get_field()
     
     function get_fields($rownum = 0, $perpage = 0)
     {
@@ -283,15 +301,21 @@ class Formslib
         }
         
         return $result;
-    }
+    } // function get_fields()
 
     function count_fields()
     {
         return $this->EE->db->count_all('proform_fields');
-    }
+    } // function count_fields()
     
-    function save_field($field) 
+    function save_field(&$field) 
     {
+        // $this->settings = $this->settings();
+        if(is_null($field->length) || $field->length <= 0)
+        {
+            $field->length = 255;
+        }
+        
         $f = $this->remove_transitory($field);
 
         $f['settings'] = serialize($field->settings);
@@ -308,7 +332,7 @@ class Formslib
         }
         
         return $field;
-    }
+    } // function save_field()
     
     function delete_field($field) 
     {
@@ -322,7 +346,7 @@ class Formslib
         
         // get rid of the field record
         $this->EE->db->delete('proform_fields', array('field_name' => $field->field_name));
-    }
+    } // function delete_field()
 
     function remove_transitory($object)
     {
@@ -334,7 +358,7 @@ class Formslib
             }
         }
         return $f;
-    }
+    } // function remove_transitory()
 
     /* ------------------------------------------------------------
      * Session manager interface 
@@ -423,7 +447,7 @@ class Formslib
             }
         }
         return $result;
-    }
+    } // function encrypt_values()
     
     /**
      * Decrypt an array of values through the CI encrypt class.
@@ -474,7 +498,7 @@ class Formslib
             }
         }
         return $result;
-    }
+    } // function decrypt_values()
     
     /**
      * Get list of channels to be used in a form_dropdown field
@@ -529,6 +553,7 @@ class BM_Form extends BM_RowInitialized {
     var $encryption_on = 'n';
     var $safecracker_channel_id = 0;
     var $reply_to_address;
+    var $reply_to_name;
     
     var $admin_notification_on = 'y';
     var $notification_template;
@@ -651,7 +676,7 @@ class BM_Form extends BM_RowInitialized {
             $this->__EE->db->where(array('field_id' => $field_id, 'form_id' => $this->form_id))
                            ->update('proform_form_fields', $data);
         }
-    }
+    } // function set_all_form_field_settings()
     
     function count_entries()
     {
@@ -671,7 +696,7 @@ class BM_Form extends BM_RowInitialized {
                 break;
         }
         return $result;
-    }
+    } // function count_entries()
 
     function entries($search=array(), $start_row = 0, $limit = 0, $orderby = FALSE, $sort = FALSE)
     {
@@ -738,7 +763,7 @@ class BM_Form extends BM_RowInitialized {
                 return array();
                 break;
         }
-    }
+    } // function entries()
     
     function _has_operator($str)
     {
@@ -749,6 +774,11 @@ class BM_Form extends BM_RowInitialized {
         }
 
         return TRUE;
+    }
+
+    function get_entry($entry_id)
+    {
+        return $this->__EE->db->get_where($this->table_name(), array('form_entry_id' => $entry_id))->row();
     }
 
     function delete_entry($entry_id)
@@ -799,8 +829,10 @@ class BM_Form extends BM_RowInitialized {
                         if($field->length)
                         {
                             $fields[$field->field_name]['constraint'] = $field->length;
+                        } else {
+                            $fields[$field->field_name]['constraint'] = 255;
                         }
-                        
+
                         // if the form has encryption turned on, force at least a minimum size of 255
                         if($this->encryption_on == 'y' AND $field->length < 255)
                         {
@@ -934,7 +966,7 @@ class BM_Form extends BM_RowInitialized {
         
         // trigger refresh on next request for field list
         $this->__fields = FALSE;
-    }
+    } // function assign_field()
     
     /*
     function update_preset($field, $preset_value, $preset_forced)
@@ -1003,6 +1035,11 @@ class BM_Form extends BM_RowInitialized {
         return BM_Form::make_table_name($this->form_name);
     }
     
+    function original_table_name()
+    {
+        return BM_Form::make_table_name($this->__original_name);
+    }
+    
     function save()
     {
         $this->__EE->load->library('formslib');
@@ -1032,6 +1069,7 @@ class BM_Field extends BM_RowInitialized
             'list'          => array('type' => 'text'),
             'mailinglist'   => array('type' => 'varchar', 'constraint' => '90'),
             'hidden'        => array('type' => 'varchar', 'limit' => 255, 'limit_promote' => 'text'),
+            'secure'        => array('type' => 'varchar', 'limit' => 255, 'limit_promote' => 'text'),
             'member_data'   => array('type' => 'varchar', 'limit' => 255, 'limit_promote' => 'text'),
         )
     );
@@ -1048,7 +1086,6 @@ class BM_Field extends BM_RowInitialized
     
     function save()
     {
-        // $this->settings = $this->settings();
         $this->__EE->formslib->save_field($this);
     }
 

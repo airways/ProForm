@@ -76,15 +76,13 @@ class Proform {
         $this->EE->load->library('user_agent');
         $this->EE->load->library('proform_notifications');
         
-        $this->EE->proform_notifications->default_from_address = $this->EE->formslib->ini('from_address');
-        $this->EE->proform_notifications->default_reply_to_address = $this->EE->formslib->ini('reply_to_address');
-        $this->EE->proform_notifications->template_group_name = $this->EE->formslib->ini('notification_template_group');
-        
         if(strlen($this->EE->config->item('encryption_key')) < 32) 
         {
             show_error("{exp:proform:form} requires a valid (32 character) encryption_key to be set in the config file.");
         }
 
+        $varsets = array();
+        
         /*
          * TODO: add license key validation
 
@@ -116,6 +114,7 @@ class Proform {
         $download_label     = $this->EE->TMPL->fetch_param('download_label',  '');
         $debug              = $this->EE->TMPL->fetch_param('debug',  'false') == 'yes';
         $error_delimiters   = explode('|', $this->EE->TMPL->fetch_param('error_delimiters',  '<div class="error">|</div>'));
+        $error_messages     = $this->EE->bm_parser->fetch_param_group('message');
         
         if(count($error_delimiters) != 2)
         {
@@ -168,6 +167,22 @@ class Proform {
                 $use_captcha = TRUE;
         }
         
+                        
+        $get_params = array();
+        foreach($_GET as $k => $v)
+        {
+            $k = $this->EE->security->xss_clean($k);
+            $v = $this->EE->security->xss_clean($v);
+            $get_params[$k] = $v;
+        }
+        $varsets[] = array('get', $get_params);
+
+        $secure = $this->prolib->bm_parser->fetch_param_group('secure');
+        if(!$secure)
+        {
+            $secure = array();
+        }
+
         $form_config = array(
             'in_place_errors'   => $in_place_errors,
             'use_captcha'       => $use_captcha,
@@ -183,7 +198,9 @@ class Proform {
             'download_label'    => $download_label,
             'referrer_url'      => $this->EE->agent->is_referral() ? $this->EE->agent->referrer() : '',
             'debug'             => $debug,
-            'error_delimiters'  => $error_delimiters
+            'error_delimiters'  => $error_delimiters,
+            'secure'            => $secure,
+            'error_messages'    => $error_messages,
         );
         
         // copy everything else the user may have added
@@ -204,6 +221,10 @@ class Proform {
         {
             if(!is_array($v) && !is_numeric($v))
                 $form_config[$k] = $this->EE->TMPL->parse_globals($v);
+            //echo '<hr/>';
+            //var_dump($form_config[$k]);
+            //var_dump(array($get_params));
+            //$form_config[$k] = $this->EE->TMPL->parse_variables($form_config[$k], array($get_params));
         }
         //var_dump($form_config);
         
@@ -256,7 +277,6 @@ class Proform {
                 
                 ////////////////////
                 // Setup variables
-                $varsets = array();
                 
                 $variables['use_captcha'] = $use_captcha;
                 
@@ -328,6 +348,7 @@ class Proform {
                 $varsets[] = array('value', $field_values);
                 $varsets[] = array('checked', $field_checked_flags);
                 $varsets[] = array('error', $field_errors);
+                
                 
                 // Turn various arrays of values into variables
                 // $variables = array();
@@ -558,25 +579,7 @@ class Proform {
                     }*/
 
                     // add form field data
-                    foreach($form_obj->fields() as $field)
-                    {
-                        $row_vars['value:'.$field->field_name] = $row->{$field->field_name};
-
-                        if($field->type == 'file' && $row_vars['value:'.$field->field_name] != '')
-                        {
-                            $dir = $this->EE->bm_uploads->get_upload_pref($field->upload_pref_id);
-                            $row_vars['value:'.$field->field_name] = $dir->url.$row_vars['value:'.$field->field_name];
-                        }
-                    }
-
-                    // add row data that isn't part of the form
-                    foreach($row as $key => $value)
-                    {
-                        if(!array_key_exists('value:'.$key, $row_vars))
-                        {
-                            $row_vars['value:' . $key] = $value;
-                        }
-                    }
+                    $this->_add_rowdata($form_obj, $row, $row_vars);
                     
                     // add additional variables needed in the iteration
                     $row_vars['row:number'] = $row_i;
@@ -711,6 +714,10 @@ class Proform {
             // Send notifications
             if($send_notification == 'yes') {
                 $data['entry_id'] = $this->EE->db->insert_id();
+                
+                $entry_data = $form_obj->get_entry($data['entry_id']);
+
+
                 $form_config = array(
                     'notify' => $notify,
                     'debug' => $debug,
@@ -721,7 +728,7 @@ class Proform {
                 $data['fieldrows'] = $fieldrows;
                 $data['fields'] = $fields;
 
-                $this->_process_notifications($form_obj, $form_config, $data);
+                $this->_process_notifications($form_obj, $form_config, $data, $entry_data);
             }
             
             if ($this->EE->extensions->active_hook('proform_insert_end') === TRUE)
@@ -736,10 +743,11 @@ class Proform {
         }
     }
     
-    public function debug()
+    public function debug($value, $exit=TRUE)
     {
-        var_dump($this->EE->TMPL->tagdata);
-        exit;
+        echo "<pre>";
+        var_dump($value);
+        if($exit) exit;
     }
     
     function forms()
@@ -880,6 +888,34 @@ class Proform {
         return $this->return_data;
     }
     
+
+    private function _add_rowdata(&$form_obj, &$row, &$row_vars)
+    {
+        foreach($form_obj->fields() as $field)
+        {
+            if(is_object($row))
+            {
+                $row_vars['value:'.$field->field_name] = $row->{$field->field_name};
+            } elseif(is_array($row)) {
+                $row_vars['value:'.$field->field_name] = $row[$field->field_name];
+            }
+
+            if($field->type == 'file' && $row_vars['value:'.$field->field_name] != '')
+            {
+                $dir = $this->EE->bm_uploads->get_upload_pref($field->upload_pref_id);
+                $row_vars['value:'.$field->field_name] = $dir->url.$row_vars['value:'.$field->field_name];
+            }
+        }
+
+        // add row data that isn't part of the form
+        foreach($row as $key => $value)
+        {
+            if(!array_key_exists('value:'.$key, $row_vars))
+            {
+                $row_vars['value:' . $key] = $value;
+            }
+        }
+    }
     
     
     
@@ -985,7 +1021,7 @@ class Proform {
                 $this->_process_captcha($form_obj, $form_session, $data);
             }
 
-            $this->_process_secure_fields($form_obj, $form_session, $data);
+            $this->_process_secure_fields($form_obj, $form_config, $form_session, $data);
 
             $this->_process_validation($form_obj, $form_config, $form_session, $data);
 
@@ -1007,7 +1043,11 @@ class Proform {
                 $data['user_agent'] = $this->EE->agent->agent_string();
 
                 $this->_process_insert($form_obj, $form_session, $data);
-                $this->_process_notifications($form_obj, $form_config, $data);
+
+                $data['entry_id'] = $this->EE->db->insert_id();
+                $entry_data = $form_obj->get_entry($data['entry_id']);
+
+                $this->_process_notifications($form_obj, $form_config, $data, $entry_data);
                 
                 if ($this->EE->extensions->active_hook('proform_process_end') === TRUE)
                 {
@@ -1028,7 +1068,7 @@ class Proform {
     }
     
     
-    private function _process_notifications(&$form_obj, &$form_config, &$data)
+    private function _process_notifications(&$form_obj, &$form_config, &$data, &$entry_row)
     {
         if($this->EE->proform_notifications->has_notifications($form_obj, $data, $form_config))
         {
@@ -1041,6 +1081,14 @@ class Proform {
 
             $parse_data['fieldrows'] = $fieldrows;
             $parse_data['fields'] = $fields;
+
+            $this->_add_rowdata($form_obj, $entry_row, $parse_data);
+
+            // $this->debug(array(
+            //     "form_obj:" => $form_obj,
+            //     "parse_data:" => $parse_data,
+            //     "entry_row:" => $entry_row,
+            // ));
 
             if(!$this->EE->proform_notifications->send_notifications($form_obj, $parse_data, $form_config))
             {
@@ -1120,7 +1168,7 @@ class Proform {
         return $timestamp;
     }
     
-    private function _process_secure_fields(&$form_obj, &$form_session, &$data)
+    private function _process_secure_fields(&$form_obj, &$form_config, &$form_session, &$data)
     {
         // set secure fields values from the session or other backend sources
         foreach($form_obj->fields() as $field)
@@ -1132,6 +1180,16 @@ class Proform {
                     $data[$field->field_name] = $this->EE->session->userdata[$field->settings['type_member_data']];
                 } else {
                     $data[$field->field_name] = 'Invalid member key ' . $field->settings['type_member_data'];
+                }
+            }
+            
+            if($field->type == 'secure')
+            {
+                if(array_key_exists($field->field_name, $form_config['secure']))
+                {
+                    $data[$field->field_name] = $form_config['secure'][$field->field_name];
+                } else {
+                    $data[$field->field_name] = '';
                 }
             }
         }
@@ -1316,6 +1374,9 @@ class Proform {
 
         // send the compiled rules on to the validation class
         $this->EE->bm_validation->set_rules($validation_rules);
+
+        // set custom error messages as provided on the form tag
+        $this->EE->bm_validation->set_error_messages($form_config['error_messages']);
 
         // run the validation and see if we get any errors to add to the form_session
         if(!$this->EE->bm_validation->run())
@@ -1512,7 +1573,7 @@ class Proform {
         foreach($form_obj->fields() as $field)
         {
             // skip secured fields such as member_id, member_name, etc.
-            //if($field->type == 'member_data') continue;
+            if($field->type == 'secure' OR $field->type == 'member_data') continue;
             
             // handle normal posted fields
             $is_required = $field->is_required == 'y';

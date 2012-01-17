@@ -72,7 +72,7 @@
         $this->table->add_row(
                 '<a href="'.$form->edit_link.'">'.$form->form_name.'</a>',
                 $form->entries_count,
-                '<span class="action-list"><a href="'.$form->edit_fields_link.'">'.lang('heading_edit_fields').'</a> <a href="'.$form->edit_link.'">'.lang('heading_edit_form').'</a> <a href="'.$form->list_entries_link.'">'.lang('heading_list_entries').'</a> <a href="'.$form->delete_link.'">'.lang('heading_delete_form').'</a></span>'
+                '<span class="action-list"> <a href="'.$form->edit_link.'">'.lang('heading_edit_form').'</a> <a href="'.$form->edit_fields_link.'">'.lang('heading_edit_fields').'</a> <a href="'.$form->list_entries_link.'">'.lang('heading_list_entries').'</a> <a href="'.$form->delete_link.'">'.lang('heading_delete_form').'</a></span>'
                 //<a href="'.$form->edit_preset_values_link.'">'.ico_defaults(lang('heading_edit_preset_values')).'</a>
                 //form_checkbox($form->toggle)
             );

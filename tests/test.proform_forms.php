@@ -3,12 +3,14 @@
 /**
  * Test ProForm out a bit.
  *
+ * Runs inside the Testee module: http://experienceinternet.co.uk/software/testee/
+ *
  * Note that these tests do not work with a normal Testee installation. I find mock objects
- * to be a lot more work than they are worth, so I have removed them from the version of testee
+ * to be a lot more work than they are worth, so I have removed them from the version of Testee
  * that I use.
  *
  * @package     ProForm
- * @author      Isaac Raway <isaac.raway@gmail.com>
+ * @author      Isaac Raway <test2@example.com>
  */
 
 if (!class_exists('Testee_addon')) { require_once PATH_THIRD.'testee/classes/Testee_addon'.EXT; }
@@ -23,10 +25,10 @@ class Proform_forms extends Proform_test_base {
             'form_type' => 'form',
             'form_label' => 'Contact',
             'form_name' => 'test_form_1',
-            'reply_to_address' => 'isaac.raway+default@gmail.com',
+            'reply_to_address' => 'test@example.com',
             'admin_notification_on' => 'y',
             'notification_template' => 'default',
-            'notification_list' => 'isaac.raway@gmail.com',
+            'notification_list' => 'test2@example.com',
             'subject' => 'Admin notification: {form_name}',
             'reply_to_field' => 'email',
 
@@ -47,6 +49,26 @@ class Proform_forms extends Proform_test_base {
         $this->assertNotEqual($save_form, FALSE);
         $this->assertTrue($save_form instanceof BM_Form);
         
+        $this->assertEqual($save_form->form_type, 'form');
+        $this->assertEqual($save_form->form_label, 'Contact');
+        $this->assertEqual($save_form->form_name, 'test_form_1');
+        $this->assertEqual($save_form->encryption_on, 'n');
+        $this->assertEqual($save_form->admin_notification_on, 'y');
+        $this->assertEqual($save_form->notification_template, 'default');
+        $this->assertEqual($save_form->notification_list, 'test2@example.com');
+        $this->assertEqual($save_form->subject, 'Admin notification: {form_name}');
+        $this->assertEqual($save_form->reply_to_field, 'email');
+        $this->assertEqual($save_form->submitter_notification_on, 'n');
+        $this->assertEqual($save_form->submitter_notification_template, '');
+        $this->assertEqual($save_form->submitter_notification_subject, '');
+        $this->assertEqual($save_form->submitter_email_field, '');
+        $this->assertEqual($save_form->submitter_reply_to_field, '');
+        $this->assertEqual($save_form->share_notification_on, 'n');
+        $this->assertEqual($save_form->share_notification_template, '');
+        $this->assertEqual($save_form->share_notification_subject, '');
+        $this->assertEqual($save_form->share_email_field, '');
+        $this->assertEqual($save_form->share_reply_to_field, '');
+
         $db_form = $this->EE->formslib->get_form('test_form_1');
         
         $this->assertNotEqual($db_form, FALSE);
@@ -58,7 +80,7 @@ class Proform_forms extends Proform_test_base {
         $this->assertEqual($db_form->encryption_on, 'n');
         $this->assertEqual($db_form->admin_notification_on, 'y');
         $this->assertEqual($db_form->notification_template, 'default');
-        $this->assertEqual($db_form->notification_list, 'isaac.raway@gmail.com');
+        $this->assertEqual($db_form->notification_list, 'test2@example.com');
         $this->assertEqual($db_form->subject, 'Admin notification: {form_name}');
         $this->assertEqual($db_form->reply_to_field, 'email');
         $this->assertEqual($db_form->submitter_notification_on, 'n');
@@ -73,6 +95,47 @@ class Proform_forms extends Proform_test_base {
         $this->assertEqual($db_form->share_reply_to_field, '');
     }
 
+    function test_rename_form()
+    {
+        $data = array(
+            'form_type' => 'form',
+            'form_label' => 'Contact',
+            'form_name' => 'test_form_2',
+            'reply_to_address' => 'test@example.com',
+            'admin_notification_on' => 'y',
+            'notification_template' => 'default',
+            'notification_list' => 'test2@example.com',
+            'subject' => 'Admin notification: {form_name}',
+            'reply_to_field' => 'email',
+
+            'submitter_notification_on' => 'n',
+            'submitter_notification_template' => '',
+            'submitter_notification_subject' => '',
+            'submitter_email_field' => '',
+            'submitter_reply_to_field' => '',
+            
+            'share_notification_on' => 'n',
+            'share_notification_template' => '',
+            'share_notification_subject' => '',
+            'share_email_field' => '',
+            'share_reply_to_field' => '',
+        );
+        $save_form = $this->EE->formslib->new_form($data);
+
+        $save_form->form_name = 'test_form_2_renamed';
+        $save_form->save();
+        
+        $db_form = $this->EE->formslib->get_form('test_form_2_renamed');
+        
+        $this->assertNotEqual($db_form, FALSE);
+        $this->assertTrue($db_form instanceof BM_Form);
+        
+        $this->assertEqual($db_form->form_type, 'form');
+        $this->assertEqual($db_form->form_label, 'Contact');
+        $this->assertEqual($db_form->form_name, 'test_form_2_renamed');
+
+    }
+    
     function test_create_field()
     {
         $data = array(
@@ -93,6 +156,7 @@ class Proform_forms extends Proform_test_base {
         $this->assertEqual($db_field->type, 'string');
         $this->assertEqual($db_field->field_label, 'First Name');
         $this->assertEqual($db_field->field_name, 'first_name');
+        $this->assertEqual($db_field->length, '255');
     }
     
     function test_create_list_field()
@@ -131,6 +195,38 @@ class Proform_forms extends Proform_test_base {
 
         $this->assertEqual($options_keys[1], 'complex_option');
         $this->assertEqual($options['complex_option'], 'Complex Option');
+    }
+    
+    
+    function test_assign_field()
+    {
+        $this->test_create_form();
+        $this->test_create_field();
+        
+        $form = $this->EE->formslib->get_form('test_form_1');
+        $field = $this->EE->formslib->get_field('first_name');
+        
+        $form->assign_field($field);
+        
+        $field_keys = array_keys($form->fields());
+        $this->assertEqual($field_keys[0], 'first_name');
+        
+    }
+    
+    function test_rename_form_then_assign_field()
+    {
+        $this->test_create_form();
+        $this->test_create_field();
+        $this->test_rename_form();
+        
+        $form = $this->EE->formslib->get_form('test_form_2_renamed');
+        $field = $this->EE->formslib->get_field('first_name');
+        
+        $form->assign_field($field);
+
+        $field_keys = array_keys($form->fields());
+        $this->assertEqual($field_keys[0], 'first_name');
+        
     }
     
 }

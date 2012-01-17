@@ -51,7 +51,55 @@ class Proform_notifications
     {
         prolib($this, 'proform');
         $this->mgr = new Bm_handle_mgr();
-    }
+
+        /*
+         * Get settings
+         */
+        $this->template_group_name       = $this->EE->formslib->ini('notification_template_group');
+
+        // first see if the admin has setup a from address / name in the module's preferences
+        if($this->EE->formslib->ini('from_address'))
+        {
+            $this->default_from_address = $this->EE->formslib->ini('from_address');
+
+            if($this->EE->formslib->ini('from_name'))
+            {
+                $this->default_from_name = $this->EE->formslib->ini('from_name');
+            } else {
+                // use the email as the name
+                $this->default_from_name = $this->default_from_address;
+            }
+        } else {
+            // default to using the site-wide email settings
+            $this->default_from_address = $this->EE->config->item('webmaster_email');
+            $this->default_from_name = $this->EE->config->item('webmaster_name');
+
+            if(trim($this->default_from_name) == '')
+            {
+                $this->default_from_name = $this->default_from_address;
+            }
+        }
+
+        // do the same things for the default reply-to values, using whatever we found for the from
+        // fields as a default this time
+        if($this->EE->formslib->ini('reply_to_address'))
+        {
+            $this->default_reply_to_address = $this->EE->formslib->ini('reply_to_address');
+
+            if($this->EE->formslib->ini('reply_to_name'))
+            {
+                $this->default_reply_to_name = $this->EE->formslib->ini('reply_to_name');
+            } else {
+                // use the email as the name
+                $this->default_reply_to_name = $this->default_reply_to_address;
+            }
+        } else {
+            // use the from address values, which may have been set to the site-wide email settings
+            $this->default_reply_to_address = $this->default_from_address;
+            $this->default_reply_to_name = $this->default_from_name;
+        }
+
+    } // function __construct()
     
     function _debug($msg)
     {
@@ -78,7 +126,7 @@ class Proform_notifications
 
         return FALSE;
 
-    }
+    } // function has_notifications($form, $data, $config)
 
     function send_notifications($form, $data, $config)
     {
@@ -215,9 +263,9 @@ class Proform_notifications
             }
             return FALSE;
         }
-    }
+    } // function send_notifications()
     
-    function _send_notifications($type, $template_name, &$form, &$data, $subject, $notification_list, $reply_to=FALSE)
+    function _send_notifications($type, $template_name, &$form, &$data, $subject, $notification_list, $reply_to=FALSE, $reply_to_name=FALSE)
     {
         $result = FALSE;
         $template = $this->get_template($template_name);
@@ -243,18 +291,30 @@ class Proform_notifications
 
                 if($this->default_from_address)
                 {
-                    $this->EE->bm_email->from($this->default_from_address);
+                    $this->EE->bm_email->from($this->default_from_address, $this->default_from_name);
                 }
-                
+
                 if($reply_to)
                 {
-                    $this->EE->bm_email->reply_to($reply_to);
+                    if($reply_to_name)
+                    {
+                        $this->EE->bm_email->reply_to($reply_to, $reply_to_name);
+                    } else {
+                        $this->EE->bm_email->reply_to($reply_to);
+                    }
                 } else {
+                    // use the form's reply-to email and name if they have been set
                     if(trim($form->reply_to_address) != '')
                     {
-                        $this->EE->bm_email->reply_to($form->reply_to_address);
+                        if(trim($form->reply_to_name) != '')
+                        {
+                            $this->EE->bm_email->reply_to($form->reply_to_address, $form->reply_to_name);
+                        } else {
+                            $this->EE->bm_email->reply_to($form->reply_to_address);
+                        }
                     } elseif($this->default_reply_to_address) {
-                        $this->EE->bm_email->reply_to($this->default_reply_to_address);
+                        // use the default reply-to address if it's been set
+                        $this->EE->bm_email->reply_to($this->default_reply_to_address, $this->default_reply_to_name);
                     }
                 }
                 
@@ -280,7 +340,7 @@ class Proform_notifications
         }
 
         return $result;
-    }
+    } // function _send_notifications()
 
     /**
      * Get a list of EE template group names from the database. These will be used as the options
@@ -298,7 +358,7 @@ class Proform_notifications
         }
         ksort($result);
         return $result;
-    }
+    } // function get_template_group_names()
 
     /**
      * Get a list of template names for the given group name. Used on form settings to specify
@@ -326,12 +386,10 @@ class Proform_notifications
             }
         }
         return $result;
-    }
+    } // function get_template_names()
 
     function get_template($template_name)
     {
-
-
         $query = $this->EE->db->query($sql = "SELECT group_id FROM exp_template_groups WHERE group_name = '" . $this->EE->db->escape_str($this->template_group_name) . "';");
         if($query->num_rows() > 0)
         {
@@ -359,8 +417,8 @@ class Proform_notifications
             } else {
                 return FALSE;
             }
-        } else {
+        } else { // if($query->num_rows() > 0)
             return FALSE;
         }
-    }
-}
+    } // function get_template()
+} // class Proform_notifications

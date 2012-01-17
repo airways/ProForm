@@ -7,13 +7,13 @@ function print_hidden($field)
          '<input type="hidden" name="field_id[]" value="'.$field['field_id'].'" class="fieldId" />'.
          '<input type="hidden" name="field_order[]" value="' . $field['field_id'] . '" />'.
          '<input type="hidden" name="field_row[]" value="' . $field['field_row'] . '" class="fieldRowFlag" />'.
-         '<input type="hidden" name="field_label[]" value="' . $field['settings']['label'] . '" class="fieldLabel" />'.
-         '<input type="hidden" name="field_preset_value[]" value="' . $field['settings']['preset_value'] . '" class="fieldPresetValue" />'.
+         '<input type="hidden" name="field_label[]" value="' . htmlentities($field['settings']['label']) . '" class="fieldLabel" />'.
+         '<input type="hidden" name="field_preset_value[]" value="' . htmlentities($field['settings']['preset_value']) . '" class="fieldPresetValue" />'.
          '<input type="hidden" name="field_preset_forced[]" value="' . $field['settings']['preset_forced'] . '" class="fieldPresetForced" />'.
-         '<input type="hidden" name="field_html_id[]" value="' . $field['settings']['html_id'] . '" class="fieldHtmlId" />'.
-         '<input type="hidden" name="field_html_class[]" value="' . $field['settings']['html_class'] . '" class="fieldHtmlClass" />'.
-         '<input type="hidden" name="field_extra1[]" value="' . $field['settings']['extra1'] . '" class="fieldExtra1" />'.
-         '<input type="hidden" name="field_extra2[]" value="' . $field['settings']['extra2'] . '" class="fieldExtra2" />'
+         '<input type="hidden" name="field_html_id[]" value="' . htmlentities($field['settings']['html_id']) . '" class="fieldHtmlId" />'.
+         '<input type="hidden" name="field_html_class[]" value="' . htmlentities($field['settings']['html_class']) . '" class="fieldHtmlClass" />'.
+         '<input type="hidden" name="field_extra1[]" value="' . htmlentities($field['settings']['extra1']) . '" class="fieldExtra1" />'.
+         '<input type="hidden" name="field_extra2[]" value="' . htmlentities($field['settings']['extra2']) . '" class="fieldExtra2" />'
          ;
 }
 
@@ -158,8 +158,8 @@ function print_hidden($field)
         <div class="field-modifications">
             <div class="action-group">
                 <div class="form-fields">
-                    <label for="field_id">Select field to add</label>&nbsp;
-                    <?php echo form_dropdown('add_field_id', $field_options); ?>
+                    <label for="add_item">Add item</label>&nbsp;
+                    <?php echo form_dropdown('add_item', $add_item_options, Proform_mcp::NONE, 'id="add_item"'); ?>
                 </div>
                 &nbsp; <input type="submit" class="submit btn-main" name="add_field" value="Add" />
             </div>

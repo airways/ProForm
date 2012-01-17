@@ -34,19 +34,25 @@ require_once PATH_THIRD.'prolib/prolib.php';
 require_once PATH_THIRD.'proform/libraries/formslib.php';
 require_once PATH_THIRD.'proform/config.php';
 
-define('ACTION_BASE', BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP);
+if(!defined('ACTION_BASE'))
+{
+    define('ACTION_BASE', BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP);
+}
 
 class Proform_mcp {
     
     var $pipe_length = 1;
     var $perpage = 10;
     
+    const NONE = 0;
+    const ITEM_SEPARATOR_1 = -2;
+    const ITEM_SEPARATOR_2 = -3;
+    const ITEM_NEW_FIELD = -1;
+    const ITEM_HEADING = -10;
+    
     function Proform_mcp()
     {
-        //$this->EE = &get_instance();
         prolib($this, 'proform');
-        
-        //define('TAB_ACTION', BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP);
         
         $this->EE->cp->set_right_nav(array(
                 'home' => TAB_ACTION,
@@ -69,6 +75,7 @@ class Proform_mcp {
             'list'          => 'List',
             'mailinglist'   => 'Mailing List Subscription',
             'hidden'        => 'Hidden',
+            'secure'        => 'Secure Hidden',
             'member_data'   => 'Member Data',
         );
         
@@ -427,7 +434,7 @@ class Proform_mcp {
         $extra = array('after' => array());
         
         if($form_obj->form_type == 'form')
-            $extra['after']['reply_to_address'] = array(array('heading' => lang('notification_list_name')));
+            $extra['after']['reply_to_name'] = array(array('heading' => lang('notification_list_name')));
         if($form_obj->form_type == 'form' OR $form_obj->form_type == 'share')
             $extra['after']['reply_to_field'] = array(array('heading' => lang('field_submitter_notification_name')));
         if($form_obj->form_type == 'form' OR $form_obj->form_type == 'share')
@@ -481,17 +488,20 @@ class Proform_mcp {
         $vars['special_options'] = array('step' => 'Step');
 
         // list available fields to add to the form
-        $vars['field_options'] = array();
-        $vars['field_options'][0] = "Select a field";
+        $vars['add_item_options'] = array();
+        $vars['add_item_options'][Proform_mcp::NONE] = "Select an item";
+        $vars['add_item_options'][Proform_mcp::ITEM_SEPARATOR_1] = "-";
         foreach($this->EE->formslib->get_fields() as $field) 
         {
             // don't show fields that are already on the form
             if(!$form OR !array_key_exists($field->field_name, $form->fields())) 
             {
-                $vars['field_options'][$field->field_id] = $field->field_label . ' (' . $field->field_name . ')';
+                $vars['add_item_options'][$field->field_id] = $field->field_label . ' (' . $field->field_name . ')';
             }
         }
-        $vars['field_options'][-1] = "New Field";
+        $vars['add_item_options'][Proform_mcp::ITEM_SEPARATOR_2] = "-";
+        $vars['add_item_options'][Proform_mcp::ITEM_NEW_FIELD] = "New Field";
+        //$vars['add_item_options'][Proform_mcp::ITEM_HEADING] = "New Heading";
         
         ////////////////////////////////////////
         // Generate table of fields
@@ -541,6 +551,8 @@ class Proform_mcp {
         $this->EE->load->library('table');
 
         $this->_get_flashdata($vars);
+        $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/edit_form.js"></script>');
+        $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/edit_form_layout.js"></script>');
         return $this->EE->load->view('edit_form', $vars, TRUE);
     }
     
@@ -585,20 +597,32 @@ class Proform_mcp {
         }
         
         // process adding a field
-        $field_id = trim($this->EE->input->get_post('add_field_id'));
-        if(is_numeric($field_id) && $field_id != 0) 
+        $add_item = trim($this->EE->input->get_post('add_item'));
+        if($add_item != Proform_mcp::NONE)
         {
-            if($field_id == -1)
+            if(is_numeric($add_item) && ($add_item == Proform_mcp::ITEM_NEW_FIELD || $add_item >= 1)) 
             {
-                $this->EE->functions->redirect(ACTION_BASE.AMP.'method=new_field'.AMP.'auto_add_form_id='.$form_id);
-            } else {
-                $field = $this->EE->formslib->get_field($field_id);
-                if($field)
+                $field_id = $add_item;
+                if($field_id == -1)
                 {
-                    $form->assign_field($field);
-                    $this->EE->session->set_flashdata('message', lang('msg_field_added'));
+                    $this->EE->functions->redirect(ACTION_BASE.AMP.'method=new_field'.AMP.'auto_add_form_id='.$form_id);
                 } else {
-                    show_error(lang('invalid_field_id'));
+                    $field = $this->EE->formslib->get_field($field_id);
+                    if($field)
+                    {
+                        $form->assign_field($field);
+                        $this->EE->session->set_flashdata('message', lang('msg_field_added'));
+                    } else {
+                        show_error(lang('invalid_field_id'));
+                    }
+                }
+            } else {
+                // Add special item
+                switch($add_item)
+                {
+                    case Proform_mcp::ITEM_HEADING:
+                    
+                        break;
                 }
             }
         }
@@ -720,13 +744,13 @@ class Proform_mcp {
             $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=remove_field';
             
             // list available fields to add to the form
-            $vars['field_options'] = array();  
+            $vars['add_item_options'] = array();  
             foreach($this->EE->formslib->get_fields() as $field) 
             {
                 // don't show fields that are already on the form
                 if(!array_key_exists($field->field_name, $form->fields())) 
                 {
-                    $vars['field_options'][$field->field_id] = $field->field_name;
+                    $vars['add_item_options'][$field->field_id] = $field->field_name;
                 }
             }
             
@@ -970,6 +994,7 @@ class Proform_mcp {
         $vars['hidden_fields'] = array('field_id', 'settings');
         
         $this->EE->load->library('table');
+        $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/edit_field.js"></script>');
         return $this->EE->load->view('generic_edit', $vars, TRUE);
     }
     
@@ -1113,12 +1138,12 @@ class Proform_mcp {
 
         ////////////////////////////////////////
         // Table Headings
-        $vars['hidden_columns'] = array("updated", "ip_address", "user_agent", "dst_enabled");
+        $vars['hidden_columns'] = array("ip_address", "user_agent", "dst_enabled");
         
-        $headings = array('ID');
+        $headings = array('ID', 'Last Updated');
         $fields = $form->fields();
 
-        $vars['fields'] = array();
+        $vars['fields'] = array('updated');
         
         foreach($fields as $field)
         {
