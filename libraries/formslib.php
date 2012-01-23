@@ -49,18 +49,35 @@ class Formslib
         'from_name' => '',
         'reply_to_address' => '',
         'reply_to_name' => '',
+        'allow_encrypted_forms' => '',
+
     );
 
     function Formslib()
     {
         prolib($this, "proform");
         
+        // If there are already any encrypted forms, then we will default the option to allow encryption
+        // to on. This option was not available in previous versions, where encryption was always
+        // available. Since it is often not implemented correctly, we are now turning off the option
+        // by default - unless they already have encrypted forms setup in the system.
+        $query = $this->EE->db->select('*')
+                              ->where('encryption_on', 'y')
+                              ->get('proform_forms');
+        
+        if($query->num_rows() > 0)
+        {
+            $this->default_prefs['allow_encrypted_forms'] = 'y';
+        }
+        
+        // Initialize the preferences manager. This will set default preferences for us according to
+        // what we have in the $default_prefs array on this object.
         $this->prefs_mgr = new Bm_prefs("proform_preferences", FALSE, $this->default_prefs);
         
+        // Caching can cause issues with schema manipulation, so we need to turn it off.
         $this->EE->db->cache_off();
         
-        //$this->session_mgr = new Bm_handle_mgr("proform_sessions", "session", "BM_FormSession", array('values', 'errors'));
-    }
+    } // function Formslib()
     
     function new_form($data) 
     {

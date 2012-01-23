@@ -145,6 +145,8 @@ $lang = array(
     'field_mailinglist_id' => 'Mailing List',
     'field_reply_to_field' => 'Reply-To Field',
     'field_reply_to_field_desc' => 'Field on the form containing the email address to set as this notification\'s Reply-To',
+    'field_allow_encrypted_forms' => 'Allow Form Encryption',
+    'field_allow_encrypted_forms_desc' => 'Allows the option to encrypt data stored for a form in the database to be used. This option is not recommended for most users.',
     
     'field_submitter_notification_name' => 'Notification Field Settings - A',
     'field_submitter_notification_on' => 'Enable Group',

@@ -43,13 +43,13 @@ class Proform_install
     {
         prolib($this, "proform");
         
-    }
+    } // function Proform_install()
     
     function is_installed()
     {
         return $this->EE->db->where(array('module_name' => PROFORM_CLASS))
                             ->get('modules');
-    }
+    } // function is_installed()
     
     function install()
     {
@@ -95,7 +95,6 @@ class Proform_install
 
     function create_tables()
     {
-        
         ////////////////////////////////////////
         // Tables
         // These are the core tables for the forms module - other tables are created when forms are created
@@ -107,30 +106,30 @@ class Proform_install
             'form_id'                           => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE, 'auto_increment' => TRUE),
             'form_label'                        => array('type' => 'varchar', 'constraint' => '250'),
             'form_name'                         => array('type' => 'varchar', 'constraint' => '32'),
-            'form_type'                         => array('type' => 'varchar', 'constraint' => '10', 'default' => 'form'),
-            'encryption_on'                     => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'),
-            'safecracker_channel_id'            => array('type' => 'int', 'constraint' => '10', 'default' => 0),
-            'reply_to_address'                  => array('type' => 'varchar', 'constraint' => '32'),
-            'reply_to_name'                     => array('type' => 'varchar', 'constraint' => '32'),
-            'settings'                          => array('type' => 'blob'),
+            'form_type'                         => array('type' => 'varchar', 'constraint' => '10',     'default' => 'form'),
+            'encryption_on'                     => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
+            'safecracker_channel_id'            => array('type' => 'int', 'constraint' => '10',         'default' => 0),
+            'reply_to_address'                  => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
+            'reply_to_name'                     => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
+            'settings'                          => array('type' => 'blob',                              'default' => ''),
             
-            'admin_notification_on'             => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'),
-            'notification_template'             => array('type' => 'varchar', 'constraint' => '50'),
-            'notification_list'                 => array('type' => 'text'),
-            'subject'                           => array('type' => 'varchar', 'constraint' => '128'),
-            'reply_to_field'                    => array('type' => 'varchar', 'constraint' => '32'),
+            'admin_notification_on'             => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
+            'notification_template'             => array('type' => 'varchar', 'constraint' => '50',     'default' => ''),
+            'notification_list'                 => array('type' => 'text',                              'default' => ''),
+            'subject'                           => array('type' => 'varchar', 'constraint' => '128',    'default' => ''),
+            'reply_to_field'                    => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
 
-            'submitter_notification_on'         => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'),
-            'submitter_notification_template'   => array('type' => 'varchar', 'constraint' => '50'),
-            'submitter_notification_subject'    => array('type' => 'varchar', 'constraint' => '128'),
-            'submitter_email_field'             => array('type' => 'varchar', 'constraint' => '32'),
-            'submitter_reply_to_field'          => array('type' => 'varchar', 'constraint' => '32'),
+            'submitter_notification_on'         => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
+            'submitter_notification_template'   => array('type' => 'varchar', 'constraint' => '50',     'default' => ''),
+            'submitter_notification_subject'    => array('type' => 'varchar', 'constraint' => '128',    'default' => ''),
+            'submitter_email_field'             => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
+            'submitter_reply_to_field'          => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
 
-            'share_notification_on'             => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'),
-            'share_notification_template'       => array('type' => 'varchar', 'constraint' => '50'),
-            'share_notification_subject'        => array('type' => 'varchar', 'constraint' => '128'),
-            'share_email_field'                 => array('type' => 'varchar', 'constraint' => '32'),
-            'share_reply_to_field'              => array('type' => 'varchar', 'constraint' => '32'),
+            'share_notification_on'             => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
+            'share_notification_template'       => array('type' => 'varchar', 'constraint' => '50',     'default' => ''),
+            'share_notification_subject'        => array('type' => 'varchar', 'constraint' => '128',    'default' => ''),
+            'share_email_field'                 => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
+            'share_reply_to_field'              => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
             
         );
         $forge->add_field($fields);
@@ -192,7 +191,8 @@ class Proform_install
         $forge->add_key('preference_id', TRUE);
         $forge->add_key('preference_name');
         $forge->create_table('proform_preferences');
-    }
+    } // function create_tables()
+
     function uninstall()
     {
         ////////////////////////////////////////
@@ -264,9 +264,9 @@ class Proform_install
             if(!$this->EE->db->field_exists('reply_to_field', 'proform_forms'))
             {
                 $fields = array(
-                    'reply_to_field'            => array('type' => 'varchar', 'constraint' => '32'),
-                    'submitter_reply_to_field'  => array('type' => 'varchar', 'constraint' => '32'),
-                    'share_reply_to_field'      => array('type' => 'varchar', 'constraint' => '32'),
+                    'reply_to_field'            => array('type' => 'varchar', 'constraint' => '32', 'default' => ''),
+                    'submitter_reply_to_field'  => array('type' => 'varchar', 'constraint' => '32', 'default' => ''),
+                    'share_reply_to_field'      => array('type' => 'varchar', 'constraint' => '32', 'default' => ''),
                 );
                 $forge->add_column('proform_forms', $fields);
             }
@@ -275,7 +275,7 @@ class Proform_install
         if($current < 0.42)
         {
             $fields = array(
-                'reply_to_name'                 => array('type' => 'varchar', 'constraint' => '32'),
+                'reply_to_name'                 => array('type' => 'varchar', 'constraint' => '32', 'default' => ''),
             );
             $forge->add_column('proform_forms', $fields);
         }

@@ -958,10 +958,10 @@ class Proform_mcp {
         }
         
         $upload_prefs = $this->EE->bm_uploads->get_upload_prefs();
-        $upload_prefs = array_merge(array(0 => 'None'), $upload_prefs);
+        $upload_prefs[0] = 'None';
         
         $mailinglists = $this->_get_mailinglists();
-        $mailinglists = array_merge(array(0 => 'None'), $mailinglists);
+        $mailinglists[0] = 'None';
         
         $validation_rules = $this->EE->bm_validation->available_rules; 
         
