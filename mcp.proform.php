@@ -491,15 +491,20 @@ class Proform_mcp {
         $vars['add_item_options'] = array();
         $vars['add_item_options'][Proform_mcp::NONE] = "Select an item";
         $vars['add_item_options'][Proform_mcp::ITEM_SEPARATOR_1] = "-";
+        $field_count = 0;
         foreach($this->EE->formslib->get_fields() as $field) 
         {
             // don't show fields that are already on the form
             if(!$form OR !array_key_exists($field->field_name, $form->fields())) 
             {
                 $vars['add_item_options'][$field->field_id] = $field->field_label . ' (' . $field->field_name . ')';
+                $field_count++;
             }
         }
-        $vars['add_item_options'][Proform_mcp::ITEM_SEPARATOR_2] = "-";
+        if($field_count)
+        {
+            $vars['add_item_options'][Proform_mcp::ITEM_SEPARATOR_2] = "-";
+        }
         $vars['add_item_options'][Proform_mcp::ITEM_NEW_FIELD] = "New Field";
         //$vars['add_item_options'][Proform_mcp::ITEM_HEADING] = "New Heading";
         
