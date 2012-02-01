@@ -1637,20 +1637,7 @@ class Proform {
 
                     if($k == 'list')
                     {
-                        $v = explode("\n", $v);
-                        foreach($v as $q => $r)
-                        {
-                            // Check for Value : Label syntax
-                            $a = explode(':', $r);
-                            if(count($a) > 1)
-                            {
-                                // Remove old index
-                                unset($v[$q]);
-                                
-                                // Add back to array under key value
-                                $v[trim($a[0])] = trim($a[1]);
-                            }
-                        }
+						$v = $field->get_list_options();
                     }
                     $field_array['field_setting_'.$k] = $v;
                 }

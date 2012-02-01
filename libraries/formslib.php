@@ -1164,6 +1164,7 @@ class BM_Field extends BM_RowInitialized
                 }
             }
         }
+
         return $result;
     }
 
