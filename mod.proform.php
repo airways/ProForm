@@ -132,7 +132,7 @@ class Proform {
         $form_obj = $this->EE->formslib->get_form($form_name);
         
         
-        if($_SERVER['REQUEST_METHOD'] == 'POST')
+        if($_SERVER['REQUEST_METHOD'] == 'POST' && $this->input->post('__conf'))
         {
             $form_result = FALSE;
             $this->_copy_post($form_obj, $form_session);
@@ -990,8 +990,14 @@ class Proform {
         $this->EE->load->library('proform_notifications');
 
         // decrypt the form's configuration array
-        $form_config_enc = $this->EE->input->get_post('__conf');
+        $form_config_enc = $this->EE->input->post('__conf');
         $form_config = unserialize($this->EE->encrypt->decode($form_config_enc));
+
+		// make sure the form object data we have is for this form, if not bail
+		if(!isset($form_config['form_name']) || $form_config['form_name'] != $form_obj->form_name || $form_config['form_id'] != $form_obj->form_id)
+		{
+			return $result;
+		}
         
         // find the form
         $form_name = $form_config['form_name'];
@@ -1033,7 +1039,6 @@ class Proform {
             // return any errors to the form template
             if(count($form_session->errors) > 0)
             {
-                
                 return $form_session;
             } else {
 
