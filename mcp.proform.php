@@ -119,10 +119,11 @@ class Proform_mcp {
 
         $this->field_type_settings = array(
             'list' => array(
-                array('type' => 'textarea', 'name' => 'options', 'label' => 'Options')
+				array('type' => 'dropdown', 'name' => 'multiselect', 'label' => 'Allow multiple selections', 'options' => array('' => 'No', 'y' => 'Yes')),
+                array('type' => 'textarea', 'name' => 'list', 'label' => 'Options')
             ),
             'member_data' => array(
-                array('type' => 'dropdown', 'name' => 'member_field', 'label' => 'Field', 
+                array('type' => 'dropdown', 'name' => 'member_data', 'label' => 'Field', 
                       'options' => $this->prolib->bm_forms->simple_select_options($this->member_field_options))
             ),
         );
@@ -991,7 +992,6 @@ class Proform_mcp {
                     'headings'  => array('Rule', 'Param'),
                     'options'   => $validation_rules))
             );
-        
         $form = $this->EE->bm_forms->create_cp_form($field, $types);
         
         $vars['form'] = $form;
@@ -1034,8 +1034,10 @@ class Proform_mcp {
 
         // doing this based on if there is a value, not if the type is set - in case someone picks the
         // wrong type we don't want to lose their settings.
-        if($this->EE->input->post('type_list'))
-            $settings['type_list'] = $this->EE->input->post('type_list');
+        if($this->EE->input->post('type_list')) {
+			$settings['type_list'] = $this->EE->input->post('type_list');
+            $settings['type_multiselect'] = $this->EE->input->post('type_multiselect');
+		}
         if($this->EE->input->post('type_member_data'))
             $settings['type_member_data'] = $this->EE->input->post('type_member_data');
 

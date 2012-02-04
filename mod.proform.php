@@ -132,7 +132,7 @@ class Proform {
         $form_obj = $this->EE->formslib->get_form($form_name);
         
         
-        if($_SERVER['REQUEST_METHOD'] == 'POST' && $this->input->post('__conf'))
+        if($_SERVER['REQUEST_METHOD'] == 'POST' && $this->EE->input->post('__conf'))
         {
             $form_result = FALSE;
             $this->_copy_post($form_obj, $form_session);
@@ -331,13 +331,13 @@ class Proform {
                     }
                 }
                 
-                /*if($form_session)
-                {
-                    echo "field_values";
-                    var_dump($field_values);
-                    echo "field_checked_flags";
-                    var_dump($field_checked_flags);
-                }*/
+                // if($form_session)
+                // {
+                //     echo "field_values";
+                //     var_dump($field_values);
+                //     echo "field_checked_flags";
+                //     var_dump($field_checked_flags);
+                // }
                 
                 if(isset($form_session->errors['captcha']))
                 {
@@ -943,7 +943,6 @@ class Proform {
                     // force checkboxes to store "y" or "n"
                     if($field->type == 'checkbox' || $field->type == 'mailinglist')
                     {
-                        
                         $value = $value ? 'y' : 'n';
                         #echo "{$field->field_name} value = $value<br/>";
                     }
@@ -994,7 +993,7 @@ class Proform {
         $form_config = unserialize($this->EE->encrypt->decode($form_config_enc));
 
 		// make sure the form object data we have is for this form, if not bail
-		if(!isset($form_config['form_name']) || $form_config['form_name'] != $form_obj->form_name || $form_config['form_id'] != $form_obj->form_id)
+		if(!isset($form_config['form_name']) || $form_config['form_name'] != $form_obj->form_name)
 		{
 			return $result;
 		}
@@ -1295,12 +1294,29 @@ class Proform {
             {
                 // Check that the value submitted is one of the available options
                 $options = $field->get_list_options();
-                $valid = array_key_exists($data[$field->field_name], $options);
+
+				if(!isset($field->settings['type_multiselect']) || !$field->settings['type_multiselect'])
+				{
+					$multi = FALSE;
+                	$valid = array_key_exists($data[$field->field_name], $options);
+				} else {
+					$multi = TRUE;
+					if(!is_array($data[$field->field_name]))
+					{
+						$data[$field->field_name] = array($data[$field->field_name]);
+					}
+					$valid = TRUE;
+					foreach($data[$field->field_name] as $selected_option) {
+						$valid &= array_key_exists($selected_option, $options);
+						if(!$valid) break;
+					}
+				}
                 
-                if(!$valid)
+				if(!$valid)
                 {
-                    $form_session->add_error($field->field_name, 'Value for '.htmlentities($field->field_name).' is not amongst options presented.');
+                   	$form_session->add_error($field->field_name, ($multi ? 'One of the values for' : 'The value for ').htmlentities($field->field_name).' is not a valid choice.');
                 }
+
             }
             
             if($field->type != 'file')
@@ -1441,8 +1457,16 @@ class Proform {
                 $this->prolib->debug($save_data);
                 // */
             }
-        
-            
+        	
+			// collapse multiselect options and other array values to a single string
+            foreach($save_data as $k => $v)
+			{
+				if(is_array($v))
+				{
+					$save_data[$k] = implode("|", $v);
+				}
+			}
+			
             if(!$result = $this->EE->db->insert($form_obj->table_name(), $save_data))
             {
                 show_error("{exp:proform:form} could not insert into form: ".$form_obj->form_name);
@@ -1648,12 +1672,12 @@ class Proform {
                 }
             }            
             
-            /*if($field_array['field_type'] == 'list')
-            {
-                var_dump($field_array);
-                var_dump($field);
-                exit;
-            }*/
+            // if($field_array['field_type'] == 'list')
+            // {
+            //     var_dump($field_array);
+            //     var_dump($field);
+            //     exit;
+            // }
 
             if(array_key_exists($field->field_name, $field_errors))
             {
