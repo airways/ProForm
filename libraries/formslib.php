@@ -976,7 +976,6 @@ class BM_Form extends BM_RowInitialized {
             // update assignment saved field_name so this will work next time
             $data  = array(
                 'field_name' => $field->field_name,
-                'is_required' => $is_required
             );
             $this->__EE->db->update('exp_proform_form_fields', $data, array('form_id' => $this->form_id, 'field_id' => $field->field_id));
         }
@@ -984,6 +983,21 @@ class BM_Form extends BM_RowInitialized {
         // trigger refresh on next request for field list
         $this->__fields = FALSE;
     } // function assign_field()
+
+
+	function set_field_required($field, $is_required='y')
+	{
+		// check if the field is already associated with the form
+        $query = $this->__EE->db->get_where('exp_proform_form_fields', array('form_id' => $this->form_id, 'field_id' => $field->field_id));
+
+        if($query->num_rows() > 0)
+        {
+			$data  = array(
+                'is_required' => $is_required,
+            );
+            $this->__EE->db->update('exp_proform_form_fields', $data, array('form_id' => $this->form_id, 'field_id' => $field->field_id));
+        }
+	}
     
     /*
     function update_preset($field, $preset_value, $preset_forced)

@@ -585,7 +585,7 @@ class Proform_mcp {
             {
                 $is_required = $this->EE->input->post('required_'.$field->field_name);
                 if($is_required != 'y') $is_required = 'n';
-                $form->assign_field($field, $is_required);
+                $form->set_field_required($field, $is_required);
             }
             
             $form->set_layout($field_order, $this->EE->input->post('field_row'));
