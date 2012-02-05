@@ -1159,8 +1159,10 @@ class BM_Field extends BM_RowInitialized
         }
     }
     
-    function get_list_options()
+    function get_list_options($selected_items=array())
     {
+		if(!is_array($selected_items)) $selected_items = array($selected_items);
+		
         $result = array();
         
         if(array_key_exists('type_list', $this->settings))
@@ -1171,14 +1173,25 @@ class BM_Field extends BM_RowInitialized
             {
                 if(strpos($option, ':') !== FALSE)
                 {
-                    $option = explode(':', $option);
-                    $result[trim($option[0])] = trim($option[1]);
+					$option = explode(':', $option);
+                    $key = trim($option[0]);
+                    $option = trim($option[1]);
                 } else {
-                    $result[$option] = $option;
-                }
+					$option = trim($option);
+					$key = $option;
+				}
+				
+				$selected = array_search($key, $selected_items) !== FALSE ? ' selected="selected" ' : '';
+
+				$result[] = array(
+					'key' => $key,
+					'row' => $option,
+					'option' => $option,
+					'selected' => $selected,
+				);
+                //$result[trim($option[0])] = trim($option[1]);
             }
         }
-
         return $result;
     }
 

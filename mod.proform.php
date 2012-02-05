@@ -1666,7 +1666,8 @@ class Proform {
 
                     if($k == 'list')
                     {
-						$v = $field->get_list_options();
+//	var_dump($field_values[$field->field_name]);exit;
+						$v = $field->get_list_options($field_values[$field->field_name]);
                     }
                     $field_array['field_setting_'.$k] = $v;
                 }
