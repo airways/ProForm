@@ -167,6 +167,7 @@ class Proform_install
         
         // Create FORM_FIELDS table
         $fields = array(
+            'form_field_id' => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE, 'auto_increment' => TRUE),
             'field_id'      => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE),
             'form_id'       => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE),
             'field_order'   => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE),
@@ -174,8 +175,10 @@ class Proform_install
             'field_name'    => array('type' => 'varchar', 'constraint' => '32'),
             'is_required'   => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'),
             'form_field_settings'      => array('type' => 'blob'),
+			'heading'		=> array('type' => 'varchar', 'constraint' => 256, 'default' => '')
         );
         $this->EE->dbforge->add_field($fields);
+        $forge->add_key('form_field_id', TRUE);
         $forge->add_key('field_id');
         $forge->add_key('form_id');
         $forge->create_table('proform_form_fields'); 
@@ -279,6 +282,22 @@ class Proform_install
             );
             $forge->add_column('proform_forms', $fields);
         }
+
+		if($current < 0.44)
+		{
+			$fields = array(
+				'heading' => array('type' => 'varchar', 'constraint' => 256, 'default' => '')
+			);
+            $forge->add_column('proform_form_fields', $fields);
+		}
+		
+		if($current < 0.45)
+		{
+			// Forge doesn't seem to be able to add a column and key at the same time, which you must do when adding a AUTO_INCREMENT to an
+			// existing table, so we need to do this in SQL:
+			$this->EE->db->query('ALTER TABLE `exp_proform_form_fields` ADD `form_field_id` int(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY');
+		}
+
 
         return TRUE;
     } // function update

@@ -102,6 +102,7 @@ $lang = array(
     'tab_list_templates' => 'List Templates',
     'tab_new_template' => 'New Template',
     'tab_delete_template' => 'Delete Template',
+	'tab_new_heading' => 'New Heading',
     
     // Fields
     'field_form_name' => 'Form Short Name',
@@ -251,7 +252,11 @@ $lang = array(
     'msg_field_deleted' => 'Field successfully deleted',
     'msg_field_added' => 'Field successfully added to the form',
     'msg_field_removed' => 'Field successfully removed from the form',
-    
+
+
+	'msg_heading_added' => 'New heading successfully added to the form',
+	'msg_heading_edited'=> 'Heading successfully edited',
+
     // End
     '' => ''
     

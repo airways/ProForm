@@ -160,12 +160,16 @@ class Formslib
             $query = $this->EE->db->get_where('proform_forms', array('form_name' => $form_name));
         }
         
-        if($form && is_object($form) && !$form->form_type)
-        {
-            $form->form_type = 'form';
-        }
+		if($form && is_object($form))
+		{
+        	if(!$form->form_type)
+        	{
+            	$form->form_type = 'form';
+			}
+
+       		$form->__original_name = $form->form_name;
+		}
         
-        $form->__original_name = $form->form_name;
         
         return $form;
     } // function get_form()
@@ -609,18 +613,33 @@ class BM_Form extends BM_RowInitialized {
         if(!$this->__fields) 
         {
             $this->__fields = array();
-            $query = $this->__EE->db->query('SELECT * FROM exp_proform_fields JOIN exp_proform_form_fields ON exp_proform_fields.field_id = exp_proform_form_fields.field_id WHERE exp_proform_form_fields.form_id = ' . ((int)$this->form_id) . ' ORDER BY exp_proform_form_fields.field_order');
+            $query = $this->__EE->db->query('SELECT * FROM exp_proform_fields RIGHT JOIN exp_proform_form_fields ON exp_proform_fields.field_id = exp_proform_form_fields.field_id WHERE exp_proform_form_fields.form_id = ' . ((int)$this->form_id) . ' ORDER BY exp_proform_form_fields.field_order');
             if($query->num_rows > 0) 
             {
                 foreach($query->result() as $row) 
                 {
-                    $this->__fields[$row->field_name] = new BM_Field($row);
-                    if(isset($this->__fields[$row->field_name]->settings))
-                        $this->__fields[$row->field_name]->settings = unserialize($this->__fields[$row->field_name]->settings);
-                    else
-                        $this->__fields[$row->field_name]->settings = array();
+					$this->__fields[$row->field_name] = new BM_Field($row);
+					
+					if($row->field_id)
+					{
+	                    if(isset($this->__fields[$row->field_name]->settings))
+	                        $this->__fields[$row->field_name]->settings = unserialize($this->__fields[$row->field_name]->settings);
+	                    else
+	                        $this->__fields[$row->field_name]->settings = array();
                     
-                    $this->__fields[$row->field_name]->form_field_settings = $this->get_form_field_settings($row->form_field_settings);
+	                    $this->__fields[$row->field_name]->form_field_settings = $this->get_form_field_settings($row->form_field_settings);
+					} else {
+						$this->__fields[$row->field_name]->settings = array();
+						$this->__fields[$row->field_name]->form_field_settings = array(
+							'label' => '',
+							'preset_value' => '',
+							'preset_forced' => '',
+							'html_id' => '',
+							'html_class' => '',
+							'extra1' => '',
+							'extra2' => '',
+						);
+					}
                 }
             }
         }
@@ -642,14 +661,16 @@ class BM_Form extends BM_RowInitialized {
         return $settings;
     }
     
-    function set_layout($field_order, $field_rows)
+    function set_layout($field_order, $field_rows, $form_field_id)
     {
-        $i = 1;
+        $i = 0;
         foreach($field_order as $field_id)
         {
-            $field_row = (int)$field_rows[$i-1];
-            $this->__EE->db->query($sql = "UPDATE exp_proform_form_fields SET field_order = $i, field_row = $field_row WHERE form_id = {$this->form_id} AND field_id = $field_id");
-            $i ++;
+			$data = array('field_order' => $i+1, 'field_row' => $field_rows[$i]);
+			$where = array('form_id' => $this->form_id, 'form_field_id' => $form_field_id[$i]);
+			$this->__EE->db->where($where)->update('exp_proform_form_fields', $data);
+			
+            $i++;
         }
     }
     
@@ -999,6 +1020,56 @@ class BM_Form extends BM_RowInitialized {
         }
 	}
     
+    function add_heading($heading) 
+    {
+	    // get last field_order value so we can add the new field at the end
+        $max = $this->__EE->db->query($sql = 'SELECT MAX(field_order) AS field_order, MAX(field_row) AS field_row FROM exp_proform_form_fields WHERE form_id = '.intval($this->form_id));
+        $field_order = $max->row()->field_order + 1;
+        $field_row = $max->row()->field_row + 1;
+        
+        // associate the field with the form
+        $data  = array(
+            'form_id'       => $this->form_id,
+            'field_id'      => -1,
+            'field_name'    => '',
+            'is_required'   => FALSE,
+            'field_order'   => $field_order,
+            'field_row'     => $field_row,
+			'heading'		=> $heading,
+        );
+        
+        $this->__EE->db->insert('exp_proform_form_fields', $data);
+
+		// trigger refresh on next request for field list
+        $this->__fields = FALSE;
+	}
+	
+	function update_heading($form_field_id, $heading) 
+    {
+		$data = array(
+			'heading' => $heading
+		);
+		$this->__EE->db->update('exp_proform_form_fields', $data, array('form_field_id' => $form_field_id));
+	}
+	
+	function remove_heading($form_field_id) 
+    {
+		$this->__EE->db->delete('exp_proform_form_fields', array('form_field_id' => $form_field_id));
+	}
+	
+	function get_heading($form_field_id) 
+    {
+		$query = $this->__EE->db->where(array('form_field_id' => $form_field_id))->get('exp_proform_form_fields');
+		if($query->num_rows() > 0)
+		{
+			return $query->row()->heading;
+		} else {
+			return '';
+		}
+	}
+	
+	
+
     /*
     function update_preset($field, $preset_value, $preset_forced)
     {
@@ -1105,6 +1176,7 @@ class BM_Field extends BM_RowInitialized
         )
     );
 
+	var $form_field_id = FALSE;
     var $field_id = FALSE;
     var $field_label = FALSE;
     var $field_name = FALSE;
@@ -1114,6 +1186,7 @@ class BM_Field extends BM_RowInitialized
     var $upload_pref_id = FALSE;
     var $mailinglist_id = FALSE;
     var $settings = array();
+	var $headomg = FALSE;
     
     function save()
     {
