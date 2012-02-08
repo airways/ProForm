@@ -160,15 +160,15 @@ class Formslib
             $query = $this->EE->db->get_where('proform_forms', array('form_name' => $form_name));
         }
         
-		if($form && is_object($form))
-		{
-        	if(!$form->form_type)
-        	{
-            	$form->form_type = 'form';
-			}
+        if($form && is_object($form))
+        {
+            if(!$form->form_type)
+            {
+                $form->form_type = 'form';
+            }
 
-       		$form->__original_name = $form->form_name;
-		}
+            $form->__original_name = $form->form_name;
+        }
         
         
         return $form;
@@ -618,28 +618,28 @@ class BM_Form extends BM_RowInitialized {
             {
                 foreach($query->result() as $row) 
                 {
-					$this->__fields[$row->field_name] = new BM_Field($row);
-					
-					if($row->field_id)
-					{
-	                    if(isset($this->__fields[$row->field_name]->settings))
-	                        $this->__fields[$row->field_name]->settings = unserialize($this->__fields[$row->field_name]->settings);
-	                    else
-	                        $this->__fields[$row->field_name]->settings = array();
+                    $this->__fields[$row->field_name] = new BM_Field($row);
                     
-	                    $this->__fields[$row->field_name]->form_field_settings = $this->get_form_field_settings($row->form_field_settings);
-					} else {
-						$this->__fields[$row->field_name]->settings = array();
-						$this->__fields[$row->field_name]->form_field_settings = array(
-							'label' => '',
-							'preset_value' => '',
-							'preset_forced' => '',
-							'html_id' => '',
-							'html_class' => '',
-							'extra1' => '',
-							'extra2' => '',
-						);
-					}
+                    if($row->field_id)
+                    {
+                        if(isset($this->__fields[$row->field_name]->settings))
+                            $this->__fields[$row->field_name]->settings = unserialize($this->__fields[$row->field_name]->settings);
+                        else
+                            $this->__fields[$row->field_name]->settings = array();
+                    
+                        $this->__fields[$row->field_name]->form_field_settings = $this->get_form_field_settings($row->form_field_settings);
+                    } else {
+                        $this->__fields[$row->field_name]->settings = array();
+                        $this->__fields[$row->field_name]->form_field_settings = array(
+                            'label' => '',
+                            'preset_value' => '',
+                            'preset_forced' => '',
+                            'html_id' => '',
+                            'html_class' => '',
+                            'extra1' => '',
+                            'extra2' => '',
+                        );
+                    }
                 }
             }
         }
@@ -666,10 +666,10 @@ class BM_Form extends BM_RowInitialized {
         $i = 0;
         foreach($field_order as $field_id)
         {
-			$data = array('field_order' => $i+1, 'field_row' => $field_rows[$i]);
-			$where = array('form_id' => $this->form_id, 'form_field_id' => $form_field_id[$i]);
-			$this->__EE->db->where($where)->update('exp_proform_form_fields', $data);
-			
+            $data = array('field_order' => $i+1, 'field_row' => $field_rows[$i]);
+            $where = array('form_id' => $this->form_id, 'form_field_id' => $form_field_id[$i]);
+            $this->__EE->db->where($where)->update('exp_proform_form_fields', $data);
+            
             $i++;
         }
     }
@@ -1006,23 +1006,23 @@ class BM_Form extends BM_RowInitialized {
     } // function assign_field()
 
 
-	function set_field_required($field, $is_required='y')
-	{
-		// check if the field is already associated with the form
+    function set_field_required($field, $is_required='y')
+    {
+        // check if the field is already associated with the form
         $query = $this->__EE->db->get_where('exp_proform_form_fields', array('form_id' => $this->form_id, 'field_id' => $field->field_id));
 
         if($query->num_rows() > 0)
         {
-			$data  = array(
+            $data  = array(
                 'is_required' => $is_required,
             );
             $this->__EE->db->update('exp_proform_form_fields', $data, array('form_id' => $this->form_id, 'field_id' => $field->field_id));
         }
-	}
+    }
     
     function add_heading($heading) 
     {
-	    // get last field_order value so we can add the new field at the end
+        // get last field_order value so we can add the new field at the end
         $max = $this->__EE->db->query($sql = 'SELECT MAX(field_order) AS field_order, MAX(field_row) AS field_row FROM exp_proform_form_fields WHERE form_id = '.intval($this->form_id));
         $field_order = $max->row()->field_order + 1;
         $field_row = $max->row()->field_row + 1;
@@ -1035,40 +1035,40 @@ class BM_Form extends BM_RowInitialized {
             'is_required'   => FALSE,
             'field_order'   => $field_order,
             'field_row'     => $field_row,
-			'heading'		=> $heading,
+            'heading'       => $heading,
         );
         
         $this->__EE->db->insert('exp_proform_form_fields', $data);
 
-		// trigger refresh on next request for field list
+        // trigger refresh on next request for field list
         $this->__fields = FALSE;
-	}
-	
-	function update_heading($form_field_id, $heading) 
+    }
+    
+    function update_heading($form_field_id, $heading) 
     {
-		$data = array(
-			'heading' => $heading
-		);
-		$this->__EE->db->update('exp_proform_form_fields', $data, array('form_field_id' => $form_field_id));
-	}
-	
-	function remove_heading($form_field_id) 
+        $data = array(
+            'heading' => $heading
+        );
+        $this->__EE->db->update('exp_proform_form_fields', $data, array('form_field_id' => $form_field_id));
+    }
+    
+    function remove_heading($form_field_id) 
     {
-		$this->__EE->db->delete('exp_proform_form_fields', array('form_field_id' => $form_field_id));
-	}
-	
-	function get_heading($form_field_id) 
+        $this->__EE->db->delete('exp_proform_form_fields', array('form_field_id' => $form_field_id));
+    }
+    
+    function get_heading($form_field_id) 
     {
-		$query = $this->__EE->db->where(array('form_field_id' => $form_field_id))->get('exp_proform_form_fields');
-		if($query->num_rows() > 0)
-		{
-			return $query->row()->heading;
-		} else {
-			return '';
-		}
-	}
-	
-	
+        $query = $this->__EE->db->where(array('form_field_id' => $form_field_id))->get('exp_proform_form_fields');
+        if($query->num_rows() > 0)
+        {
+            return $query->row()->heading;
+        } else {
+            return '';
+        }
+    }
+    
+    
 
     /*
     function update_preset($field, $preset_value, $preset_forced)
@@ -1176,7 +1176,6 @@ class BM_Field extends BM_RowInitialized
         )
     );
 
-	var $form_field_id = FALSE;
     var $field_id = FALSE;
     var $field_label = FALSE;
     var $field_name = FALSE;
@@ -1186,7 +1185,6 @@ class BM_Field extends BM_RowInitialized
     var $upload_pref_id = FALSE;
     var $mailinglist_id = FALSE;
     var $settings = array();
-	var $headomg = FALSE;
     
     function save()
     {
@@ -1234,8 +1232,8 @@ class BM_Field extends BM_RowInitialized
     
     function get_list_options($selected_items=array())
     {
-		if(!is_array($selected_items)) $selected_items = array($selected_items);
-		
+        if(!is_array($selected_items)) $selected_items = array($selected_items);
+        
         $result = array();
         
         if(array_key_exists('type_list', $this->settings))
@@ -1246,22 +1244,22 @@ class BM_Field extends BM_RowInitialized
             {
                 if(strpos($option, ':') !== FALSE)
                 {
-					$option = explode(':', $option);
+                    $option = explode(':', $option);
                     $key = trim($option[0]);
                     $option = trim($option[1]);
                 } else {
-					$option = trim($option);
-					$key = $option;
-				}
-				
-				$selected = array_search($key, $selected_items) !== FALSE ? ' selected="selected" ' : '';
+                    $option = trim($option);
+                    $key = $option;
+                }
+                
+                $selected = array_search($key, $selected_items) !== FALSE ? ' selected="selected" ' : '';
 
-				$result[] = array(
-					'key' => $key,
-					'row' => $option,
-					'option' => $option,
-					'selected' => $selected,
-				);
+                $result[] = array(
+                    'key' => $key,
+                    'row' => $option,
+                    'option' => $option,
+                    'selected' => $selected,
+                );
                 //$result[trim($option[0])] = trim($option[1]);
             }
         }

@@ -119,7 +119,7 @@ class Proform_mcp {
 
         $this->field_type_settings = array(
             'list' => array(
-				array('type' => 'dropdown', 'name' => 'multiselect', 'label' => 'Allow multiple selections', 'options' => array('' => 'No', 'y' => 'Yes')),
+                array('type' => 'dropdown', 'name' => 'multiselect', 'label' => 'Allow multiple selections', 'options' => array('' => 'No', 'y' => 'Yes')),
                 array('type' => 'textarea', 'name' => 'list', 'label' => 'Options')
             ),
             'member_data' => array(
@@ -135,7 +135,7 @@ class Proform_mcp {
         $this->EE->cp->add_to_head('<link rel="stylesheet" href="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/styles/main.css" type="text/css" media="screen" />');
         $this->EE->cp->add_to_head('<link rel="stylesheet" href="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/styles/jquery.contextMenu.css" type="text/css" media="screen" />');
         $this->EE->cp->add_to_head('<link rel="stylesheet" href="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/styles/screen.css" type="text/css" media="screen" />');
-	
+    
         $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/prolib/javascript/prolib.js"></script>');
 
         $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/jquery.tablednd_0_5.js"></script>');
@@ -520,14 +520,14 @@ class Proform_mcp {
                 $row_array = (array)$field;
                 
                 $row_array['settings']      = array_merge($field->settings, $field->form_field_settings);
-				if($row_array['heading'])
-				{
-					$row_array['edit_link']     = ACTION_BASE.AMP.'method=edit_heading'.AMP.'form_field_id='.$field->form_field_id.AMP.'form_id='.$form->form_id;
-                	$row_array['remove_link']   = ACTION_BASE.AMP.'method=delete_heading'.AMP.'form_field_id='.$field->form_field_id.AMP.'form_id='.$form->form_id;
-				} else {
-                	$row_array['edit_link']     = ACTION_BASE.AMP.'method=edit_field'.AMP.'field_id='.$field->field_id;
-                	$row_array['remove_link']   = ACTION_BASE.AMP.'method=remove_field'.AMP.'form_id='.$form_id.AMP.'field_id='.$field->field_id;
-				}
+                if($row_array['heading'])
+                {
+                    $row_array['edit_link']     = ACTION_BASE.'method=edit_heading'.AMP.'form_field_id='.$field->form_field_id.AMP.'form_id='.$form->form_id;
+                    $row_array['remove_link']   = ACTION_BASE.'method=delete_heading'.AMP.'form_field_id='.$field->form_field_id.AMP.'form_id='.$form->form_id;
+                } else {
+                    $row_array['edit_link']     = ACTION_BASE.'method=edit_field'.AMP.'field_id='.$field->field_id.AMP.'form_id='.$form->form_id;;
+                    $row_array['remove_link']   = ACTION_BASE.'method=remove_field'.AMP.'form_id='.$form_id.AMP.'field_id='.$field->field_id.AMP.'form_id='.$form->form_id;;
+                }
                 $row_array['is_required']   = $field->is_required;
 
                 // Toggle checkbox
@@ -633,7 +633,7 @@ class Proform_mcp {
                 switch($add_item)
                 {
                     case Proform_mcp::ITEM_HEADING:
-                    	$this->EE->functions->redirect(ACTION_BASE.AMP.'method=new_heading'.AMP.'form_id='.$form_id);
+                        $this->EE->functions->redirect(ACTION_BASE.AMP.'method=new_heading'.AMP.'form_id='.$form_id);
                         break;
                 }
             }
@@ -948,6 +948,8 @@ class Proform_mcp {
     {
         $this->EE->load->library('formslib');
         
+        $form_id = (int)$this->EE->input->get('form_id');
+
         if($editing && $this->EE->input->post('field_id') !== FALSE) 
         {
             if($this->process_edit_field()) return;
@@ -955,10 +957,11 @@ class Proform_mcp {
         
         if($editing)
         {
-            $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_field';
+            $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_field'.AMP.'form_id='.$form_id;
             $this->sub_page('tab_edit_field');
         
             $field_id = (int)$this->EE->input->get('field_id');
+
             //$query = $this->EE->db->get_where('proform_fields', array('field_id' => $field_id));
             $field = $this->EE->formslib->get_field($field_id);
         
@@ -1002,7 +1005,7 @@ class Proform_mcp {
         
         $vars['form'] = $form;
         $vars['form_name'] = 'field_edit';
-        $vars['hidden_fields'] = array('field_id', 'settings');
+        $vars['hidden_fields'] = array('field_id', 'settings', 'heading');
         
         $this->EE->load->library('table');
         $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/edit_field.js"></script>');
@@ -1030,6 +1033,8 @@ class Proform_mcp {
         $this->_run_validation('edit_field');
         
         $field_id = $this->EE->input->post('field_id');
+        $form_id = (int)$this->EE->input->get('form_id');
+        
         if(!$field_id || $field_id <= 0) show_error(lang('invalid_field_id'));
         
         // find field
@@ -1041,9 +1046,9 @@ class Proform_mcp {
         // doing this based on if there is a value, not if the type is set - in case someone picks the
         // wrong type we don't want to lose their settings.
         if($this->EE->input->post('type_list')) {
-			$settings['type_list'] = $this->EE->input->post('type_list');
+            $settings['type_list'] = $this->EE->input->post('type_list');
             $settings['type_multiselect'] = $this->EE->input->post('type_multiselect');
-		}
+        }
         if($this->EE->input->post('type_member_data'))
             $settings['type_member_data'] = $this->EE->input->post('type_member_data');
 
@@ -1053,7 +1058,13 @@ class Proform_mcp {
         $field->save();
         
         // go back to form listing
-        $this->EE->functions->redirect(ACTION_BASE.AMP.'method=list_fields');
+        if($form_id)
+        {
+            $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.
+                                                AMP.'form_id='.$form_id.'#tab-content-layout');
+        } else {
+            $this->EE->functions->redirect(ACTION_BASE.AMP.'method=list_fields');
+        }
         return TRUE;
     }
     
@@ -1112,7 +1123,7 @@ class Proform_mcp {
         }
         
         $this->sub_page('tab_new_heading');
-		$vars = array();
+        $vars = array();
         $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_heading';
         $form_id = $this->EE->input->get_post('form_id');
         $vars['hidden'] = array('form_id' => $form_id);
@@ -1128,15 +1139,15 @@ class Proform_mcp {
         // run form validation
         $this->_run_validation('edit_heading');
         
-		$form_id = $this->EE->input->post('form_id');
-		$heading = $this->EE->input->post('heading');
-		
-		$form = $this->EE->formslib->get_form($form_id);
-		
-		if($form && $heading)
-		{
-			$form->add_heading($heading);
-		}
+        $form_id = $this->EE->input->post('form_id');
+        $heading = $this->EE->input->post('heading');
+        
+        $form = $this->EE->formslib->get_form($form_id);
+        
+        if($form && $heading)
+        {
+            $form->add_heading($heading);
+        }
 
         $this->EE->session->set_flashdata('message', lang('msg_heading_added'));
         $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form_id.'#tab-content-layout');
@@ -1153,17 +1164,17 @@ class Proform_mcp {
             if($this->process_edit_heading()) return;
         }
         
-		$form_id = (int)$this->EE->input->get('form_id');
+        $form_id = (int)$this->EE->input->get('form_id');
         $form_field_id = (int)$this->EE->input->get('form_field_id');
-		
+        
         if($editing)
         {
             $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_heading'.AMP.'form_field_id='.$form_field_id.AMP.'form_id='.$form_id;
             $this->sub_page('tab_edit_heading');
         
-			$query = $this->EE->db->where('form_field_id', $form_field_id)->get('exp_proform_form_fields');
+            $query = $this->EE->db->where('form_field_id', $form_field_id)->get('exp_proform_form_fields');
             $row = $query->row();
-			$heading = array('form_field_id' => $row->form_field_id, 'form_id' => $row->form_id, 'heading' => $row->heading);
+            $heading = array('form_field_id' => $row->form_field_id, 'form_id' => $row->form_id, 'heading' => $row->heading);
             $vars['editing'] = TRUE;
         } else {
             $vars['editing'] = FALSE;
@@ -1171,7 +1182,7 @@ class Proform_mcp {
         }
         
         $types = array(
-            'heading'       	=> 'input',
+            'heading'           => 'input',
         );
         $form = $this->EE->bm_forms->create_cp_form($heading, $types);
         
@@ -1190,16 +1201,16 @@ class Proform_mcp {
         // run form validation
         $this->_run_validation('edit_heading');
         
-		$form_id = $this->EE->input->get('form_id');
-		$form_field_id = $this->EE->input->get('form_field_id');
-		$heading = $this->EE->input->post('heading');
-		
-		$form = $this->EE->formslib->get_form($form_id);
-		
-		if($form && $heading)
-		{
-			$form->update_heading($form_field_id, $heading);
-		}
+        $form_id = $this->EE->input->get('form_id');
+        $form_field_id = $this->EE->input->get('form_field_id');
+        $heading = $this->EE->input->post('heading');
+        
+        $form = $this->EE->formslib->get_form($form_id);
+        
+        if($form && $heading)
+        {
+            $form->update_heading($form_field_id, $heading);
+        }
 
         $this->EE->session->set_flashdata('message', lang('msg_heading_edited'));
         $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form_id.'#tab-content-layout');
@@ -1207,9 +1218,9 @@ class Proform_mcp {
         return TRUE;
     }
 
-	function delete_heading()
-	{
-		if($this->EE->input->post('form_field_id') !== FALSE) 
+    function delete_heading()
+    {
+        if($this->EE->input->post('form_field_id') !== FALSE) 
         {
             if($this->process_delete_heading()) return;
         }
@@ -1226,8 +1237,8 @@ class Proform_mcp {
         
         if(is_numeric($form_id) && $form)
         {
-			$heading = $form->get_heading($form_field_id);
-			
+            $heading = $form->get_heading($form_field_id);
+            
             $vars['form_id'] = $form_id;
             $vars['form_name'] = $form->form_name;
             
@@ -1250,11 +1261,11 @@ class Proform_mcp {
             show_error(lang('invalid_form_id_or_field_id') . ' [11]');
             return FALSE;
         }
-	}
-	
-	function process_delete_heading()
-	{
-	 	$vars = array();
+    }
+    
+    function process_delete_heading()
+    {
+        $vars = array();
         $this->sub_page('tab_delete_heading');
         $this->EE->load->library('formslib');
         
@@ -1265,15 +1276,15 @@ class Proform_mcp {
         
         if(is_numeric($form_id) && $form)
         {
-			$form->remove_heading($form_field_id);
-			$this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form_id.'#tab-content-layout');
-		} 
+            $form->remove_heading($form_field_id);
+            $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form_id.'#tab-content-layout');
+        } 
         else 
         {
             show_error(lang('invalid_form_id_or_field_id') . ' [12]');
             return FALSE;
         }
-	}
+    }
     
     function list_entries()
     {
