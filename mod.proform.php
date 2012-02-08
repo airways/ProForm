@@ -893,26 +893,32 @@ class Proform {
     {
         foreach($form_obj->fields() as $field)
         {
-            if(is_object($row))
+            if($field->field_name)
             {
-                $row_vars['value:'.$field->field_name] = $row->{$field->field_name};
-            } elseif(is_array($row)) {
-                $row_vars['value:'.$field->field_name] = $row[$field->field_name];
-            }
+                if(is_object($row))
+                {
+                    $row_vars['value:'.$field->field_name] = $row->{$field->field_name};
+                } elseif(is_array($row)) {
+                    $row_vars['value:'.$field->field_name] = $row[$field->field_name];
+                }
 
-            if($field->type == 'file' && $row_vars['value:'.$field->field_name] != '')
-            {
-                $dir = $this->EE->bm_uploads->get_upload_pref($field->upload_pref_id);
-                $row_vars['value:'.$field->field_name] = $dir->url.$row_vars['value:'.$field->field_name];
+                if($field->type == 'file' && $row_vars['value:'.$field->field_name] != '')
+                {
+                    $dir = $this->EE->bm_uploads->get_upload_pref($field->upload_pref_id);
+                    $row_vars['value:'.$field->field_name] = $dir->url.$row_vars['value:'.$field->field_name];
+                }
             }
         }
 
         // add row data that isn't part of the form
         foreach($row as $key => $value)
         {
-            if(!array_key_exists('value:'.$key, $row_vars))
+            if($key)
             {
-                $row_vars['value:' . $key] = $value;
+                if(!array_key_exists('value:'.$key, $row_vars))
+                {
+                    $row_vars['value:' . $key] = $value;
+                }
             }
         }
     }
@@ -1461,11 +1467,13 @@ class Proform {
 			// collapse multiselect options and other array values to a single string
             foreach($save_data as $k => $v)
 			{
-				if(is_array($v))
-				{
-					$save_data[$k] = implode("|", $v);
-				}
+			    if(is_array($v))
+    			{
+    				$save_data[$k] = implode("|", $v);
+    			}
 			}
+			
+			if(isset($save_data[''])) unset($save_data['']);
 			
             if(!$result = $this->EE->db->insert($form_obj->table_name(), $save_data))
             {
