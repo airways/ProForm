@@ -72,7 +72,7 @@ class Formslib
         
         // Initialize the preferences manager. This will set default preferences for us according to
         // what we have in the $default_prefs array on this object.
-        $this->prefs_mgr = new Bm_prefs("proform_preferences", FALSE, $this->default_prefs);
+        $this->prefs_mgr = new PL_prefs("proform_preferences", FALSE, $this->default_prefs);
         
         // Caching can cause issues with schema manipulation, so we need to turn it off.
         $this->EE->db->cache_off();
@@ -118,7 +118,7 @@ class Formslib
             // var_dump($data);
             //             var_dump($fields);
             //             exit;
-            $forge->create_table(BM_Form::make_table_name($data['form_name']));
+            $forge->create_table(PL_Form::make_table_name($data['form_name']));
         }
         
         $form_obj = $this->get_form($form_name);
@@ -144,7 +144,7 @@ class Formslib
         
         if($query->num_rows > 0) 
         {
-            $form = new BM_Form($query->row());
+            $form = new PL_Form($query->row());
             $form_id = $form->form_id;
             $form_name = $form->form_name;
             
@@ -297,7 +297,7 @@ class Formslib
         
         if($query->num_rows > 0) 
         {
-            $field = new BM_Field($query->row());
+            $field = new PL_Field($query->row());
             $field->settings = unserialize($field->settings);
         }
         
@@ -317,7 +317,7 @@ class Formslib
         {
             foreach($query->result() as $row) 
             {
-                $result[] = new BM_Field($row);
+                $result[] = new PL_Field($row);
             }
         }
         
@@ -385,19 +385,19 @@ class Formslib
      * Session manager interface 
      * ------------------------------------------------------------ */
     function new_session() {
-        return new BM_FormSession;
+        return new PL_FormSession;
     }
 
     /* ------------------------------------------------------------
      * Preferences manager interface 
      *
-     * Wraps the bm_handle_mgr for this module's preference values.
+     * Wraps the PL_handle_mgr for this module's preference values.
      * ------------------------------------------------------------ */
     function new_preference($data) { return $this->prefs_mgr->new_preference($data); }
 
     /**
      * @param  $handle
-     * @return Bm_preference
+     * @return PL_preference
      */
     function get_preference($handle) { return $this->prefs_mgr->get_preference($handle); }
 
@@ -561,8 +561,8 @@ class Formslib
 }
 
 
-if(!class_exists('BM_Form')) {
-class BM_Form extends BM_RowInitialized {
+if(!class_exists('PL_Form')) {
+class PL_Form extends PL_RowInitialized {
     
     var $__fields = FALSE;
     var $__entries = FALSE;
@@ -618,7 +618,7 @@ class BM_Form extends BM_RowInitialized {
             {
                 foreach($query->result() as $row) 
                 {
-                    $this->__fields[$row->field_name] = new BM_Field($row);
+                    $this->__fields[$row->field_name] = new PL_Field($row);
                     
                     if($row->field_id)
                     {
@@ -656,7 +656,7 @@ class BM_Form extends BM_RowInitialized {
         } else {
             $settings = array();
         }
-        $settings = array_merge(BM_Form::$default_form_field_settings, $settings);
+        $settings = array_merge(PL_Form::$default_form_field_settings, $settings);
         
         return $settings;
     }
@@ -847,9 +847,9 @@ class BM_Form extends BM_RowInitialized {
                 $this->__EE->load->dbforge();
                 $forge = &$this->__EE->dbforge;
         
-                if(array_key_exists($field->type, BM_Field::$types['mysql']))
+                if(array_key_exists($field->type, PL_Field::$types['mysql']))
                 {
-                    $typedef = BM_Field::$types['mysql'][$field->type];
+                    $typedef = PL_Field::$types['mysql'][$field->type];
 
                     $fields = array(
                         $field->field_name       => array('type' => $typedef['type'])
@@ -935,7 +935,7 @@ class BM_Form extends BM_RowInitialized {
                 // }
                 // 
                 // // TODO: maybe this should be done when the field is created?
-                // if(!$this->__EE->bm_channel_fields->field_exists($group_id, $field->field_name))
+                // if(!$this->__EE->pl_channel_fields->field_exists($group_id, $field->field_name))
                 // {
                 //     $data = array(
                 //         'field_name' => $field->field_name,
@@ -959,7 +959,7 @@ class BM_Form extends BM_RowInitialized {
                 //         
                 //     );
                 //     
-                //     $custom_field = $this->__EE->bm_channel_fields->new_field($group_id, $data);
+                //     $custom_field = $this->__EE->pl_channel_fields->new_field($group_id, $data);
                 //     
                 //     if(!$custom_field)
                 //     {
@@ -1134,12 +1134,12 @@ class BM_Form extends BM_RowInitialized {
 
     function table_name()
     {
-        return BM_Form::make_table_name($this->form_name);
+        return PL_Form::make_table_name($this->form_name);
     }
     
     function original_table_name()
     {
-        return BM_Form::make_table_name($this->__original_name);
+        return PL_Form::make_table_name($this->__original_name);
     }
     
     function save()
@@ -1150,8 +1150,8 @@ class BM_Form extends BM_RowInitialized {
 }
 }
 
-if(!class_exists('BM_Field')) {
-class BM_Field extends BM_RowInitialized
+if(!class_exists('PL_Field')) {
+class PL_Field extends PL_RowInitialized
 {
     // $types maps internal type names to mysql or other DB types
     
@@ -1269,8 +1269,8 @@ class BM_Field extends BM_RowInitialized
 }
 }
 
-if(!class_exists('BM_FormSession')) {
-class BM_FormSession
+if(!class_exists('PL_FormSession')) {
+class PL_FormSession
 {
     var $values = array();
     var $errors = array();

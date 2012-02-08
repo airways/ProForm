@@ -124,7 +124,7 @@ class Proform_mcp {
             ),
             'member_data' => array(
                 array('type' => 'dropdown', 'name' => 'member_data', 'label' => 'Field', 
-                      'options' => $this->prolib->bm_forms->simple_select_options($this->member_field_options))
+                      'options' => $this->prolib->pl_forms->simple_select_options($this->member_field_options))
             ),
         );
         
@@ -352,7 +352,7 @@ class Proform_mcp {
         $this->_run_validation('edit_form');
         
         $data = array();
-        $this->prolib->copy_post($data, "BM_Form");
+        $this->prolib->copy_post($data, "PL_Form");
         
         // create new form and table
         $this->EE->load->library('formslib');
@@ -397,7 +397,7 @@ class Proform_mcp {
             $form_obj = $form;//$query->row();
         } else {
             $form = FALSE;
-            $form_obj = new BM_Form($form);
+            $form_obj = new PL_Form($form);
             $form_obj->form_type = $vars['new_type'];
             $vars['hidden']['form_type'] = $vars['new_type'];
             $vars['editing'] = FALSE;
@@ -441,7 +441,7 @@ class Proform_mcp {
         if($form_obj->form_type == 'form' OR $form_obj->form_type == 'share')
             $extra['after']['submitter_reply_to_field'] = array(array('heading' => lang('field_share_notification_name')));
         
-        $edit_form = $this->EE->bm_forms->create_cp_form($form_obj, $types, $extra);
+        $edit_form = $this->EE->pl_forms->create_cp_form($form_obj, $types, $extra);
 
         
         $vars['form'] = $edit_form;
@@ -902,7 +902,7 @@ class Proform_mcp {
         $this->_run_validation('edit_field');
         
         $data = array();
-        $this->prolib->copy_post($data, "BM_Field");
+        $this->prolib->copy_post($data, "PL_Field");
         
         // add the field
         $settings = array();
@@ -969,16 +969,16 @@ class Proform_mcp {
             $vars['hidden'] = array('field_id' => $field_id);
         } else {
             $row = FALSE;
-            $field = new BM_Field($row);
+            $field = new PL_Field($row);
         }
         
-        $upload_prefs = $this->EE->bm_uploads->get_upload_prefs();
+        $upload_prefs = $this->EE->pl_uploads->get_upload_prefs();
         $upload_prefs[0] = 'None';
         
         $mailinglists = $this->_get_mailinglists();
         $mailinglists[0] = 'None';
         
-        $validation_rules = $this->EE->bm_validation->available_rules; 
+        $validation_rules = $this->EE->pl_validation->available_rules; 
         
         if(isset($this->config_overrides['validation_rules'])) 
         { 
@@ -1001,7 +1001,7 @@ class Proform_mcp {
                     'headings'  => array('Rule', 'Param'),
                     'options'   => $validation_rules))
             );
-        $form = $this->EE->bm_forms->create_cp_form($field, $types);
+        $form = $this->EE->pl_forms->create_cp_form($field, $types);
         
         $vars['form'] = $form;
         $vars['form_name'] = 'field_edit';
@@ -1184,7 +1184,7 @@ class Proform_mcp {
         $types = array(
             'heading'           => 'input',
         );
-        $form = $this->EE->bm_forms->create_cp_form($heading, $types);
+        $form = $this->EE->pl_forms->create_cp_form($heading, $types);
         
         $vars['form'] = $form;
         $vars['form_name'] = 'heading_edit';
@@ -1399,7 +1399,7 @@ class Proform_mcp {
             $vars['field_names'] = $field_names;
             
             //var_dump($form_obj);
-            $form = $this->EE->bm_forms->create_cp_form($form_obj, $types);
+            $form = $this->EE->pl_forms->create_cp_form($form_obj, $types);
             //var_dump($form);die;
             $vars['form'] = $form;
             
@@ -1586,7 +1586,7 @@ class Proform_mcp {
         }
         $dropdown = form_dropdown('addgridrow_'.$key, $dropdown_options, array(), 'id="'.'addgridrow_'.$key.'"');
         
-        $out .= '<div id="field_'.$key.'" class="bm_grid" data-key="'.$key.'">';
+        $out .= '<div id="field_'.$key.'" class="pl_grid" data-key="'.$key.'">';
         
         $out .= '<table id="gridrow_'.$key.'" class="mainTable" border="0" cellspacing="0" cellpadding="0"><tbody><tr>';
         
@@ -1643,9 +1643,9 @@ class Proform_mcp {
         $out .= '<input type="hidden" name="'.$key.'" value="'.$value.'" />';
         
         $out .= '<script type="text/javascript">';
-        $out .= 'bm_grid.options["'.$key.'"] = ' . json_encode($options) . ';';
-        $out .= 'bm_grid.help["'.$key.'"] = ' . json_encode($help) . ';';
-        $out .= 'bm_grid.data["'.$key.'"] = ' . json_encode($grid) . ';';
+        $out .= 'pl_grid.options["'.$key.'"] = ' . json_encode($options) . ';';
+        $out .= 'pl_grid.help["'.$key.'"] = ' . json_encode($help) . ';';
+        $out .= 'pl_grid.data["'.$key.'"] = ' . json_encode($grid) . ';';
         /*$out .= 'var options = {';
         foreach($options as $option => $opts)
         {
@@ -1659,7 +1659,7 @@ class Proform_mcp {
         }
         $out = substr($out, 0, -1);
         $out .= '};';*/
-        $out .= 'bm_grid.bind_events("'.$key.'", "gridrow_'.$key.'");</script>';
+        $out .= 'pl_grid.bind_events("'.$key.'", "gridrow_'.$key.'");</script>';
         $out .= '</div>';
         
         return $out;

@@ -30,18 +30,18 @@ body {
 	cursor: move;
 }
 
-.bm_commands {
+.pl_commands {
     float: right;
 }
 
-.bm_commands .cp_button {
+.pl_commands .cp_button {
     font-size: 11px !important;
     margin: 0;
     padding: 0;
     text-shadow: none;
 }
 
-.bm_commands #filter_ajax_indicator {
+.pl_commands #filter_ajax_indicator {
     display: none;
 }
 
@@ -82,9 +82,9 @@ th, td {
 /*    padding: 0px !important;*/
 }
 
-/* when wallace is not installed, the bm_commands dive will be outside
+/* when wallace is not installed, the pl_commands dive will be outside
    of the heading, and needs some padding around it */
-.pageContents .bm_commands {
+.pageContents .pl_commands {
     margin: 5px;
 }
 
@@ -130,19 +130,19 @@ table.plain td,
 table.plain tr {
 }
 
-.bm_grid table {
+.pl_grid table {
     border: 1px solid #D0D7DF;
     width: 100%;
 }
 
-.bm_grid table td,
-.bm_grid table td:last-child {
+.pl_grid table td,
+.pl_grid table td:last-child {
     border: 1px solid #D0D7DF !important; /* goddamnit */
     padding: 5px !important;
     
 }
 
-.bm_grid .grid_param {
+.pl_grid .grid_param {
     width: 80%;
 }
 

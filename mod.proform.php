@@ -54,9 +54,9 @@ class Proform {
         $this->EE->db->cache_off();
         
         @session_start();
-        if(!isset($_SESSION['bm_form']))
+        if(!isset($_SESSION['pl_form']))
         {
-            $_SESSION['bm_form'] = array();
+            $_SESSION['pl_form'] = array();
         }
     }
     
@@ -86,9 +86,9 @@ class Proform {
         /*
          * TODO: add license key validation
 
-        if(strlen($this->EE->config->item('bm_form_license')) < 32)
+        if(strlen($this->EE->config->item('pl_form_license')) < 32)
         {
-            echo "bm_form requires a valid bm_form_license value to be set in the config file.";die;
+            echo "pl_form requires a valid pl_form_license value to be set in the config file.";die;
         }*/
         
         // Get params
@@ -114,7 +114,7 @@ class Proform {
         $download_label     = $this->EE->TMPL->fetch_param('download_label',  '');
         $debug              = $this->EE->TMPL->fetch_param('debug',  'false') == 'yes';
         $error_delimiters   = explode('|', $this->EE->TMPL->fetch_param('error_delimiters',  '<div class="error">|</div>'));
-        $error_messages     = $this->EE->bm_parser->fetch_param_group('message');
+        $error_messages     = $this->EE->pl_parser->fetch_param_group('message');
         
         if(count($error_delimiters) != 2)
         {
@@ -145,11 +145,11 @@ class Proform {
             }
         }
         
-        if(isset($_SESSION['bm_form']['thank_you_form']))
+        if(isset($_SESSION['pl_form']['thank_you_form']))
         {
-            if($_SESSION['bm_form']['thank_you_form'] == $form_name)
+            if($_SESSION['pl_form']['thank_you_form'] == $form_name)
             {
-                unset($_SESSION['bm_form']['thank_you_form']);
+                unset($_SESSION['pl_form']['thank_you_form']);
                 $complete = 'yes';
             }
         }
@@ -177,7 +177,7 @@ class Proform {
         }
         $varsets[] = array('get', $get_params);
 
-        $secure = $this->prolib->bm_parser->fetch_param_group('secure');
+        $secure = $this->prolib->pl_parser->fetch_param_group('secure');
         if(!$secure)
         {
             $secure = array();
@@ -319,7 +319,7 @@ class Proform {
                             if(is_array($form_session->errors[$field->field_name]))
                             {
                                 $field_errors[$field->field_name.'_array'] = $form_session->errors[$field->field_name];
-                                $field_errors[$field->field_name] = $this->EE->bm_uploads->implode_errors_array($form_session->errors[$field->field_name]);
+                                $field_errors[$field->field_name] = $this->EE->pl_uploads->implode_errors_array($form_session->errors[$field->field_name]);
                             } else {
                                 $field_errors[$field->field_name.'_array'] = '';
                                 $field_errors[$field->field_name] = $form_session->errors[$field->field_name];
@@ -421,7 +421,7 @@ class Proform {
                 }
                 
                 // Parse variables
-                $form .= $this->EE->bm_parser->parse_variables($tagdata, $variables, $this->var_pairs);
+                $form .= $this->EE->pl_parser->parse_variables($tagdata, $variables, $this->var_pairs);
                 
                 // Close form
                 if($form_obj->form_type == 'form' || $form_obj->form_type == 'share')
@@ -465,13 +465,13 @@ class Proform {
             'fields'        => array(),
         );
         
-        if(isset($_SESSION['bm_form']['thank_you_form'])
-            AND isset($_SESSION['bm_form']['result_session'])
-            AND isset($_SESSION['bm_form']['result_config']))
+        if(isset($_SESSION['pl_form']['thank_you_form'])
+            AND isset($_SESSION['pl_form']['result_session'])
+            AND isset($_SESSION['pl_form']['result_config']))
         {
-            $form_session   = unserialize($_SESSION['bm_form']['result_session']);
-            $form_config    = unserialize($_SESSION['bm_form']['result_config']);
-            $form_name      = $_SESSION['bm_form']['thank_you_form'];
+            $form_session   = unserialize($_SESSION['pl_form']['result_session']);
+            $form_config    = unserialize($_SESSION['pl_form']['result_config']);
+            $form_name      = $_SESSION['pl_form']['thank_you_form'];
             
             //$this->prolib->debug($form_session);
             //$this->prolib->debug($form_config);
@@ -492,7 +492,7 @@ class Proform {
             }
         }
         
-        $this->return_data = $this->EE->bm_parser->parse_variables($this->EE->TMPL->tagdata, $variables, $this->var_pairs);
+        $this->return_data = $this->EE->pl_parser->parse_variables($this->EE->TMPL->tagdata, $variables, $this->var_pairs);
         return $this->return_data;
     }
     
@@ -516,7 +516,7 @@ class Proform {
         $sort           = strtolower($this->EE->TMPL->fetch_param('sort'));
         if($sort != 'asc' AND $sort != 'desc') $sort = 'asc';
 
-        $search = $this->prolib->bm_parser->fetch_param_group('search');
+        $search = $this->prolib->pl_parser->fetch_param_group('search');
         
         // Check required input
         if(!$form_name)
@@ -593,7 +593,7 @@ class Proform {
                         $row_vars = $this->EE->extensions->call('proform_entries_row', $this, $form_obj, $row_vars);
                     }
                     
-                    $rowdata = $this->EE->bm_parser->parse_variables($tagdata, $row_vars, array('fieldrows', 'fields'), 0, array('dst_enabled' => 1));
+                    $rowdata = $this->EE->pl_parser->parse_variables($tagdata, $row_vars, array('fieldrows', 'fields'), 0, array('dst_enabled' => 1));
 
                     $this->return_data .= $rowdata;
                     
@@ -612,7 +612,7 @@ class Proform {
                 //$row_vars['fields'] = $this->create_fields_array($form_obj);
                 $row_vars['fields:count'] = count($row_vars['fields']);
                 
-                $rowdata = $this->EE->bm_parser->parse_variables($tagdata, $row_vars, array('fieldrows', 'fields'));
+                $rowdata = $this->EE->pl_parser->parse_variables($tagdata, $row_vars, array('fieldrows', 'fields'));
                 
                 //echo $rowdata;die;
                 $this->return_data .= $rowdata;
@@ -649,7 +649,7 @@ class Proform {
                 'total_pages'   => $total_pages,
                 'pages'         => $pages
             );
-            $this->paginate_data = $this->EE->bm_parser->parse_variables($this->paginate_data, $pagination_vars, array('pages'));
+            $this->paginate_data = $this->EE->pl_parser->parse_variables($this->paginate_data, $pagination_vars, array('pages'));
             
             if($paginate == 'top')
             {
@@ -827,7 +827,7 @@ class Proform {
                     $row_vars = $this->EE->extensions->call('proform_forms_row', $this, $form_obj, $row_vars);
                 }
                 
-                $rowdata = $this->EE->bm_parser->parse_variables($tagdata, $row_vars, array());
+                $rowdata = $this->EE->pl_parser->parse_variables($tagdata, $row_vars, array());
 
                 $this->return_data .= $rowdata;
                 
@@ -844,7 +844,7 @@ class Proform {
             $row_vars['forms_count'] = 0;
             $row_vars['forms_no_results'] = TRUE;
             
-            $rowdata = $this->EE->bm_parser->parse_variables($tagdata, $row_vars, array());
+            $rowdata = $this->EE->pl_parser->parse_variables($tagdata, $row_vars, array());
             
             $this->return_data .= $rowdata;
         }
@@ -875,7 +875,7 @@ class Proform {
                 'total_pages'   => $total_pages,
                 'pages'         => $pages
             );
-            $this->paginate_data = $this->EE->bm_parser->parse_variables($this->paginate_data, $pagination_vars, array('pages'));
+            $this->paginate_data = $this->EE->pl_parser->parse_variables($this->paginate_data, $pagination_vars, array('pages'));
             
             if($paginate == 'top')
             {
@@ -904,7 +904,7 @@ class Proform {
 
                 if($field->type == 'file' && $row_vars['value:'.$field->field_name] != '')
                 {
-                    $dir = $this->EE->bm_uploads->get_upload_pref($field->upload_pref_id);
+                    $dir = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
                     $row_vars['value:'.$field->field_name] = $dir->url.$row_vars['value:'.$field->field_name];
                 }
             }
@@ -1066,9 +1066,9 @@ class Proform {
                 }
 
                 // Go to thank you URL
-                $_SESSION['bm_form']['thank_you_form'] = $form_name;
-                $_SESSION['bm_form']['result_session'] = serialize($form_session);
-                $_SESSION['bm_form']['result_config'] = serialize($form_config);
+                $_SESSION['pl_form']['thank_you_form'] = $form_name;
+                $_SESSION['pl_form']['result_session'] = serialize($form_session);
+                $_SESSION['pl_form']['result_config'] = serialize($form_config);
                 $this->EE->functions->redirect($form_config['thank_you_url']);
                 
                 $result = TRUE;
@@ -1107,9 +1107,9 @@ class Proform {
                     echo '<b>{exp:proform:form} could not send notifications for form: '.$form_obj->form_name.'</b><p/>';
                     echo $this->EE->proform_notifications->debug;
                     echo '<hr/>';
-                    $this->EE->bm_email->print_debugger();
+                    $this->EE->pl_email->print_debugger();
                     echo '<hr/>';
-                    foreach($this->EE->bm_email->_debug_msg as $row)
+                    foreach($this->EE->pl_email->_debug_msg as $row)
                     {
                         echo $row.'<br/>';
                     }
@@ -1227,7 +1227,7 @@ class Proform {
                         //echo "Previously saved file: " . $form_session->values[$field->field_name];die;
                     } else {
                         // "upload" the file to it's permanent home
-                        $upload_data = $this->EE->bm_uploads->handle_upload($field->upload_pref_id, $field->field_name, $field->is_required == 'y');
+                        $upload_data = $this->EE->pl_uploads->handle_upload($field->upload_pref_id, $field->field_name, $field->is_required == 'y');
                         
                         // default to no file saved
                         $data[$field->field_name] = '';
@@ -1243,9 +1243,9 @@ class Proform {
                             
                             // save the filename in case we get to actually save the form insert this time
                             $data[$field->field_name] = $upload_data['file_name'];
-                        } elseif(count($this->EE->bm_uploads->errors) > 0) {
+                        } elseif(count($this->EE->pl_uploads->errors) > 0) {
                             // if the file wasn't required, there would be no errors in the array
-                            $form_session->add_error($field->field_name, $this->EE->bm_uploads->errors);
+                            $form_session->add_error($field->field_name, $this->EE->pl_uploads->errors);
                         }
                     } // else array_key_exists($field->field_name, $form_session->values) 
                 } // $field->type == 'file'
@@ -1290,7 +1290,7 @@ class Proform {
         }
         
         // override delimiter values from form configuration
-        $this->EE->bm_validation->set_error_delimiters($form_config['error_delimiters'][0], $form_config['error_delimiters'][1]);
+        $this->EE->pl_validation->set_error_delimiters($form_config['error_delimiters'][0], $form_config['error_delimiters'][1]);
         
         // check rules for sanity then pass them on to the validation class
         $validation_rules = array();
@@ -1358,7 +1358,7 @@ class Proform {
                         // $rule[1] is an optional parameter
 
                         // these are the built-in Form_validation provided rules
-                        if(array_key_exists($rule[0], $this->EE->bm_validation->available_rules) !== FALSE)
+                        if(array_key_exists($rule[0], $this->EE->pl_validation->available_rules) !== FALSE)
                         {
                             $checked_rules .= $rule[0];
                         } else {
@@ -1400,17 +1400,17 @@ class Proform {
         }
 
         // send the compiled rules on to the validation class
-        $this->EE->bm_validation->set_rules($validation_rules);
+        $this->EE->pl_validation->set_rules($validation_rules);
 
         // set custom error messages as provided on the form tag
-        $this->EE->bm_validation->set_error_messages($form_config['error_messages']);
+        $this->EE->pl_validation->set_error_messages($form_config['error_messages']);
 
         // run the validation and see if we get any errors to add to the form_session
-        if(!$this->EE->bm_validation->run())
+        if(!$this->EE->pl_validation->run())
         {
             foreach($form_obj->fields() as $field)
             {
-                $field_error = $this->EE->bm_validation->error($field->field_name);
+                $field_error = $this->EE->pl_validation->error($field->field_name);
                 
                 if ($this->EE->extensions->active_hook('proform_validation_field') === TRUE)
                 {
@@ -1692,7 +1692,7 @@ class Proform {
             {
                 if(is_array($field_errors[$field->field_name]))
                 {
-                    $field_array['field_error'] = $this->EE->bm_uploads->implode_errors_array($field_errors[$field->field_name]);
+                    $field_array['field_error'] = $this->EE->pl_uploads->implode_errors_array($field_errors[$field->field_name]);
                 } else {
                     $field_array['field_error'] = $field_errors[$field->field_name];
                 }
@@ -1700,7 +1700,7 @@ class Proform {
 
             if($field->type == 'file' && $field_array['field_value'] != '')
             {
-                $dir = $this->EE->bm_uploads->get_upload_pref($field->upload_pref_id);
+                $dir = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
                 $field_array['field_value'] = $dir->url.$field_array['field_value'];
             }
 

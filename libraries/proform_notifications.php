@@ -41,7 +41,7 @@ class Proform_notifications
 {
     /**
      * Handle manager for accessing template data
-     * @var Bm_handler_mgr
+     * @var PL_handler_mgr
      */
     var $template_mgr;
     var $debug = FALSE;
@@ -50,7 +50,7 @@ class Proform_notifications
     function __construct()
     {
         prolib($this, 'proform');
-        $this->mgr = new Bm_handle_mgr();
+        $this->mgr = new PL_handle_mgr();
 
         /*
          * Get settings
@@ -287,20 +287,20 @@ class Proform_notifications
             $result = TRUE;
             foreach($notification_list as $to_email)
             {
-                $this->EE->bm_email->initialize();
+                $this->EE->pl_email->initialize();
 
                 if($this->default_from_address)
                 {
-                    $this->EE->bm_email->from($this->default_from_address, $this->default_from_name);
+                    $this->EE->pl_email->from($this->default_from_address, $this->default_from_name);
                 }
 
                 if($reply_to)
                 {
                     if($reply_to_name)
                     {
-                        $this->EE->bm_email->reply_to($reply_to, $reply_to_name);
+                        $this->EE->pl_email->reply_to($reply_to, $reply_to_name);
                     } else {
-                        $this->EE->bm_email->reply_to($reply_to);
+                        $this->EE->pl_email->reply_to($reply_to);
                     }
                 } else {
                     // use the form's reply-to email and name if they have been set
@@ -308,32 +308,32 @@ class Proform_notifications
                     {
                         if(trim($form->reply_to_name) != '')
                         {
-                            $this->EE->bm_email->reply_to($form->reply_to_address, $form->reply_to_name);
+                            $this->EE->pl_email->reply_to($form->reply_to_address, $form->reply_to_name);
                         } else {
-                            $this->EE->bm_email->reply_to($form->reply_to_address);
+                            $this->EE->pl_email->reply_to($form->reply_to_address);
                         }
                     } elseif($this->default_reply_to_address) {
                         // use the default reply-to address if it's been set
-                        $this->EE->bm_email->reply_to($this->default_reply_to_address, $this->default_reply_to_name);
+                        $this->EE->pl_email->reply_to($this->default_reply_to_address, $this->default_reply_to_name);
                     }
                 }
                 
-                $this->EE->bm_email->to($to_email);
-                $this->EE->bm_email->subject($subject);
+                $this->EE->pl_email->to($to_email);
+                $this->EE->pl_email->subject($subject);
 
                 // need to call entities_to_ascii() for text mode email w/ entry encoded data
-                $this->EE->bm_email->message(entities_to_ascii($message));
+                $this->EE->pl_email->message(entities_to_ascii($message));
 
-                $this->EE->bm_email->send = TRUE;
+                $this->EE->pl_email->send = TRUE;
                 if ($this->EE->extensions->active_hook('proform_notification_message') === TRUE)
                 {
-                    $this->EE->extensions->call('proform_notification_message', $type, $form, $this->EE->bm_email, $this);
+                    $this->EE->extensions->call('proform_notification_message', $type, $form, $this->EE->pl_email, $this);
                     if($this->EE->extensions->end_script) return;
                 }
             
-                if($this->EE->bm_email->send)
+                if($this->EE->pl_email->send)
                 {
-                    $result = $result && $this->EE->bm_email->Send();
+                    $result = $result && $this->EE->pl_email->Send();
                 }
 
             }

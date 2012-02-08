@@ -54,7 +54,7 @@ class Proform_ext {
 
         // find commands
         preg_match(
-            '/<!--start:bm_commands-->(.*?)<!--end:bm_commands-->/is',
+            '/<!--start:pl_commands-->(.*?)<!--end:pl_commands-->/is',
             $out, $matches);
 
         if(count($matches) >= 1)
@@ -78,7 +78,7 @@ class Proform_ext {
                 //exit($matches[1]);
                 
                 $out = preg_replace(array(
-                    '/<!--start:bm_commands-->(.*?)<!--end:bm_commands-->/is',
+                    '/<!--start:pl_commands-->(.*?)<!--end:pl_commands-->/is',
                     '/<span id="filter_ajax_indicator".*?span>/'), '', $out);
             }
         }

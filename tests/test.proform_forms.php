@@ -47,7 +47,7 @@ class Proform_forms extends Proform_test_base {
         $save_form = $this->EE->formslib->new_form($data);
         
         $this->assertNotEqual($save_form, FALSE);
-        $this->assertTrue($save_form instanceof BM_Form);
+        $this->assertTrue($save_form instanceof PL_Form);
         
         $this->assertEqual($save_form->form_type, 'form');
         $this->assertEqual($save_form->form_label, 'Contact');
@@ -72,7 +72,7 @@ class Proform_forms extends Proform_test_base {
         $db_form = $this->EE->formslib->get_form('test_form_1');
         
         $this->assertNotEqual($db_form, FALSE);
-        $this->assertTrue($db_form instanceof BM_Form);
+        $this->assertTrue($db_form instanceof PL_Form);
         
         $this->assertEqual($db_form->form_type, 'form');
         $this->assertEqual($db_form->form_label, 'Contact');
@@ -128,7 +128,7 @@ class Proform_forms extends Proform_test_base {
         $db_form = $this->EE->formslib->get_form('test_form_2_renamed');
         
         $this->assertNotEqual($db_form, FALSE);
-        $this->assertTrue($db_form instanceof BM_Form);
+        $this->assertTrue($db_form instanceof PL_Form);
         
         $this->assertEqual($db_form->form_type, 'form');
         $this->assertEqual($db_form->form_label, 'Contact');
@@ -146,12 +146,12 @@ class Proform_forms extends Proform_test_base {
         $save_field = $this->EE->formslib->new_field($data);
         
         $this->assertNotEqual($save_field, FALSE);
-        $this->assertTrue($save_field instanceof BM_Field);
+        $this->assertTrue($save_field instanceof PL_Field);
         
         $db_field = $this->EE->formslib->get_field('first_name');
         
         $this->assertNotEqual($db_field, FALSE);
-        $this->assertTrue($db_field instanceof BM_Field);
+        $this->assertTrue($db_field instanceof PL_Field);
         
         $this->assertEqual($db_field->type, 'string');
         $this->assertEqual($db_field->field_label, 'First Name');
@@ -170,7 +170,7 @@ class Proform_forms extends Proform_test_base {
         $save_field = $this->EE->formslib->new_field($data);
         
         $this->assertNotEqual($save_field, FALSE);
-        $this->assertTrue($save_field instanceof BM_Field);
+        $this->assertTrue($save_field instanceof PL_Field);
         $this->assertTrue(is_array($save_field->settings));
         $this->assertTrue(array_key_exists('type_list', $save_field->settings));
         $this->assertEqual($save_field->settings['type_list'], "simple_option\ncomplex_option : Complex Option");
@@ -178,7 +178,7 @@ class Proform_forms extends Proform_test_base {
         $db_field = $this->EE->formslib->get_field('list_field');
         
         $this->assertNotEqual($db_field, FALSE);
-        $this->assertTrue($db_field instanceof BM_Field);
+        $this->assertTrue($db_field instanceof PL_Field);
         
         $this->assertEqual($db_field->type, 'list');
         $this->assertEqual($db_field->field_label, 'List Field');
