@@ -471,6 +471,11 @@ class Proform_mcp {
                 break;
         }
         
+        if(!$this->EE->config->item('proform_allow_encrypted_form_data'))
+        {
+            $vars['hidden_fields'][] = 'encryption_on';
+        }
+        
         $vars['form_hidden'] = array();
         $vars['default_value_hidden'] = array('form_id' => 0, 'field_id' => 0);
         if($form)
