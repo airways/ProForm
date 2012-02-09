@@ -333,6 +333,7 @@ Form Layout > Fields
 
 .tab-content-layout {
     min-width: 900px;
+	min-height: 500px;
 }
 
 /* -- begin old -- */

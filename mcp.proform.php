@@ -178,7 +178,7 @@ class Proform_mcp {
         //$query = $this->EE->db->order_by("form_name", "desc")->get('proform'); //, $rownum, $this->perpage
         // TODO: member access controls on data and form editing
         
-        $forms = $this->EE->formslib->get_forms();
+        $forms = $this->EE->formslib->forms->get_all();
         
         ////////////////////////////////////////
         // Generate table of forms
@@ -263,7 +263,7 @@ class Proform_mcp {
 
         $this->EE->load->library('formslib');
         $this->EE->load->library('proform_notifications');
-        $prefs = $this->EE->formslib->get_preferences();
+        $prefs = $this->EE->formslib->prefs->get_preferences();
 
         foreach($prefs as $pref => $value)
         {
@@ -356,7 +356,7 @@ class Proform_mcp {
         
         // create new form and table
         $this->EE->load->library('formslib');
-        $form = $this->EE->formslib->new_form($data);
+        $form = $this->EE->formslib->forms->create($data);
         
         // go back to form edit page
         $this->EE->session->set_flashdata('message', lang('msg_form_created'));
@@ -383,7 +383,7 @@ class Proform_mcp {
         
             $form_id = (int)$this->EE->input->get('form_id');
             $query = $this->EE->db->get_where('proform_forms', array('form_id' => $form_id));
-            $form = $this->EE->formslib->get_form($form_id);
+            $form = $this->EE->formslib->forms->get($form_id);
             
             if(!$form_id || !$form)
             {
@@ -406,13 +406,13 @@ class Proform_mcp {
         $this->EE->load->library('proform_notifications');
         $this->EE->load->library('formslib');
         $template_options = $this->EE->proform_notifications->get_template_names(
-            $this->EE->formslib->ini('notification_template_group', 'notifications'));
+            $this->EE->formslib->prefs->ini('notification_template_group', 'notifications'));
         $template_options = array_merge(array(0 => 'None'), $template_options);
         
         //unset($form_obj->form_id);
         unset($form_obj->settings);
         
-        // $channel_options = $this->EE->formslib->get_channel_options($this->EE->formslib->ini('safecracker_field_group_id'),
+        // $channel_options = $this->EE->formslib->get_channel_options($this->EE->formslib->prefs->ini('safecracker_field_group_id'),
         //                                                              array(0 => 'None'));
         $channel_options = array();
         
@@ -498,7 +498,7 @@ class Proform_mcp {
         $vars['add_item_options'][Proform_mcp::NONE] = "Select an item";
         $vars['add_item_options'][Proform_mcp::ITEM_SEPARATOR_1] = "-";
         $field_count = 0;
-        foreach($this->EE->formslib->get_fields() as $field) 
+        foreach($this->EE->formslib->fields->get_all() as $field) 
         {
             // don't show fields that are already on the form
             if(!$form OR !array_key_exists($field->field_name, $form->fields())) 
@@ -584,7 +584,7 @@ class Proform_mcp {
         $form_id = trim($this->EE->input->get_post('form_id'));
         if(!$form_id || $form_id <= 0) show_error(lang('missing_form_id'));
         
-        $form = $this->EE->formslib->get_form($form_id);
+        $form = $this->EE->formslib->forms->get($form_id);
         
         
         // process layout and field customization for the form
@@ -624,7 +624,7 @@ class Proform_mcp {
                 {
                     $this->EE->functions->redirect(ACTION_BASE.AMP.'method=new_field'.AMP.'auto_add_form_id='.$form_id);
                 } else {
-                    $field = $this->EE->formslib->get_field($field_id);
+                    $field = $this->EE->formslib->fields->get($field_id);
                     if($field)
                     {
                         $form->assign_field($field);
@@ -688,7 +688,7 @@ class Proform_mcp {
         
         $this->EE->load->library('formslib');
         $form_id = $this->EE->input->get('form_id');
-        $form = $this->EE->formslib->get_form($form_id);
+        $form = $this->EE->formslib->forms->get($form_id);
         
         $vars = array();
         $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=delete_form';
@@ -711,8 +711,8 @@ class Proform_mcp {
         {
             $this->EE->load->library('formslib');
             
-            $form = $this->EE->formslib->get_form($form_id);
-            $this->EE->formslib->delete_form($form);
+            $form = $this->EE->formslib->forms->get($form_id);
+            $this->EE->formslib->forms->delete($form);
             
             // go back to form listing
             $this->EE->session->set_flashdata('message', lang('msg_form_deleted'));
@@ -740,8 +740,8 @@ class Proform_mcp {
         $form_id = $this->EE->input->get('form_id');
         $field_id = $this->EE->input->get('field_id');
         
-        $form = $this->EE->formslib->get_form($form_id);
-        $field = $this->EE->formslib->get_field($field_id);
+        $form = $this->EE->formslib->forms->get($form_id);
+        $field = $this->EE->formslib->fields->get($field_id);
         
         
         if(is_numeric($form_id) && is_numeric($field_id) && $form && $field) 
@@ -762,7 +762,7 @@ class Proform_mcp {
             
             // list available fields to add to the form
             $vars['add_item_options'] = array();  
-            foreach($this->EE->formslib->get_fields() as $field) 
+            foreach($this->EE->formslib->fields->get_all() as $field) 
             {
                 // don't show fields that are already on the form
                 if(!array_key_exists($field->field_name, $form->fields())) 
@@ -790,8 +790,8 @@ class Proform_mcp {
         $form_id = trim($this->EE->input->post('form_id'));
         $field_id = trim($this->EE->input->post('field_id'));
         
-        $form = $this->EE->formslib->get_form($form_id);
-        $field = $this->EE->formslib->get_field($field_id);
+        $form = $this->EE->formslib->forms->get($form_id);
+        $field = $this->EE->formslib->fields->get($field_id);
         
         if(is_numeric($form_id) && is_numeric($field_id) && $form && $field)
         {
@@ -828,7 +828,7 @@ class Proform_mcp {
         
         // get data
         $rownum = (int)$this->EE->input->get_post('rownum');
-        $fields = $this->EE->formslib->get_fields($rownum, $this->perpage);
+        $fields = $this->EE->formslib->fields->get_all(FALSE, FALSE, FALSE, $rownum, $this->perpage);
         // TODO: member access controls on data and form editing
 
         ////////////////////////////////////////
@@ -897,7 +897,7 @@ class Proform_mcp {
         
         // see if the field already exists
         $field_name = strtolower(trim($this->EE->input->post('field_name')));
-        $field = $this->EE->formslib->get_field($field_name);
+        $field = $this->EE->formslib->fields->get($field_name);
         if($field) show_error(lang('field_already_exists'));
         
         // reset invalid length so it is set to the default
@@ -919,8 +919,8 @@ class Proform_mcp {
         
         $data['settings'] = $settings;
         
-        $this->EE->formslib->new_field($data);
-        $field = $this->EE->formslib->get_field($field_name);
+        $this->EE->formslib->fields->create($data);
+        $field = $this->EE->formslib->fields->get($field_name);
 
         // automatically add the field to a form?
         $auto_add_form_id = $this->EE->input->get_post('auto_add_form_id');
@@ -932,11 +932,10 @@ class Proform_mcp {
             $this->EE->functions->redirect(ACTION_BASE.AMP.'method=list_fields');
         } else {
             // add the field to that form and go to it's layout view
-            $form = $this->EE->formslib->get_form($auto_add_form_id);
+            $form = $this->EE->formslib->forms->get($auto_add_form_id);
             if($form AND $field)
             {
                 $form->assign_field($field);
-                
                 
                 $this->EE->session->set_flashdata('message', lang('msg_field_created_added'));
                 $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.
@@ -968,7 +967,7 @@ class Proform_mcp {
             $field_id = (int)$this->EE->input->get('field_id');
 
             //$query = $this->EE->db->get_where('proform_fields', array('field_id' => $field_id));
-            $field = $this->EE->formslib->get_field($field_id);
+            $field = $this->EE->formslib->fields->get($field_id);
         
             $vars['editing'] = TRUE;
             $vars['hidden'] = array('field_id' => $field_id);
@@ -1044,7 +1043,7 @@ class Proform_mcp {
         
         // find field
         $this->EE->load->library('formslib');
-        $field = $this->EE->formslib->get_field($field_id);
+        $field = $this->EE->formslib->fields->get($field_id);
 
         $settings = array();
 
@@ -1082,7 +1081,7 @@ class Proform_mcp {
         
         $this->EE->load->library('formslib');
         $field_id = $this->EE->input->get('field_id');
-        $field = $this->EE->formslib->get_field($field_id);
+        $field = $this->EE->formslib->fields->get($field_id);
         
         $vars = array();
         $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=delete_field';
@@ -1105,8 +1104,8 @@ class Proform_mcp {
         {
             $this->EE->load->library('formslib');
             
-            $field = $this->EE->formslib->get_field($field_id);
-            $this->EE->formslib->delete_field($field);
+            $field = $this->EE->formslib->fields->get($field_id);
+            $this->EE->formslib->fields->delete($field);
             
             // go back to field listing
             $this->EE->session->set_flashdata('message', lang('msg_field_deleted'));
@@ -1147,7 +1146,7 @@ class Proform_mcp {
         $form_id = $this->EE->input->post('form_id');
         $heading = $this->EE->input->post('heading');
         
-        $form = $this->EE->formslib->get_form($form_id);
+        $form = $this->EE->formslib->forms->get($form_id);
         
         if($form && $heading)
         {
@@ -1210,7 +1209,7 @@ class Proform_mcp {
         $form_field_id = $this->EE->input->get('form_field_id');
         $heading = $this->EE->input->post('heading');
         
-        $form = $this->EE->formslib->get_form($form_id);
+        $form = $this->EE->formslib->forms->get($form_id);
         
         if($form && $heading)
         {
@@ -1238,7 +1237,7 @@ class Proform_mcp {
         $form_id = $this->EE->input->get('form_id');
         $form_field_id = $this->EE->input->get('form_field_id');
         
-        $form = $this->EE->formslib->get_form($form_id);
+        $form = $this->EE->formslib->forms->get($form_id);
         
         if(is_numeric($form_id) && $form)
         {
@@ -1277,7 +1276,7 @@ class Proform_mcp {
         $form_id = $this->EE->input->get_post('form_id');
         $form_field_id = $this->EE->input->get_post('form_field_id');
         
-        $form = $this->EE->formslib->get_form($form_id);
+        $form = $this->EE->formslib->forms->get($form_id);
         
         if(is_numeric($form_id) && $form)
         {
@@ -1304,7 +1303,7 @@ class Proform_mcp {
         $rownum = (int)$this->EE->input->get_post('rownum');
         
         // Get form object
-        $form = $this->EE->formslib->get_form($form_id);
+        $form = $this->EE->formslib->forms->get($form_id);
 
         // Set up UI
         $this->sub_page('tab_list_entries', $form->form_name);
@@ -1354,7 +1353,7 @@ class Proform_mcp {
                 // Prepare headings from lang file and from Field configs
                 if(lang('heading_' . $field->field_name) == 'heading_' . $field->field_name)
                 {
-                    $field = $this->EE->formslib->get_field($field->field_name);
+                    $field = $this->EE->formslib->fields->get($field->field_name);
                     $headings[] = $field->field_label;
                 } else {
                     $headings[] = lang('heading_' . $field->field_name);
@@ -1377,7 +1376,7 @@ class Proform_mcp {
         $form_id = (int)$this->EE->input->get('form_id');
         $form_entry_id = (int)$this->EE->input->get('entry_id');
         
-        $form_obj = $this->EE->formslib->get_form($form_id);
+        $form_obj = $this->EE->formslib->forms->get($form_id);
         if($form_obj)
         {
             $query = $this->EE->db->get_where($form_obj->table_name(), array('form_entry_id' => $form_entry_id));
@@ -1423,7 +1422,7 @@ class Proform_mcp {
         $form_id = (int)$this->EE->input->get('form_id');
         $form_entry_id = (int)$this->EE->input->get('entry_id');
 
-        $form_obj = $this->EE->formslib->get_form($form_id);
+        $form_obj = $this->EE->formslib->forms->get($form_id);
         if($form_obj)
         {
             $form_obj->delete_entry($form_entry_id);
@@ -1455,7 +1454,7 @@ class Proform_mcp {
         $rownum = (int)$this->EE->input->get_post('rownum');
 
         // Get form object
-        $form = $this->EE->formslib->get_form($form_id);
+        $form = $this->EE->formslib->forms->get($form_id);
 
         // Set up UI
         $this->sub_page('tab_list_entries', $form->form_name);
@@ -1473,7 +1472,7 @@ class Proform_mcp {
         $form_id = $this->EE->input->get('form_id');
 
         // Get form object
-        $form = $this->EE->formslib->get_form($form_id);
+        $form = $this->EE->formslib->forms->get($form_id);
 
         $file_name = $form->form_name . '_' . date("j-n-Y_G-i-s") . '.csv';
         $stdout = fopen("php://output", "w");

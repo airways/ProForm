@@ -55,16 +55,16 @@ class Proform_notifications
         /*
          * Get settings
          */
-        $this->template_group_name       = $this->EE->formslib->ini('notification_template_group');
+        $this->template_group_name = $this->EE->formslib->prefs->ini('notification_template_group');
 
         // first see if the admin has setup a from address / name in the module's preferences
-        if($this->EE->formslib->ini('from_address'))
+        if($this->EE->formslib->prefs->ini('from_address'))
         {
-            $this->default_from_address = $this->EE->formslib->ini('from_address');
+            $this->default_from_address = $this->EE->formslib->prefs->ini('from_address');
 
-            if($this->EE->formslib->ini('from_name'))
+            if($this->EE->formslib->prefs->ini('from_name'))
             {
-                $this->default_from_name = $this->EE->formslib->ini('from_name');
+                $this->default_from_name = $this->EE->formslib->prefs->ini('from_name');
             } else {
                 // use the email as the name
                 $this->default_from_name = $this->default_from_address;
@@ -82,13 +82,13 @@ class Proform_notifications
 
         // do the same things for the default reply-to values, using whatever we found for the from
         // fields as a default this time
-        if($this->EE->formslib->ini('reply_to_address'))
+        if($this->EE->formslib->prefs->ini('reply_to_address'))
         {
-            $this->default_reply_to_address = $this->EE->formslib->ini('reply_to_address');
+            $this->default_reply_to_address = $this->EE->formslib->prefs->ini('reply_to_address');
 
-            if($this->EE->formslib->ini('reply_to_name'))
+            if($this->EE->formslib->prefs->ini('reply_to_name'))
             {
-                $this->default_reply_to_name = $this->EE->formslib->ini('reply_to_name');
+                $this->default_reply_to_name = $this->EE->formslib->prefs->ini('reply_to_name');
             } else {
                 // use the email as the name
                 $this->default_reply_to_name = $this->default_reply_to_address;
