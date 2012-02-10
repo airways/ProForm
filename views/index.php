@@ -32,12 +32,26 @@
 
 
 <?php if($is_super_admin AND $mcrypt_warning): ?>
-    <div style="color: black; background: yellow; margin: 10px; padding: 5px; border: 1px solid red;"><strong>Warning:</strong> Your server does not support mcrypt.<br/>Data stored with "encryption" turned on will use a simple XOR encoding cipher rather than the more secure encryption. It is <strong>strongly</strong> recommended that you install the mcrypt PHP extension.</div>
+    <div class="warning">
+        <p><strong>Warning:</strong> Your server does not have the <a href="http://php.net/mcrypt">mcrypt PHP extension</a> installed. Your form submissions will be less secure without this PHP extension. It is <strong>strongly</strong> recommended that you install mcrypt.</p>
+        <?php if($allow_encrypted_form_data): ?>
+        <p><strong>Data storedin encrypted forms (disabled by default) will use a simple XOR encoding cipher rather than the more secure encryption.</strong></p>
+        <?php endif; ?>
+    </div>
 <?php endif; ?>
 
 
 <?php if($is_super_admin AND $key_warning): ?>
-    <div style="color: black; background: yellow; margin: 10px; padding: 5px; border: 1px solid red;"><strong>Warning:</strong> You do not have a encryption_key value set.<br/>ProForm will not function correctly until this value is set. It should be set to a complex string with upper and lower case letters, numbers, and symbols, 32 characters in length.</div>
+    <div class="warning">
+        <p><strong>Warning:</strong> You do not have a encryption_key value set. ProForm will not function correctly until this value is set. To set the encryption key, you should edit your config file at <strong>system/expressionengine/config/config.php</strong>. Find the value named encryption_key and change the blank string to a random value.</p>
+        <p>For your convenience, here is a semi-random value you can use - although it may not be as secure as a truly random value:</p>
+        <p><strong>$config['encryption_key'] = '<?php echo $random_key; ?>';</strong></p>
+        <p>Once this has been set, this message will be removed.</p>
+        <?php if($allow_encrypted_form_data): ?>
+        <p><b>If you use encrypted forms (disabled by default) - you should keep a copy of your encryption_key in a secure location, or the data in your forms will not be accessible. In this case it should also not be changed for this site.</b></p>
+        <?php endif; ?>
+        <p>You can see the <a href="http://codeigniter.com/user_guide/libraries/encryption.html">CodeIgniter Encryption documentation</a> for more information.</p>
+    </div>
 <?php endif; ?>
 
 <h2 class="content-heading">Forms</h2>

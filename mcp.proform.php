@@ -206,6 +206,8 @@ class Proform_mcp {
         $vars['is_super_admin'] = $this->EE->session->userdata['group_id'] == 1;
         $vars['mcrypt_warning'] = !function_exists('mcrypt_encrypt');
         $vars['key_warning'] = !(strlen($this->EE->config->item('encryption_key')) >= 32);
+        $vars['allow_encrypted_form_data'] = $this->EE->config->item('proform_allow_encrypted_form_data') == 'y';
+        $vars['random_key'] = $this->make_random_key();
 
         ////////////////////////////////////////
         // Pagination
@@ -245,6 +247,14 @@ class Proform_mcp {
         // Render view
         $this->_get_flashdata($vars);
         return $this->EE->load->view('index', $vars, TRUE);
+    }
+    
+    function make_random_key()
+    {
+        $result = '';
+        $s = '1234567890!@#$%^&*()_+-={}|?:;[],./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+        for($i = 0; $i < 32; $i++) $result .= $s[rand(0,strlen($s)-1)];
+        return $result;
     }
     
     function global_form_preferences()
@@ -292,6 +302,8 @@ class Proform_mcp {
         
         $vars['mcrypt'] = function_exists('mcrypt_encrypt') ? 'yes' : 'no';
         $vars['encryption_key_set'] = (strlen($this->EE->config->item('encryption_key')) >= 32) ? 'yes' : 'no';
+        $vars['allow_encrypted_form_data'] = $this->EE->config->item('proform_allow_encrypted_form_data') == 'y';
+        $vars['random_key'] = $this->make_random_key();
         
         $this->EE->load->library('table');
         return $this->EE->load->view('generic_edit', $vars, TRUE);
@@ -1409,6 +1421,8 @@ class Proform_mcp {
             
             $vars['mcrypt'] = function_exists('mcrypt_encrypt') ? 'yes' : 'no';
             $vars['encryption_key_set'] = (strlen($this->EE->config->item('encryption_key')) >= 32) ? 'yes' : 'no';
+            $vars['allow_encrypted_form_data'] = $this->EE->config->item('proform_allow_encrypted_form_data') == 'y';
+            $vars['random_key'] = $this->make_random_key();
             
             $this->EE->load->library('table');
             return $this->EE->load->view('generic_edit', $vars, TRUE);
