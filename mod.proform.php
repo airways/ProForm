@@ -129,7 +129,7 @@ class Proform {
         $form_session->processed = FALSE;
         
         // Get all form data for the requested form
-        $form_obj = $this->EE->formslib->get_form($form_name);
+        $form_obj = $this->EE->formslib->forms->get($form_name);
         
         
         if($_SERVER['REQUEST_METHOD'] == 'POST' && $this->EE->input->post('__conf'))
@@ -228,7 +228,8 @@ class Proform {
         }
         //var_dump($form_config);
         
-        $form_config_enc = $this->EE->encrypt->encode(serialize($form_config));
+        //$form_config_enc = $this->EE->encrypt->encode(serialize($form_config));
+        $form_config_enc = $this->EE->formslib->vault->put($form_config);
         
         if ($this->EE->extensions->active_hook('proform_form_start') === TRUE)
         {
@@ -478,7 +479,7 @@ class Proform {
             
             if($form_name && $form_config['form_name'] == $form_name)
             {
-                $form_obj = $this->EE->formslib->get_form($form_name);
+                $form_obj = $this->EE->formslib->forms->get($form_name);
                 //$this->prolib->debug($form_obj);
 
                 $this->prolib->copy_values($form_config, $variables);
@@ -535,7 +536,7 @@ class Proform {
         $this->return_data = "";
         
         // Get all form data for the requested form
-        $form_obj = $this->EE->formslib->get_form($form_name);
+        $form_obj = $this->EE->formslib->forms->get($form_name);
         
         if ($this->EE->extensions->active_hook('proform_entries_start') === TRUE)
         {
@@ -678,7 +679,7 @@ class Proform {
         $notify = explode("\n", implode("\n", explode('|', $this->EE->TMPL->fetch_param('notify', ''))));
 
         // Get the form object
-        $form_obj = $this->EE->formslib->get_form($form_name);
+        $form_obj = $this->EE->formslib->forms->get($form_name);
         
         if($form_obj)
         {
@@ -779,7 +780,7 @@ class Proform {
         $this->return_data = "";
         
         // Get all form data for the requested form
-        $forms = $this->EE->formslib->get_forms($limit, ($page-1) * $limit);
+        $forms = $this->EE->formslib->forms->get_all(FALSE, FALSE, FALSE, $limit, ($page-1) * $limit);
         $total_forms = $this->EE->formslib->count_forms();
         
         if ($this->EE->extensions->active_hook('proform_forms_start') === TRUE)
@@ -996,17 +997,18 @@ class Proform {
 
         // decrypt the form's configuration array
         $form_config_enc = $this->EE->input->post('__conf');
-        $form_config = unserialize($this->EE->encrypt->decode($form_config_enc));
+        //$form_config = unserialize($this->EE->encrypt->decode($form_config_enc));
+        $form_config = $this->EE->formslib->vault->get($form_config_enc);
 
 		// make sure the form object data we have is for this form, if not bail
-		if(!isset($form_config['form_name']) || $form_config['form_name'] != $form_obj->form_name)
+		if(!$form_config || !isset($form_config['form_name']) || $form_config['form_name'] != $form_obj->form_name)
 		{
 			return $result;
 		}
         
         // find the form
         $form_name = $form_config['form_name'];
-        $form_obj = $this->EE->formslib->get_form($form_name);
+        $form_obj = $this->EE->formslib->forms->get($form_name);
         
         $form_session->processed = TRUE;
         

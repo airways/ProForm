@@ -44,7 +44,7 @@ class Formslib
     var $form_types = array('form' => 'Entry Form', 'saef' => 'SAEF Form', 'share' => 'Share Form');
     
     // Fields that will not be encrypted or decrypted
-    var $no_encryption = array('dst_enabled');
+    var $field_encryption_disabled = array('dst_enabled');
 
     var $default_prefs = array(
         'notification_template_group' => 'notifications',
@@ -58,7 +58,7 @@ class Formslib
 
     function Formslib()
     {
-        prolib($this, "proform");
+        prolib($this, 'proform');
         
         // If there are already any encrypted forms, then we will default the option to allow encryption
         // to on. This option was not available in previous versions, where encryption was always
@@ -80,9 +80,12 @@ class Formslib
         $this->forms = new PL_handle_mgr("proform_forms", "form", "PL_Form");
         $this->fields = new PL_handle_mgr("proform_fields", "field", "PL_Field");
 
+        $this->vault = new PL_Vault('proform');
 
         // Caching can cause issues with schema manipulation, so we need to turn it off.
         $this->EE->db->cache_off();
+        
+        $this->EE->pl_encryption->field_encryption_disabled = $this->field_encryption_disabled;
         
     } // function Formslib()
 
@@ -106,101 +109,6 @@ class Formslib
     function new_session() {
         return new PL_FormSession;
     }
-
-    /* ------------------------------------------------------------
-     * Encryption API
-     *
-     * Ensures uniform use of the encrypt library
-     * ------------------------------------------------------------ */
-    
-    /**
-     * Encrypt an array of values through the CI encrypt class.
-     * 
-     * @param  $data - simple string values to encrypt
-     * @return array
-     */
-    function encrypt_values($data)
-    {
-        if(is_array($data))
-        {
-            $result = array();
-        } else {
-            $result = new stdClass();
-        }
-
-        $this->EE->load->library('encrypt');
-        foreach($data as $k => $v)
-        {
-            if(array_search($k, $this->no_encryption) !== FALSE)
-            {
-                if(is_array($data))
-                {
-                    $result[$k] = $v;
-                } else {
-                    $result->{$k} = $v;
-                }
-            } else {
-                if(is_array($data))
-                {
-                    $result[$k] = $this->EE->encrypt->encode($v);
-                } else {
-                    $result->{$k} = $this->EE->encrypt->encode($v);
-                }
-            }
-        }
-        return $result;
-    } // function encrypt_values()
-    
-    /**
-     * Decrypt an array of values through the CI encrypt class.
-     * 
-     * @param  $data - simple string values to decrypt
-     * @return array
-     */
-    function decrypt_values($data)
-    {
-        if(is_array($data))
-        {
-            $result = array();
-        } else {
-            $result = new stdClass();
-        }
-        
-        $this->EE->load->library('encrypt');
-        $mcrypt_installed = function_exists('mcrypt_encrypt');
-        foreach($data as $k => $v)
-        {
-            if(array_search($k, $this->no_encryption) !== FALSE)
-            {
-                if(is_array($data))
-                {
-                    $result[$k] = $v;
-                } else {
-                    $result->{$k} = $v;
-                }
-            } else {
-                // properly encrypted strings should have == at the end of their values
-                // unless they are XOR encoded, which is only used if mcrypt isn't installed
-                if(($mcrypt_installed && substr($v, -1) == '=') || !$mcrypt_installed)
-                {
-                    if(is_array($data))
-                    {
-                        $result[$k] = $this->EE->encrypt->decode($v);
-                    } else {
-                        $result->{$k} = $this->EE->encrypt->decode($v);
-                    }
-                } else {
-                    if(is_array($data))
-                    {
-                        $result[$k] = $v;
-                    } else {
-                        $result->{$k} = $v;
-                    }
-                }
-            }
-        }
-        return $result;
-    } // function decrypt_values()
     
     /**
      * Get list of channels to be used in a form_dropdown field
