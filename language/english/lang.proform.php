@@ -102,6 +102,7 @@ $lang = array(
     'tab_list_templates' => 'List Templates',
     'tab_new_template' => 'New Template',
     'tab_delete_template' => 'Delete Template',
+	'tab_new_heading' => 'New Heading',
     
     // Fields
     'field_form_name' => 'Form Short Name',
@@ -145,6 +146,8 @@ $lang = array(
     'field_mailinglist_id' => 'Mailing List',
     'field_reply_to_field' => 'Reply-To Field',
     'field_reply_to_field_desc' => 'Field on the form containing the email address to set as this notification\'s Reply-To',
+    'field_allow_encrypted_forms' => 'Allow Form Encryption',
+    'field_allow_encrypted_forms_desc' => 'Allows the option to encrypt data stored for a form in the database to be used. This option is not recommended for most users.',
     
     'field_submitter_notification_name' => 'Notification Field Settings - A',
     'field_submitter_notification_on' => 'Enable Group',
@@ -249,7 +252,11 @@ $lang = array(
     'msg_field_deleted' => 'Field successfully deleted',
     'msg_field_added' => 'Field successfully added to the form',
     'msg_field_removed' => 'Field successfully removed from the form',
-    
+
+
+	'msg_heading_added' => 'New heading successfully added to the form',
+	'msg_heading_edited'=> 'Heading successfully edited',
+
     // End
     '' => ''
     

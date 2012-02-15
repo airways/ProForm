@@ -73,10 +73,13 @@
                                 <input type="{field_control}" id="{field_name}" name="{field_name}" value="y" {field_checked} 
                                     {if field_preset_value == 'y' AND error_count == 0}checked="checked" class="default" {/if} />
                             {if:elseif field_control == 'select'}
-
-                                <select id="{field_name}" name="{field_name}">
+								{if field_setting_multiselect}
+                                <select id="{field_name}" name="{field_name}[]" multiple="multiple">
+								{if:else}
+								<select id="{field_name}" name="{field_name}">
+								{/if}
                                     {field_setting_list}
-                                        <option value="{row}">{row}</option>
+                                        <option value="{key}" {selected}>{row}</option>
                                     {/field_setting_list}
                                 </select>
                             {if:else}

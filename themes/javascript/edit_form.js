@@ -69,6 +69,13 @@ var proform_edit_form = {
     {
         if($active_field)
         {
+	$('.meta-sidebar').show();
+			if($active_field.find('.fieldHeading').val() != '') {
+				$('.meta-sidebar').hide();
+			} else {
+				
+			}
+			
             $('#field-required').attr('checked', $active_field.find('.fieldRequired').val() == 'y');
             $('#field-label').val($active_field.find('.fieldLabel').val());
             $('#field-preset-value').val($active_field.find('.fieldPresetValue').val());

@@ -42,10 +42,14 @@ if(isset($_form_description))
     echo '<p>'.$_form_description.'</b>';
 }
 
-echo validation_errors('<div class="message error-message">', '</div>');
 
-if(isset($message) && $message != FALSE) echo '<div class="message error-message">'.$message.'</div>';
-if(isset($error) && $error != FALSE) echo '<div class="message error-message">'.$error.'</div>';
+if(count($_POST) > 0)
+{
+    echo validation_errors('<div class="message error-message">', '</div>');
+
+    if(isset($message) && $message != FALSE) echo '<div class="message error-message">'.$message.'</div>';
+    if(isset($error) && $error != FALSE) echo '<div class="message error-message">'.$error.'</div>';
+}
 ?>
 <!-- <div class="message error-message">
     Please complete the highlighted fields below.

@@ -41,7 +41,7 @@ class Proform_notifications
 {
     /**
      * Handle manager for accessing template data
-     * @var Bm_handler_mgr
+     * @var PL_handler_mgr
      */
     var $template_mgr;
     var $debug = FALSE;
@@ -50,21 +50,21 @@ class Proform_notifications
     function __construct()
     {
         prolib($this, 'proform');
-        $this->mgr = new Bm_handle_mgr();
+        $this->mgr = new PL_handle_mgr();
 
         /*
          * Get settings
          */
-        $this->template_group_name       = $this->EE->formslib->ini('notification_template_group');
+        $this->template_group_name = $this->EE->formslib->prefs->ini('notification_template_group');
 
         // first see if the admin has setup a from address / name in the module's preferences
-        if($this->EE->formslib->ini('from_address'))
+        if($this->EE->formslib->prefs->ini('from_address'))
         {
-            $this->default_from_address = $this->EE->formslib->ini('from_address');
+            $this->default_from_address = $this->EE->formslib->prefs->ini('from_address');
 
-            if($this->EE->formslib->ini('from_name'))
+            if($this->EE->formslib->prefs->ini('from_name'))
             {
-                $this->default_from_name = $this->EE->formslib->ini('from_name');
+                $this->default_from_name = $this->EE->formslib->prefs->ini('from_name');
             } else {
                 // use the email as the name
                 $this->default_from_name = $this->default_from_address;
@@ -82,13 +82,13 @@ class Proform_notifications
 
         // do the same things for the default reply-to values, using whatever we found for the from
         // fields as a default this time
-        if($this->EE->formslib->ini('reply_to_address'))
+        if($this->EE->formslib->prefs->ini('reply_to_address'))
         {
-            $this->default_reply_to_address = $this->EE->formslib->ini('reply_to_address');
+            $this->default_reply_to_address = $this->EE->formslib->prefs->ini('reply_to_address');
 
-            if($this->EE->formslib->ini('reply_to_name'))
+            if($this->EE->formslib->prefs->ini('reply_to_name'))
             {
-                $this->default_reply_to_name = $this->EE->formslib->ini('reply_to_name');
+                $this->default_reply_to_name = $this->EE->formslib->prefs->ini('reply_to_name');
             } else {
                 // use the email as the name
                 $this->default_reply_to_name = $this->default_reply_to_address;
@@ -103,7 +103,7 @@ class Proform_notifications
     
     function _debug($msg)
     {
-        $this->debug_str .= $msg . '<br/>';
+        $this->debug_str .= htmlentities($msg) . '<br/>';
     }
 
     function has_notifications($form, $data, $config)
@@ -273,6 +273,7 @@ class Proform_notifications
         if($template)
         {
             // parse data from the entry
+            $this->_debug($template);
             $message = $this->EE->parser->parse_string($template, $data, TRUE);
             $subject = $this->EE->parser->parse_string($subject, $data, TRUE);
 
@@ -287,20 +288,20 @@ class Proform_notifications
             $result = TRUE;
             foreach($notification_list as $to_email)
             {
-                $this->EE->bm_email->initialize();
+                $this->EE->pl_email->PL_initialize();
 
                 if($this->default_from_address)
                 {
-                    $this->EE->bm_email->from($this->default_from_address, $this->default_from_name);
+                    $this->EE->pl_email->from($this->default_from_address, $this->default_from_name);
                 }
 
                 if($reply_to)
                 {
                     if($reply_to_name)
                     {
-                        $this->EE->bm_email->reply_to($reply_to, $reply_to_name);
+                        $this->EE->pl_email->reply_to($reply_to, $reply_to_name);
                     } else {
-                        $this->EE->bm_email->reply_to($reply_to);
+                        $this->EE->pl_email->reply_to($reply_to);
                     }
                 } else {
                     // use the form's reply-to email and name if they have been set
@@ -308,32 +309,37 @@ class Proform_notifications
                     {
                         if(trim($form->reply_to_name) != '')
                         {
-                            $this->EE->bm_email->reply_to($form->reply_to_address, $form->reply_to_name);
+                            $this->EE->pl_email->reply_to($form->reply_to_address, $form->reply_to_name);
                         } else {
-                            $this->EE->bm_email->reply_to($form->reply_to_address);
+                            $this->EE->pl_email->reply_to($form->reply_to_address);
                         }
                     } elseif($this->default_reply_to_address) {
                         // use the default reply-to address if it's been set
-                        $this->EE->bm_email->reply_to($this->default_reply_to_address, $this->default_reply_to_name);
+                        $this->EE->pl_email->reply_to($this->default_reply_to_address, $this->default_reply_to_name);
                     }
                 }
                 
-                $this->EE->bm_email->to($to_email);
-                $this->EE->bm_email->subject($subject);
+                $this->EE->pl_email->to($to_email);
+                $this->EE->pl_email->subject($subject);
 
-                // need to call entities_to_ascii() for text mode email w/ entry encoded data
-                $this->EE->bm_email->message(entities_to_ascii($message));
+                // We need to call entities_to_ascii() for text mode email w/ entry encoded data.
+                // $message will automatically have {if plain_email} and {if html_email} handled inside the pl_email class
+                // The message will also be automatically stripped of markup for the plain text version since we are not
+                // providing an explicit alternative, in which case a lack of a check for either of those variables will
+                // still generate a passable text email if the markup was not totally reliant on images.
+                //$this->EE->pl_email->message(entities_to_ascii($message));
+                $this->EE->pl_email->message($message);
 
-                $this->EE->bm_email->send = TRUE;
+                $this->EE->pl_email->send = TRUE;
                 if ($this->EE->extensions->active_hook('proform_notification_message') === TRUE)
                 {
-                    $this->EE->extensions->call('proform_notification_message', $type, $form, $this->EE->bm_email, $this);
+                    $this->EE->extensions->call('proform_notification_message', $type, $form, $this->EE->pl_email, $this);
                     if($this->EE->extensions->end_script) return;
                 }
             
-                if($this->EE->bm_email->send)
+                if($this->EE->pl_email->send)
                 {
-                    $result = $result && $this->EE->bm_email->Send();
+                    $result = $result && $this->EE->pl_email->Send();
                 }
 
             }
@@ -390,10 +396,14 @@ class Proform_notifications
 
     function get_template($template_name)
     {
+        $this->_debug($this->template_group_name);
+        
         $query = $this->EE->db->query($sql = "SELECT group_id FROM exp_template_groups WHERE group_name = '" . $this->EE->db->escape_str($this->template_group_name) . "';");
         if($query->num_rows() > 0)
         {
             $group_id = $query->row()->group_id;
+            
+            $this->_debug('Template group ID: '.$group_id);
 
             $sql = "SELECT * FROM exp_templates WHERE group_id = {$group_id} AND template_name = '" . $this->EE->db->escape_str($template_name) . "';";
             $query = $this->EE->db->query($sql);
@@ -407,12 +417,17 @@ class Proform_notifications
                                     . $this->EE->config->slash_item('site_short_name')
                                     . $this->template_group_name.'.group/'
                                     . $template_name.'.html';
-
+                    
+                    $this->_debug('Template saved as file '.$template_file);
+                    
                     $template_data = file_get_contents($template_file);
                 } else {
+                    $this->_debug('Template from DB');
                     $template_data = $query->row()->template_data;
                 }
-
+                
+                $this->_debug('Template: '.$template_data);
+                
                 return $template_data;
             } else {
                 return FALSE;
@@ -421,4 +436,5 @@ class Proform_notifications
             return FALSE;
         }
     } // function get_template()
+    
 } // class Proform_notifications

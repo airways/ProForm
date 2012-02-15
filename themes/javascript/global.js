@@ -39,7 +39,7 @@ $(document).ready(function() {
 
 
 
-var bm_grid = {
+var pl_grid = {
     options: {},
     data: {},
     help: {},
@@ -51,9 +51,9 @@ var bm_grid = {
                     $('#'+id).append('<tbody></tbody>');
                 }*/
                 var found = false;
-                for(var i = 0; i < bm_grid.data[key].length; i++)
+                for(var i = 0; i < pl_grid.data[key].length; i++)
                 {
-                    if(bm_grid.data[key][i][0] == val)
+                    if(pl_grid.data[key][i][0] == val)
                     {
                         found = true;
                     }
@@ -62,18 +62,18 @@ var bm_grid = {
                 if(!found)
                 {
                     // <button data-key="' + kbm_form_editey + '" data-opt="' + val + '" type="button" class="remove_grid_row">X</button></td>
-                    bm_grid.data[key].push([val]);
+                    pl_grid.data[key].push([val]);
                     $('#'+id+' tbody').append(
                         '<tr class="grid_row">'
-                            +'<td>'+bm_grid.options[key][val].label+'</td>'
+                            +'<td>'+pl_grid.options[key][val].label+'</td>'
                             +(
-                                bm_grid.options[key][val].flags && bm_grid.options[key][val].flags.indexOf('has_param') > -1
-                                    ? '<td><input data-key="' + key + '" data-opt="' + val + '" type="text" size="5" class="grid_param" /><span class="help">'+bm_grid.help[key][val]+'</span></td>'
-                                    : '<td><span class="help">'+bm_grid.help[key][val]+'</span></td>'
+                                pl_grid.options[key][val].flags && pl_grid.options[key][val].flags.indexOf('has_param') > -1
+                                    ? '<td><input data-key="' + key + '" data-opt="' + val + '" type="text" size="5" class="grid_param" /><span class="help">'+pl_grid.help[key][val]+'</span></td>'
+                                    : '<td><span class="help">'+pl_grid.help[key][val]+'</span></td>'
                             )+'<td><a href="#" class="remove_grid_row" data-key="'+ key +'" data-opt="' + val +'">X</a></td>'
                             +'</tr>'
                     );
-                    bm_grid.bind_events();
+                    pl_grid.bind_events();
                 }
                 
                 e.preventDefault();
@@ -81,20 +81,20 @@ var bm_grid = {
         }
         
         var save_val = function() {
-            var data = bm_grid.data[$(this).attr('data-key')];
+            var data = pl_grid.data[$(this).attr('data-key')];
             for(var i = 0; i < data.length; i++) {
                 if(data[i][0] == $(this).attr('data-opt')) {
                     data[i][1] = $(this).val();
                 }
             }
-            //console.log(bm_grid.data['validation'][1][1]);
+            //console.log(pl_grid.data['validation'][1][1]);
         }
         
         $('.grid_param').unbind('change').change(save_val);
         $('.grid_param').unbind('keyup').keyup(save_val);
         
         $('.remove_grid_row').unbind('click').click(function(e) {
-            var data = bm_grid.data[$(this).attr('data-key')];
+            var data = pl_grid.data[$(this).attr('data-key')];
             //console.log(data);
             for(var i = 0; i < data.length; i++) {
                 //console.log(data[i][0] + ' ? ' + $(this).attr('data-opt'));
@@ -109,19 +109,19 @@ var bm_grid = {
         });
         
         $('form.generic_edit').unbind('submit').submit(function() {
-            $(this).find('.bm_grid').each(function() {
+            $(this).find('.pl_grid').each(function() {
                 var key = $(this).attr('data-key');
                 var val = '';
                 
-                //console.log(bm_grid.data[key]);
+                //console.log(pl_grid.data[key]);
                 
-                for(var i = 0; i < bm_grid.data[key].length; i++)
+                for(var i = 0; i < pl_grid.data[key].length; i++)
                 {
-                    val += bm_grid.data[key][i][0];
+                    val += pl_grid.data[key][i][0];
                     
-                    if(bm_grid.data[key][i].length > 1)
+                    if(pl_grid.data[key][i].length > 1)
                     {
-                        val += '[' + bm_grid.data[key][i][1] + ']';
+                        val += '[' + pl_grid.data[key][i][1] + ']';
                     }
                     val += '|';
                 }

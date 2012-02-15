@@ -333,6 +333,7 @@ Form Layout > Fields
 
 .tab-content-layout {
     min-width: 900px;
+	min-height: 500px;
 }
 
 /* -- begin old -- */
@@ -666,5 +667,23 @@ Create Form
 }
 
 
+.warning {
+	background: #fff3d1;
+	border: 1px solid #ffe59c;
+	color: #715300;
+	padding: 10px;
+	margin-bottom: 20px;
+	-moz-border-radius: 5px; /* Firefox */
+  	-webkit-border-radius: 5px; /* Safari, Chrome */
+  	border-radius: 5px; /* universal */
+}
 
+.warning p {
+	margin-bottom: 0px !important;
+	padding: 5px;
+}
+
+.warning a {
+	font-weight: bold;
+}
 

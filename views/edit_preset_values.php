@@ -30,11 +30,11 @@
  * 
  **/ ?>
 
-<!--start:bm_commands-->
-<div class="bm_commands" style="float: right;">
+<!--start:pl_commands-->
+<div class="pl_commands" style="float: right;">
     <span class="cp_button"><a href="<?php echo BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=assign_field'.AMP.'form_id='.$form_id; ?>"><?php echo lang('assign_field'); ?></a></span>
 </div>
-<!--end:bm_commands-->
+<!--end:pl_commands-->
 
 <?php if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>'; ?>
 <?php if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>'; ?>
