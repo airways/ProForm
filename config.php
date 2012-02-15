@@ -1,7 +1,7 @@
 <?php
 
 // @version 0.45
-// @prolib 0.26
+// @prolib 0.29
 
 define('PROFORM_VERSION', '0.45');
 define('PROFORM_NAME', 'ProForm');
