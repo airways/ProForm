@@ -103,7 +103,7 @@ class Proform_notifications
     
     function _debug($msg)
     {
-        $this->debug_str .= $msg . '<br/>';
+        $this->debug_str .= htmlentities($msg) . '<br/>';
     }
 
     function has_notifications($form, $data, $config)
@@ -273,6 +273,7 @@ class Proform_notifications
         if($template)
         {
             // parse data from the entry
+            $this->_debug($template);
             $message = $this->EE->parser->parse_string($template, $data, TRUE);
             $subject = $this->EE->parser->parse_string($subject, $data, TRUE);
 
@@ -287,7 +288,7 @@ class Proform_notifications
             $result = TRUE;
             foreach($notification_list as $to_email)
             {
-                $this->EE->pl_email->initialize();
+                $this->EE->pl_email->PL_initialize();
 
                 if($this->default_from_address)
                 {
@@ -321,8 +322,13 @@ class Proform_notifications
                 $this->EE->pl_email->to($to_email);
                 $this->EE->pl_email->subject($subject);
 
-                // need to call entities_to_ascii() for text mode email w/ entry encoded data
-                $this->EE->pl_email->message(entities_to_ascii($message));
+                // We need to call entities_to_ascii() for text mode email w/ entry encoded data.
+                // $message will automatically have {if plain_email} and {if html_email} handled inside the pl_email class
+                // The message will also be automatically stripped of markup for the plain text version since we are not
+                // providing an explicit alternative, in which case a lack of a check for either of those variables will
+                // still generate a passable text email if the markup was not totally reliant on images.
+                //$this->EE->pl_email->message(entities_to_ascii($message));
+                $this->EE->pl_email->message($message);
 
                 $this->EE->pl_email->send = TRUE;
                 if ($this->EE->extensions->active_hook('proform_notification_message') === TRUE)
@@ -390,10 +396,14 @@ class Proform_notifications
 
     function get_template($template_name)
     {
+        $this->_debug($this->template_group_name);
+        
         $query = $this->EE->db->query($sql = "SELECT group_id FROM exp_template_groups WHERE group_name = '" . $this->EE->db->escape_str($this->template_group_name) . "';");
         if($query->num_rows() > 0)
         {
             $group_id = $query->row()->group_id;
+            
+            $this->_debug('Template group ID: '.$group_id);
 
             $sql = "SELECT * FROM exp_templates WHERE group_id = {$group_id} AND template_name = '" . $this->EE->db->escape_str($template_name) . "';";
             $query = $this->EE->db->query($sql);
@@ -407,12 +417,17 @@ class Proform_notifications
                                     . $this->EE->config->slash_item('site_short_name')
                                     . $this->template_group_name.'.group/'
                                     . $template_name.'.html';
-
+                    
+                    $this->_debug('Template saved as file '.$template_file);
+                    
                     $template_data = file_get_contents($template_file);
                 } else {
+                    $this->_debug('Template from DB');
                     $template_data = $query->row()->template_data;
                 }
-
+                
+                $this->_debug('Template: '.$template_data);
+                
                 return $template_data;
             } else {
                 return FALSE;
@@ -421,4 +436,5 @@ class Proform_notifications
             return FALSE;
         }
     } // function get_template()
+    
 } // class Proform_notifications
