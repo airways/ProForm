@@ -1302,20 +1302,38 @@ class Proform {
             {
                 // Check that the value submitted is one of the available options
                 $options = $field->get_list_options();
-
 				if(!isset($field->settings['type_multiselect']) || !$field->settings['type_multiselect'])
 				{
 					$multi = FALSE;
-                	$valid = array_key_exists($data[$field->field_name], $options);
+					$option_valid = FALSE;
+					foreach($options as $option)
+					{
+					    if($option['key'] == $data[$field->field_name])
+					    {
+					        $option_valid = TRUE;
+				        }
+			        }
+                	
+                	$valid = $option_valid;
 				} else {
 					$multi = TRUE;
 					if(!is_array($data[$field->field_name]))
 					{
 						$data[$field->field_name] = array($data[$field->field_name]);
 					}
+					
 					$valid = TRUE;
-					foreach($data[$field->field_name] as $selected_option) {
-						$valid &= array_key_exists($selected_option, $options);
+					foreach($data[$field->field_name] as $selected_option)
+					{
+						$option_valid = FALSE;
+						foreach($options as $option)
+    					{
+    					    if($option['key'] == $data[$field->field_name])
+    					    {
+    					        $option_valid = TRUE;
+    				        }
+    			        }
+                    	$valid &= $option_valid;
 						if(!$valid) break;
 					}
 				}
@@ -1324,9 +1342,8 @@ class Proform {
                 {
                    	$form_session->add_error($field->field_name, ($multi ? 'One of the values for' : 'The value for ').htmlentities($field->field_name).' is not a valid choice.');
                 }
-
             }
-            
+
             if($field->type != 'file')
             {
                 $checked_rules = '';
