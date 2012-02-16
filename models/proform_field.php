@@ -1,7 +1,5 @@
 <?php
 
-
-if(!class_exists('PL_Field')) {
 class PL_Field extends PL_RowInitialized
 {
     // $types maps internal type names to mysql or other DB types
@@ -43,11 +41,6 @@ class PL_Field extends PL_RowInitialized
         {
             $this->length = 255;
         }
-    }
-    
-    function save()
-    {
-        $this->__EE->formslib->save_field($this);
     }
 
     function get_control()
@@ -111,19 +104,24 @@ class PL_Field extends PL_RowInitialized
                     $key = $option;
                 }
                 
-                $selected = array_search($key, $selected_items) !== FALSE ? ' selected="selected" ' : '';
+                $selected = ($k = array_search($key, $selected_items)) !== FALSE ? ' selected="selected" ' : '';
+                if($selected)
+                {
+                    // If we have duplicate values, we only want to select the first one (useful for "select something"
+                    // messages and dividers).
+                    unset($selected_items[$k]);
+                }
 
                 $result[] = array(
                     'key' => $key,
                     'row' => $option,
                     'option' => $option,
+                    'label' => $option,
                     'selected' => $selected,
                 );
-                //$result[trim($option[0])] = trim($option[1]);
             }
         }
         return $result;
     }
 
-}
 }

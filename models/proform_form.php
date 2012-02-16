@@ -1,6 +1,5 @@
 <?php
 
-if(!class_exists('PL_Form')) {
 class PL_Form extends PL_RowInitialized {
     
     var $__fields = FALSE;
@@ -657,5 +656,4 @@ class PL_Form extends PL_RowInitialized {
         $this->__EE->load->library('formslib');
         $this->__EE->formslib->forms->save($this);
     }
-}
 }

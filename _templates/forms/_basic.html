@@ -57,6 +57,9 @@
             {if fieldrow:count > fieldrow:hidden_count}
                 <ul class="fieldRow">
                 {fields}
+                    {if field_heading}
+                        <h3>{field_heading}</h3>
+                    {if:else}
                     {if field_control != 'hidden'}{!-- skip hidden fields --}
                         <li id="{field_html_id}" class="{if field_error}error{/if} {if field_is_required}required{/if} {field_html_class}">
                             {field_extra_1}
@@ -88,6 +91,7 @@
                             {field_error}
                             {field_extra_2}
                         </li>
+                    {/if}
                     {/if}
                 {/fields}
                 </ul>

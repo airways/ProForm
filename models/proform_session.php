@@ -1,6 +1,5 @@
 <?php
 
-if(!class_exists('PL_FormSession')) {
 class PL_FormSession
 {
     var $values = array();
@@ -27,5 +26,4 @@ class PL_FormSession
         }
     }
 
-}
 }

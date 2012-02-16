@@ -909,7 +909,7 @@ class Proform_mcp {
         
         // see if the field already exists
         $field_name = strtolower(trim($this->EE->input->post('field_name')));
-        $field = $this->EE->formslib->fields->get($field_name);
+        $field = $this->EE->formslib->fields->get($field_name, FALSE);
         if($field) show_error(lang('field_already_exists'));
         
         // reset invalid length so it is set to the default
