@@ -207,10 +207,10 @@ class Proform_install
         // delete all defined forms
         if(!$this->test_uninstall)
         {
-            $forms = $this->EE->formslib->get_forms();
+            $forms = $this->EE->formslib->forms->get_all();
             foreach($forms as $form) 
             {
-                $this->EE->formslib->delete_form($form);
+                $this->EE->formslib->forms->delete($form);
             }
 
             $query = $this->EE->db->select('module_id')->get_where('modules', array('module_name' => 'Proform'));;
