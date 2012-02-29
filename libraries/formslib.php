@@ -97,7 +97,7 @@ class Formslib
         {
             foreach($query->result() as $form_row)
             {
-                $result[] = $this->get_form($form_row->form_id);
+                $result[] = $this->forms->get($form_row->form_id);
             }
         }
         return $result;

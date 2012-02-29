@@ -44,7 +44,7 @@ class Proform_forms extends Proform_test_base {
             'share_email_field' => '',
             'share_reply_to_field' => '',
         );
-        $save_form = $this->EE->formslib->new_form($data);
+        $save_form = $this->EE->formslib->forms->create($data);
         
         $this->assertNotEqual($save_form, FALSE);
         $this->assertTrue($save_form instanceof PL_Form);
@@ -69,7 +69,7 @@ class Proform_forms extends Proform_test_base {
         $this->assertEqual($save_form->share_email_field, '');
         $this->assertEqual($save_form->share_reply_to_field, '');
 
-        $db_form = $this->EE->formslib->get_form('test_form_1');
+        $db_form = $this->EE->formslib->forms->get('test_form_1');
         
         $this->assertNotEqual($db_form, FALSE);
         $this->assertTrue($db_form instanceof PL_Form);
@@ -120,12 +120,12 @@ class Proform_forms extends Proform_test_base {
             'share_email_field' => '',
             'share_reply_to_field' => '',
         );
-        $save_form = $this->EE->formslib->new_form($data);
+        $save_form = $this->EE->formslib->forms->create($data);
 
         $save_form->form_name = 'test_form_2_renamed';
         $save_form->save();
         
-        $db_form = $this->EE->formslib->get_form('test_form_2_renamed');
+        $db_form = $this->EE->formslib->forms->get('test_form_2_renamed');
         
         $this->assertNotEqual($db_form, FALSE);
         $this->assertTrue($db_form instanceof PL_Form);
@@ -143,12 +143,12 @@ class Proform_forms extends Proform_test_base {
             'field_label' => 'First Name',
             'field_name' => 'first_name',
         );
-        $save_field = $this->EE->formslib->new_field($data);
+        $save_field = $this->EE->formslib->fields->create($data);
         
         $this->assertNotEqual($save_field, FALSE);
         $this->assertTrue($save_field instanceof PL_Field);
         
-        $db_field = $this->EE->formslib->get_field('first_name');
+        $db_field = $this->EE->formslib->fields->get('first_name');
         
         $this->assertNotEqual($db_field, FALSE);
         $this->assertTrue($db_field instanceof PL_Field);
@@ -167,7 +167,7 @@ class Proform_forms extends Proform_test_base {
             'field_name' => 'list_field',
             'settings' => array('type_list' => "simple_option\ncomplex_option : Complex Option")
         );
-        $save_field = $this->EE->formslib->new_field($data);
+        $save_field = $this->EE->formslib->fields->create($data);
         
         $this->assertNotEqual($save_field, FALSE);
         $this->assertTrue($save_field instanceof PL_Field);
@@ -175,7 +175,7 @@ class Proform_forms extends Proform_test_base {
         $this->assertTrue(array_key_exists('type_list', $save_field->settings));
         $this->assertEqual($save_field->settings['type_list'], "simple_option\ncomplex_option : Complex Option");
         
-        $db_field = $this->EE->formslib->get_field('list_field');
+        $db_field = $this->EE->formslib->fields->get('list_field');
         
         $this->assertNotEqual($db_field, FALSE);
         $this->assertTrue($db_field instanceof PL_Field);
@@ -203,8 +203,8 @@ class Proform_forms extends Proform_test_base {
         $this->test_create_form();
         $this->test_create_field();
         
-        $form = $this->EE->formslib->get_form('test_form_1');
-        $field = $this->EE->formslib->get_field('first_name');
+        $form = $this->EE->formslib->forms->get('test_form_1');
+        $field = $this->EE->formslib->fields->get('first_name');
         
         $form->assign_field($field);
         
@@ -219,8 +219,8 @@ class Proform_forms extends Proform_test_base {
         $this->test_create_field();
         $this->test_rename_form();
         
-        $form = $this->EE->formslib->get_form('test_form_2_renamed');
-        $field = $this->EE->formslib->get_field('first_name');
+        $form = $this->EE->formslib->forms->get('test_form_2_renamed');
+        $field = $this->EE->formslib->fields->get('first_name');
         
         $form->assign_field($field);
 

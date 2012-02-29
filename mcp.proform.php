@@ -30,6 +30,13 @@
  *
  **/
 
+ 
+if(!file_exists(PATH_THIRD.'prolib/prolib.php'))
+{
+    echo 'ProForm requires the prolib package. Please place prolib into your third_party folder.';
+    exit;
+}
+
 require_once PATH_THIRD.'prolib/prolib.php';
 require_once PATH_THIRD.'proform/libraries/formslib.php';
 require_once PATH_THIRD.'proform/config.php';
@@ -610,7 +617,6 @@ class Proform_mcp {
                 if($is_required != 'y') $is_required = 'n';
                 $form->set_field_required($field, $is_required);
             }
-            
             $form->set_layout($field_order, $this->EE->input->post('field_row'), $this->EE->input->post('form_field_id'));
             
             $settings_map = array(
@@ -846,7 +852,7 @@ class Proform_mcp {
         ////////////////////////////////////////
         // Pagination
 
-        $total = $this->EE->formslib->count_fields();
+        $total = $this->EE->formslib->fields->count();
         $p_config = $this->pagination_config('list_fields', $total); // creates our pagination config for us
         $this->EE->pagination->initialize($p_config);
         $vars['pagination'] = $this->EE->pagination->create_links();
@@ -1355,9 +1361,9 @@ class Proform_mcp {
         $fields = $form->fields();
 
         $vars['fields'] = array('updated');
-        
         foreach($fields as $field)
-        {
+        {                      
+            if($field->heading) continue;
             $vars['fields'][] = $field->field_name;
             
             if(array_search($field->field_name, $vars['hidden_columns']) === FALSE)

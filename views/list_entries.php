@@ -30,7 +30,7 @@
  * 
  **/ ?>
 
-
+<div class="list_entries">
 <div class="new_field">
     <span class="button"><a href="<?php echo BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=export_entries'.AMP.'form_id='.$form_id; ?>"><?php echo lang('export_entries'); ?></a></span>
 </div>
@@ -90,4 +90,5 @@
 
 else:
     echo '<div class="no_items_msg">' . lang('no_entries') . '</div>';
-endif;
+endif;?>
+</div>

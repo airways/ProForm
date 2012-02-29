@@ -45,41 +45,46 @@ class PL_Form extends PL_RowInitialized {
         'extra2'        => '',
     );
     
+    function init()
+    {
+        $this->__EE->load->dbforge();
+        $forge = &$this->__EE->dbforge;
+        
+        // Create new table for the form
+        if($this->form_type == 'form')
+        {
+            // Create FORM table for storing actual form entries
+            $fields = array(
+                'form_entry_id'     => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE, 'auto_increment' => TRUE),
+                'updated'           => array('type' => 'timestamp'),
+                'ip_address'        => array('type' => 'varchar', 'constraint' => '128'),
+                'user_agent'        => array('type' => 'varchar', 'constraint' => '255'),
+                'dst_enabled'       => array('type' => 'varchar', 'constraint' => '1'),
+            );
+    
+            $forge->add_field($fields);
+            $forge->add_key('form_entry_id', TRUE);
+            $forge->add_key('updated');
+            // var_dump($data);
+            //             var_dump($fields);
+            //             exit;
+            $forge->create_table(PL_Form::make_table_name($this->form_name));
+        } 
+    }
+    
     function pre_save()
     {
         $this->form_name = strtolower(str_replace(' ', '_', $this->form_name));
     }
 
-    function post_save()
+    function post_save($mgr, $data)
     {
-        // Create new table for the form
         $this->__EE->load->dbforge();
         $forge = &$this->__EE->dbforge;
         
-        // Create the table for this form if it isn't a SAEF or Share form
-        if(!$this->form_id)
+        // Rename the table
+        if($this->form_type == 'form')
         {
-            // new form
-            if($this->form_type == 'form')
-            {
-                // Create FORM table for storing actual form entries
-                $fields = array(
-                    'form_entry_id'     => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE, 'auto_increment' => TRUE),
-                    'updated'           => array('type' => 'timestamp'),
-                    'ip_address'        => array('type' => 'varchar', 'constraint' => '128'),
-                    'user_agent'        => array('type' => 'varchar', 'constraint' => '255'),
-                    'dst_enabled'       => array('type' => 'varchar', 'constraint' => '1'),
-                );
-        
-                $forge->add_field($fields);
-                $forge->add_key('form_entry_id', TRUE);
-                $forge->add_key('updated');
-                // var_dump($data);
-                //             var_dump($fields);
-                //             exit;
-                $forge->create_table(PL_Form::make_table_name($this->form_name));
-            }
-        } else {
             if($this->__original_name != $this->form_name)
             {
                 $this->__EE->db->query("RENAME TABLE exp_".$this->original_table_name()." TO exp_".$this->table_name());

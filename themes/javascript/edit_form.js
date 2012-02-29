@@ -15,97 +15,36 @@ var proform_edit_form = {
         $('input[name=form_label]').keydown(update_form_label).keyup(update_form_label).change(update_form_label);
         
         
-    $('.dropdown-wrap .submit, .dropdown-wrap .dropdown').hover(function() {
-        $('.dropdown').show();
-    }, function() {
-        $('.dropdown').hide();
-    });
+        $('.dropdown-wrap .submit, .dropdown-wrap .dropdown').hover(function() {
+            $('.dropdown').show();
+        }, function() {
+            $('.dropdown').hide();
+        });
     
-    //console.log('test');
+        //console.log('test');
     
-    function activateTab(currentTab)
-    {
-        $('input[name=active_tab]').val(currentTab.replace('#', ''));
-        $('.tabs li a').parent('li').removeClass('active');
-        $(currentTab.replace('tab-', '').replace('#', '.')).addClass('active');
-        $('.tab-content').hide();
-        //console.log(currentTab);
-        $(currentTab.replace('#', '.')).show();
-        window.location.hash = currentTab;
-    }
-    
-    $('.tabs li a').click(function() {
-        var currentTab = $(this).attr('href');
-        activateTab(currentTab);
-        return false;
-    });
-    
-    $('#gridrow_validation tr:odd').addClass('even');
-
-    if(window.location.hash.indexOf('tab-content-layout') !== -1) {
-        activateTab('#tab-content-layout');
-    } else {
-        activateTab('#tab-content-settings');
-    }
-    
-    
-    var $active_field = 0;
-    function save_meta()
-    {
-        if($active_field)
+        function activateTab(currentTab)
         {
-            $active_field.find('.fieldRequired').val($('#field-required').is(':checked') ? 'y' : 'n');
-            $active_field.find('.fieldLabel').val($('#field-label').val());
-            $active_field.find('.fieldPresetValue').val($('#field-preset-value').val());
-            $active_field.find('.fieldPresetForced').val($('#field-preset-forced').is(':checked') ? 'y' : 'n');
-            $active_field.find('.fieldHtmlId').val($('#field-html-id').val());
-            $active_field.find('.fieldHtmlClass').val($('#field-html-class').val());
-            $active_field.find('.fieldExtra1').val($('#field-extra1').val());
-            $active_field.find('.fieldExtra2').val($('#field-extra2').val());
+            $('input[name=active_tab]').val(currentTab.replace('#', ''));
+            $('.tabs li a').parent('li').removeClass('active');
+            $(currentTab.replace('tab-', '').replace('#', '.')).addClass('active');
+            $('.tab-content').hide();
+            //console.log(currentTab);
+            $(currentTab.replace('#', '.')).show();
+            window.location.hash = currentTab;
         }
-    }
-
-    function load_meta()
-    {
-        if($active_field)
-        {
-	$('.meta-sidebar').show();
-			if($active_field.find('.fieldHeading').val() != '') {
-				$('.meta-sidebar').hide();
-			} else {
-				
-			}
-			
-            $('#field-required').attr('checked', $active_field.find('.fieldRequired').val() == 'y');
-            $('#field-label').val($active_field.find('.fieldLabel').val());
-            $('#field-preset-value').val($active_field.find('.fieldPresetValue').val());
-            $('#field-preset-forced').attr('checked', $active_field.find('.fieldPresetForced').val() == 'y');
-            $('#field-html-id').val($active_field.find('.fieldHtmlId').val());
-            $('#field-html-class').val($active_field.find('.fieldHtmlClass').val());
-            $('#field-extra1').val($active_field.find('.fieldExtra1').val());
-            $('#field-extra2').val($active_field.find('.fieldExtra2').val());
+    
+        $('.tabs li a').click(function() {
+            var currentTab = $(this).attr('href');
+            activateTab(currentTab);
+            return false;
+        });
+    
+        if(window.location.hash.indexOf('tab-content-layout') !== -1) {
+            activateTab('#tab-content-layout');
+        } else {
+            activateTab('#tab-content-settings');
         }
-    }
-    
-    // disable all property inspector inputs until a field is selected
-    $('.field-modifications input[type=text],.field-modifications input[type=checkbox]').attr('disabled', 'disabled');
-    
-    $('.form-setup li').click(function() {
-        save_meta();
-        $('.form-setup li').removeClass('active');
-        
-        $active_field = $(this);
-        $(this).addClass('active');
-        load_meta();
-        
-        $('#edit-field-name').text($active_field.find('.fieldLabel'));
-        $('.field-modifications input').removeAttr('disabled');
-        
-    });
-    
-    $('#main_form').submit(function() {
-        save_meta();
-    });
     }
 }
 

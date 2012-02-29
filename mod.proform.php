@@ -29,6 +29,13 @@
  * to this clause.
  *
  **/
+ 
+ 
+if(!file_exists(PATH_THIRD.'prolib/prolib.php'))
+{
+    echo 'ProForm requires the prolib package. Please place prolib into your third_party folder.';
+    exit;
+}
 
 require_once PATH_THIRD.'prolib/prolib.php';
 require_once PATH_THIRD.'proform/config.php';
@@ -83,13 +90,8 @@ class Proform {
 
         $varsets = array();
         
-        /*
-         * TODO: add license key validation
-
-        if(strlen($this->EE->config->item('pl_form_license')) < 32)
-        {
-            echo "pl_form requires a valid pl_form_license value to be set in the config file.";die;
-        }*/
+        //|| file_get_contents('http://metasushi.com/license_validation.php?license='.$this->EE->config->item('proform_license')) != 'pass' 
+        strlen($this->EE->config->item('proform_license')) >= 32 || exit("ProForm requires a valid proform_license value to be set in the config file.");
         
         // Get params
         $form_name = $this->EE->TMPL->fetch_param('form_name', FALSE);
@@ -418,7 +420,7 @@ class Proform {
                 
                 if ($this->EE->extensions->active_hook('proform_form_preparse') === TRUE)
                 {
-                    list($variables, $this->var_pairs) = $this->EE->extensions->call('proform_form_preparse', $this, $form_obj, $variables, $this->var_pairs);
+                    list($$tagdata, $form_obj, $variables, $this->var_pairs) = $this->EE->extensions->call('proform_form_preparse', $this, $tagdata, $form_obj, $variables, $this->var_pairs);
                 }
                 
                 // Parse variables
@@ -591,7 +593,7 @@ class Proform {
                     // parse the row
                     if ($this->EE->extensions->active_hook('proform_entries_row') === TRUE)
                     {
-                        $row_vars = $this->EE->extensions->call('proform_entries_row', $this, $form_obj, $row_vars);
+                        list($form_obj, $row_vars) = $this->EE->extensions->call('proform_entries_row', $this, $form_obj, $row_vars);
                     }
                     
                     $rowdata = $this->EE->pl_parser->parse_variables($tagdata, $row_vars, array('fieldrows', 'fields'), 0, array('dst_enabled' => 1));
@@ -986,8 +988,11 @@ class Proform {
         // can be set by extensions when processing some of our hooks to ask the action to end early
         $this->EE->extensions->end_script = FALSE;
 
-        if ($this->EE->security->check_xid($this->EE->input->post('XID')) == FALSE) exit('Request could not be authenticated');
-        $this->EE->security->delete_xid($this->EE->input->post('XID'));
+        if($this->EE->config->item('proform_disable_xid', 'n') != 'y')
+        {
+            if ($this->EE->security->check_xid($this->EE->input->post('XID')) == FALSE) exit('Request could not be authenticated');
+            $this->EE->security->delete_xid($this->EE->input->post('XID'));
+        }
 
         $this->EE->load->library('encrypt');
         $this->EE->load->library('user_agent');
@@ -1016,7 +1021,7 @@ class Proform {
 
         if ($this->EE->extensions->active_hook('proform_process_start') === TRUE)
         {
-            $form_obj = $this->EE->extensions->call('proform_process_start', $form_obj, $form_config, $form_session, $this);
+            list($form_obj, $form_config, $form_session) = $this->EE->extensions->call('proform_process_start', $this, $form_obj, $form_config, $form_session);
             if($this->EE->extensions->end_script) return;
         }
 
@@ -1288,7 +1293,7 @@ class Proform {
         
         if ($this->EE->extensions->active_hook('proform_validation_start') === TRUE)
         {
-            $this->EE->extensions->call('proform_validation_start', $this, $form_obj, $form_session, $data);
+            list($form_obj, $form_session, $data) = $this->EE->extensions->call('proform_validation_start', $this, $form_obj, $form_session, $data);
         }
         
         // override delimiter values from form configuration
