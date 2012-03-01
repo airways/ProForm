@@ -48,7 +48,7 @@
         <p><strong>$config['encryption_key'] = '<?php echo $random_key; ?>';</strong></p>
         <p>Once this has been set, this message will be removed.</p>
         <?php if($allow_encrypted_form_data): ?>
-        <p><b>If you use encrypted forms (disabled by default) - you should keep a copy of your encryption_key in a secure location, or the data in your forms will not be accessible. In this case it should also not be changed for this site.</b></p>
+        <p><b>If you use encrypted forms (disabled by default) - you should keep a copy of your encryption_key in a secure location, or the data in your forms will not be accessible. Once set, the encryption_key should also not be changed for this site.</b></p>
         <?php endif; ?>
         <p>You can see the <a href="http://codeigniter.com/user_guide/libraries/encryption.html">CodeIgniter Encryption documentation</a> for more information.</p>
     </div>

@@ -213,7 +213,7 @@ class Proform_mcp {
         $vars['is_super_admin'] = $this->EE->session->userdata['group_id'] == 1;
         $vars['mcrypt_warning'] = !function_exists('mcrypt_encrypt');
         $vars['key_warning'] = !(strlen($this->EE->config->item('encryption_key')) >= 32);
-        $vars['allow_encrypted_form_data'] = $this->EE->config->item('proform_allow_encrypted_form_data') == 'y';
+        $vars['allow_encrypted_form_data'] = $this->EE->config->item('proform_allow_encrypted_form_data') == 'y' || $this->EE->formslib->force_allow_encrypted_forms;
         $vars['random_key'] = $this->make_random_key();
 
         ////////////////////////////////////////
@@ -309,7 +309,7 @@ class Proform_mcp {
         
         $vars['mcrypt'] = function_exists('mcrypt_encrypt') ? 'yes' : 'no';
         $vars['encryption_key_set'] = (strlen($this->EE->config->item('encryption_key')) >= 32) ? 'yes' : 'no';
-        $vars['allow_encrypted_form_data'] = $this->EE->config->item('proform_allow_encrypted_form_data') == 'y';
+        $vars['allow_encrypted_form_data'] = $this->EE->config->item('proform_allow_encrypted_form_data') == 'y' || $this->EE->formslib->force_allow_encrypted_forms;
         $vars['random_key'] = $this->make_random_key();
         
         $this->EE->load->library('table');

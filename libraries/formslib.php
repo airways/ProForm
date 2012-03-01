@@ -52,7 +52,6 @@ class Formslib
         'from_name' => '',
         'reply_to_address' => '',
         'reply_to_name' => '',
-        'allow_encrypted_forms' => '',
 
     );
 
@@ -70,7 +69,9 @@ class Formslib
         
         if($query->num_rows() > 0)
         {
-            $this->default_prefs['allow_encrypted_forms'] = 'y';
+            $this->force_allow_encrypted_forms = 'y';
+        } else {
+            $this->force_allow_encrypted_forms = '';
         }
         
         // Initialize the preferences manager. This will set default preferences for us according to
