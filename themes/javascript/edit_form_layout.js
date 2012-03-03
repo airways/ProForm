@@ -90,7 +90,7 @@ var proform_edit_form_layout = {
                 } 
             }
         }
-        $('#field-label').keydown(label_updated).keyup(label_updated).change(label_updated);
+        $('#field-label').unbind('keydown').unbind('keyup').unbind('change').keydown(label_updated).keyup(label_updated).change(label_updated);
 
         var default_updated = function() {
             if($active_field && !loading_meta) {
@@ -127,10 +127,11 @@ var proform_edit_form_layout = {
             {
                 loading_meta = true;
                 
-                $('.meta-sidebar').show();
-                if($active_field.find('.isHeading').val() == '1') {
-                    $('.meta-sidebar').hide();
-                }
+                proform_edit_form.activate_tab('sidebar', '#tab-content-override');
+                // $('.meta-sidebar').show();
+                //                 if($active_field.find('.isHeading').val() == '1') {
+                //                     $('.meta-sidebar').hide();
+                //                 }
             
                 $('#field-required').attr('checked', $active_field.find('.fieldRequired').val() == 'y');
                 $('#field-label').val($active_field.find('.fieldLabel').val());
@@ -148,7 +149,7 @@ var proform_edit_form_layout = {
         // disable all property inspector inputs until a field is selected
         $('.field-modifications input[type=text],.field-modifications input[type=checkbox]').attr('disabled', 'disabled');
     
-        $('.form-setup li').click(function() {
+        $('.form-setup li').unbind('click').click(function() {
             save_meta();
             $('.form-setup li').removeClass('active');
         
@@ -161,9 +162,33 @@ var proform_edit_form_layout = {
         
         });
     
-        $('#main_form').submit(function() {
+        $('#main_form').unbind('submit').submit(function() {
             save_meta();
         });
+        
+        // $('.toolbox a.field_type').colorbox({
+        //     returnFocus: false,
+        //     fixed: true,
+        //     left: 40,
+        //     width: 900,
+        //     height: 700,
+        //     onClosed: function() {
+        //         $('.edit_form').load(window.location + ' .edit_form', function() {
+        //             proform_edit_form.bind_events();
+        //             proform_edit_form_layout.bind_events();
+        //         });
+        //     }
+        // });
+        // 
+        // $('.toolbox a.library').unbind('click').click(function() {
+        //     $.post($(this).attr('href'), function() {
+        //         $('.edit_form').load(window.location + ' .edit_form', function() {
+        //             proform_edit_form.bind_events();
+        //             proform_edit_form_layout.bind_events();
+        //         }); 
+        //     });
+        //     return false;
+        // });
    }
 };
 

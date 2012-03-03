@@ -31,26 +31,22 @@
  **/ ?>
 
 
-<?php if($is_super_admin AND $mcrypt_warning): ?>
+<?php if($is_super_admin AND !$mcrypt_installed AND $allow_encrypted_form_data): ?>
     <div class="warning">
-        <p><strong>Warning:</strong> Your server does not have the <a href="http://php.net/mcrypt">mcrypt PHP extension</a> installed. Your form submissions will be less secure without this PHP extension. It is <strong>strongly</strong> recommended that you install mcrypt.</p>
-        <?php if($allow_encrypted_form_data): ?>
-        <p><strong>Data storedin encrypted forms (disabled by default) will use a simple XOR encoding cipher rather than the more secure encryption.</strong></p>
-        <?php endif; ?>
+        <p><strong>Warning:</strong> You have enabled the hidden configuration option allow_encrypted_form_data, but your server does not have the <a href="http://php.net/mcrypt">mcrypt PHP extension</a> installed. Your form submissions will be less secure without this PHP extension. It is <strong>strongly</strong> recommended that you install mcrypt. Please contact your hosting provider or search their knowledge base for information on how to accomplish this.</p>
+        <p><strong>Data stored in encrypted forms (disabled by default) will use a simple XOR encoding cipher rather than the more secure encryption.</strong></p>
     </div>
 <?php endif; ?>
 
 
-<?php if($is_super_admin AND $key_warning): ?>
+<?php if($is_super_admin AND $encryption_key_set == 'no' AND $allow_encrypted_form_data): ?>
     <div class="warning">
-        <p><strong>Warning:</strong> You do not have a encryption_key value set. ProForm will not function correctly until this value is set. To set the encryption key, you should edit your config file at <strong>system/expressionengine/config/config.php</strong>. Find the value named encryption_key and change the blank string to a random value.</p>
+        <p><strong>Warning:</strong> You have enabled the hidden configuration option allow_encrypted_form_data, but you do not have a encryption_key value set. ProForm will not function correctly until this value is set. To set the encryption key, you should edit your config file at <strong>system/expressionengine/config/config.php</strong>. Find the value named encryption_key and change the blank string to a random value.</p>
         <p>For your convenience, here is a semi-random value you can use - although it may not be as secure as a truly random value:</p>
         <p><strong>$config['encryption_key'] = '<?php echo $random_key; ?>';</strong></p>
         <p>Once this has been set, this message will be removed.</p>
-        <?php if($allow_encrypted_form_data): ?>
         <p><b>If you use encrypted forms (disabled by default) - you should keep a copy of your encryption_key in a secure location, or the data in your forms will not be accessible. Once set, the encryption_key should also not be changed for this site.</b></p>
-        <?php endif; ?>
-        <p>You can see the <a href="http://codeigniter.com/user_guide/libraries/encryption.html">CodeIgniter Encryption documentation</a> for more information.</p>
+        <p>You can read the <a href="http://codeigniter.com/user_guide/libraries/encryption.html">CodeIgniter Encryption documentation</a> for more information.</p>
     </div>
 <?php endif; ?>
 

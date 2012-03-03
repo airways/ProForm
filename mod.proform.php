@@ -83,15 +83,15 @@ class Proform {
         $this->EE->load->library('user_agent');
         $this->EE->load->library('proform_notifications');
         
-        if(strlen($this->EE->config->item('encryption_key')) < 32) 
-        {
-            show_error("{exp:proform:form} requires a valid (32 character) encryption_key to be set in the config file.");
-        }
+        // if(strlen($this->EE->config->item('encryption_key')) < 32) 
+        // {
+        //     show_error("{exp:proform:form} requires a valid (32 character) encryption_key to be set in the config file.");
+        // }
 
         $varsets = array();
         
         //|| file_get_contents('http://metasushi.com/license_validation.php?license='.$this->EE->config->item('proform_license')) != 'pass' 
-        strlen($this->EE->config->item('proform_license')) >= 32 || exit("ProForm requires a valid proform_license value to be set in the config file.");
+        // strlen($this->EE->config->item('proform_license')) >= 32 || exit("ProForm requires a valid proform_license value to be set in the config file.");
         
         // Get params
         $form_name = $this->EE->TMPL->fetch_param('form_name', FALSE);

@@ -103,6 +103,7 @@ $lang = array(
     'tab_new_template' => 'New Template',
     'tab_delete_template' => 'Delete Template',
 	'tab_new_heading' => 'New Heading',
+	'tab_edit_heading' => 'Edit Heading',
     
     // Fields
     'field_form_name' => 'Form Short Name',
@@ -204,6 +205,9 @@ $lang = array(
     'field_updated' => 'Updated',
     'field_ip_address' => 'IP Address',
     'field_user_agent' => 'User Agent',
+    
+    'field_heading' => 'Heading',
+    'field_reusable' => 'Reusable (place in library)',
     
     // Errors
     'invalid_submit' => 'The form has invalid values',
