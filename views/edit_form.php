@@ -39,7 +39,8 @@
 <?php if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>'; ?>
 <?php if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>'; ?>
 
-<div class="tabs">
+<div class="tabs-wrapper">
+<div class="tabs main" id="main-tabs" data-tabset="main">
     <ul>
         <li class="active content-settings"><a href="#tab-content-settings">Form Settings</a></li>
 <?php if(isset($form_id) AND $form_id): ?>
@@ -48,11 +49,22 @@
     </ul>
 </div>
 
+<div class="tabs sidebar" id="sidebar-tabs" data-tabset="sidebar">
+    <ul>
+        <li class="active content-add-item"><a href="#tab-content-add-item">Add Item</a></li>
+        <li class="content-override"><a href="#tab-content-override">Overrides</a></li>
+    </ul>
+</div>
+</div>
+
+<div class="clear"></div>
+
+
 <?php echo form_open($action_url, array('id' => 'main_form'), isset($hidden) ? $hidden : array()); ?>
 <?php echo form_hidden('active_tab'); ?>
 
 <!-- start edit form tab content -->
-<div class="tab-content tab-content-settings">
+<div class="tab-content main tab-content-settings">
 
     <?php $generic_edit_embedded = TRUE; include(PATH_THIRD.'proform/views/generic_edit.php'); ?>
 
@@ -62,7 +74,7 @@
 <?php if(isset($form_id) AND $form_id): ?>
 
 <!-- start tab content -->
-<div class="grid-group tab-content tab-content-layout">
+<div class="grid-group tab-content main tab-content-layout">
 
     <?php include(PATH_THIRD.'proform/views/edit_form_layout.php'); ?>
 

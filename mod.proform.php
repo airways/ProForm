@@ -83,15 +83,15 @@ class Proform {
         $this->EE->load->library('user_agent');
         $this->EE->load->library('proform_notifications');
         
-        if(strlen($this->EE->config->item('encryption_key')) < 32) 
-        {
-            show_error("{exp:proform:form} requires a valid (32 character) encryption_key to be set in the config file.");
-        }
+        // if(strlen($this->EE->config->item('encryption_key')) < 32) 
+        // {
+        //     show_error("{exp:proform:form} requires a valid (32 character) encryption_key to be set in the config file.");
+        // }
 
         $varsets = array();
         
         //|| file_get_contents('http://metasushi.com/license_validation.php?license='.$this->EE->config->item('proform_license')) != 'pass' 
-        strlen($this->EE->config->item('proform_license')) >= 32 || exit("ProForm requires a valid proform_license value to be set in the config file.");
+        // strlen($this->EE->config->item('proform_license')) >= 32 || exit("ProForm requires a valid proform_license value to be set in the config file.");
         
         // Get params
         $form_name = $this->EE->TMPL->fetch_param('form_name', FALSE);
@@ -462,6 +462,13 @@ class Proform {
     {
         $this->EE->load->library('formslib');
 
+        $variables = $this->_get_results(); 
+        $this->return_data = $this->EE->pl_parser->parse_variables($this->EE->TMPL->tagdata, $variables, $this->var_pairs);
+        return $this->return_data;
+    } 
+    
+    private function _get_results()
+    {
         $variables = array(
             'form_name'     => FALSE,
             'fieldrows'     => array(),
@@ -495,8 +502,7 @@ class Proform {
             }
         }
         
-        $this->return_data = $this->EE->pl_parser->parse_variables($this->EE->TMPL->tagdata, $variables, $this->var_pairs);
-        return $this->return_data;
+        return $variables;
     }
     
     /*
@@ -988,7 +994,10 @@ class Proform {
         // can be set by extensions when processing some of our hooks to ask the action to end early
         $this->EE->extensions->end_script = FALSE;
 
-        if($this->EE->config->item('proform_disable_xid', 'n') != 'y')
+        
+        if($this->EE->config->item('proform_disable_xid', 'n') == 'n'
+          OR ($this->EE->input->is_ajax_request() AND
+              $this->EE->config->item('proform_disable_xid_ajax', 'n') == 'n'))
         {
             if ($this->EE->security->check_xid($this->EE->input->post('XID')) == FALSE) exit('Request could not be authenticated');
             $this->EE->security->delete_xid($this->EE->input->post('XID'));
@@ -1005,11 +1014,11 @@ class Proform {
         //$form_config = unserialize($this->EE->encrypt->decode($form_config_enc));
         $form_config = $this->EE->formslib->vault->get($form_config_enc);
 
-		// make sure the form object data we have is for this form, if not bail
-		if(!$form_config || !isset($form_config['form_name']) || $form_config['form_name'] != $form_obj->form_name)
-		{
-			return $result;
-		}
+        // make sure the form object data we have is for this form, if not bail
+        if(!$form_config || !isset($form_config['form_name']) || $form_config['form_name'] != $form_obj->form_name)
+        {
+            return $result;
+        }
         
         // find the form
         $form_name = $form_config['form_name'];
@@ -1051,7 +1060,14 @@ class Proform {
             // return any errors to the form template
             if(count($form_session->errors) > 0)
             {
-                return $form_session;
+                if($this->EE->input->is_ajax_request())
+                {
+                    $form_session->status = 'error';
+                    $this->EE->output->send_ajax_response((array)$form_session);
+                    exit;
+                } else {
+                    return $form_session;
+                }
             } else {
 
                 // if no errors - insert data
@@ -1076,7 +1092,15 @@ class Proform {
                 $_SESSION['pl_form']['thank_you_form'] = $form_name;
                 $_SESSION['pl_form']['result_session'] = serialize($form_session);
                 $_SESSION['pl_form']['result_config'] = serialize($form_config);
-                $this->EE->functions->redirect($form_config['thank_you_url']);
+                
+                if($this->EE->input->is_ajax_request())
+                {
+                    $entry_data['status'] = 'success';
+                    $this->EE->output->send_ajax_response($entry_data);
+                    exit;
+                } else {
+                    $this->EE->functions->redirect($form_config['thank_you_url']);
+                }
                 
                 $result = TRUE;
                 return $form_session;
@@ -1307,45 +1331,45 @@ class Proform {
             {
                 // Check that the value submitted is one of the available options
                 $options = $field->get_list_options();
-				if(!isset($field->settings['type_multiselect']) || !$field->settings['type_multiselect'])
-				{
-					$multi = FALSE;
-					$option_valid = FALSE;
-					foreach($options as $option)
-					{
-					    if($option['key'] == $data[$field->field_name])
-					    {
-					        $option_valid = TRUE;
-				        }
-			        }
-                	
-                	$valid = $option_valid;
-				} else {
-					$multi = TRUE;
-					if(!is_array($data[$field->field_name]))
-					{
-						$data[$field->field_name] = array($data[$field->field_name]);
-					}
-					
-					$valid = TRUE;
-					foreach($data[$field->field_name] as $selected_option)
-					{
-						$option_valid = FALSE;
-						foreach($options as $option)
-    					{
-    					    if($option['key'] == $data[$field->field_name])
-    					    {
-    					        $option_valid = TRUE;
-    				        }
-    			        }
-                    	$valid &= $option_valid;
-						if(!$valid) break;
-					}
-				}
-                
-				if(!$valid)
+                if(!isset($field->settings['type_multiselect']) || !$field->settings['type_multiselect'])
                 {
-                   	$form_session->add_error($field->field_name, ($multi ? 'One of the values for' : 'The value for ').htmlentities($field->field_name).' is not a valid choice.');
+                    $multi = FALSE;
+                    $option_valid = FALSE;
+                    foreach($options as $option)
+                    {
+                        if($option['key'] == $data[$field->field_name])
+                        {
+                            $option_valid = TRUE;
+                        }
+                    }
+                    
+                    $valid = $option_valid;
+                } else {
+                    $multi = TRUE;
+                    if(!is_array($data[$field->field_name]))
+                    {
+                        $data[$field->field_name] = array($data[$field->field_name]);
+                    }
+                    
+                    $valid = TRUE;
+                    foreach($data[$field->field_name] as $selected_option)
+                    {
+                        $option_valid = FALSE;
+                        foreach($options as $option)
+                        {
+                            if($option['key'] == $data[$field->field_name])
+                            {
+                                $option_valid = TRUE;
+                            }
+                        }
+                        $valid &= $option_valid;
+                        if(!$valid) break;
+                    }
+                }
+                
+                if(!$valid)
+                {
+                    $form_session->add_error($field->field_name, ($multi ? 'One of the values for' : 'The value for ').htmlentities($field->field_name).' is not a valid choice.');
                 }
             }
 
@@ -1487,18 +1511,18 @@ class Proform {
                 $this->prolib->debug($save_data);
                 // */
             }
-        	
-			// collapse multiselect options and other array values to a single string
+            
+            // collapse multiselect options and other array values to a single string
             foreach($save_data as $k => $v)
-			{
-			    if(is_array($v))
-    			{
-    				$save_data[$k] = implode("|", $v);
-    			}
-			}
-			
-			if(isset($save_data[''])) unset($save_data['']);
-			
+            {
+                if(is_array($v))
+                {
+                    $save_data[$k] = implode("|", $v);
+                }
+            }
+            
+            if(isset($save_data[''])) unset($save_data['']);
+            
             if(!$result = $this->EE->db->insert($form_obj->table_name(), $save_data))
             {
                 show_error("{exp:proform:form} could not insert into form: ".$form_obj->form_name);
@@ -1698,8 +1722,8 @@ class Proform {
 
                     if($k == 'list')
                     {
-//	var_dump($field_values[$field->field_name]);exit;
-						$v = $field->get_list_options($field_values[$field->field_name]);
+//  var_dump($field_values[$field->field_name]);exit;
+                        $v = $field->get_list_options($field_values[$field->field_name]);
                     }
                     $field_array['field_setting_'.$k] = $v;
                 }

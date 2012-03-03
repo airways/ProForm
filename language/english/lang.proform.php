@@ -103,6 +103,7 @@ $lang = array(
     'tab_new_template' => 'New Template',
     'tab_delete_template' => 'Delete Template',
 	'tab_new_heading' => 'New Heading',
+	'tab_edit_heading' => 'Edit Heading',
     
     // Fields
     'field_form_name' => 'Form Short Name',
@@ -146,8 +147,6 @@ $lang = array(
     'field_mailinglist_id' => 'Mailing List',
     'field_reply_to_field' => 'Reply-To Field',
     'field_reply_to_field_desc' => 'Field on the form containing the email address to set as this notification\'s Reply-To',
-    'field_allow_encrypted_forms' => 'Allow Form Encryption',
-    'field_allow_encrypted_forms_desc' => 'Allows the option to encrypt data stored for a form in the database to be used. This option is not recommended for most users.',
     
     'field_submitter_notification_name' => 'Notification Field Settings - A',
     'field_submitter_notification_on' => 'Enable Group',
@@ -206,6 +205,9 @@ $lang = array(
     'field_updated' => 'Updated',
     'field_ip_address' => 'IP Address',
     'field_user_agent' => 'User Agent',
+    
+    'field_heading' => 'Heading',
+    'field_reusable' => 'Reusable (place in library)',
     
     // Errors
     'invalid_submit' => 'The form has invalid values',

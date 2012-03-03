@@ -111,6 +111,7 @@ class Proform_install
             'safecracker_channel_id'            => array('type' => 'int', 'constraint' => '10',         'default' => 0),
             'reply_to_address'                  => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
             'reply_to_name'                     => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
+            'reusable'                          => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
             'settings'                          => array('type' => 'blob',                              'default' => ''),
             
             'admin_notification_on'             => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
@@ -175,7 +176,7 @@ class Proform_install
             'field_name'    => array('type' => 'varchar', 'constraint' => '32'),
             'is_required'   => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'),
             'form_field_settings'      => array('type' => 'blob'),
-			'heading'		=> array('type' => 'varchar', 'constraint' => 256, 'default' => '')
+            'heading'       => array('type' => 'varchar', 'constraint' => 256, 'default' => '')
         );
         $this->EE->dbforge->add_field($fields);
         $forge->add_key('form_field_id', TRUE);
@@ -283,21 +284,31 @@ class Proform_install
             $forge->add_column('proform_forms', $fields);
         }
 
-		if($current < 0.44)
-		{
-			$fields = array(
-				'heading' => array('type' => 'varchar', 'constraint' => 256, 'default' => '')
-			);
+        if($current < 0.44)
+        {
+            $fields = array(
+                'heading' => array('type' => 'varchar', 'constraint' => 256, 'default' => '')
+            );
             $forge->add_column('proform_form_fields', $fields);
-		}
-		
-		if($current < 0.45)
-		{
-			// Forge doesn't seem to be able to add a column and key at the same time, which you must do when adding a AUTO_INCREMENT to an
-			// existing table, so we need to do this in SQL:
-			$this->EE->db->query('ALTER TABLE `exp_proform_form_fields` ADD `form_field_id` int(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY');
-		}
+        }
+        
+        if($current < 0.45)
+        {
+            // Forge doesn't seem to be able to add a column and key at the same time, which you must do when adding a AUTO_INCREMENT to an
+            // existing table, so we need to do this in SQL:
+            $this->EE->db->query('ALTER TABLE `exp_proform_form_fields` ADD `form_field_id` int(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY');
+        }
 
+        if($current < 0.49)
+        {
+            $fields = array(
+                'reusable'                      => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
+            );
+            $forge->add_column('proform_fields', $fields);
+            
+            // Make any existing fields reusable since all fields were prior to this version
+            $this->EE->db->update('proform_fields', array('reusable' => 'y'));
+        }
 
         return TRUE;
     } // function update

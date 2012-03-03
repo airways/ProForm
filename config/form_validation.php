@@ -29,5 +29,6 @@ $config_defaults = array(
     'edit_field' => array(
         'validation' => 'none',
         'length' => 255,
+        'reusable' => 'n',
     ),
 );

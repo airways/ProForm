@@ -24,7 +24,26 @@ class PL_Field extends PL_RowInitialized
             'member_data'   => array('type' => 'varchar', 'limit' => 255, 'limit_promote' => 'text'),
         )
     );
-
+    
+    public static $item_options = array(
+        array('label' => 'Checkbox',                    'type' => 'checkbox',                   'icon' => 'checkbox.png'),
+        array('label' => 'Text',                        'type' => 'string',                     'icon' => 'textfield.png'),
+        array('label' => 'Textarea',                    'type' => 'string',                     'icon' => 'textarea.png'),
+        array('label' => 'Number: Integer',             'type' => 'int',                        'icon' => 'number.png'),
+        array('label' => 'Number: Float',               'type' => 'float',                      'icon' => 'float.png'),
+        array('label' => 'Number: Currency',            'type' => 'currency',                   'icon' => 'currency.png'),
+        array('label' => 'Date',                        'type' => 'date',                       'icon' => 'calendar_view_day.png'),
+        array('label' => 'Date Time',                   'type' => 'datetime',                   'icon' => 'time.png'),
+        array('label' => 'File Upload',                 'type' => 'file',                       'icon' => 'page_attach.png'),
+        array('label' => 'List',                        'type' => 'list',                       'icon' => 'select.png'),
+        // array('label' => 'Quantity Group List',         'type' => 'Quantity Group List',         'icon' => 'email_add.png'),
+        array('label' => 'Hidden',                      'type' => 'hidden',                     'icon' => 'hidden.png'),
+        array('label' => 'Secure Hidden',               'type' => 'secure',                     'icon' => 'secure.png'),
+        array('label' => 'Member Data',                 'type' => 'member_data',                'icon' => 'user_gray.png'),
+        array('label' => 'Mailing List Subscription',   'type' => 'mailinglist',                'icon' => 'email_add.png'),
+        // array('label' => 'Field Group',                 'type' => 'fieldgroup',                 'icon' => 'textfield.png'),
+    );
+    
     var $field_id = FALSE;
     var $field_label = FALSE;
     var $field_name = FALSE;
@@ -34,6 +53,7 @@ class PL_Field extends PL_RowInitialized
     var $upload_pref_id = FALSE;
     var $mailinglist_id = FALSE;
     var $settings = array();
+    var $reusable = 'n';
     
     function pre_save()
     {
@@ -80,6 +100,22 @@ class PL_Field extends PL_RowInitialized
                 return 'text';
                 
         }
+    }
+    
+    function get_field_icon()
+    {
+        $result = 'textfield.png';
+        
+        foreach(PL_Field::$item_options as $option)
+        {
+            if($option['type'] == $this->type)
+            {
+                $result = $option['icon'];
+                break;
+            }
+        }
+        
+        return $result;
     }
     
     function get_list_options($selected_items=array())
