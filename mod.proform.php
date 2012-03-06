@@ -137,7 +137,7 @@ class Proform {
         if($_SERVER['REQUEST_METHOD'] == 'POST' && $this->EE->input->post('__conf'))
         {
             $form_result = FALSE;
-            $this->_copy_post($form_obj, $form_session);
+            $this->_copy_post_to_session($form_obj, $form_session);
             
             $form_session = $this->_process_form($form_obj, $form_session, $form_result);
             
@@ -943,7 +943,7 @@ class Proform {
     // Actions
     ////////////////////////////////////////////////////////////////////////////////
     
-    private function _copy_post(&$form_obj, &$form_session)
+    private function _copy_post_to_session(&$form_obj, &$form_session)
     {
         $form_session->values = array();
         $form_session->checked_flags = array();
@@ -1163,13 +1163,6 @@ class Proform {
         // copy all values from the form_session into the data array prior to insert
         foreach($form_obj->fields() as $field)
         {
-            if(array_key_exists($field->field_name, $form_session->values))
-            {
-                $form_session->values[$field->field_name] = $form_session->values[$field->field_name];
-            } else {
-                $form_session->values[$field->field_name] = '';
-            }
-            
             // reformat date and datetime values into a format that can be stored in the database
             switch($field->type)
             {
@@ -1249,13 +1242,8 @@ class Proform {
                 if($field->type == 'file')
                 {
                     // if the field already exists in $form_session->values then we have already uploaded the file
-                    if(array_key_exists($field->field_name, $form_session->values))
+                    if(!array_key_exists($field->field_name, $form_session->values))
                     {
-                        // save the filename for use in the form entries insert
-                        $form_session->values[$field->field_name] = $form_session->values[$field->field_name];
-                        
-                        //echo "Previously saved file: " . $form_session->values[$field->field_name];die;
-                    } else {
                         // "upload" the file to it's permanent home
                         $upload_data = $this->EE->pl_uploads->handle_upload($field->upload_pref_id, $field->field_name, $field->is_required == 'y');
                         
