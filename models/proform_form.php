@@ -123,7 +123,38 @@ class PL_Form extends PL_RowInitialized {
         
     }
     
-    function fields() 
+    function get_page_count()
+    {
+        $pages = 0;
+        $fields = 0;
+        foreach($this->fields() as $field)
+        {
+            if($field->separator_type == PL_Form::SEPARATOR_PAGE)
+            {
+                // We don't want to count the first page if there are no fields on it:  if
+                // the first field is itself a page separator, it simply becomes the first page.
+                if($fields > 0)
+                {
+                    $pages++;
+                }
+            } else {
+                $fields++;
+            }
+        }
+        
+        // There is always one page, even if it's empty and there are no page separators.
+        if($pages == 0) $pages = 1;
+        
+        return $pages;
+    }
+    
+    /**
+     * Load a page of fields, or load all fields.
+     *
+     * @param $page 0 for all, page number otherwise
+     * @returns $fields
+     **/
+    function fields($page = 0)
     {
 
         if(!$this->__fields) 
