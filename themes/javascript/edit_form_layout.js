@@ -163,6 +163,7 @@ var proform_edit_form_layout = {
         });
     
         $('#main_form').unbind('submit').submit(function() {
+            proform_mod.dirty = false;
             save_meta();
         });
         

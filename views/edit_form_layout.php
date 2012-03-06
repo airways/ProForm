@@ -17,7 +17,9 @@ function print_hidden($field)
          '<input type="hidden" name="field_html_class[]" value="'   . htmlentities($field['settings']['html_class']) . '" class="fieldHtmlClass" />'.
          '<input type="hidden" name="field_extra1[]" value="'       . htmlentities($field['settings']['extra1']) . '" class="fieldExtra1" />'.
          '<input type="hidden" name="field_extra2[]" value="'       . htmlentities($field['settings']['extra2']) . '" class="fieldExtra2" />'.
-         '<input type="hidden" name="field_heading[]" value="'      . htmlentities($field['heading']) . '" class="fieldHeading" />'
+         '<input type="hidden" name="field_heading[]" value="'      . htmlentities($field['heading']) . '" class="fieldHeading" />'.
+         '<input type="hidden" name="field_separator_type[]" value="'      . htmlentities($field['separator_type']) . '" class="fieldSeparatorType" />'.
+         ''
          ;
 }
 
@@ -191,13 +193,20 @@ $alt = FALSE;
                         <?php endforeach; ?>
                     
                         <li class="section">Library</li>
-                        <?php foreach($add_item_options as $option): ?>
-                        <li><a class="library" 
-                            href="<?php echo $add_item_url.'&field_id='.$option['field_id']; ?>">
-                                <img src="<?php echo get_instance()->config->slash_item('theme_folder_url'); ?>third_party/proform/images/<?php echo $option['icon']; ?>"> <?php echo $option['label']; ?></a>
-                            <a href="<?php echo $edit_field_url.'&field_id='.$option['field_id']; ?>" class="edit"><img src="<?php echo get_instance()->config->slash_item('theme_folder_url'); ?>third_party/proform/images/cog.png">Edit...</a>
-                        </li>
-                        <?php endforeach; ?>
+                        <?php 
+                        if(!count($add_item_options)): ?>
+                            <li>Click the Reusable checkbox on a field to place it in the library. Only fields that are not on the current form will be shown in the library.</li>
+                        <?php
+                        else:
+                            foreach($add_item_options as $option): ?>
+                            <li><a class="library" 
+                                href="<?php echo $add_item_url.'&field_id='.$option['field_id']; ?>">
+                                    <img src="<?php echo get_instance()->config->slash_item('theme_folder_url'); ?>third_party/proform/images/<?php echo $option['icon']; ?>"> <?php echo $option['label']; ?></a>
+                                <a href="<?php echo $edit_field_url.'&field_id='.$option['field_id']; ?>" class="edit"><img src="<?php echo get_instance()->config->slash_item('theme_folder_url'); ?>third_party/proform/images/cog.png">Edit...</a>
+                            </li>
+                            <?php endforeach; 
+                        endif;
+                        ?>
                     </ul>
                 </div>
             </div>

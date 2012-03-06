@@ -39,38 +39,46 @@
 <?php if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>'; ?>
 <?php if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>'; ?>
 
-<?php if (count($entries) > 0):
+<?php 
     $this->table->set_template($cp_table_template);
     $this->table->set_heading($headings);
     
-    foreach($entries as $entry)
-    {
-        $row = array($entry->form_entry_id);
-        
-        //$row[] = '<a href="'.$field->edit_link.'">'.entry->id.'</a>';
-        foreach($fields as $field)
+    if (count($entries) > 0):
+        foreach($entries as $entry)
         {
-            $value = $entry->$field;
-            
-            if(array_search($field, $hidden_columns) === FALSE)
+            $row = array($entry->form_entry_id);
+        
+            //$row[] = '<a href="'.$field->edit_link.'">'.entry->id.'</a>';
+            foreach($fields as $field)
             {
-                if(strlen($value) > 300)
+                $value = $entry->$field;
+            
+                if(array_search($field, $hidden_columns) === FALSE)
                 {
-                    $value = substr($value, 0, 300).'...';
-                }
+                    if(strlen($value) > 300)
+                    {
+                        $value = substr($value, 0, 300).'...';
+                    }
                 
-                if($field == 'form_entry_id')
-                {
-                    $row[] = '<a href="'.$edit_entry_url.'&entry_id='.$value.'">'.htmlspecialchars($value).'</a>';
-                } else {
-                    $row[] = htmlspecialchars($value);
+                    if($field == 'form_entry_id')
+                    {
+                        $row[] = '<a href="'.$edit_entry_url.'&entry_id='.$value.'">'.htmlspecialchars($value).'</a>';
+                    } else {
+                        $row[] = htmlspecialchars($value);
+                    }
                 }
             }
-        }
 
-        $row[] = '<a href="'.$delete_entry_url.'&entry_id='.$entry->form_entry_id.'" class="pl_confirm" rel="Are you sure you want to delete this entry?">Delete</a>';
-        $this->table->add_row($row);
-    }
+            $row[] = '<a href="'.$delete_entry_url.'&entry_id='.$entry->form_entry_id.'" class="pl_confirm" rel="Are you sure you want to delete this entry?">Delete</a>';
+            $this->table->add_row($row);
+        }
+    
+    else:
+        $this->table->add_row(array(
+            'data'      => '<div class="no_items_msg">' . lang('no_entries') . '</div>',
+            'colspan'   => count($headings) ? count($headings) : 1,
+        ));
+    endif;
     
     echo $this->table->generate();
     ?>
@@ -86,9 +94,4 @@
     </div>
 
 
-<?php
-
-else:
-    echo '<div class="no_items_msg">' . lang('no_entries') . '</div>';
-endif;?>
 </div>

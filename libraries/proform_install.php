@@ -88,7 +88,7 @@ class Proform_install
         $this->EE->load->library('formslib');
 
         // save default preferences as set in $default_prefs on Formslib
-        $this->EE->formslib->prefs_mgr->save_preferences(array());
+        $this->EE->formslib->prefs->save_preferences(array());
 
         return TRUE;
     } // function install
@@ -111,7 +111,6 @@ class Proform_install
             'safecracker_channel_id'            => array('type' => 'int', 'constraint' => '10',         'default' => 0),
             'reply_to_address'                  => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
             'reply_to_name'                     => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
-            'reusable'                          => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
             'settings'                          => array('type' => 'blob',                              'default' => ''),
             
             'admin_notification_on'             => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
@@ -160,6 +159,7 @@ class Proform_install
             'validation'     => array('type' => 'varchar', 'constraint' => '250'),
             'upload_pref_id' => array('type' => 'int', 'constraint' => '4'),
             'mailinglist_id' => array('type' => 'int', 'constraint' => '4'),
+            'reusable'       => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
             'settings'       => array('type' => 'blob'),
         );
         $this->EE->dbforge->add_field($fields);
@@ -176,7 +176,8 @@ class Proform_install
             'field_name'    => array('type' => 'varchar', 'constraint' => '32'),
             'is_required'   => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'),
             'form_field_settings'      => array('type' => 'blob'),
-            'heading'       => array('type' => 'varchar', 'constraint' => 256, 'default' => '')
+            'heading'       => array('type' => 'varchar', 'constraint' => 256, 'default' => ''),
+            'separator_type'=> array('type' => 'varchar', 'constraint' => 4, 'default' => ''),
         );
         $this->EE->dbforge->add_field($fields);
         $forge->add_key('form_field_id', TRUE);
@@ -260,7 +261,7 @@ class Proform_install
             if(!$this->EE->db->field_exists('reply_to_address', 'proform_forms'))
             {
                 $fields = array(
-                    'reply_to_address'          => array('type' => 'varchar', 'constraint' => '32'),
+                    'reply_to_address' => array('type' => 'varchar', 'constraint' => '32'),
                 );
                 $forge->add_column('proform_forms', $fields);
             }
@@ -279,7 +280,7 @@ class Proform_install
         if($current < 0.42)
         {
             $fields = array(
-                'reply_to_name'                 => array('type' => 'varchar', 'constraint' => '32', 'default' => ''),
+                'reply_to_name' => array('type' => 'varchar', 'constraint' => '32', 'default' => ''),
             );
             $forge->add_column('proform_forms', $fields);
         }
@@ -302,13 +303,27 @@ class Proform_install
         if($current < 0.49)
         {
             $fields = array(
-                'reusable'                      => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
+                'reusable' => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'),
             );
             $forge->add_column('proform_fields', $fields);
             
-            // Make any existing fields reusable since all fields were prior to this version
+            // Make any existing fields reusable since all fields were prior to this version,
+            // even though the new default is for them NOT to be reusable.
             $this->EE->db->update('proform_fields', array('reusable' => 'y'));
         }
+        
+        if($current < 0.50)
+        {
+            $fields = array(
+                'separator_type'=> array('type' => 'varchar', 'constraint' => 4, 'default' => '')
+            );
+            $forge->add_column('proform_form_fields', $fields);
+            
+            // Update any existing heading rows to have the appropriate HEAD separator type, since before only heading separators were
+            // available.
+            $this->EE->db->update('proform_form_fields', array('separator_type' => 'HEAD'), array('heading !=' => '', 'separator_type !=' => 'PAGE', 'field_id' => 0));
+        }
+
 
         return TRUE;
     } // function update

@@ -34,6 +34,8 @@ class PL_Form extends PL_RowInitialized {
     
     var $settings;
     
+    const SEPARATOR_HEADING  = 'HEAD';
+    const SEPARATOR_PAGE     = 'PAGE';
     
     public static $default_form_field_settings = array(
         'label'         => '',
@@ -132,10 +134,10 @@ class PL_Form extends PL_RowInitialized {
             {
                 foreach($query->result() as $row) 
                 {
-                    $this->__fields[$row->field_name] = new PL_Field($row);
-                    
-                    if($row->field_id)
+                    if($row->field_name AND $row->field_id)
                     {
+                        $this->__fields[$row->field_name] = new PL_Field($row);
+
                         if(isset($this->__fields[$row->field_name]->settings))
                             $this->__fields[$row->field_name]->settings = unserialize($this->__fields[$row->field_name]->settings);
                         else
@@ -143,8 +145,10 @@ class PL_Form extends PL_RowInitialized {
                     
                         $this->__fields[$row->field_name]->form_field_settings = $this->get_form_field_settings($row->form_field_settings);
                     } else {
-                        $this->__fields[$row->field_name]->settings = array();
-                        $this->__fields[$row->field_name]->form_field_settings = array(
+                        $this->__fields['sep_'.$row->form_field_id] = new PL_Field($row);
+
+                        $this->__fields['sep_'.$row->form_field_id]->settings = array();
+                        $this->__fields['sep_'.$row->form_field_id]->form_field_settings = array(
                             'label' => '',
                             'preset_value' => '',
                             'preset_forced' => '',
@@ -534,7 +538,7 @@ class PL_Form extends PL_RowInitialized {
         }
     }
     
-    function add_heading($heading) 
+    function add_separator($heading, $type=PL_Form::SEPARATOR_HEADING)
     {
         // get last field_order value so we can add the new field at the end
         $max = $this->__EE->db->query($sql = 'SELECT MAX(field_order) AS field_order, MAX(field_row) AS field_row FROM exp_proform_form_fields WHERE form_id = '.intval($this->form_id));
@@ -543,13 +547,14 @@ class PL_Form extends PL_RowInitialized {
         
         // associate the field with the form
         $data  = array(
-            'form_id'       => $this->form_id,
-            'field_id'      => -1,
-            'field_name'    => '',
-            'is_required'   => FALSE,
-            'field_order'   => $field_order,
-            'field_row'     => $field_row,
-            'heading'       => $heading,
+            'form_id'           => $this->form_id,
+            'field_id'          => -1,
+            'field_name'        => '',
+            'is_required'       => FALSE,
+            'field_order'       => $field_order,
+            'field_row'         => $field_row,
+            'heading'           => $heading,
+            'separator_type'    => $type,
         );
         
         $this->__EE->db->insert('exp_proform_form_fields', $data);
@@ -558,7 +563,7 @@ class PL_Form extends PL_RowInitialized {
         $this->__fields = FALSE;
     }
     
-    function update_heading($form_field_id, $heading) 
+    function update_separator($form_field_id, $heading, $type=PL_Form::SEPARATOR_HEADING) 
     {
         $data = array(
             'heading' => $heading
@@ -566,17 +571,17 @@ class PL_Form extends PL_RowInitialized {
         $this->__EE->db->update('exp_proform_form_fields', $data, array('form_field_id' => $form_field_id));
     }
     
-    function remove_heading($form_field_id) 
+    function remove_separator($form_field_id) 
     {
         $this->__EE->db->delete('exp_proform_form_fields', array('form_field_id' => $form_field_id));
     }
     
-    function get_heading($form_field_id) 
+    function get_separator($form_field_id) 
     {
         $query = $this->__EE->db->where(array('form_field_id' => $form_field_id))->get('exp_proform_form_fields');
         if($query->num_rows() > 0)
         {
-            return $query->row()->heading;
+            return $query->row();
         } else {
             return '';
         }

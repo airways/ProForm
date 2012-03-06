@@ -102,8 +102,10 @@ $lang = array(
     'tab_list_templates' => 'List Templates',
     'tab_new_template' => 'New Template',
     'tab_delete_template' => 'Delete Template',
-	'tab_new_heading' => 'New Heading',
-	'tab_edit_heading' => 'Edit Heading',
+    'tab_new_heading' => 'New Heading',
+    'tab_edit_heading' => 'Edit Heading',
+    'tab_new_separator' => 'New Page / Step',
+    'tab_edit_separator' => 'Edit Page / Step',
     
     // Fields
     'field_form_name' => 'Form Short Name',
@@ -207,6 +209,7 @@ $lang = array(
     'field_user_agent' => 'User Agent',
     
     'field_heading' => 'Heading',
+    'field_page_name' => 'Page Name',
     'field_reusable' => 'Reusable (place in library)',
     
     // Errors
@@ -256,8 +259,8 @@ $lang = array(
     'msg_field_removed' => 'Field successfully removed from the form',
 
 
-	'msg_heading_added' => 'New heading successfully added to the form',
-	'msg_heading_edited'=> 'Heading successfully edited',
+    'msg_heading_added' => 'New heading successfully added to the form',
+    'msg_heading_edited'=> 'Heading successfully edited',
 
     // End
     '' => ''

@@ -102,7 +102,24 @@
             <input type="text" name="captcha" />{if error:captcha}<span class="error">{error:captcha}</span>{/if}
         </p>
         {/if}
-
-        <p><input type="submit" /></p>
+        
+        {if multistep}
+            <p>
+            {if prev_step}
+                <input type="submit" name="_prev_step" value="&lt; Previous Step" />
+            {if:else}
+                <input type="submit" disabled="disabled" value="&lt; Previous Step" />
+            {/if}
+            {if next_step}
+                <input type="submit" name="_next_step" value="Next Step &gt;" />
+            {if:else}
+                <input type="submit" disabled="disabled" value="Next Step &gt;" />
+            {/if}
+            </p>
+        {/if}
+        {if last_step}
+            <p><input type="submit" /></p>
+        {/if}
     {/if}
+    
 {/exp:proform:form}

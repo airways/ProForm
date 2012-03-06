@@ -117,6 +117,7 @@ class Proform {
         $debug              = $this->EE->TMPL->fetch_param('debug',  'false') == 'yes';
         $error_delimiters   = explode('|', $this->EE->TMPL->fetch_param('error_delimiters',  '<div class="error">|</div>'));
         $error_messages     = $this->EE->pl_parser->fetch_param_group('message');
+        $page               = $this->EE->TMPL->fetch_param('page', 1);
         
         if(count($error_delimiters) != 2)
         {
@@ -203,6 +204,7 @@ class Proform {
             'error_delimiters'  => $error_delimiters,
             'secure'            => $secure,
             'error_messages'    => $error_messages,
+            'page'              => $page,
         );
         
         // copy everything else the user may have added
@@ -1038,14 +1040,17 @@ class Proform {
         {
             // data to be inserted into form table
             $data = array();
-
-            $this->_process_data($form_obj, $form_session, $data);
             
-            $this->_process_uploads($form_obj, $form_session, $data);
+            // copy data from the other steps
+            $data = $data + $form_config['data'];
+
+            $this->_process_data($form_obj, $form_config, $form_session, $data);
+            
+            $this->_process_uploads($form_obj, $form_config, $form_session, $data);
 
             if($form_config['use_captcha'])
             {
-                $this->_process_captcha($form_obj, $form_session, $data);
+                $this->_process_captcha($form_obj, $form_config, $form_session, $data);
             }
 
             $this->_process_secure_fields($form_obj, $form_config, $form_session, $data);
@@ -1069,40 +1074,41 @@ class Proform {
                     return $form_session;
                 }
             } else {
-
-                // if no errors - insert data
-                
-                $data['ip_address'] = $this->EE->input->ip_address();
-                $data['user_agent'] = $this->EE->agent->agent_string();
-
-                $this->_process_insert($form_obj, $form_session, $data);
-
-                $data['entry_id'] = $this->EE->db->insert_id();
-                $entry_data = $form_obj->get_entry($data['entry_id']);
-
-                $this->_process_notifications($form_obj, $form_config, $data, $entry_data);
-                
-                if ($this->EE->extensions->active_hook('proform_process_end') === TRUE)
+                // If no errors and we are on the last step of the form, insert the data.
+                if($form_config['page'] == $form_obj->page_count)
                 {
-                    $this->EE->extensions->call('proform_process_end', $form_obj, $form_config, $form_session, $this);
-                    if($this->EE->extensions->end_script) return;
-                }
+                    $data['ip_address'] = $this->EE->input->ip_address();
+                    $data['user_agent'] = $this->EE->agent->agent_string();
 
-                // Go to thank you URL
-                $_SESSION['pl_form']['thank_you_form'] = $form_name;
-                $_SESSION['pl_form']['result_session'] = serialize($form_session);
-                $_SESSION['pl_form']['result_config'] = serialize($form_config);
+                    $this->_process_insert($form_obj, $form_session, $data);
+
+                    $data['entry_id'] = $this->EE->db->insert_id();
+                    $entry_data = $form_obj->get_entry($data['entry_id']);
+
+                    $this->_process_notifications($form_obj, $form_config, $data, $entry_data);
                 
-                if($this->EE->input->is_ajax_request())
-                {
-                    $entry_data['status'] = 'success';
-                    $this->EE->output->send_ajax_response($entry_data);
-                    exit;
-                } else {
-                    $this->EE->functions->redirect($form_config['thank_you_url']);
+                    if ($this->EE->extensions->active_hook('proform_process_end') === TRUE)
+                    {
+                        $this->EE->extensions->call('proform_process_end', $form_obj, $form_config, $form_session, $this);
+                        if($this->EE->extensions->end_script) return;
+                    }
+
+                    // Go to thank you URL
+                    $_SESSION['pl_form']['thank_you_form'] = $form_name;
+                    $_SESSION['pl_form']['result_session'] = serialize($form_session);
+                    $_SESSION['pl_form']['result_config'] = serialize($form_config);
+                
+                    if($this->EE->input->is_ajax_request())
+                    {
+                        $entry_data['status'] = 'success';
+                        $this->EE->output->send_ajax_response($entry_data);
+                        exit;
+                    } else {
+                        $this->EE->functions->redirect($form_config['thank_you_url']);
+                    }
+                
+                    $result = TRUE;
                 }
-                
-                $result = TRUE;
                 return $form_session;
             }
         }
@@ -1156,7 +1162,7 @@ class Proform {
     // Processing Helpers
     ////////////////////////////////////////////////////////////////////////////////
 
-    private function _process_data(&$form_obj, &$form_session, &$data)
+    private function _process_data(&$form_obj, &$form_config, &$form_session, &$data)
     {
         // copy all values from the form_session into the data array prior to insert
         foreach($form_obj->fields() as $field)
@@ -1240,7 +1246,7 @@ class Proform {
         // */
     }
 
-    private function _process_uploads(&$form_obj, &$form_session, &$data)
+    private function _process_uploads(&$form_obj, &$form_config, &$form_session, &$data)
     {
         if($form_obj->form_type == 'form')
         {
@@ -1284,7 +1290,7 @@ class Proform {
         } // save_entries_on == 'y'
     } // function _process_uploads
     
-    private function _process_captcha(&$form_obj, &$form_session, &$data)
+    private function _process_captcha(&$form_obj, &$form_config, &$form_session, &$data)
     {
         if ( ! isset($_POST['captcha']) OR $_POST['captcha'] == '')
         {
@@ -1481,7 +1487,7 @@ class Proform {
         // TODO: make sure encryption is taken into account for duplicates checks
     } // function _process_duplicates
 
-    private function _process_insert(&$form_obj, &$form_session, &$data)
+    private function _process_insert(&$form_obj, &$form_config, &$form_session, &$data)
     {
         $data['dst_enabled'] = $this->prolib->dst_enabled ? 'y' : 'n';
         
@@ -1549,7 +1555,7 @@ class Proform {
         
     } // function _process_insert
     
-    private function _process_mailinglist(&$form_obj, &$form_session, &$data)
+    private function _process_mailinglist(&$form_obj, &$form_config, &$form_session, &$data)
     {
         //$data['form:entry_id']
         if(!class_exists('Mailinglist'))

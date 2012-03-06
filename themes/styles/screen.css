@@ -649,6 +649,8 @@ Messages / Form Errors
 .toolbox li {
     overflow: hidden;
     margin-bottom: 4px;
+    color: white;
+    padding: 5px;
 }
 
 .toolbox li a img {

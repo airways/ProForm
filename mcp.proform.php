@@ -51,12 +51,6 @@ class Proform_mcp {
     var $pipe_length = 1;
     var $perpage = 20;
     
-    const NONE = 0;
-    const ITEM_SEPARATOR_1 = -2;
-    const ITEM_SEPARATOR_2 = -3;
-    const ITEM_NEW_FIELD = -1;
-    const ITEM_HEADING = -10;
-    
     function Proform_mcp()
     {
         prolib($this, 'proform');
@@ -408,7 +402,16 @@ class Proform_mcp {
             $vars['hidden']['form_id'] = $form_id;
             $vars['new_item_url'] = ACTION_BASE.AMP.'method=new_field'.AMP.'auto_add_form_id='.$form_id;
             $vars['add_item_url'] = ACTION_BASE.AMP.'method=assign_field'.AMP.'form_id='.$form_id;
+            $vars['edit_field_url'] = ACTION_BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_field'.AMP.'form_id='.$form_id;
         
+            $vars['special_options'] = array(
+                array('label' => 'Heading',                     'type' => 'heading',                 'icon' => 'flag_blue.png', 
+                      'url' => ACTION_BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_separator'.AMP.'form_id='.$form_id.AMP.'type='.PL_Form::SEPARATOR_HEADING),
+                array('label' => 'Page / Step',                 'type' => 'page',                    'icon' => 'page_add.png',
+                      'url' => ACTION_BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_separator'.AMP.'form_id='.$form_id.AMP.'type='.PL_Form::SEPARATOR_PAGE),
+            );
+
+
             $form_obj = $form;//$query->row();
         } else {
             $form = FALSE;
@@ -418,9 +421,9 @@ class Proform_mcp {
             $vars['editing'] = FALSE;
             $vars['new_item_url'] = FALSE;
             $vars['add_item_url'] = FALSE;
+            $vars['edit_field_url'] = FALSE;
+            $vars['special_options'] = array();
         }
-        
-        $vars['edit_field_url'] = ACTION_BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_field'.AMP.'form_id='.$form_id;
         
         
         $this->EE->load->library('proform_notifications');
@@ -511,17 +514,8 @@ class Proform_mcp {
         $vars['new_field_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_field';
         $vars['default_value_action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=set_default_value';
         
-        $vars['special_options'] = array(
-            array('label' => 'Heading',                     'type' => 'heading',                 'icon' => 'flag_blue.png', 
-                  'url' => ACTION_BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_heading'.AMP.'form_id='.$form_id),
-            array('label' => 'Page / Step',                 'type' => 'page',                    'icon' => 'page_add.png',
-                  'url' => ACTION_BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_page'.AMP.'form_id='.$form_id),
-        );
-
         // list available fields to add to the form
         $vars['add_item_options'] = array();
-        // $vars['add_item_options'][Proform_mcp::NONE] = "Select an item";
-        // $vars['add_item_options'][Proform_mcp::ITEM_SEPARATOR_1] = "-";
         $field_count = 0;
         foreach($this->EE->formslib->fields->get_all(array('reusable' => 'y')) as $field) 
         {
@@ -537,12 +531,6 @@ class Proform_mcp {
                 $field_count++;
             }
         }
-        // if($field_count)
-        // {
-        //     $vars['add_item_options'][Proform_mcp::ITEM_SEPARATOR_2] = "-";
-        // }
-        // $vars['add_item_options'][Proform_mcp::ITEM_NEW_FIELD] = "New Field";
-        // $vars['add_item_options'][Proform_mcp::ITEM_HEADING] = "New Heading";
         
         $vars['item_options'] = PL_Field::$item_options;
         
@@ -554,13 +542,14 @@ class Proform_mcp {
         {
             foreach($form->fields() as $field) 
             {
-                $row_array = (array)$field;
+                $row_array = $field->to_array();;
                 
-                $row_array['settings']      = array_merge($field->settings, $field->form_field_settings);
+                $row_array['settings']          = array_merge($field->settings, $field->form_field_settings);
+                
                 if($row_array['heading'])
                 {
-                    $row_array['edit_link']     = ACTION_BASE.'method=edit_heading'.AMP.'form_field_id='.$field->form_field_id.AMP.'form_id='.$form->form_id;
-                    $row_array['remove_link']   = ACTION_BASE.'method=delete_heading'.AMP.'form_field_id='.$field->form_field_id.AMP.'form_id='.$form->form_id;
+                    $row_array['edit_link']     = ACTION_BASE.'method=edit_separator'.AMP.'form_field_id='.$field->form_field_id.AMP.'form_id='.$form->form_id;
+                    $row_array['remove_link']   = ACTION_BASE.'method=delete_separator'.AMP.'form_field_id='.$field->form_field_id.AMP.'form_id='.$form->form_id;
                 } else {
                     $row_array['edit_link']     = ACTION_BASE.'method=edit_field'.AMP.'field_id='.$field->field_id.AMP.'form_id='.$form->form_id;;
                     $row_array['remove_link']   = ACTION_BASE.'method=remove_field'.AMP.'form_id='.$form_id.AMP.'field_id='.$field->field_id.AMP.'form_id='.$form->form_id;;
@@ -574,7 +563,7 @@ class Proform_mcp {
                                         'value'     => $field->field_id,
                                         'class'     =>'toggle');
             
-                $vars['fields'][$field->field_id] = $row_array;
+                $vars['fields'][] = $row_array;
             }
         }
         
@@ -645,35 +634,35 @@ class Proform_mcp {
         }
         
         // process adding a field
-        $add_item = trim($this->EE->input->get_post('add_item'));
-        if($add_item != Proform_mcp::NONE)
-        {
-            if(is_numeric($add_item) && ($add_item == Proform_mcp::ITEM_NEW_FIELD || $add_item >= 1)) 
-            {
-                $field_id = $add_item;
-                if($field_id == -1)
-                {
-                    $this->EE->functions->redirect(ACTION_BASE.AMP.'method=new_field'.AMP.'auto_add_form_id='.$form_id);
-                } else {
-                    $field = $this->EE->formslib->fields->get($field_id);
-                    if($field)
-                    {
-                        $form->assign_field($field);
-                        $this->EE->session->set_flashdata('message', lang('msg_field_added'));
-                    } else {
-                        show_error(lang('invalid_field_id'));
-                    }
-                }
-            } else {
-                // Add special item
-                switch($add_item)
-                {
-                    case Proform_mcp::ITEM_HEADING:
-                        $this->EE->functions->redirect(ACTION_BASE.AMP.'method=new_heading'.AMP.'form_id='.$form_id);
-                        break;
-                }
-            }
-        }
+        // $add_item = trim($this->EE->input->get_post('add_item'));
+        // if($add_item != Proform_mcp::NONE)
+        // {
+        //     if(is_numeric($add_item) && ($add_item == Proform_mcp::ITEM_NEW_FIELD || $add_item >= 1)) 
+        //     {
+        //         $field_id = $add_item;
+        //         if($field_id == -1)
+        //         {
+        //             $this->EE->functions->redirect(ACTION_BASE.AMP.'method=new_field'.AMP.'auto_add_form_id='.$form_id);
+        //         } else {
+        //             $field = $this->EE->formslib->fields->get($field_id);
+        //             if($field)
+        //             {
+        //                 $form->assign_field($field);
+        //                 $this->EE->session->set_flashdata('message', lang('msg_field_added'));
+        //             } else {
+        //                 show_error(lang('invalid_field_id'));
+        //             }
+        //         }
+        //     } else {
+        //         // Add special item
+        //         switch($add_item)
+        //         {
+        //             case Proform_mcp::ITEM_HEADING:
+        //                 $this->EE->functions->redirect(ACTION_BASE.AMP.'method=new_heading'.AMP.'form_id='.$form_id);
+        //                 break;
+        //         }
+        //     }
+        // }
         
         // check that the reply_to field names are valid
         $fields = $form->fields();
@@ -962,6 +951,7 @@ class Proform_mcp {
         
         $data = array();
         $this->prolib->copy_post($data, "PL_Field");
+        unset($data['form_field_settings']);
         
         // add the field
         $settings = array();
@@ -1187,53 +1177,73 @@ class Proform_mcp {
         }
     }
 
-    function new_heading()
+    function new_separator()
     {
         if($this->EE->input->post('heading') !== FALSE) 
         {
-            if($this->process_new_heading()) return;
+            if($this->process_new_separator()) return;
         }
         
-        $this->sub_page('tab_new_heading');
+        switch($this->EE->input->get('type'))
+        {
+            case PL_Form::SEPARATOR_HEADING:
+                $type = PL_Form::SEPARATOR_HEADING;
+                $this->sub_page('tab_new_heading');
+                break;
+            case PL_Form::SEPARATOR_PAGE:
+                $type = PL_Form::SEPARATOR_PAGE;
+                $this->sub_page('tab_new_separator');
+                break;
+        }
+        
         $vars = array();
-        $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_heading';
+        $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_separator'.AMP.'type='.$type;
         $form_id = $this->EE->input->get_post('form_id');
         $vars['hidden'] = array('form_id' => $form_id);
         $vars['editing'] = FALSE;
 
-        return $this->edit_heading(FALSE, $vars);
+        return $this->edit_separator(FALSE, $vars);
     }
     
-    function process_new_heading()
+    function process_new_separator()
     {
         $this->EE->load->library('formslib');
         
         // run form validation
-        $this->_run_validation('edit_heading');
+        $this->_run_validation('edit_separator');
         
         $form_id = $this->EE->input->post('form_id');
         $heading = $this->EE->input->post('heading');
+        $type = $this->EE->input->get('type');
         
         $form = $this->EE->formslib->forms->get($form_id);
         
         if($form && $heading)
         {
-            $form->add_heading($heading);
+            $form->add_separator($heading, $type);
         }
 
-        $this->EE->session->set_flashdata('message', lang('msg_heading_added'));
+        switch($this->EE->input->get('type'))
+        {
+            case PL_Form::SEPARATOR_HEADING:
+                $this->EE->session->set_flashdata('message', lang('msg_heading_added'));
+                break;
+            case PL_Form::SEPARATOR_PAGE:
+                $this->EE->session->set_flashdata('message', lang('msg_page_added'));
+                break;
+        }
         $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form_id.'#tab-content-layout');
 
         return TRUE;
     }
     
-    function edit_heading($editing=TRUE, $vars = array())
+    function edit_separator($editing=TRUE, $vars = array())
     {
         $this->EE->load->library('formslib');
         
         if($editing && $this->EE->input->post('heading') !== FALSE) 
         {
-            if($this->process_edit_heading()) return;
+            if($this->process_edit_separator()) return;
         }
         
         $form_id = (int)$this->EE->input->get('form_id');
@@ -1241,16 +1251,26 @@ class Proform_mcp {
         
         if($editing)
         {
-            $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_heading'.AMP.'form_field_id='.$form_field_id.AMP.'form_id='.$form_id;
-            $this->sub_page('tab_edit_heading');
-        
+            $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_separator'.AMP.'form_field_id='.$form_field_id.AMP.'form_id='.$form_id;
+
             $query = $this->EE->db->where('form_field_id', $form_field_id)->get('exp_proform_form_fields');
             $row = $query->row();
-            $heading = array('form_field_id' => $row->form_field_id, 'form_id' => $row->form_id, 'heading' => $row->heading);
+            $heading = array('form_field_id' => $row->form_field_id, 'form_id' => $row->form_id, 'heading' => $row->heading, 'type' => $row->separator_type);
+            
+            switch($row->separator_type)
+            {
+                case PL_Form::SEPARATOR_HEADING:
+                    $this->sub_page('tab_edit_heading');
+                    break;
+                case PL_Form::SEPARATOR_PAGE:
+                    $this->sub_page('tab_edit_separator');
+                    break;
+            }
+        
             $vars['editing'] = TRUE;
         } else {
             $vars['editing'] = FALSE;
-            $heading = array('form_field_id' => '', 'form_id' => $form_id, 'heading' => '');
+            $heading = array('form_field_id' => '', 'form_id' => $form_id, 'heading' => '', 'type' => $this->EE->input->get('type'));
         }
         
         $types = array(
@@ -1258,20 +1278,26 @@ class Proform_mcp {
         );
         $form = $this->EE->pl_forms->create_cp_form($heading, $types);
         
+        if($heading['type'] == PL_Form::SEPARATOR_PAGE)
+        {
+            $vars['field_names'] = array(
+                'field_heading' => lang('field_page_name'),
+            );
+        }
         $vars['form'] = $form;
         $vars['form_name'] = 'heading_edit';
-        $vars['hidden_fields'] = array('form_field_id', 'form_id');
+        $vars['hidden_fields'] = array('form_field_id', 'form_id', 'type');
         
         $this->EE->load->library('table');
         return $this->EE->load->view('generic_edit', $vars, TRUE);
     }
     
-    function process_edit_heading()
+    function process_edit_separator()
     {
         $this->EE->load->library('formslib');
         
         // run form validation
-        $this->_run_validation('edit_heading');
+        $this->_run_validation('edit_separator');
         
         $form_id = $this->EE->input->get('form_id');
         $form_field_id = $this->EE->input->get('form_field_id');
@@ -1281,35 +1307,55 @@ class Proform_mcp {
         
         if($form && $heading)
         {
-            $form->update_heading($form_field_id, $heading);
+            $form->update_separator($form_field_id, $heading);
         }
 
-        $this->EE->session->set_flashdata('message', lang('msg_heading_edited'));
+        switch($this->EE->input->get('type'))
+        {
+            case PL_Form::SEPARATOR_HEADING:
+                $this->EE->session->set_flashdata('message', lang('msg_heading_edited'));
+                break;
+            case PL_Form::SEPARATOR_PAGE:
+                $this->EE->session->set_flashdata('message', lang('msg_page_edited'));
+                break;
+        }
+
         $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form_id.'#tab-content-layout');
 
         return TRUE;
     }
 
-    function delete_heading()
+    function delete_separator()
     {
-        if($this->EE->input->post('form_field_id') !== FALSE) 
-        {
-            if($this->process_delete_heading()) return;
-        }
-
-       
-        $vars = array();
-        $this->sub_page('tab_delete_heading');
         $this->EE->load->library('formslib');
         
+        if($this->EE->input->post('form_field_id') !== FALSE) 
+        {
+            if($this->process_delete_separator()) return;
+        }
+
         $form_id = $this->EE->input->get('form_id');
         $form_field_id = $this->EE->input->get('form_field_id');
-        
+    
         $form = $this->EE->formslib->forms->get($form_id);
-        
+    
         if(is_numeric($form_id) && $form)
         {
-            $heading = $form->get_heading($form_field_id);
+            $heading = $form->get_separator($form_field_id);
+            
+            
+            $vars = array();
+            
+            switch($heading->separator_type)
+            {
+                case PL_Form::SEPARATOR_HEADING:
+                    $this->sub_page('tab_delete_heading');
+                    break;
+                case PL_Form::SEPARATOR_PAGE:
+                    $this->sub_page('tab_delete_separator');
+                    break;
+            }
+            
             
             $vars['form_id'] = $form_id;
             $vars['form_name'] = $form->form_name;
@@ -1322,11 +1368,11 @@ class Proform_mcp {
                 'form_field_id' => $form_field_id
             );
             
-            $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=delete_heading';
+            $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=delete_separator';
             
             $this->EE->load->library('table');
             $this->_get_flashdata($vars);
-            return $this->EE->load->view('delete_heading', $vars, TRUE);
+            return $this->EE->load->view('delete_separator', $vars, TRUE);
         } 
         else 
         {
@@ -1335,10 +1381,9 @@ class Proform_mcp {
         }
     }
     
-    function process_delete_heading()
+    function process_delete_separator()
     {
         $vars = array();
-        $this->sub_page('tab_delete_heading');
         $this->EE->load->library('formslib');
         
         $form_id = $this->EE->input->get_post('form_id');
@@ -1348,7 +1393,7 @@ class Proform_mcp {
         
         if(is_numeric($form_id) && $form)
         {
-            $form->remove_heading($form_field_id);
+            $form->remove_separator($form_field_id);
             $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form_id.'#tab-content-layout');
         } 
         else 

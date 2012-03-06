@@ -38,7 +38,7 @@ require_once PATH_THIRD.'proform/models/proform_session.php';
 if(!class_exists('Formslib')) {
 class Formslib 
 {
-    var $prefs_mgr;
+    var $prefs;
     var $session_mgr;
 
     var $form_types = array('form' => 'Entry Form', 'saef' => 'SAEF Form', 'share' => 'Share Form');

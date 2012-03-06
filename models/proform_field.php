@@ -55,6 +55,24 @@ class PL_Field extends PL_RowInitialized
     var $settings = array();
     var $reusable = 'n';
     
+    function __construct($row, &$mgr=NULL)
+    {
+        parent::__construct($row, $mgr);
+        if(!$this->field_id AND isset($this->heading))
+        {
+            $this->settings = array();
+            $this->form_field_settings = array();
+        }
+    }
+    
+    function to_array()
+    {
+        $result = (array)$this;
+        unset($result['__EE']);
+        unset($result['__CI']);
+        return $result;
+    }
+    
     function pre_save()
     {
         if(!isset($this->length) || is_null($this->length) || $this->length <= 0)

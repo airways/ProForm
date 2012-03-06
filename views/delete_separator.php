@@ -30,46 +30,14 @@
  * 
  **/ ?>
 
-<div class="new_field">
-    <span class="button"><a href="<?php echo BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_field'; ?>"><?php echo lang('new_field'); ?></a></span>
-</div>
+<?php echo validation_errors(); ?>
 
 <?php if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>'; ?>
 <?php if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>'; ?>
 
-<?php
-//    form_open($action_url, '', $form_hidden);
-
-    $this->table->set_template($cp_table_template);
-    $this->table->set_heading(
-        lang('heading_field_name'),
-        lang('heading_commands'));
-
-if (count($fields) > 0):
-    foreach($fields as $field)
-    {
-        $this->table->add_row(
-                '<a href="'.$field->edit_link.'">'.$field->name.'</a>',
-                '<a href="'.$field->delete_link.'">'.lang('heading_delete_field').'</a>'
-            );
-    }
-else:
-    $this->table->add_row(array(
-        'data'      => '<div class="no_items_msg">' . lang('no_fields_defined') . '</div>',
-        'colspan'   => 3,
-    ));     
-endif;
-    echo $this->table->generate();
-    ?>
-    
-    <div class="tableFooter">
-
-        <div class="tableSubmit">
-            
-        </div>
-        
-        <span class="pagination"><?php echo $pagination; ?></span>
-    </div>
-    <?php
-   // form_close();
-
+<?php echo form_open($action_url, '', $form_hidden); ?>
+<p class="warning">Are you sure you want to delete the <?php echo $heading->separator_type == PL_Form::SEPARATOR_HEADING ? 'heading' : 'page'; ?> <span><?php echo $heading->heading; ?></span> from the form <span><?php echo $form_name; ?></span>? This cannot be undone.</p>
+<div class="tableFooter">
+    <?php echo form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit')); ?>
+</div>
+<?php echo form_close(); ?>
