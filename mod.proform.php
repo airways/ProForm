@@ -185,7 +185,7 @@ class Proform {
             $secure = array();
         }
 
-        $form_config = array(
+        $form_session->config = array(
             'in_place_errors'   => $in_place_errors,
             'use_captcha'       => $use_captcha,
             'form_name'         => $form_name,
@@ -209,30 +209,30 @@ class Proform {
         // copy everything else the user may have added
         foreach($this->EE->TMPL->tagparams as $key => $value)
         {
-            if(!isset($form_config[$key]))
+            if(!isset($form_session->config[$key]))
             {
-                $form_config[$key] = $value;
+                $form_session->config[$key] = $value;
             }
         }
         
         /*
         echo "<b>Form config:</b>:";
-        $this->prolib->debug($form_config);
+        $this->prolib->debug($form_session->config);
         // */
         // swap out global vars like {path=x} and {site_url}
-        foreach($form_config as $k => $v)
+        foreach($form_session->config as $k => $v)
         {
             if(!is_array($v) && !is_numeric($v))
-                $form_config[$k] = $this->EE->TMPL->parse_globals($v);
+                $form_session->config[$k] = $this->EE->TMPL->parse_globals($v);
             //echo '<hr/>';
-            //var_dump($form_config[$k]);
+            //var_dump($form_session->config[$k]);
             //var_dump(array($get_params));
-            //$form_config[$k] = $this->EE->TMPL->parse_variables($form_config[$k], array($get_params));
+            //$form_session->config[$k] = $this->EE->TMPL->parse_variables($form_session->config[$k], array($get_params));
         }
-        //var_dump($form_config);
+        //var_dump($form_session->config);
         
         //$form_config_enc = $this->EE->encrypt->encode(serialize($form_config));
-        $form_config_enc = $this->EE->formslib->vault->put($form_config);
+        $form_session_enc = $this->EE->formslib->vault->put($form_session);
         
         if ($this->EE->extensions->active_hook('proform_form_start') === TRUE)
         {
@@ -249,14 +249,14 @@ class Proform {
                 /*$base_url = $this->EE->functions->fetch_site_index(0, 0).QUERY_MARKER.
                     'ACT='.$this->EE->functions->fetch_action_id('Proform', 'process_form_act');*/
                     
-                $base_url = $form_config['form_url'];
+                $base_url = $form_session->config['form_url'];
                 
                 $form_details = array(
                         'action'            => $this->EE->functions->remove_double_slashes($base_url),
                         'name'              => $form_name,
                         'id'                => $form_id,
                         'class'             => $form_class,
-                        'hidden_fields'     => array('__conf' => $form_config_enc),
+                        'hidden_fields'     => array('__conf' => $form_session_enc),
                         'secure'            => TRUE,
                         'onsubmit'          => '',
                         'enctype'           => 'multipart/form-data');
@@ -376,7 +376,7 @@ class Proform {
                 }
                 
                 // Set up pagination / step variables
-                $variables['last_step'] = $form_config['page'] == $form_obj->get_page_count();
+                $variables['last_step'] = $form_session->config['page'] == $form_obj->get_page_count();
                 // Setup template pair variables
                 $variables['fieldrows'] = $this->create_fields_array($form_obj, $field_errors, $field_values, $field_checked_flags, TRUE);
                 $variables['fields'] = $this->create_fields_array($form_obj, $field_errors, $field_values, $field_checked_flags, FALSE);
@@ -483,18 +483,17 @@ class Proform {
             AND isset($_SESSION['pl_form']['result_config']))
         {
             $form_session   = unserialize($_SESSION['pl_form']['result_session']);
-            $form_config    = unserialize($_SESSION['pl_form']['result_config']);
             $form_name      = $_SESSION['pl_form']['thank_you_form'];
             
             //$this->prolib->debug($form_session);
-            //$this->prolib->debug($form_config);
+            //$this->prolib->debug($form_session->config);
             
-            if($form_name && $form_config['form_name'] == $form_name)
+            if($form_name && $form_session->config['form_name'] == $form_name)
             {
                 $form_obj = $this->EE->formslib->forms->get($form_name);
                 //$this->prolib->debug($form_obj);
 
-                $this->prolib->copy_values($form_config, $variables);
+                $this->prolib->copy_values($form_session->config, $variables);
                 $this->prolib->copy_values($form_obj, $variables);
                 
                 $variables['fieldrows'] = $this->create_fields_array($form_obj, $form_session->errors, $form_session->values, $form_session->checked_flags, TRUE);
@@ -1014,18 +1013,18 @@ class Proform {
         $this->EE->load->library('proform_notifications');
 
         // decrypt the form's configuration array
-        $form_config_enc = $this->EE->input->post('__conf');
+        $form_session_enc = $this->EE->input->post('__conf');
         //$form_config = unserialize($this->EE->encrypt->decode($form_config_enc));
-        $form_config = $this->EE->formslib->vault->get($form_config_enc);
+        $form_session = $this->EE->formslib->vault->get($form_session_enc);
 
         // make sure the form object data we have is for this form, if not bail
-        if(!$form_config || !isset($form_config['form_name']) || $form_config['form_name'] != $form_obj->form_name)
+        if(!$form_session || !isset($form_session->config['form_name']) || $form_session->config['form_name'] != $form_obj->form_name)
         {
             return $result;
         }
         
         // find the form
-        $form_name = $form_config['form_name'];
+        $form_name = $form_session->config['form_name'];
         $form_obj = $this->EE->formslib->forms->get($form_name);
         
         $form_session->processed = TRUE;
@@ -1034,29 +1033,29 @@ class Proform {
 
         if ($this->EE->extensions->active_hook('proform_process_start') === TRUE)
         {
-            list($form_obj, $form_config, $form_session) = $this->EE->extensions->call('proform_process_start', $this, $form_obj, $form_config, $form_session);
+            list($form_obj, $form_session) = $this->EE->extensions->call('proform_process_start', $this, $form_obj, $form_session);
             if($this->EE->extensions->end_script) return;
         }
 
         if($form_obj)
         {
-            $this->_process_data($form_obj, $form_config, $form_session);
+            $this->_process_data($form_obj, $form_session);
             
-            $this->_process_uploads($form_obj, $form_config, $form_session);
+            $this->_process_uploads($form_obj, $form_session);
 
-            if($form_config['use_captcha'])
+            if($form_session->config['use_captcha'])
             {
-                $this->_process_captcha($form_obj, $form_config, $form_session);
+                $this->_process_captcha($form_obj, $form_session);
             }
 
-            $this->_process_secure_fields($form_obj, $form_config, $form_session);
+            $this->_process_secure_fields($form_obj, $form_session);
 
-            $this->_process_validation($form_obj, $form_config, $form_session);
+            $this->_process_validation($form_obj, $form_session);
 
             // check for duplicates
             $this->_process_duplicates($form_obj, $form_session);
 
-            $this->_process_mailinglist($form_obj, $form_config, $form_session);
+            $this->_process_mailinglist($form_obj, $form_session);
 
             // return any errors to the form template
             if(count($form_session->errors) > 0)
@@ -1071,28 +1070,27 @@ class Proform {
                 }
             } else {
                 // If no errors and we are on the last step of the form, insert the data.
-                if($form_config['page'] == $form_obj->get_page_count())
+                if($form_session->config['page'] == $form_obj->get_page_count())
                 {
                     $form_session->values['ip_address'] = $this->EE->input->ip_address();
                     $form_session->values['user_agent'] = $this->EE->agent->agent_string();
 
-                    $this->_process_insert($form_obj, $form_config, $form_session);
+                    $this->_process_insert($form_obj, $form_session);
 
                     $form_session->values['entry_id'] = $this->EE->db->insert_id();
                     $entry_data = $form_obj->get_entry($form_session->values['entry_id']);
 
-                    $this->_process_notifications($form_obj, $form_config, $form_session, $entry_data);
+                    $this->_process_notifications($form_obj, $form_session, $entry_data);
                 
                     if ($this->EE->extensions->active_hook('proform_process_end') === TRUE)
                     {
-                        $this->EE->extensions->call('proform_process_end', $form_obj, $form_config, $form_session, $this);
+                        $this->EE->extensions->call('proform_process_end', $form_obj, $form_session, $this);
                         if($this->EE->extensions->end_script) return;
                     }
 
                     // Go to thank you URL
                     $_SESSION['pl_form']['thank_you_form'] = $form_name;
                     $_SESSION['pl_form']['result_session'] = serialize($form_session);
-                    $_SESSION['pl_form']['result_config'] = serialize($form_config);
                 
                     if($this->EE->input->is_ajax_request())
                     {
@@ -1100,7 +1098,7 @@ class Proform {
                         $this->EE->output->send_ajax_response($entry_data);
                         exit;
                     } else {
-                        $this->EE->functions->redirect($form_config['thank_you_url']);
+                        $this->EE->functions->redirect($form_session->config['thank_you_url']);
                     }
                 
                     $result = TRUE;
@@ -1111,12 +1109,12 @@ class Proform {
     }
     
     
-    private function _process_notifications(&$form_obj, &$form_config, &$form_session, &$entry_row)
+    private function _process_notifications(&$form_obj, &$form_session, &$entry_row)
     {
-        if($this->EE->proform_notifications->has_notifications($form_obj, $form_config, $form_config))
+        if($this->EE->proform_notifications->has_notifications($form_obj, $form_session))
         {
             $parse_data = array();
-            $this->prolib->copy_values($form_config, $parse_data);
+            $this->prolib->copy_values($form_session->config, $parse_data);
             $this->prolib->copy_values($form_session->values, $parse_data);
             
             $fieldrows = $this->create_fields_array($form_obj, array(), $form_session->values, array(), TRUE);
@@ -1133,9 +1131,9 @@ class Proform {
             //     "entry_row:" => $entry_row,
             // ));
 
-            if(!$this->EE->proform_notifications->send_notifications($form_obj, $parse_data, $form_config))
+            if(!$this->EE->proform_notifications->send_notifications($form_obj, $parse_data, $form_session))
             {
-                if($form_config['debug'])
+                if($form_session->config['debug'])
                 {
                     echo '<b>{exp:proform:form} could not send notifications for form: '.$form_obj->form_name.'</b><p/>';
                     echo $this->EE->proform_notifications->debug;
@@ -1158,7 +1156,7 @@ class Proform {
     // Processing Helpers
     ////////////////////////////////////////////////////////////////////////////////
 
-    private function _process_data(&$form_obj, &$form_config, &$form_session)
+    private function _process_data(&$form_obj, &$form_session)
     {
         // copy all values from the form_session into the data array prior to insert
         foreach($form_obj->fields() as $field)
@@ -1201,7 +1199,7 @@ class Proform {
         return $timestamp;
     }
     
-    private function _process_secure_fields(&$form_obj, &$form_config, &$form_session)
+    private function _process_secure_fields(&$form_obj, &$form_session)
     {
         // set secure fields values from the session or other backend sources
         foreach($form_obj->fields() as $field)
@@ -1218,9 +1216,9 @@ class Proform {
             
             if($field->type == 'secure')
             {
-                if(array_key_exists($field->field_name, $form_config['secure']))
+                if(array_key_exists($field->field_name, $form_session->config['secure']))
                 {
-                    $form_session->values[$field->field_name] = $form_config['secure'][$field->field_name];
+                    $form_session->values[$field->field_name] = $form_session->config['secure'][$field->field_name];
                 } else {
                     $form_session->values[$field->field_name] = '';
                 }
@@ -1232,7 +1230,7 @@ class Proform {
         // */
     }
 
-    private function _process_uploads(&$form_obj, &$form_config, &$form_session)
+    private function _process_uploads(&$form_obj, &$form_session)
     {
         if($form_obj->form_type == 'form')
         {
@@ -1271,7 +1269,7 @@ class Proform {
         } // save_entries_on == 'y'
     } // function _process_uploads
     
-    private function _process_captcha(&$form_obj, &$form_config, &$form_session)
+    private function _process_captcha(&$form_obj, &$form_session)
     {
         if ( ! isset($_POST['captcha']) OR $_POST['captcha'] == '')
         {
@@ -1296,7 +1294,7 @@ class Proform {
                     OR date < UNIX_TIMESTAMP()-7200");
     } // function _process_captch
     
-    private function _process_validation(&$form_obj, &$form_config, &$form_session)
+    private function _process_validation(&$form_obj, &$form_session)
     {
         $this->EE->lang->loadfile('proform');
         
@@ -1308,7 +1306,7 @@ class Proform {
         }
         
         // override delimiter values from form configuration
-        $this->EE->pl_validation->set_error_delimiters($form_config['error_delimiters'][0], $form_config['error_delimiters'][1]);
+        $this->EE->pl_validation->set_error_delimiters($form_session->config['error_delimiters'][0], $form_session->config['error_delimiters'][1]);
         
         // check rules for sanity then pass them on to the validation class
         $validation_rules = array();
@@ -1322,12 +1320,19 @@ class Proform {
                 {
                     $multi = FALSE;
                     $option_valid = FALSE;
-                    foreach($options as $option)
+                    if(isset($form_session->values[$field->field_name]))
                     {
-                        if($option['key'] == $form_session->values[$field->field_name])
+                        foreach($options as $option)
                         {
-                            $option_valid = TRUE;
+                            if($option['key'] == $form_session->values[$field->field_name])
+                            {
+                                $option_valid = TRUE;
+                            }
                         }
+                    } else 
+                    {
+                        echo 'values:';
+                        var_dump($form_session->values);
                     }
                     
                     $valid = $option_valid;
@@ -1438,7 +1443,7 @@ class Proform {
         $this->EE->pl_validation->set_rules($validation_rules);
 
         // set custom error messages as provided on the form tag
-        $this->EE->pl_validation->set_error_messages($form_config['error_messages']);
+        $this->EE->pl_validation->set_error_messages($form_session->config['error_messages']);
 
         // run the validation and see if we get any errors to add to the form_session
         if(!$this->EE->pl_validation->run())
@@ -1468,7 +1473,7 @@ class Proform {
         // TODO: make sure encryption is taken into account for duplicates checks
     } // function _process_duplicates
 
-    private function _process_insert(&$form_obj, &$form_config, &$form_session)
+    private function _process_insert(&$form_obj, &$form_session)
     {
         $form_session->values['dst_enabled'] = $this->prolib->dst_enabled ? 'y' : 'n';
         
@@ -1537,7 +1542,7 @@ class Proform {
         
     } // function _process_insert
     
-    private function _process_mailinglist(&$form_obj, &$form_config, &$form_session)
+    private function _process_mailinglist(&$form_obj, &$form_session)
     {
         //$form_session->values['form:entry_id']
         if(!class_exists('Mailinglist'))

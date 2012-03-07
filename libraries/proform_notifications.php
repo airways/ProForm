@@ -106,19 +106,19 @@ class Proform_notifications
         $this->debug_str .= htmlentities($msg) . '<br/>';
     }
 
-    function has_notifications($form, $data, $config)
+    function has_notifications($form, $data, $form_session)
     {
 
         if ($this->EE->extensions->active_hook('proform_notification_exists') === TRUE)
         {
             $this->_debug('Calling proform_notification_exists');
-            if(!$this->EE->extensions->call('proform_notification_exists', $form, $this, $config))
+            if(!$this->EE->extensions->call('proform_notification_exists', $form, $this, $form_session))
             {
                 return FALSE;
             }
         }
 
-        if(strlen(trim($form->notification_list)) > 0 || (isset($config['notify']) && count($config['notify']) > 0))
+        if(strlen(trim($form->notification_list)) > 0 || (isset($form_session->config['notify']) && count($form_session->config['notify']) > 0))
         {
             $this->_debug('Notifications exist for '.$form->form_name);
             return TRUE;
@@ -126,9 +126,9 @@ class Proform_notifications
 
         return FALSE;
 
-    } // function has_notifications($form, $data, $config)
+    } // function has_notifications($form, $data, $form_session)
 
-    function send_notifications($form, $data, $config)
+    function send_notifications($form, $data, $form_session)
     {
         $this->EE->extensions->end_script = FALSE;
 
@@ -156,7 +156,7 @@ class Proform_notifications
             if($this->EE->extensions->end_script) return;
         }
 
-        if(strlen($form->notification_list) > 0 || (isset($config['notify']) && count($config['notify']) > 0)) {
+        if(strlen($form->notification_list) > 0 || (isset($form_session->config['notify']) && count($form_session->config['notify']) > 0)) {
             if(is_object($data)) {
                 $data = (array)$data;
             }
@@ -165,9 +165,9 @@ class Proform_notifications
             // prepare list of emails to send notification to
             $notification_list = explode("\n", $form->notification_list);
             
-            if(isset($config['notify']))
+            if(isset($form_session->config['notify']))
             {
-                $notification_list = array_unique(array_merge($notification_list, $config['notify']));
+                $notification_list = array_unique(array_merge($notification_list, $form_session->config['notify']));
                 sort($notification_list);   // fix keys
             }
 

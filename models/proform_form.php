@@ -13,6 +13,7 @@ class PL_Form extends PL_RowInitialized {
     var $safecracker_channel_id = 0;
     var $reply_to_address;
     var $reply_to_name;
+    var $table_override = '';
     
     var $admin_notification_on = 'y';
     var $notification_template;
@@ -49,29 +50,32 @@ class PL_Form extends PL_RowInitialized {
     
     function init()
     {
-        $this->__EE->load->dbforge();
-        $forge = &$this->__EE->dbforge;
-        
-        // Create new table for the form
-        if($this->form_type == 'form')
+        if(!$this->table_override)
         {
-            // Create FORM table for storing actual form entries
-            $fields = array(
-                'form_entry_id'     => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE, 'auto_increment' => TRUE),
-                'updated'           => array('type' => 'timestamp'),
-                'ip_address'        => array('type' => 'varchar', 'constraint' => '128'),
-                'user_agent'        => array('type' => 'varchar', 'constraint' => '255'),
-                'dst_enabled'       => array('type' => 'varchar', 'constraint' => '1'),
-            );
+            $this->__EE->load->dbforge();
+            $forge = &$this->__EE->dbforge;
+        
+            // Create new table for the form
+            if($this->form_type == 'form')
+            {
+                // Create FORM table for storing actual form entries
+                $fields = array(
+                    'form_entry_id'     => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE, 'auto_increment' => TRUE),
+                    'updated'           => array('type' => 'timestamp'),
+                    'ip_address'        => array('type' => 'varchar', 'constraint' => '128'),
+                    'user_agent'        => array('type' => 'varchar', 'constraint' => '255'),
+                    'dst_enabled'       => array('type' => 'varchar', 'constraint' => '1'),
+                );
     
-            $forge->add_field($fields);
-            $forge->add_key('form_entry_id', TRUE);
-            $forge->add_key('updated');
-            // var_dump($data);
-            //             var_dump($fields);
-            //             exit;
-            $forge->create_table(PL_Form::make_table_name($this->form_name));
-        } 
+                $forge->add_field($fields);
+                $forge->add_key('form_entry_id', TRUE);
+                $forge->add_key('updated');
+                // var_dump($data);
+                //             var_dump($fields);
+                //             exit;
+                $forge->create_table(PL_Form::make_table_name($this->form_name));
+            }
+        }
     }
     
     function pre_save()
@@ -81,15 +85,18 @@ class PL_Form extends PL_RowInitialized {
 
     function post_save($mgr, $data)
     {
-        $this->__EE->load->dbforge();
-        $forge = &$this->__EE->dbforge;
-        
-        // Rename the table
-        if($this->form_type == 'form')
+        if(!$this->table_override)
         {
-            if($this->__original_name != $this->form_name)
+            $this->__EE->load->dbforge();
+            $forge = &$this->__EE->dbforge;
+        
+            // Rename the table
+            if($this->form_type == 'form')
             {
-                $this->__EE->db->query("RENAME TABLE exp_".$this->original_table_name()." TO exp_".$this->table_name());
+                if($this->__original_name != $this->form_name)
+                {
+                    $this->__EE->db->query("RENAME TABLE exp_".$this->original_table_name()." TO exp_".$this->table_name());
+                }
             }
         }
     }
@@ -106,19 +113,25 @@ class PL_Form extends PL_RowInitialized {
     
     function post_delete()
     {
-        $this->__EE->load->dbforge();
-        $forge = &$this->__EE->dbforge;
+        if(!$this->table_override)
+        {
+            $this->__EE->load->dbforge();
+            $forge = &$this->__EE->dbforge;
+        }
 
         // delete field associations
         $query = $this->__EE->db->where('form_id', $this->form_id)
                               ->delete('proform_form_fields');
         
-        // small sanity check - only delete tables that have double underscores in them somewhere
-        // beyond the initial two characters, as all data tables should
-        if(strpos($this->table_name(), '__') > 0) 
+        if(!$this->table_override)
         {
-            // remove the form table
-            $forge->drop_table($this->table_name());
+            // small sanity check - only delete tables that have double underscores in them somewhere
+            // beyond the initial two characters, as all data tables should
+            if(strpos($this->table_name(), '__') > 0) 
+            {
+                // remove the form table
+                $forge->drop_table($this->table_name());
+            }
         }
         
     }
@@ -393,87 +406,90 @@ class PL_Form extends PL_RowInitialized {
         {
             case 'form':
                 // create the physical field
-                $this->__EE->load->dbforge();
-                $forge = &$this->__EE->dbforge;
-        
-                if(array_key_exists($field->type, PL_Field::$types['mysql']))
+                if(!$this->table_override)
                 {
-                    $typedef = PL_Field::$types['mysql'][$field->type];
-
-                    $fields = array(
-                        $field->field_name       => array('type' => $typedef['type'])
-                    );
-
-                    // if there is a constraint set on the type definition, this always overrides anything
-                    // set by the user
-                    if(isset($typedef['constraint']))
+                    $this->__EE->load->dbforge();
+                    $forge = &$this->__EE->dbforge;
+        
+                    if(array_key_exists($field->type, PL_Field::$types['mysql']))
                     {
-                        if($typedef['constraint'])
+                        $typedef = PL_Field::$types['mysql'][$field->type];
+
+                        $fields = array(
+                            $field->field_name       => array('type' => $typedef['type'])
+                        );
+
+                        // if there is a constraint set on the type definition, this always overrides anything
+                        // set by the user
+                        if(isset($typedef['constraint']))
                         {
-                            $fields[$field->field_name]['constraint'] = $typedef['constraint'];
+                            if($typedef['constraint'])
+                            {
+                                $fields[$field->field_name]['constraint'] = $typedef['constraint'];
+                            }
+                        } else {
+                            if($field->length)
+                            {
+                                $fields[$field->field_name]['constraint'] = $field->length;
+                            } else {
+                                $fields[$field->field_name]['constraint'] = 255;
+                            }
+
+                            // if the form has encryption turned on, force at least a minimum size of 255
+                            if($this->encryption_on == 'y' AND $field->length < 255)
+                            {
+                                $fields[$field->field_name]['constraint'] = 255;
+                            }
+                        }
+
+
+                        // check if the length specified is too long, if so, promote to the next data type
+                        if(isset($typedef['limit'])
+                            && is_numeric($fields[$field->field_name]['constraint'])
+                            && $fields[$field->field_name]['constraint'] > $typedef['limit'])
+                        {
+                            if(!isset($typedef['limit_promote']))
+                            {
+                                exit('Field constraint exceeds '.$typedef['limit'].' but has no promote type.');
+                            } else {
+                                $fields[$field->field_name]['type'] = $typedef['limit_promote'];
+                            }
+                        }
+                    
+                        $do_forge = TRUE;
+                    } else {
+                        exit('Invalid field type for mysql ' . $field->type);
+                        $do_forge = FALSE;
+                    }
+                
+                    if($new_assignment)
+                    {
+                        // add new column to the form's table
+                        if($do_forge)
+                        {
+                            $forge->add_column($this->table_name(), $fields);
                         }
                     } else {
-                        if($field->length)
+                        // rename the column on the table
+                    
+                        // move old field name to new field name in field definition array
+                        if($assignment_row->field_name != $field->field_name)
                         {
-                            $fields[$field->field_name]['constraint'] = $field->length;
-                        } else {
-                            $fields[$field->field_name]['constraint'] = 255;
+                            $fields[$assignment_row->field_name] = $fields[$field->field_name];
+                            // remove old field name
+                            unset($fields[$field->field_name]);
                         }
-
-                        // if the form has encryption turned on, force at least a minimum size of 255
-                        if($this->encryption_on == 'y' AND $field->length < 255)
+                    
+                        // add new field name to definition
+                        $fields[$assignment_row->field_name]['name'] = $field->field_name;
+                    
+                        if($do_forge)
                         {
-                            $fields[$field->field_name]['constraint'] = 255;
+                            $forge->modify_column($this->table_name(), $fields);
                         }
-                    }
-
-
-                    // check if the length specified is too long, if so, promote to the next data type
-                    if(isset($typedef['limit'])
-                        && is_numeric($fields[$field->field_name]['constraint'])
-                        && $fields[$field->field_name]['constraint'] > $typedef['limit'])
-                    {
-                        if(!isset($typedef['limit_promote']))
-                        {
-                            exit('Field constraint exceeds '.$typedef['limit'].' but has no promote type.');
-                        } else {
-                            $fields[$field->field_name]['type'] = $typedef['limit_promote'];
-                        }
-                    }
-                    
-                    $do_forge = TRUE;
-                } else {
-                    exit('Invalid field type for mysql ' . $field->type);
-                    $do_forge = FALSE;
-                }
-                
-                if($new_assignment)
-                {
-                    // add new column to the form's table
-                    if($do_forge)
-                    {
-                        $forge->add_column($this->table_name(), $fields);
-                    }
-                } else {
-                    // rename the column on the table
-                    
-                    // move old field name to new field name in field definition array
-                    if($assignment_row->field_name != $field->field_name)
-                    {
-                        $fields[$assignment_row->field_name] = $fields[$field->field_name];
-                        // remove old field name
-                        unset($fields[$field->field_name]);
-                    }
-                    
-                    // add new field name to definition
-                    $fields[$assignment_row->field_name]['name'] = $field->field_name;
-                    
-                    if($do_forge)
-                    {
-                        $forge->modify_column($this->table_name(), $fields);
-                    }
             
-                }
+                    }
+                } // if(!$this->table_override)
                 break; // case 'form':
             case 'saef':
                 show_error('There was an error creating the new Custom Field. SAEF not yet supported.');
@@ -650,14 +666,17 @@ class PL_Form extends PL_RowInitialized {
 
     function remove_field($field) 
     {
-        $this->__EE->load->dbforge();
-        $forge = &$this->__EE->dbforge;
-        
-        // Remove the physical column for normal forms - do not delete custom fields for SAEF
-        // forms as they may be used by other forms or channels that are assigned to the group.
-        if($this->form_type == 'form')
+        if(!$this->table_override)
         {
-            $forge->drop_column($this->table_name(), $field->field_name);
+            $this->__EE->load->dbforge();
+            $forge = &$this->__EE->dbforge;
+        
+            // Remove the physical column for normal forms - do not delete custom fields for SAEF
+            // forms as they may be used by other forms or channels that are assigned to the group.
+            if($this->form_type == 'form')
+            {
+                $forge->drop_column($this->table_name(), $field->field_name);
+            }
         }
         
         // remove the association between the form and the field
@@ -684,7 +703,12 @@ class PL_Form extends PL_RowInitialized {
 
     function table_name()
     {
-        return PL_Form::make_table_name($this->form_name);
+        if($this->table_override)
+        {
+            return $this->table_override;
+        } else {
+            return PL_Form::make_table_name($this->form_name);
+        }
     }
     
     function original_table_name()

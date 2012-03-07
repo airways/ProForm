@@ -111,6 +111,7 @@ class Proform_install
             'safecracker_channel_id'            => array('type' => 'int', 'constraint' => '10',         'default' => 0),
             'reply_to_address'                  => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
             'reply_to_name'                     => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
+            'table_override'                    => array('type' => 'varchar', 'constraint' => '128',    'default' => ''),
             'settings'                          => array('type' => 'blob',                              'default' => ''),
             
             'admin_notification_on'             => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
@@ -323,7 +324,14 @@ class Proform_install
             // available.
             $this->EE->db->update('proform_form_fields', array('separator_type' => 'HEAD'), array('heading !=' => '', 'separator_type !=' => 'PAGE', 'field_id' => 0));
         }
-
+        
+        if($current < 0.51)
+        {
+            $fields = array(
+                'table_override' => array('type' => 'varchar', 'constraint' => '128', 'default' => ''),
+            );
+            $forge->add_column('proform_forms', $fields);
+        }
 
         return TRUE;
     } // function update
