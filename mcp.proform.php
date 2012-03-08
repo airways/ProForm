@@ -282,7 +282,7 @@ class Proform_mcp {
             {
                 case 'pref_notification_template_group':
                     $groups = $this->EE->proform_notifications->get_template_group_names();
-                    $groups = array_merge(array(0 => 'None'), $groups);
+                    $groups = array(0 => 'None') + $groups;
                     $control = form_dropdown($f_name, $groups, $value);
                     break;
                 case 'pref_safecracker_integration_on':
@@ -430,7 +430,7 @@ class Proform_mcp {
         $this->EE->load->library('formslib');
         $template_options = $this->EE->proform_notifications->get_template_names(
             $this->EE->formslib->prefs->ini('notification_template_group', 'notifications'));
-        $template_options = array_merge(array(0 => 'None'), $template_options);
+        $template_options = array(0 => 'None') + $template_options;
         
         //unset($form_obj->form_id);
         unset($form_obj->settings);
@@ -1037,6 +1037,20 @@ class Proform_mcp {
             $validation_rules = $this->_filter_array($this->config_overrides['validation_rules'], $validation_rules); 
         }
         
+        // Make a list of assigned form names
+        $field->assigned_forms = 'None';
+        $edit_form_url = ACTION_BASE.'method=edit_form'.AMP.'form_id=';
+        foreach($field->get_assigned_forms() as $assigned_form)
+        {
+            if($field->assigned_forms == 'None') $field->assigned_forms = '';
+            
+            $field->assigned_forms .= '<a href="'.$edit_form_url.$assigned_form->form_id.'">'.$assigned_form->form_name.'</a>, ';
+        }
+        
+        // Chop off last comma and space
+        $field->assigned_forms = rtrim($field->assigned_forms, ', ');
+
+
         $types = array(
             'field_id'          => 'read_only',
             'field_label'       => 'input',
@@ -1053,6 +1067,7 @@ class Proform_mcp {
                     'headings'  => array('Rule', 'Param'),
                     'options'   => $validation_rules)),
             'reusable'          => 'checkbox',
+            'assigned_forms'    => 'static',
             );
         $form = $this->EE->pl_forms->create_cp_form($field, $types);
         

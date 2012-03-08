@@ -90,20 +90,6 @@ class Formslib
         
     } // function Formslib()
 
-    function get_forms_with_field($field)
-    {
-        $result = array();
-        $query = $this->EE->db->get_where('exp_proform_form_fields', array('field_id' => $field->field_id));
-        if($query->num_rows() > 0)
-        {
-            foreach($query->result() as $form_row)
-            {
-                $result[] = $this->forms->get($form_row->form_id);
-            }
-        }
-        return $result;
-    } // function get_forms_with_field()
-    
     /* ------------------------------------------------------------
      * Session manager interface 
      * ------------------------------------------------------------ */

@@ -176,6 +176,20 @@ class PL_Field extends PL_RowInitialized
             }
         }
         return $result;
-    }
+    } // function get_list_options
+    
+    function get_assigned_forms()
+    {
+        $result = array();
+        $query = $this->__EE->db->get_where('exp_proform_form_fields', array('field_id' => $this->field_id));
+        if($query->num_rows() > 0)
+        {
+            foreach($query->result() as $form_row)
+            {
+                $result[] = $this->__EE->formslib->forms->get($form_row->form_id);
+            }
+        }
+        return $result;
+    } // function get_assigned_forms()
 
 }

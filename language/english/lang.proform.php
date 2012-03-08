@@ -188,11 +188,15 @@ $lang = array(
     
     'field_save_entries_on' => 'Save Entries',
     'field_save_entries_on_desc' => 'Save entries entered into the form in the database',
+    'field_assigned_forms' => 'Assigned Forms',
+    'field_assigned_forms_desc' => 'Forms which currently have this field assigned to them',
     
     'field_pref_notification_template_group' => 'Notification Template Group',
     'field_pref_notification_template_group_desc' => 'Template group containing email notification templates',
     'field_pref_from_address' => 'From Address',
     'field_pref_from_address_desc' => 'Email address notifications are sent from, should match the actual mail settings used to send mail',
+    'field_pref_from_name' => 'From Name',
+    'field_pref_reply_to_name_desc' => 'Name value to show in the From header, you can override this in each form\'s settings',
     'field_pref_reply_to_address' => 'Reply-To Address',
     'field_pref_reply_to_address_desc' => 'Email to set in email Reply-To header, you can override this in each form\'s settings',
     'field_pref_reply_to_name' => 'Reply-To Name',

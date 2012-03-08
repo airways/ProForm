@@ -793,7 +793,7 @@ class Proform {
         
         // Get all form data for the requested form
         $forms = $this->EE->formslib->forms->get_all(FALSE, FALSE, FALSE, $limit, ($page-1) * $limit);
-        $total_forms = $this->EE->formslib->count_forms();
+        $total_forms = $this->EE->formslib->forms->count();
         
         if ($this->EE->extensions->active_hook('proform_forms_start') === TRUE)
         {
