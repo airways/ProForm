@@ -80,6 +80,14 @@ class PL_Field extends PL_RowInitialized
             $this->length = 255;
         }
     }
+    
+    function post_save()
+    {
+        foreach($this->get_assigned_forms() as $form)
+        {
+            $form->assign_field($this);
+        }
+    }
 
     function get_control()
     {
