@@ -127,7 +127,7 @@ var proform_edit_form_layout = {
             {
                 loading_meta = true;
                 
-                proform_edit_form.activate_tab('sidebar', '#tab-content-override');
+                proform_edit_form.activate_tab('sidebar', 'tab-content-override');
                 // $('.meta-sidebar').show();
                 //                 if($active_field.find('.isHeading').val() == '1') {
                 //                     $('.meta-sidebar').hide();

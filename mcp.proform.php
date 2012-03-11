@@ -188,8 +188,8 @@ class Proform_mcp {
         foreach($forms as $form)
         {
 
-            $form->edit_link                = ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form->form_id.'#tab-content-settings';
-            $form->edit_fields_link         = ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form->form_id.'#tab-content-layout';
+            $form->edit_link                = ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form->form_id.AMP.'active_tabs=tab-content-settings';
+            $form->edit_fields_link         = ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form->form_id.AMP.'active_tabs=tab-content-layout';
             //$form->edit_preset_values_link  = ACTION_BASE.AMP.'method=edit_form_preset_values'.AMP.'form_id='.$form->form_id;
             $form->list_entries_link        = ACTION_BASE.AMP.'method=list_entries'.AMP.'form_id='.$form->form_id;
             $form->delete_link              = ACTION_BASE.AMP.'method=delete_form'.AMP.'form_id='.$form->form_id;
@@ -383,6 +383,8 @@ class Proform_mcp {
         
         $vars['hidden'] = array();
         
+        $vars['hidden']['active_tabs'] = ($s = $this->EE->input->get_post('active_tabs')) ? $s : 'tab-content-settings';
+        
         if($editing)
         {
             $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_form';
@@ -499,6 +501,11 @@ class Proform_mcp {
             $vars['hidden_fields'][] = 'encryption_on';
         }
         
+        if($this->EE->config->item('proform_allow_table_override') != 'y')
+        {
+            $vars['hidden_fields'][] = 'table_override';
+        }
+        
         $vars['form_hidden'] = array();
         $vars['default_value_hidden'] = array('form_id' => 0, 'field_id' => 0);
         if($form)
@@ -607,7 +614,6 @@ class Proform_mcp {
         
         $form = $this->EE->formslib->forms->get($form_id);
         
-        
         // process layout and field customization for the form
         $field_order = $this->EE->input->post('field_order');
         
@@ -690,11 +696,9 @@ class Proform_mcp {
         $this->prolib->copy_post($form);
         $form->save();
         
-        // go back to the form edit tab that was active
-        $active_tab = $this->EE->input->post('active_tab');
-        
         // go back to form edit
-        $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form->form_id.'#'.$active_tab);
+        $active_tabs = ($s = $this->EE->input->get_post('active_tabs')) ? $s : 'tab-content-settings';
+        $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form->form_id.AMP.'active_tabs='.$active_tabs);
         
         return TRUE;
     }
@@ -714,7 +718,7 @@ class Proform_mcp {
             $form->assign_field($field);
             // exit(json_encode(array('status' => 'OK')));
             // go back to form edit
-            $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form->form_id.'#tab-content-layout');
+            $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form->form_id.AMP.'active_tabs=tab-content-layout');
         } else {
             // exit(json_encode(array('status' => 'error')));
             show_error('Invalid form or field ID specified.');
@@ -844,7 +848,7 @@ class Proform_mcp {
             
             // go back to edit field assignments listing for this form
             $this->EE->session->set_flashdata('message', lang('msg_field_removed'));
-            $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form_id.'#tab-content-layout');
+            $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form_id.AMP.'active_tabs=tab-content-layout');
             return TRUE;
         } 
         else 
@@ -920,6 +924,7 @@ class Proform_mcp {
         
         $vars = array();
         $vars['field_type'] = $this->EE->input->get('field_type');
+        $vars['field_length'] = ($n = $this->EE->input->get('field_length')) ? $n : 256;
         $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_field';
         $auto_add_form_id = $this->EE->input->get_post('auto_add_form_id');
         
@@ -983,7 +988,7 @@ class Proform_mcp {
                 
                 $this->EE->session->set_flashdata('message', lang('msg_field_created_added'));
                 $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.
-                                                AMP.'form_id='.$auto_add_form_id.'#tab-content-layout');
+                                                AMP.'form_id='.$auto_add_form_id.AMP.'active_tabs=tab-content-layout');
             } else {
                 show_error(lang('invalid_form_id_or_field_id') . '[11]');
             }
@@ -1021,6 +1026,10 @@ class Proform_mcp {
             if(isset($vars['field_type']))
             {
                 $field->type = $vars['field_type'];
+            }
+            if(isset($vars['field_length']))
+            {
+                $field->length = $vars['field_length'];
             }
         }
         
@@ -1138,7 +1147,7 @@ class Proform_mcp {
         if($form_id)
         {
             $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.
-                                                AMP.'form_id='.$form_id.'#tab-content-layout');
+                                                AMP.'form_id='.$form_id.AMP.'active_tabs=tab-content-layout');
         } else {
             $this->EE->functions->redirect(ACTION_BASE.AMP.'method=list_fields');
         }
@@ -1247,7 +1256,7 @@ class Proform_mcp {
                 $this->EE->session->set_flashdata('message', lang('msg_page_added'));
                 break;
         }
-        $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form_id.'#tab-content-layout');
+        $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form_id.AMP.'active_tabs=tab-content-layout');
 
         return TRUE;
     }
@@ -1335,7 +1344,7 @@ class Proform_mcp {
                 break;
         }
 
-        $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form_id.'#tab-content-layout');
+        $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form_id.AMP.'active_tabs=tab-content-layout');
 
         return TRUE;
     }
@@ -1409,7 +1418,7 @@ class Proform_mcp {
         if(is_numeric($form_id) && $form)
         {
             $form->remove_separator($form_field_id);
-            $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form_id.'#tab-content-layout');
+            $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form_id.AMP.'active_tabs=tab-content-layout');
         } 
         else 
         {

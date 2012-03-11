@@ -12,23 +12,23 @@ class PL_Field extends PL_RowInitialized
             'date'          => array('type' => 'date', 'constraint' => FALSE),
             'datetime'      => array('type' => 'datetime', 'constraint' => FALSE),
             'file'          => array('type' => 'varchar'),
-            'string'        => array('type' => 'varchar', 'limit' => 255, 'limit_promote' => 'text'),
+            'string'        => array('type' => 'varchar', 'limit' => 256, 'limit_promote' => 'text'),
             //'text'          => array('type' => 'text'),
             'int'           => array('type' => 'int', 'constraint' => '11'),
             'float'         => array('type' => 'float', 'constraint' => '53'),
             'currency'      => array('type' => 'decimal', 'constraint' => '10,2'),
             'list'          => array('type' => 'text'),
             'mailinglist'   => array('type' => 'varchar', 'constraint' => '90'),
-            'hidden'        => array('type' => 'varchar', 'limit' => 255, 'limit_promote' => 'text'),
-            'secure'        => array('type' => 'varchar', 'limit' => 255, 'limit_promote' => 'text'),
-            'member_data'   => array('type' => 'varchar', 'limit' => 255, 'limit_promote' => 'text'),
+            'hidden'        => array('type' => 'varchar', 'limit' => 256, 'limit_promote' => 'text'),
+            'secure'        => array('type' => 'varchar', 'limit' => 256, 'limit_promote' => 'text'),
+            'member_data'   => array('type' => 'varchar', 'limit' => 256, 'limit_promote' => 'text'),
         )
     );
     
     public static $item_options = array(
         array('label' => 'Checkbox',                    'type' => 'checkbox',                   'icon' => 'checkbox.png'),
         array('label' => 'Text',                        'type' => 'string',                     'icon' => 'textfield.png'),
-        array('label' => 'Textarea',                    'type' => 'string',                     'icon' => 'textarea.png'),
+        array('label' => 'Textarea',                    'type' => 'string',                     'icon' => 'textarea.png',       'length' => '1000',),
         array('label' => 'Number: Integer',             'type' => 'int',                        'icon' => 'number.png'),
         array('label' => 'Number: Float',               'type' => 'float',                      'icon' => 'float.png'),
         array('label' => 'Number: Currency',            'type' => 'currency',                   'icon' => 'currency.png'),
@@ -77,7 +77,7 @@ class PL_Field extends PL_RowInitialized
     {
         if(!isset($this->length) || is_null($this->length) || $this->length <= 0)
         {
-            $this->length = 255;
+            $this->length = 256;
         }
     }
     

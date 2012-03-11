@@ -179,6 +179,9 @@ $lang = array(
     'field_encryption_on_desc' => 'Encrypt data stored in the form\'s database table and force minimal DB column length',
     'encryption_toggle_disabled' => 'Encryption cannot be turned on or off if there are already entries in the form',
     
+    'field_table_override' => 'Table Override',
+    'field_table_override_desc' => 'Direct all data to this existing table (this is an alpha feature, use with caution)',
+    
     'field_safecracker_on' => 'SafeCracker Integration',
     'field_safecracker_on_desc' => 'Store data from this form in a channel through the use of SafeCracker. Note that encryption <strong>cannot</strong> be used when this option is turned on',
     'field_safecracker_channel_id' => 'SafeCracker Channel',
@@ -214,7 +217,8 @@ $lang = array(
     
     'field_heading' => 'Heading',
     'field_page_name' => 'Page Name',
-    'field_reusable' => 'Reusable (place in library)',
+    'field_reusable' => 'Reusable',
+    'field_reusable_desc' => 'Places the field in the Library section of the Toolbox, allowing you to easily reuse it',
     
     // Errors
     'invalid_submit' => 'The form has invalid values',

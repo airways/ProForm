@@ -10,10 +10,10 @@ class PL_Form extends PL_RowInitialized {
     var $form_label;
     var $form_name;
     var $encryption_on = 'n';
+    var $table_override = '';
     var $safecracker_channel_id = 0;
     var $reply_to_address;
     var $reply_to_name;
-    var $table_override = '';
     
     var $admin_notification_on = 'y';
     var $notification_template;

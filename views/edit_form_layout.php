@@ -74,22 +74,28 @@ $alt = FALSE;
                     <h3><?php echo $field['heading']; ?></h3>
                 <?php else:
                     switch($field['type']):
-                        case 'string': ?>
-                        <label><?php echo $display_label; ?></label>
-                        <input type="text" class="placeHolder" disabled="disabled" />
+                        case 'string':
+                        if($field['length'] > 256): ?>
+                            <label for="" class=""><?php echo $display_label; ?></label>
+                            <textarea name="" id="" class="placeHolder" cols="30" rows="10" disabled="disabled"></textarea>
+                        <?php else: ?>
+                            <label><?php echo $display_label; ?></label>
+                            <input type="text" class="placeHolder" disabled="disabled" />
                     <?php
+                        endif;
+                        
                         break;
-                        case 'checkbox': ?>
+                    case 'checkbox': ?>
                         <input type="checkbox" class="placeHolder" disabled="disabled" />
                         <label for="" class="label-checkbox"><?php echo $display_label; ?></label>
                     <?php
                         break;
-                        case 'radio': ?>
+                    case 'radio': ?>
                         <input type="radio" class="placeHolder" disabled="disabled" />
                         <label for="" class="label-checkbox"><?php echo $display_label; ?></label>
                     <?php
                         break;
-                        case 'list': ?>
+                    case 'list': ?>
                         <label for="" class="label-checkbox"><?php echo $display_label; ?></label>
                         <select name="" id="" class="placeHolder" disabled="disabled" />
                             <?php
@@ -105,11 +111,6 @@ $alt = FALSE;
                             ?>
                         </select>
                     <?php
-                        break;
-                        case 'textarea': ?> 
-                        <label for="" class=""><?php echo $display_label; ?></label>
-                        <textarea name="" id="" class="placeHolder" cols="30" rows="10" disabled="disabled"></textarea>
-                        <?php
                         break;
                     case 'file': ?>
                         <label for="" class=""><?php echo $display_label; ?></label>
@@ -179,7 +180,10 @@ $alt = FALSE;
                         <li class="first-section">Field Types</li>
                         <?php foreach($item_options as $option): ?>
                         <li><a class="field_type" 
-                            href="<?php echo $new_item_url.AMP.'field_type='.$option['type']; ?>">
+                            href="<?php
+                                echo $new_item_url.AMP.'field_type='.$option['type'];
+                                if(isset($option['length'])) echo AMP.'field_length='.$option['length'];
+                             ?>">
                                 <img src="<?php echo get_instance()->config->slash_item('theme_folder_url'); ?>third_party/proform/images/<?php echo $option['icon']; ?>"> <?php echo $option['label']; ?></a>
                         </li>
                         <?php endforeach; ?>
