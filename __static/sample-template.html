@@ -24,7 +24,8 @@
     form.proform textarea,
     form.proform p,
     form.proform a,
-    form.proform h1, form.proform h2, form.proform h3, form.proform h4, form.proform h5 {
+    form.proform h1, form.proform h2, form.proform h3, form.proform h4, form.proform h5,
+    form.proform .errMsg {
         font-family: Helvetica, Arial, sans-serif;
         font-size: 12px;
     }
@@ -175,8 +176,12 @@
     }
     
     form.proform select[multiple=multiple] {
-        width: 200px;
+        width: 45%;
         height: 150px;
+    }
+    
+    form.proform .pf_row select[multiple=multiple] {
+        width: 100%;
     }
     
     form.proform input[type=checkbox],
@@ -194,6 +199,11 @@
     form.proform .pf_option label {
         display: inline;
         font-weight: normal;
+    }
+    
+    form.proform .pf_vertical .pf_option {
+        display: block;
+        width: 50%;
     }
     
     /*----------------------------------------*
@@ -240,11 +250,16 @@
             return false;
         });
         $('a.pf_step').unbind('click').click(function() {
+            $('input[name=_goto_step]').val($(this).attr('href').replace('#', ''));
+            $(this).parents('form').submit();
             return false;
         });
+        //alert(navigator.userAgent);
         $('input.date').datepicker();
         $('input.datetime').datetimepicker({ ampm: true });
         $('input.time').timepicker({ ampm: true });
+        // Need to hide this or a small outline is visible before the box is shown at the bottom of the page:
+        $('#ui-datepicker-div').hide();
     });
     </script>
 
@@ -252,11 +267,14 @@
 <body>
     
     <form class="proform" method="post">
+        <input type="hidden" name="_current_step" value="1" />
+        <input type="hidden" name="_goto_step" value="2" />
+        
         <ul class="pf_steps">
-            <li><a href="#" class="pf_step pf_active">Step 1</a></li><!--
-            --><li><a href="#" class="pf_step">Step 2</a></li><!--
-            --><li><a href="#" class="pf_step">Step 3</a></li><!--
-            --><li><a href="#" class="pf_step">Step 4</a></li>
+            <li><a href="#1" class="pf_step pf_active">Step 1</a></li><!--
+            --><li><a href="#2" class="pf_step">Step 2</a></li><!--
+            --><li><a href="#3" class="pf_step">Step 3</a></li><!--
+            --><li><a href="#4" class="pf_step">Step 4</a></li>
         </ul><div class="pf_wrap">
         
         <h1>Heading Level 1</h1>
@@ -266,11 +284,12 @@
         <label for="text">Text</label>
         <div class="pf_field">
             <input type="text" name="text" id="text" class="required" value="Tellus Ornare Dapibus Fringilla Purus" />
+            <div id="text-E" class="errMsg"><span>This field is required (server side validation sample).</span></div>
         </div>
 
         <label for="date">Date</label>
         <div class="pf_field">
-            <input type="date" name="date" id="date" class="date required" value="" placeholder="mm/dd/yyyy" />
+            <input type="text" name="date" id="date" class="date required" value="" placeholder="mm/dd/yyyy" />
         </div>
         
         <label for="datetime">Date and Time</label>
@@ -312,6 +331,7 @@
                 </div>
             </li>
         </ul>
+        <div class="pf_clear"></div>
         
         <fieldset>
             <legend>Field Set Test</legend>
@@ -368,7 +388,7 @@ Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Vivamus s
             </select>
         </div>
         
-        <label for="multiple">Select</label>
+        <label for="multiple">Multiple</label>
         <div class="pf_field">
             <select name="multiple" id="multiple" multiple="multiple">
                 <option value="1">One</option>
@@ -379,6 +399,36 @@ Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Vivamus s
                 <option value="6">Six</option>
             </select>
         </div>
+        
+        <ul class="pf_row">
+            <li>
+                <label for="multiplecol1">Multiple Col 1</label>
+                <div class="pf_field">
+                    <select name="multiplecol1" id="multiplecol1" multiple="multiple">
+                        <option value="1">One</option>
+                        <option value="2">Two</option>
+                        <option value="3">Three</option>
+                        <option value="4">Four</option>
+                        <option value="5">Five</option>
+                        <option value="6">Six</option>
+                    </select>
+                </div>
+            </li>
+            <li>
+                <label for="multiplecol2">Multiple Col 2</label>
+                <div class="pf_field">
+                    <select name="multiplecol2" id="multiplecol2" multiple="multiple">
+                        <option value="1">One</option>
+                        <option value="2">Two</option>
+                        <option value="3">Three</option>
+                        <option value="4">Four</option>
+                        <option value="5">Five</option>
+                        <option value="6">Six</option>
+                    </select>
+                </div>
+            </li>
+        </ul>
+        <div class="pf_clear"></div>
         
         <label for="checkboxes">Checkboxes</label>
         <div class="pf_field">
@@ -402,19 +452,60 @@ Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Vivamus s
         <label for="radios">Radio Buttons</label>
         <div class="pf_field">
             <div class="pf_option">
-                <input type="radio" name="radio_1" id="radio_1" value="1" checked="checked" /><label for="radio_1">One</label>
+                <input type="radio" name="radio" id="radio_1" value="1" checked="checked" /><label for="radio_1">One</label>
             </div>
             <div class="pf_option">
-                <input type="radio" name="radio_1" id="radio_2" value="2" /><label for="radio_2">Two</label>
+                <input type="radio" name="radio" id="radio_2" value="2" /><label for="radio_2">Two</label>
             </div>
             <div class="pf_option">
-                <input type="radio" name="radio_1" id="radio_3" value="3" /><label for="radio_3">Three</label>
+                <input type="radio" name="radio" id="radio_3" value="3" /><label for="radio_3">Three</label>
             </div>
             <div class="pf_option">
-                <input type="radio" name="radio_1" id="radio_4" value="4" /><label for="radio_4">Four</label>
+                <input type="radio" name="radio" id="radio_4" value="4" /><label for="radio_4">Four</label>
             </div>
         </div>
 
+        <ul class="pf_row">
+            <li>
+                <label for="checkboxesv">Checkboxes - Vertical</label>
+                <div class="pf_field pf_vertical">
+                    <div class="pf_option">
+                        <input type="checkbox" name="checkboxv_1" id="checkbox_1" value="1" checked="checked" /><label for="checkboxv_1">One</label>
+                    </div>
+                    <div class="pf_option">
+                        <input type="checkbox" name="checkboxv_2" id="checkboxv_2" value="2" /><label for="checkboxv_2">Two</label>
+                    </div>
+                    <div class="pf_option">
+                        <input type="checkbox" name="checkboxv_3" id="checkboxv_3" value="3" /><label for="checkboxv_3">Three</label>
+                    </div>
+                    <div class="pf_option">
+                        <input type="checkbox" name="checkboxv_4" id="checkboxv_4" value="4" /><label for="checkboxv_4">Four</label>
+                    </div>
+                    <div class="pf_option">
+                        <input type="checkbox" name="checkboxv_5" id="checkboxv_5" value="5" /><label for="checkboxv_5">Five</label>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <label for="radiosv">Radio Buttons - Vertical</label>
+                <div class="pf_field pf_vertical">
+                    <div class="pf_option">
+                        <input type="radio" name="radiov" id="radiov_1" value="1" checked="checked" /><label for="radiov_1">One</label>
+                    </div>
+                    <div class="pf_option">
+                        <input type="radio" name="radiov" id="radiov_2" value="2" /><label for="radiov_2">Two</label>
+                    </div>
+                    <div class="pf_option">
+                        <input type="radio" name="radiov" id="radiov_3" value="3" /><label for="radiov_3">Three</label>
+                    </div>
+                    <div class="pf_option">
+                        <input type="radio" name="radiov" id="radiov_4" value="4" /><label for="radiov_4">Four</label>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <div class="pf_clear"></div>
+        
         <div class="pf_buttons">
             <input type="submit" value="< Previous" disabled="disabled" />
             <input type="submit" value="Next >" />
