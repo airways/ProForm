@@ -112,6 +112,7 @@ var proform_edit_form_layout = {
                 $active_field.find('.fieldLabel').val($('#field-label').val());
                 $active_field.find('.fieldPresetValue').val($('#field-preset-value').val());
                 $active_field.find('.fieldPresetForced').val($('#field-preset-forced').is(':checked') ? 'y' : 'n');
+                $active_field.find('.fieldPlaceholder').val($('#field-placeholder').val());
                 $active_field.find('.fieldHtmlId').val($('#field-html-id').val());
                 $active_field.find('.fieldHtmlClass').val($('#field-html-class').val());
                 $active_field.find('.fieldExtra1').val($('#field-extra1').val());
@@ -137,6 +138,7 @@ var proform_edit_form_layout = {
                 $('#field-label').val($active_field.find('.fieldLabel').val());
                 $('#field-preset-value').val($active_field.find('.fieldPresetValue').val());
                 $('#field-preset-forced').attr('checked', $active_field.find('.fieldPresetForced').val() == 'y');
+                $('#field-placeholder').val($active_field.find('.fieldPlaceholder').val());
                 $('#field-html-id').val($active_field.find('.fieldHtmlId').val());
                 $('#field-html-class').val($active_field.find('.fieldHtmlClass').val());
                 $('#field-extra1').val($active_field.find('.fieldExtra1').val());

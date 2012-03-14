@@ -635,6 +635,7 @@ class Proform_mcp {
                 'html_class'    => $this->EE->input->post('field_html_class'),
                 'extra1'        => $this->EE->input->post('field_extra1'),
                 'extra2'        => $this->EE->input->post('field_extra2'),
+                'placeholder'   => $this->EE->input->post('field_placeholder'),
             );
             $form->set_all_form_field_settings($this->EE->input->post('field_order'), $settings_map);
         }

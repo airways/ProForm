@@ -45,10 +45,10 @@ require_once PATH_THIRD.'proform/config.php';
 class Proform {
 
     var $return_data    = '';
-    var $var_pairs = array('fieldrows', 'fields', 'errors');
+    var $var_pairs = array('fieldrows', 'fields', 'hidden_fields', 'errors');
     var $paginate = FALSE;
     var $paginate_data = '';
-    
+    var $default_placeholders = array('date' => 'mm/dd/yyyy!!', 'datetime' => 'mm/dd/yyyy hh:mm am/pm', 'time' => 'hh:mm am/pm', 'integer' => '###', 'float' => '0.0', 'email' => '@');
     public function Proform()
     {
         $this->__construct();
@@ -504,7 +504,8 @@ class Proform {
                 $this->prolib->copy_values($form_obj, $variables);
                 
                 $variables['fieldrows'] = $this->create_fields_array($form_obj, $form_session->errors, $form_session->values, $form_session->checked_flags, TRUE);
-                $variables['fields'] = $this->create_fields_array($form_obj, $form_session->errors, $form_session->values, $form_session->checked_flags, FALSE);
+                $variables['fields'] = $this->create_fields_array($form_obj, $form_session->errors, $form_session->values, $form_session->checked_flags, FALSE, FALSE);
+                $variables['hidden_fields'] = $this->create_fields_array($form_obj, $form_session->errors, $form_session->values, $form_session->checked_flags, FALSE, TRUE);
                 
                 //$this->prolib->debug($variables);
                 
@@ -1644,7 +1645,7 @@ class Proform {
     // Helpers
     ////////////////////////////////////////////////////////////////////////////////
 
-    private function create_fields_array($form_obj, $field_errors = array(), $field_values = array(), $field_checked_flags = array(), $create_field_rows = TRUE, $hidden = FALSE)
+    private function create_fields_array($form_obj, $field_errors = array(), $field_values = array(), $field_checked_flags = array(), $create_field_rows = TRUE, $hidden = -1)
     {
 
         if(is_object($field_values))
@@ -1654,14 +1655,28 @@ class Proform {
 
         $result = array();
         $last_field_row = -1;
-
+        
         foreach($form_obj->fields() as $field)
         {
             // skip secured fields such as member_id, member_name, etc.
             if($field->type == 'secure' OR $field->type == 'member_data') continue;
             // skip hidden fields when we don't want them, skip everything else when we do
-            if($hidden AND $field->type != 'hidden') continue;
-            if(!$hidden AND $field->type == 'hidden') continue;
+            
+            if($hidden !== -1)
+            {
+                if($field->get_control() == 'hidden')
+                {
+                    // it is hidden but we do not want hidden, skip it
+                    if(!$hidden) {
+                        continue;
+                    }
+                } else {
+                    // it is not hidden and we want only hidden, skip it
+                    if($hidden) {
+                        continue;
+                    }
+                }
+            }
             
             // handle normal posted fields
             $is_required = $field->is_required == 'y';
@@ -1682,11 +1697,17 @@ class Proform {
                     //'field_callback'    => function($form_session->values, $key=FALSE) { return time(); },
                     'field_id'          => $field->field_id,
                     'field_name'        => $field->field_name,
-                    'field_label'       => (array_key_exists('label', $field->form_field_settings) 
-                                            AND trim($field->form_field_settings['label']) != '')
+                    'field_label'       => (array_key_exists('label', $field->form_field_settings) AND trim($field->form_field_settings['label']) != '')
                                             ? $field->form_field_settings['label'] : $field->field_label,
+                    'field_placeholder' => (array_key_exists('placeholder', $field->form_field_settings) AND trim($field->form_field_settings['placeholder']) != '')
+                                            ? $field->form_field_settings['placeholder'] : (
+                                                    $field->placeholder != '' 
+                                                    ? $field->placeholder : ( 
+                                                        isset($this->default_placeholders[$field->type]) 
+                                                        ? $this->default_placeholders[$field->type] : '')),
                     'field_type'        => $field->type,
                     'field_length'      => $field->length,
+                    'field_heading'     => $field->heading,
                     'field_is_required' => $is_required ? 'y' : '',
                     'field_validation'  => $field->validation,
                     'field_error'       => array_key_exists($field->field_name, $field_errors) ? $field_errors[$field->field_name] : '',

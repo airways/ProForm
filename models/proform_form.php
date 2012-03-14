@@ -39,13 +39,14 @@ class PL_Form extends PL_RowInitialized {
     const SEPARATOR_PAGE     = 'PAGE';
     
     public static $default_form_field_settings = array(
-        'label'         => '',
-        'preset_value'  => '',
-        'preset_forced' => 'n',
-        'html_id'       => '',
-        'html_class'    => '',
-        'extra1'        => '',
-        'extra2'        => '',
+        'label'             => '',
+        'preset_value'      => '',
+        'preset_forced'     => 'n',
+        'html_id'           => '',
+        'html_class'        => '',
+        'extra1'            => '',
+        'extra2'            => '',
+        'placeholder'       => '',
     );
     
     function init()
@@ -200,6 +201,7 @@ class PL_Form extends PL_RowInitialized {
                             'html_class' => '',
                             'extra1' => '',
                             'extra2' => '',
+                            'placeholder' => '',
                         );
                     }
                 }

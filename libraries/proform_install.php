@@ -161,6 +161,7 @@ class Proform_install
             'upload_pref_id' => array('type' => 'int', 'constraint' => '4'),
             'mailinglist_id' => array('type' => 'int', 'constraint' => '4'),
             'reusable'       => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
+            'placeholder'    => array('type' => 'varchar', 'constraint' => '250', 'default' => ''),
             'settings'       => array('type' => 'blob'),
         );
         $this->EE->dbforge->add_field($fields);
@@ -331,6 +332,14 @@ class Proform_install
                 'table_override' => array('type' => 'varchar', 'constraint' => '128', 'default' => ''),
             );
             $forge->add_column('proform_forms', $fields);
+        }
+        
+        if($current < 0.54)
+        {
+            $fields = array(
+                'placeholder' => array('type' => 'varchar', 'constraint' => '250', 'default' => ''),
+            );
+            $forge->add_column('proform_fields', $fields);
         }
 
         return TRUE;

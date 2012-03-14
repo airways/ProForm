@@ -54,7 +54,8 @@ class PL_Field extends PL_RowInitialized
     var $mailinglist_id = FALSE;
     var $settings = array();
     var $reusable = 'n';
-    
+    var $placeholder = FALSE;
+
     function __construct($row, &$mgr=NULL)
     {
         parent::__construct($row, $mgr);
