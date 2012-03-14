@@ -1,1 +1,0 @@
-contact.html contains a sample form using all features of the bm_forms module.

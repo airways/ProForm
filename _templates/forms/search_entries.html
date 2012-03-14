@@ -1,9 +1,0 @@
-{exp:proform:entries form_name="comments" paginate="bottom" limit="10" search:for_entry_id="100"}
-    {if entries:no_results}
-        Nothing found
-    {if:else}
-        {row:number}<br/>
-        {value:form_entry_id}<br/>
-        {value:updated}<br/>
-    {/if}
-{/exp:proform:entries}
