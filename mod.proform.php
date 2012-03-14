@@ -117,6 +117,7 @@ class Proform {
         $error_delimiters   = explode('|', $this->EE->TMPL->fetch_param('error_delimiters',  '<div class="error">|</div>'));
         $error_messages     = $this->EE->pl_parser->fetch_param_group('message');
         $page               = $this->EE->TMPL->fetch_param('page', 1);
+        $variable_prefix    = $this->EE->TMPL->fetch_param('variable_prefix', '');
         
         if(count($error_delimiters) != 2)
         {
@@ -159,11 +160,11 @@ class Proform {
         
         
         $use_captcha = FALSE;
-        if (preg_match("/({captcha})/", $tagdata))
+        if (preg_match("/({".$variable_prefix."captcha})/", $tagdata))
         {
             $captcha = $this->EE->functions->create_captcha();
             if(!$captcha && $captcha !== '') $captcha = "[CAPTCHA ERROR]";
-            $tagdata = preg_replace("/{captcha}/", $captcha, $tagdata);
+            $tagdata = preg_replace("/{".$variable_prefix."captcha}/", $captcha, $tagdata);
 
             if($captcha !== '')
                 $use_captcha = TRUE;
@@ -378,8 +379,9 @@ class Proform {
                 // Set up pagination / step variables
                 $variables['last_step'] = $form_session->config['page'] == $form_obj->get_page_count();
                 // Setup template pair variables
-                $variables['fieldrows'] = $this->create_fields_array($form_obj, $field_errors, $field_values, $field_checked_flags, TRUE);
-                $variables['fields'] = $this->create_fields_array($form_obj, $field_errors, $field_values, $field_checked_flags, FALSE);
+                $variables['fieldrows'] = $this->create_fields_array($form_obj, $field_errors, $field_values, $field_checked_flags, TRUE, FALSE);
+                $variables['fields'] = $this->create_fields_array($form_obj, $field_errors, $field_values, $field_checked_flags, FALSE, FALSE);
+                $variables['hidden_fields'] = $this->create_fields_array($form_obj, $field_errors, $field_values, $field_checked_flags, FALSE, TRUE);
                 
                 //echo "<pre>";
                 //var_dump($variables);exit;
@@ -427,7 +429,12 @@ class Proform {
                 }
                 
                 // Parse variables
-                $form .= $this->EE->pl_parser->parse_variables($tagdata, $variables, $this->var_pairs);
+                $form .= $this->EE->pl_parser->parse_variables_ex(array(
+                    'rowdata' => $tagdata,
+                    'row_vars' => $variables,
+                    'pairs' => $this->var_pairs,
+                    'variable_prefix' => $variable_prefix,
+                ));
                 
                 // Close form
                 if($form_obj->form_type == 'form' || $form_obj->form_type == 'share')
@@ -1637,7 +1644,7 @@ class Proform {
     // Helpers
     ////////////////////////////////////////////////////////////////////////////////
 
-    private function create_fields_array($form_obj, $field_errors = array(), $field_values = array(), $field_checked_flags = array(), $create_field_rows = TRUE)
+    private function create_fields_array($form_obj, $field_errors = array(), $field_values = array(), $field_checked_flags = array(), $create_field_rows = TRUE, $hidden = FALSE)
     {
 
         if(is_object($field_values))
@@ -1652,6 +1659,9 @@ class Proform {
         {
             // skip secured fields such as member_id, member_name, etc.
             if($field->type == 'secure' OR $field->type == 'member_data') continue;
+            // skip hidden fields when we don't want them, skip everything else when we do
+            if($hidden AND $field->type != 'hidden') continue;
+            if(!$hidden AND $field->type == 'hidden') continue;
             
             // handle normal posted fields
             $is_required = $field->is_required == 'y';
