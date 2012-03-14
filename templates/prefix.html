@@ -1,0 +1,262 @@
+<style type="text/css">
+body {
+    margin: 0;
+    padding: 20px;
+}
+
+form.proform {
+    width: 600px;
+    padding: 0;
+    margin: 0;
+}
+
+form.proform .pf_wrap {
+    margin: 0;
+    padding: 0;
+}
+
+form.proform label,
+form.proform legend,
+form.proform input,
+form.proform textarea,
+form.proform p,
+form.proform a,
+form.proform h1, form.proform h2, form.proform h3, form.proform h4, form.proform h5,
+form.proform .errMsg {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 12px;
+}
+
+form.proform fieldset {
+    border: 1px solid grey;
+    width: 570px;
+    margin-bottom: 20px;
+}
+
+form.proform fieldset legend {
+    font-weight: bold;
+}
+
+form.proform h1, h2, h3, h4, h5 {
+    font-size: 20px !important;
+}
+
+/*----------------------------------------*
+ * Buttons                                *
+ *----------------------------------------*/
+form.proform .pf_buttons {
+    
+}
+
+form.proform input[type=submit],
+form.proform input[type=submit][disabled=disabled]:active {
+    border-top: 1px solid #EAEAEA;
+    border-left: 1px solid #EAEAEA;
+    border-bottom: 1px solid #A3A3A3;
+    border-right: 1px solid #A3A3A3;
+    background: #D3D3D3;
+    padding: 10px;
+    width: auto;
+    font-weight: bold;
+}
+
+form.proform input[type=submit]:active {
+    border-top: 1px solid #A3A3A3;
+    border-left: 1px solid #A3A3A3;
+    border-bottom: 1px solid #EAEAEA;
+    border-right: 1px solid #EAEAEA;
+}
+
+/*----------------------------------------*
+ * Steps Tabs                             *
+ *----------------------------------------*/
+ul.pf_steps {
+    margin-bottom: 20px;
+    padding: 0;
+    border-bottom: 1px solid #A3A3A3;
+    font: inherit;
+    vertical-align: baseline;
+    list-style: none;
+}
+
+ul.pf_steps li {
+    display: inline;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    vertical-align: baseline;
+    list-style: none;
+}
+
+ul.pf_steps li a {
+    border-top: 1px solid #EAEAEA;
+    border-left: 1px solid #EAEAEA;
+    border-bottom: 1px solid #A3A3A3;
+    border-right: 1px solid #A3A3A3;
+    border-top-left-radius: 10px 5px;
+    border-top-right-radius: 10px 5px;
+    background: #D3D3D3;
+    width: auto;
+    display: inline-block;
+    height: 20px;
+    font-weight: bold;
+    text-decoration: none;
+    color: black;
+    margin: 0;
+    padding-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    vertical-align: baseline;
+}
+
+ul.pf_steps li a.pf_active {
+    background: #A3A3A3;
+}
+
+/*----------------------------------------*
+ * Rows                                   *
+ *----------------------------------------*/
+.pf_row {
+    clear:both;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+
+.pf_row li {
+    display: inline;
+    width: 280px;
+    float: left;
+    padding-right: 20px;
+}
+
+.pf_row li label {
+    display: block;
+    width: 250px;
+}
+
+.pf_row li .pf_field {
+    display: inline-block;
+    width: 250px;
+}
+
+.pf_clear {
+    clear: both;
+}
+
+/*----------------------------------------*
+ * Fields                                 *
+ *----------------------------------------*/
+form.proform label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+form.proform .pf_field {
+    margin-bottom: 20px;
+}
+
+form.proform input {
+    border: 1px solid #A3A3A3;
+    padding: 2px;
+    width: 100%
+}
+
+form.proform textarea {
+    width: 100%;
+    height: 300px;
+    border: 1px solid #A3A3A3;
+}
+
+form.proform select[multiple=multiple] {
+    width: 45%;
+    height: 150px;
+}
+
+form.proform .pf_row select[multiple=multiple] {
+    width: 100%;
+}
+
+form.proform input[type=checkbox],
+form.proform input[type=radio] {
+    border: 1px solid #A3A3A3;
+    padding: 2px;
+    width: 20px;
+}
+
+form.proform .pf_option {
+    display: inline;
+    margin-right: 30px;
+}
+
+form.proform .pf_option label {
+    display: inline;
+    font-weight: normal;
+}
+
+form.proform .pf_vertical .pf_option {
+    display: block;
+    width: 50%;
+}
+
+/*----------------------------------------*
+ * wFORMS                                 *
+ *----------------------------------------*/
+ form.proform .errMsg {
+     display: inline;
+     color: red;
+ }
+ 
+/*----------------------------------------*
+ * jQuery UI Tweaks                       *
+ *----------------------------------------*/
+.ui-datepicker {
+    font-size: 12px !important;
+}
+
+</style>
+
+<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/start/jquery-ui.css" type="text/css" rel="Stylesheet" />
+<link href="https://raw.github.com/trentrichardson/jQuery-Timepicker-Addon/master/jquery-ui-timepicker-addon.css" type="text/css" rel="stylesheet" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js" type="text/javascript"></script>
+<script src="http://wforms.googlecode.com/svn/tags/3.3/build/wforms_pack.js" type="text/javascript"></script>
+<script src="https://raw.github.com/trentrichardson/jQuery-Timepicker-Addon/master/jquery-ui-timepicker-addon.js" type="text/javascript"></script>
+<script src="http://js.nicedit.com/nicEdit-latest.js" type="text/javascript"></script>
+<script>
+pf_nic_config = { 
+fullPanel: false,
+buttonList: [
+    'fontFamily', 'fontFormat',
+    'bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript', 'forecolor', 'bgcolor',
+    'ol', 'ul', 
+    'indent', 'outdent',
+    'left', 'center', 'right', 'justify',
+    'hr', 'link', 'unlink',
+    'removeFormat',
+]};
+$(document).ready(function() {
+    $('a.pf_add_file').unbind('click').click(function() {
+        var $parent = $(this).parents('.pf_field');
+        var $file = $($parent.find('input[type=file]')[0]);
+        var $files = $parent.find('.pf_files');
+        $file.clone().appendTo($files);
+        return false;
+    });
+    $('a.pf_step').unbind('click').click(function() {
+        $('input[name=_goto_step]').val($(this).attr('href').replace('#', ''));
+        $(this).parents('form').submit();
+        return false;
+    });
+    //alert(navigator.userAgent);
+    $('input.date').datepicker();
+    $('input.datetime').datetimepicker({ ampm: true });
+    $('input.time').timepicker({ ampm: true });
+    // Need to hide this or a small outline is visible before the box is shown at the bottom of the page:
+    $('#ui-datepicker-div').hide();
+});
+</script>

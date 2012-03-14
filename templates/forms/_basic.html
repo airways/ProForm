@@ -1,0 +1,127 @@
+Forms: [ {exp:proform:forms}{form_id}: {form_name}, {/exp:proform:forms} ]
+
+<style type="text/css">
+    .error {
+        color: red;
+    }
+    span.required {
+        color: red;
+    }
+    .fieldRow {
+        clear:both;
+        border: 1px dotted red;
+    }
+    .fieldRow li {
+        display: inline;
+        height: 30px;
+        border: 1px dotted blue;
+    }
+    .clear {
+        clear: both;
+    }
+</style>
+
+{exp:proform:form form_name="{embed:form_name}" debug="yes" secure:test_secure="{get:test_secure}"
+    message:required="This field is required!"}
+    
+    <h3>{form_label}</h3>
+
+    {if error_count}
+    <div class="errors">
+        <p>The form has the following errors:</p>
+        <ul>
+        {errors}
+            <li>{error}</li>
+        {/errors}
+        </ul>
+    </div>
+    {/if}
+    {if complete}
+        Thank you!
+    {if:else}
+        {!-- render all hidden fields in one place - you can also do these inline if you like --}
+        {fields}
+            {if field_control == 'hidden'}
+                {if field_name == "for_entry_id" AND embed:for_entry_id}
+                    <input type="{field_control}" name="{field_name}" value="{embed:for_entry_id}" />
+                {if:else}
+                    <input type="{field_control}" name="{field_name}" value="{field_value}" />
+                {/if}
+            {/if}
+        {/fields}
+
+        {!-- render normal fields in aligned rows --}
+        {fieldrows}
+            {!-- check if the row contains only hidden fields. if so, skip it because we already
+                 rendered it's fields. --}
+            {if fieldrow:count > fieldrow:hidden_count}
+                <ul class="fieldRow">
+                {fields}
+                    {if field_heading}
+                        <h3>{field_heading}</h3>
+                    {if:else}
+                    {if field_control != 'hidden'}{!-- skip hidden fields --}
+                        <li id="{field_html_id}" class="{if field_error}error{/if} {if field_is_required}required{/if} {field_html_class}">
+                            {field_extra_1}
+                            <label for="{field_name}">
+                                {field_label}
+                                {if field_is_required}
+                                    <span class="required">*</span>
+                                {/if}
+                            </label>
+
+                            {if field_control == 'textarea'}
+                                <textarea name="{field_name}" id="{field_name}" cols="40" rows="10">{field_value}{if error_count == 0}{field_preset_value}{/if}</textarea>
+                            {if:elseif field_control == 'checkbox'}
+                                <input type="{field_control}" id="{field_name}" name="{field_name}" value="y" {field_checked} 
+                                    {if field_preset_value == 'y' AND error_count == 0}checked="checked" class="default" {/if} />
+                            {if:elseif field_control == 'select'}
+								{if field_setting_multiselect}
+                                <select id="{field_name}" name="{field_name}[]" multiple="multiple">
+								{if:else}
+								<select id="{field_name}" name="{field_name}">
+								{/if}
+                                    {field_setting_list}
+                                        <option value="{key}" {selected}>{row}</option>
+                                    {/field_setting_list}
+                                </select>
+                            {if:else}
+                                <input type="{field_control}" id="{field_name}" name="{field_name}" value="{field_value}{if error_count == 0}{field_preset_value}{/if}" />
+                            {/if}
+                            {field_error}
+                            {field_extra_2}
+                        </li>
+                    {/if}
+                    {/if}
+                {/fields}
+                </ul>
+            {/if}
+        {/fieldrows}
+
+        {if use_captcha}
+        <p>
+            Enter this word: {captcha}<br/>
+            <input type="text" name="captcha" />{if error:captcha}<span class="error">{error:captcha}</span>{/if}
+        </p>
+        {/if}
+        
+        {if multistep}
+            <p>
+            {if prev_step}
+                <input type="submit" name="_prev_step" value="&lt; Previous Step" />
+            {if:else}
+                <input type="submit" disabled="disabled" value="&lt; Previous Step" />
+            {/if}
+            {if next_step}
+                <input type="submit" name="_next_step" value="Next Step &gt;" />
+            {if:else}
+                <input type="submit" disabled="disabled" value="Next Step &gt;" />
+            {/if}
+            </p>
+        {/if}
+        {if last_step}
+            <p><input type="submit" /></p>
+        {/if}
+    {/if}
+    
+{/exp:proform:form}
