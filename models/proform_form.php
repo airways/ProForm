@@ -36,7 +36,7 @@ class PL_Form extends PL_RowInitialized {
     var $settings;
     
     const SEPARATOR_HEADING  = 'HEAD';
-    const SEPARATOR_PAGE     = 'PAGE';
+    const SEPARATOR_STEP     = 'STEP';
     
     public static $default_form_field_settings = array(
         'label'             => '',
@@ -137,29 +137,73 @@ class PL_Form extends PL_RowInitialized {
         
     }
     
-    function get_page_count()
+    function get_steps($current_step=1)
     {
-        $pages = 0;
-        $fields = 0;
+        $steps = array();
+        $field_count = 0;
+        $step_count = 1;
+        
+        // There is always one step, even if it's empty and there are no step separators.
+        // Create a fake first step with the same label as the form itself.
+        $steps[] = array(
+            'separator_type' => PL_Form::SEPARATOR_STEP,
+            'heading'       => $this->form_label,
+            'step'          => $this->form_label,
+            'step_no'       => 1,
+            'step_active'   => $current_step == $step_count ? 'active' : ''
+        );
+        
         foreach($this->fields() as $field)
         {
-            if($field->separator_type == PL_Form::SEPARATOR_PAGE)
+            $field_count++;
+            if($field->separator_type == PL_Form::SEPARATOR_STEP)
             {
-                // We don't want to count the first page if there are no fields on it:  if
-                // the first field is itself a page separator, it simply becomes the first page.
-                if($fields > 0)
+                // This is still the first step if there were no fields before it, otherwise
+                // it is the next step
+                if($field_count > 1)
                 {
-                    $pages++;
+                    $step_count++;
                 }
-            } else {
-                $fields++;
+                
+                // Remove the fake first step since we found a real one before finding any fields.
+                if($step_count == 1)
+                {
+                    $steps = array();
+                }
+                
+                $steps[] = array(
+                    'separator_type'    => $field->separator_type,
+                    'heading'           => $field->heading,
+                    'step'              => $field->heading,
+                    'step_no'           => $step_count,
+                    'step_active'       => $current_step == $step_count ? 'active' : '',
+                );
             }
         }
         
-        // There is always one page, even if it's empty and there are no page separators.
-        if($pages == 0) $pages = 1;
+        return $steps;
+    }
+    
+    function get_step_count()
+    {
+        $step_count = 1;
+        $field_count = 0;
+        foreach($this->fields() as $field)
+        {
+            if($field->separator_type == PL_Form::SEPARATOR_STEP)
+            {
+                // We don't want to count the first step if there are no fields on it:  if
+                // the first field is itself a step separator, it simply becomes the first step.
+                if($field_count > 0)
+                {
+                    $step_count++;
+                }
+            } else {
+                $field_count++;
+            }
+        }
         
-        return $pages;
+        return $step_count;
     }
     
     /**
@@ -170,6 +214,8 @@ class PL_Form extends PL_RowInitialized {
      **/
     function fields($page = 0)
     {
+        $step_no = 1;
+        $field_count = 0;
 
         if(!$this->__fields) 
         {
@@ -189,9 +235,21 @@ class PL_Form extends PL_RowInitialized {
                             $this->__fields[$row->field_name]->settings = array();
                     
                         $this->__fields[$row->field_name]->form_field_settings = $this->get_form_field_settings($row->form_field_settings);
+                        $this->__fields[$row->field_name]->step_no = $step_no;
+                        $field_count ++;
                     } else {
+                        if($row->separator_type == PL_Form::SEPARATOR_STEP)
+                        {
+                            if($field_count > 0)
+                            {
+                                $step_no ++;
+                            }
+                        } else {
+                            $field_count ++;
+                        }
+                        
                         $this->__fields['sep_'.$row->form_field_id] = new PL_Field($row);
-
+                        $this->__fields['sep_'.$row->form_field_id]->step_no = $step_no;
                         $this->__fields['sep_'.$row->form_field_id]->settings = array();
                         $this->__fields['sep_'.$row->form_field_id]->form_field_settings = array(
                             'label' => '',

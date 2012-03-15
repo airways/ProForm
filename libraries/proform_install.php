@@ -323,7 +323,7 @@ class Proform_install
             
             // Update any existing heading rows to have the appropriate HEAD separator type, since before only heading separators were
             // available.
-            $this->EE->db->update('proform_form_fields', array('separator_type' => 'HEAD'), array('heading !=' => '', 'separator_type !=' => 'PAGE', 'field_id' => 0));
+            $this->EE->db->update('proform_form_fields', array('separator_type' => 'HEAD'), array('heading !=' => '', 'separator_type !=' => 'STEP', 'field_id' => 0));
         }
         
         if($current < 0.51)

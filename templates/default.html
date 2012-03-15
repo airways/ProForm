@@ -1,19 +1,18 @@
 
-{exp:proform:form form_name="{embed:form_name}" form_class="proform {embed:form_name}_proform" variable_prefix="pf_"}
+{exp:proform:form form_name="{embed:form_name}" form_class="proform {embed:form_name}_proform" variable_prefix="pf_" debug="yes"}
 
     {pf_hidden_fields}
         <input type="hidden" name="{pf_field_name}" value="{pf_field_value}" />
     {/pf_hidden_fields}
     
-    <input type="hidden" name="_current_step" value="{pf_current_step}" />
-    <input type="hidden" name="_goto_step" value="{pf_next_step}" />
+    <input type="hidden" name="_pf_current_step" value="{pf_current_step}" />
+    <input type="hidden" name="_pf_goto_step" value="" />
     
     <ul class="pf_steps">
-        <!-- These comments prevent whitespace in layouts that may not use Reset CSS.
+        <!-- These comments prevent whitespace in layouts that may not use Reset CSS.-->
         {pf_steps}
-        --><li><a href="#{pf_step_no}" class="pf_step {if pf_current_step}pf_active{/if}">{pf_step}</a></li><!--
+            <li><a href="#{pf_step_no}" class="pf_step {pf_step_active}">{pf_step}</a></li>
         {/pf_steps}
-        -->
     </ul>
     
     <div class="pf_wrap">
@@ -104,11 +103,11 @@
         {/if}
         
         {if pf_multistep}
-            <input type="submit" value="< Previous" {if pf_on_first_step}disabled="disabled"{/if} />
-            <input type="submit" value="Next >" {if pf_on_last_step}disabled="disabled"{/if} />
+            <input type="submit" name="_pf_goto_previous" value="< Previous" {if pf_on_first_step}disabled="disabled"{/if} />
+            <input type="submit" name="_pf_goto_next" value="Next >" {if pf_on_last_step}disabled="disabled"{/if} />
         {/if}
         {if pf_on_last_step}
-            <input type="submit" value="Submit" />
+            <input type="submit" name="_pf_finish" value="Submit" />
         {if:else}
             <input type="submit" value="Submit" disabled="disabled" />
         {/if}

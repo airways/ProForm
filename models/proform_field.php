@@ -56,7 +56,7 @@ class PL_Field extends PL_RowInitialized
     var $reusable = 'n';
     var $placeholder = FALSE;
 
-    function __construct($row, &$mgr=NULL)
+    function __construct($row=array(), &$mgr=NULL)
     {
         parent::__construct($row, $mgr);
         if(!$this->field_id AND isset($this->heading))

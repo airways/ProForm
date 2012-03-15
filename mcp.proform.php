@@ -409,8 +409,8 @@ class Proform_mcp {
             $vars['special_options'] = array(
                 array('label' => 'Heading',                     'type' => 'heading',                 'icon' => 'flag_blue.png', 
                       'url' => ACTION_BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_separator'.AMP.'form_id='.$form_id.AMP.'type='.PL_Form::SEPARATOR_HEADING),
-                array('label' => 'Page / Step',                 'type' => 'page',                    'icon' => 'page_add.png',
-                      'url' => ACTION_BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_separator'.AMP.'form_id='.$form_id.AMP.'type='.PL_Form::SEPARATOR_PAGE),
+                array('label' => 'Form Step',                   'type' => 'step',                    'icon' => 'page_add.png',
+                      'url' => ACTION_BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_separator'.AMP.'form_id='.$form_id.AMP.'type='.PL_Form::SEPARATOR_STEP),
             );
 
 
@@ -1215,8 +1215,8 @@ class Proform_mcp {
                 $type = PL_Form::SEPARATOR_HEADING;
                 $this->sub_page('tab_new_heading');
                 break;
-            case PL_Form::SEPARATOR_PAGE:
-                $type = PL_Form::SEPARATOR_PAGE;
+            case PL_Form::SEPARATOR_STEP:
+                $type = PL_Form::SEPARATOR_STEP;
                 $this->sub_page('tab_new_separator');
                 break;
         }
@@ -1253,8 +1253,8 @@ class Proform_mcp {
             case PL_Form::SEPARATOR_HEADING:
                 $this->EE->session->set_flashdata('message', lang('msg_heading_added'));
                 break;
-            case PL_Form::SEPARATOR_PAGE:
-                $this->EE->session->set_flashdata('message', lang('msg_page_added'));
+            case PL_Form::SEPARATOR_STEP:
+                $this->EE->session->set_flashdata('message', lang('msg_step_added'));
                 break;
         }
         $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form_id.AMP.'active_tabs=tab-content-layout');
@@ -1287,7 +1287,7 @@ class Proform_mcp {
                 case PL_Form::SEPARATOR_HEADING:
                     $this->sub_page('tab_edit_heading');
                     break;
-                case PL_Form::SEPARATOR_PAGE:
+                case PL_Form::SEPARATOR_STEP:
                     $this->sub_page('tab_edit_separator');
                     break;
             }
@@ -1303,10 +1303,10 @@ class Proform_mcp {
         );
         $form = $this->EE->pl_forms->create_cp_form($heading, $types);
         
-        if($heading['type'] == PL_Form::SEPARATOR_PAGE)
+        if($heading['type'] == PL_Form::SEPARATOR_STEP)
         {
             $vars['field_names'] = array(
-                'field_heading' => lang('field_page_name'),
+                'field_heading' => lang('field_step_name'),
             );
         }
         $vars['form'] = $form;
@@ -1340,8 +1340,8 @@ class Proform_mcp {
             case PL_Form::SEPARATOR_HEADING:
                 $this->EE->session->set_flashdata('message', lang('msg_heading_edited'));
                 break;
-            case PL_Form::SEPARATOR_PAGE:
-                $this->EE->session->set_flashdata('message', lang('msg_page_edited'));
+            case PL_Form::SEPARATOR_STEP:
+                $this->EE->session->set_flashdata('message', lang('msg_step_edited'));
                 break;
         }
 
@@ -1376,7 +1376,7 @@ class Proform_mcp {
                 case PL_Form::SEPARATOR_HEADING:
                     $this->sub_page('tab_delete_heading');
                     break;
-                case PL_Form::SEPARATOR_PAGE:
+                case PL_Form::SEPARATOR_STEP:
                     $this->sub_page('tab_delete_separator');
                     break;
             }

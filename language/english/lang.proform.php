@@ -104,8 +104,8 @@ $lang = array(
     'tab_delete_template' => 'Delete Template',
     'tab_new_heading' => 'New Heading',
     'tab_edit_heading' => 'Edit Heading',
-    'tab_new_separator' => 'New Page / Step',
-    'tab_edit_separator' => 'Edit Page / Step',
+    'tab_new_separator' => 'New Form Step',
+    'tab_edit_separator' => 'Edit Form Step',
     
     // Fields
     'field_form_name' => 'Form Short Name',
@@ -218,7 +218,7 @@ $lang = array(
     'field_user_agent' => 'User Agent',
     
     'field_heading' => 'Heading',
-    'field_page_name' => 'Page Name',
+    'field_step_name' => 'Step Name',
     'field_reusable' => 'Reusable',
     'field_reusable_desc' => 'Places the field in the Library section of the Toolbox, allowing you to easily reuse it',
     

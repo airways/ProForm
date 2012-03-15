@@ -255,7 +255,7 @@ $(document).ready(function() {
         return false;
     });
     $('a.pf_step').unbind('click').click(function() {
-        $('input[name=_goto_step]').val($(this).attr('href').replace('#', ''));
+        $('input[name=_pf_goto_step]').val($(this).attr('href').replace('#', ''));
         $(this).parents('form').submit();
         return false;
     });

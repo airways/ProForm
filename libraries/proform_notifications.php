@@ -280,10 +280,9 @@ class Proform_notifications
             // parse the template for EE tags, conditionals, etc.
             $this->EE->template->template = &$message;
             $this->EE->template->parse($message);
-        
+
             // final output to send
             $message = $this->EE->template->final_template;
-       
 
             $result = TRUE;
             foreach($notification_list as $to_email)
