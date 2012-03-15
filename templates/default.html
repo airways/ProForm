@@ -4,19 +4,19 @@
     {pf_hidden_fields}
         <input type="hidden" name="{pf_field_name}" value="{pf_field_value}" />
     {/pf_hidden_fields}
-    
+
     <input type="hidden" name="_pf_current_step" value="{pf_current_step}" />
     <input type="hidden" name="_pf_goto_step" value="" />
-    
+
     <ul class="pf_steps">
         <!-- These comments prevent whitespace in layouts that may not use Reset CSS.-->
         {pf_steps}
             <li><a href="#{pf_step_no}" class="pf_step {pf_step_active}">{pf_step}</a></li>
         {/pf_steps}
     </ul>
-    
+
     <div class="pf_wrap">
-    
+
     {!--
     <fieldset>
         <legend>Field Set Test</legend>
@@ -77,7 +77,7 @@
                         </div>
                         {/pf_field_setting_list}
                     {if:elseif pf_field_type == "radios"}
-                        {pf_field_setting_list} 
+                        {pf_field_setting_list}
                         <div class="pf_option">
                             <input type="radio" name="{pf_field_name}" id="{pf_field_name}_{pf_key}" value="{pf_key}" {if pf_selected}checked="checked"{/if} class="{pf_required}" /><label for="{pf_field_name}_{pf_key}">{pf_label}</label>
                         </div>
@@ -85,7 +85,7 @@
                     {if:else}
                         <input type="{pf_field_control}" id="{pf_field_name}" name="{pf_field_name}" value="{pf_field_value}" class="{pf_required}" />
                     {/if}
-                    
+
                     {if pf_field_error}<div id="text-E" class="errMsg"><span>{pf_field_error}</span></div>{/if}
                 </div>
             {/if}
@@ -93,7 +93,7 @@
         </ul>
         <div class="pf_clear"></div>
     {/pf_fieldrows}
-    
+
     <div class="pf_buttons">
         {if pf_use_captcha}
             <div class="pf_captcha">
@@ -101,7 +101,7 @@
                 <input type="text" name="captcha" />{if pf_error:captcha}<span class="error">{pf_error:captcha}</span>{/if}
             </div>
         {/if}
-        
+
         {if pf_multistep}
             <input type="submit" name="_pf_goto_previous" value="< Previous" {if pf_on_first_step}disabled="disabled"{/if} />
             <input type="submit" name="_pf_goto_next" value="Next >" {if pf_on_last_step}disabled="disabled"{/if} />

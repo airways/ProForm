@@ -27,7 +27,7 @@
  * copyright to the original author, your license to  use and modify this
  * source is null and void. Use of this software constitutes your agreement
  * to this clause.
- * 
+ *
  **/ ?>
 
 
@@ -73,7 +73,7 @@
         lang('heading_actions')
         );
         //form_checkbox('select_all', 'true', FALSE, 'class="toggle_all" id="select_all"'));
-    
+
     if (count($forms) > 0):
         foreach($forms as $form)
         {
@@ -91,12 +91,12 @@
             'colspan'   => 3,
         ));
     endif;
-    
+
     echo $this->table->generate();
-    
+
 if($pagination):
     ?>
-    
+
     <div class="tableFooter">
 
         <span class="pagination"><?=$pagination?></span>

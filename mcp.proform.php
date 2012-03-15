@@ -4,7 +4,7 @@
  * @package ProForm
  * @author Isaac Raway (MetaSushi, LLC) <isaac.raway@gmail.com>
  *
- * Copyright (c)2009, 2010, 2011. Isaac Raway and MetaSushi, LLC. 
+ * Copyright (c)2009, 2010, 2011. Isaac Raway and MetaSushi, LLC.
  * All rights reserved.
  *
  * This source is commercial software. Use of this software requires a
@@ -22,7 +22,7 @@
  * possible inclusion in future releases. No compensation will be provided
  * for patches, although where possible we will attribute each contribution
  * in file revision notes. Submitting such modifications constitutes
- * assignment of copyright to the original author (Isaac Raway and 
+ * assignment of copyright to the original author (Isaac Raway and
  * MetaSushi, LLC) for such modifications. If you do not wish to assign
  * copyright to the original author, your license to  use and modify this
  * source is null and void. Use of this software constitutes your agreement
@@ -30,7 +30,7 @@
  *
  **/
 
- 
+
 if(!file_exists(PATH_THIRD.'prolib/prolib.php'))
 {
     echo 'ProForm requires the prolib package. Please place prolib into your third_party folder.';
@@ -47,20 +47,20 @@ if(!defined('ACTION_BASE'))
 }
 
 class Proform_mcp {
-    
+
     var $pipe_length = 1;
     var $perpage = 20;
-    
+
     function Proform_mcp()
     {
         prolib($this, 'proform');
-        
+
         $this->EE->cp->set_right_nav(array(
                 'home' => TAB_ACTION,
                 'list_fields' => TAB_ACTION.'method=list_fields',
                 'global_form_preferences' => TAB_ACTION.'method=global_form_preferences'
                 ));
-        
+
         $this->field_type_options = array(
             'checkbox'      => 'Checkbox',
             'date'          => 'Date',
@@ -79,13 +79,13 @@ class Proform_mcp {
             'secure'        => 'Secure Hidden',
             'member_data'   => 'Member Data',
         );
-        
+
         $this->config_overrides = $this->EE->config->item('proform');
-        
-        if(isset($this->config_overrides['field_type_options'])) 
-        { 
-            $this->field_type_options = $this->config_overrides['field_type_options']; 
-        } 
+
+        if(isset($this->config_overrides['field_type_options']))
+        {
+            $this->field_type_options = $this->config_overrides['field_type_options'];
+        }
 
         if(isset($this->config_overrides['member_field_options']))
         {
@@ -96,20 +96,20 @@ class Proform_mcp {
             if(isset($this->config_overrides['member_field_options_simple']) AND $this->config_overrides['member_field_options_simple'] == 'y')
             {
                 $default = array('member_id', 'group_id', 'username', 'screen_name', 'email', 'language');
-                
+
                 // Get all CUSTOM member fields
-                $fields = $this->EE->db->query("SELECT m_field_id AS field_id, 
-                                        m_field_name AS field_name, 
-                                        m_field_label AS field_label 
+                $fields = $this->EE->db->query("SELECT m_field_id AS field_id,
+                                        m_field_name AS field_name,
+                                        m_field_label AS field_label
                                         FROM exp_member_fields");
-                
+
                 $custom = array();
-                  
+
                 foreach($fields->result_array() as $row)
                 {
                     $custom[] = $row['field_name'];
                 }
-                
+
                 $this->member_field_options = array_merge($default, $custom);
             }
             else
@@ -124,11 +124,11 @@ class Proform_mcp {
                 array('type' => 'textarea', 'name' => 'list', 'label' => 'Options')
             ),
             'member_data' => array(
-                array('type' => 'dropdown', 'name' => 'member_data', 'label' => 'Field', 
+                array('type' => 'dropdown', 'name' => 'member_data', 'label' => 'Field',
                       'options' => $this->prolib->pl_forms->simple_select_options($this->member_field_options))
             ),
         );
-        
+
         $this->field_validation_options = array(
             'none' => 'None'
         );
@@ -137,7 +137,7 @@ class Proform_mcp {
         $this->EE->cp->add_to_head('<link rel="stylesheet" href="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/styles/jquery.contextMenu.css" type="text/css" media="screen" />');
         $this->EE->cp->add_to_head('<link rel="stylesheet" href="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/styles/screen.css" type="text/css" media="screen" />');
         $this->EE->cp->add_to_head('<link rel="stylesheet" href="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/styles/colorbox.css" type="text/css" media="screen" />');
-    
+
         $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/prolib/javascript/prolib.js"></script>');
 
         $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/jquery.tablednd_0_5.js"></script>');
@@ -146,43 +146,43 @@ class Proform_mcp {
         $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/jquery.contextMenu.js"></script>');
         $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/jquery.form.js"></script>');
         $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/jquery.colorbox-min.js"></script>');
-        
+
 
     }
-    
+
     ////////////////////////////////////////////////////////////////////////////////
     // FORMS
-    
+
     function index()
     {
         $this->EE->load->library('javascript');
         $this->EE->load->library('table');
         $this->EE->load->library('formslib');
         $this->EE->load->helper('form');
-        
+
         $this->EE->cp->set_variable('cp_page_title', $this->EE->lang->line('proform_module_name'));
 
         $this->sub_page('tab_forms');
-        
+
         //$vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_form';
         $vars['form_hidden'] = NULL;
         $vars['forms'] = array();
-        
+
         $vars['options'] = array(
                     'edit'      => lang('edit_selected'),
-                    'delete'    => lang('delete_selected')  
-                    );  
-                    
+                    'delete'    => lang('delete_selected')
+                    );
+
         if (!$rownum = $this->EE->input->get_post('rownum'))
         {
             $rownum = 0;
         }
-        
+
         //$query = $this->EE->db->order_by("form_name", "desc")->get('proform'); //, $rownum, $this->perpage
         // TODO: member access controls on data and form editing
-        
+
         $forms = $this->EE->formslib->forms->get_all();
-        
+
         ////////////////////////////////////////
         // Generate table of forms
         foreach($forms as $form)
@@ -193,7 +193,7 @@ class Proform_mcp {
             //$form->edit_preset_values_link  = ACTION_BASE.AMP.'method=edit_form_preset_values'.AMP.'form_id='.$form->form_id;
             $form->list_entries_link        = ACTION_BASE.AMP.'method=list_entries'.AMP.'form_id='.$form->form_id;
             $form->delete_link              = ACTION_BASE.AMP.'method=delete_form'.AMP.'form_id='.$form->form_id;
-            
+
             $form->entries_count    = $form->count_entries();
 
             // Toggle checkbox
@@ -203,25 +203,25 @@ class Proform_mcp {
                                     'value'     => $form->form_id,
                                     'class'     =>'toggle');
             $vars['forms'][$form->form_id] = $form;
-            
+
         }
-                         
+
         $this->_add_key_warnings($vars);
 
         ////////////////////////////////////////
         // Pagination
-        
+
         //  Check for pagination
         $total = $this->EE->db->count_all('proform_forms');
-        
+
         // Pass the relevant data to the paginate class so it can display the "next page" links
         $this->EE->load->library('pagination');
         $p_config = $this->pagination_config('index', $total);
-        
+
         $this->EE->pagination->initialize($p_config);
-        
+
         $vars['pagination'] = $this->EE->pagination->create_links();
-        
+
         ////////////////////////////////////////
         // Javascript
         $this->EE->javascript->output(array(
@@ -241,13 +241,13 @@ class Proform_mcp {
         $this->EE->cp->add_js_script(array('plugin' => 'dataTables'));
         //$this->EE->javascript->output($this->ajax_filters('edit_items_ajax_filter', 4));
         $this->EE->javascript->compile();
-        
+
         ////////////////////////////////////////
         // Render view
         $this->_get_flashdata($vars);
         return $this->EE->load->view('index', $vars, TRUE);
     }
-    
+
     function make_random_key()
     {
         $result = '';
@@ -255,17 +255,17 @@ class Proform_mcp {
         for($i = 0; $i < 32; $i++) $result .= $s[rand(0,strlen($s)-1)];
         return $result;
     }
-    
+
     function global_form_preferences()
     {
         if($_SERVER['REQUEST_METHOD'] == 'POST')
         {
             $this->process_global_form_preferences();
         }
-        
+
         $vars = array();
         $this->sub_page('tab_global_form_preferences');
-        
+
         $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=global_form_preferences';
         $vars['editing'] = FALSE;
         $vars['form'] = array();
@@ -277,7 +277,7 @@ class Proform_mcp {
         foreach($prefs as $pref => $value)
         {
             $f_name = 'pref_' . $pref;
-            
+
             switch($f_name)
             {
                 case 'pref_notification_template_group':
@@ -298,7 +298,7 @@ class Proform_mcp {
             }
             $vars['form'][] = array('lang_field' => $f_name, 'label' => lang($f_name), 'control' => $control);
         }
-        
+
         $this->_add_key_warnings($vars);
         $this->EE->load->library('table');
         return $this->EE->load->view('generic_edit', $vars, TRUE);
@@ -332,14 +332,14 @@ class Proform_mcp {
 
         return TRUE;
     }
-    
+
     function new_form()
     {
         if($this->EE->input->post('form_name') !== FALSE)
         {
             if($this->process_new_form()) return;
         }
-        
+
         $vars = array();
         $type = $this->EE->input->get('type');
         if($type != 'form' && $type != 'saef' && $type != 'share')
@@ -348,66 +348,66 @@ class Proform_mcp {
         }
         $vars['new_type'] = $type;
         $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_form';
-        
+
         return $this->edit_form(FALSE, $vars);
-        
+
     }
-    
+
     function process_new_form()
     {
         // run form validation
         $this->_run_validation('edit_form');
-        
+
         $data = array();
         $this->prolib->copy_post($data, "PL_Form");
-        
+
         // create new form and table
         $this->EE->load->library('formslib');
         $form = $this->EE->formslib->forms->create($data);
-        
+
         // go back to form edit page
         $this->EE->session->set_flashdata('message', lang('msg_form_created'));
         $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form->form_id);
-        
+
         return TRUE;
     }
-    
+
     function edit_form($editing=TRUE, $vars=array())
     {
         $this->EE->load->library('formslib');
-        
-        if($editing && $this->EE->input->post('form_id') !== FALSE) 
+
+        if($editing && $this->EE->input->post('form_id') !== FALSE)
         {
             if($this->process_edit_form()) return;
         }
-        
+
         $vars['hidden'] = array();
-        
+
         $vars['hidden']['active_tabs'] = ($s = $this->EE->input->get_post('active_tabs')) ? $s : 'tab-content-settings';
-        
+
         if($editing)
         {
             $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_form';
             $this->sub_page('tab_edit_form');
-        
+
             $form_id = (int)$this->EE->input->get('form_id');
             $query = $this->EE->db->get_where('proform_forms', array('form_id' => $form_id));
             $form = $this->EE->formslib->forms->get($form_id);
-            
+
             if(!$form_id || !$form)
             {
                 show_error(lang('invalid_form_id').' [9]');
                 return FALSE;
             }
-            
+
             $vars['editing'] = TRUE;
             $vars['hidden']['form_id'] = $form_id;
             $vars['new_item_url'] = ACTION_BASE.AMP.'method=new_field'.AMP.'auto_add_form_id='.$form_id;
             $vars['add_item_url'] = ACTION_BASE.AMP.'method=assign_field'.AMP.'form_id='.$form_id;
             $vars['edit_field_url'] = ACTION_BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_field'.AMP.'form_id='.$form_id;
-        
+
             $vars['special_options'] = array(
-                array('label' => 'Heading',                     'type' => 'heading',                 'icon' => 'flag_blue.png', 
+                array('label' => 'Heading',                     'type' => 'heading',                 'icon' => 'flag_blue.png',
                       'url' => ACTION_BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_separator'.AMP.'form_id='.$form_id.AMP.'type='.PL_Form::SEPARATOR_HEADING),
                 array('label' => 'Form Step',                   'type' => 'step',                    'icon' => 'page_add.png',
                       'url' => ACTION_BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_separator'.AMP.'form_id='.$form_id.AMP.'type='.PL_Form::SEPARATOR_STEP),
@@ -426,25 +426,25 @@ class Proform_mcp {
             $vars['edit_field_url'] = FALSE;
             $vars['special_options'] = array();
         }
-        
-        
+
+
         $this->EE->load->library('proform_notifications');
         $this->EE->load->library('formslib');
         $template_options = $this->EE->proform_notifications->get_template_names(
             $this->EE->formslib->prefs->ini('notification_template_group', 'notifications'));
         $template_options = array(0 => 'None') + $template_options;
-        
+
         //unset($form_obj->form_id);
         unset($form_obj->settings);
-        
+
         // $channel_options = $this->EE->formslib->get_channel_options($this->EE->formslib->prefs->ini('safecracker_field_group_id'),
         //                                                              array(0 => 'None'));
         $channel_options = array();
-        
+
         $types = array(
-            'form_id' => 'read_only', 
-            'entries_count' => 'read_only', 
-            'notification_template' => array('dropdown', $template_options), 
+            'form_id' => 'read_only',
+            'entries_count' => 'read_only',
+            'notification_template' => array('dropdown', $template_options),
             'notification_list' => 'textarea',
             'admin_notification_on' => array('checkbox', 'y'),
             'submitter_notification_on' => array('checkbox', 'y'),
@@ -456,19 +456,19 @@ class Proform_mcp {
                                         : array('checkbox', 'y'),
             'safecracker_channel_id' => array('dropdown', $channel_options)
         );
-        
+
         $extra = array('after' => array());
-        
+
         if($form_obj->form_type == 'form')
             $extra['after']['reply_to_name'] = array(array('heading' => lang('notification_list_name')));
         if($form_obj->form_type == 'form' OR $form_obj->form_type == 'share')
             $extra['after']['reply_to_field'] = array(array('heading' => lang('field_submitter_notification_name')));
         if($form_obj->form_type == 'form' OR $form_obj->form_type == 'share')
             $extra['after']['submitter_reply_to_field'] = array(array('heading' => lang('field_share_notification_name')));
-        
+
         $edit_form = $this->EE->pl_forms->create_cp_form($form_obj, $types, $extra);
 
-        
+
         $vars['form'] = $edit_form;
         $vars['_form_title'] = lang($form_obj->form_type.'_title');
         $vars['_form_description'] = lang($form_obj->form_type.'_desc');
@@ -495,17 +495,17 @@ class Proform_mcp {
                 );
                 break;
         }
-        
+
         if($this->EE->config->item('proform_allow_encrypted_form_data') != 'y')
         {
             $vars['hidden_fields'][] = 'encryption_on';
         }
-        
+
         if($this->EE->config->item('proform_allow_table_override') != 'y')
         {
             $vars['hidden_fields'][] = 'table_override';
         }
-        
+
         $vars['form_hidden'] = array();
         $vars['default_value_hidden'] = array('form_id' => 0, 'field_id' => 0);
         if($form)
@@ -515,19 +515,19 @@ class Proform_mcp {
             $vars['hidden']['form_id'] = $form_id;
             $vars['default_value_hidden']['form_id'] = $form_id;
         }
-        
+
         //$vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_form_fields';
         $vars['assign_action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=assign_field';
         $vars['new_field_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_field';
         $vars['default_value_action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=set_default_value';
-        
+
         // list available fields to add to the form
         $vars['add_item_options'] = array();
         $field_count = 0;
-        foreach($this->EE->formslib->fields->get_all(array('reusable' => 'y')) as $field) 
+        foreach($this->EE->formslib->fields->get_all(array('reusable' => 'y')) as $field)
         {
             // don't show fields that are already on the form
-            if(!$form OR !array_key_exists($field->field_name, $form->fields())) 
+            if(!$form OR !array_key_exists($field->field_name, $form->fields()))
             {
                 $vars['add_item_options'][] = array(
                     'field_id' => $field->field_id,
@@ -538,21 +538,21 @@ class Proform_mcp {
                 $field_count++;
             }
         }
-        
+
         $vars['item_options'] = PL_Field::$item_options;
-        
+
         ////////////////////////////////////////
         // Generate table of fields
         $vars['fields'] = array();
-        
+
         if($form)
         {
-            foreach($form->fields() as $field) 
+            foreach($form->fields() as $field)
             {
                 $row_array = $field->to_array();;
-                
+
                 $row_array['settings']          = array_merge($field->settings, $field->form_field_settings);
-                
+
                 if($row_array['heading'])
                 {
                     $row_array['edit_link']     = ACTION_BASE.'method=edit_separator'.AMP.'form_field_id='.$field->form_field_id.AMP.'form_id='.$form->form_id;
@@ -569,14 +569,14 @@ class Proform_mcp {
                                         'id'        => 'edit_box_'.$field->field_id,
                                         'value'     => $field->field_id,
                                         'class'     =>'toggle');
-            
+
                 $vars['fields'][] = $row_array;
             }
         }
-        
+
         ////////////////////////////////////////
         // Javascript
-        
+
         $save_order_url = '';
         $this->EE->javascript->output(array(
             '$(document).ready(function() {
@@ -592,7 +592,7 @@ class Proform_mcp {
 
         $this->EE->cp->add_js_script(array('plugin' => 'dataTables'));
         $this->EE->javascript->compile();
-        
+
         $this->EE->load->library('table');
 
         $this->_get_flashdata($vars);
@@ -600,23 +600,23 @@ class Proform_mcp {
         $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/edit_form_layout.js"></script>');
         return $this->EE->load->view('edit_form', $vars, TRUE);
     }
-    
+
     function process_edit_form()
     {
         $this->EE->load->library('formslib');
-        
+
         // run form validation
         $this->_run_validation('edit_form');
-        
+
         // find form
         $form_id = trim($this->EE->input->get_post('form_id'));
         if(!$form_id || $form_id <= 0) show_error(lang('missing_form_id'));
-        
+
         $form = $this->EE->formslib->forms->get($form_id);
-        
+
         // process layout and field customization for the form
         $field_order = $this->EE->input->post('field_order');
-        
+
         if($field_order)
         {
             foreach($form->fields() as $field)
@@ -626,7 +626,7 @@ class Proform_mcp {
                 $form->set_field_required($field, $is_required);
             }
             $form->set_layout($field_order, $this->EE->input->post('field_row'), $this->EE->input->post('form_field_id'));
-            
+
             $settings_map = array(
                 'label'         => $this->EE->input->post('field_label'),
                 'preset_value'  => $this->EE->input->post('field_preset_value'),
@@ -639,12 +639,12 @@ class Proform_mcp {
             );
             $form->set_all_form_field_settings($this->EE->input->post('field_order'), $settings_map);
         }
-        
+
         // process adding a field
         // $add_item = trim($this->EE->input->get_post('add_item'));
         // if($add_item != Proform_mcp::NONE)
         // {
-        //     if(is_numeric($add_item) && ($add_item == Proform_mcp::ITEM_NEW_FIELD || $add_item >= 1)) 
+        //     if(is_numeric($add_item) && ($add_item == Proform_mcp::ITEM_NEW_FIELD || $add_item >= 1))
         //     {
         //         $field_id = $add_item;
         //         if($field_id == -1)
@@ -670,7 +670,7 @@ class Proform_mcp {
         //         }
         //     }
         // }
-        
+
         // check that the reply_to field names are valid
         $fields = $form->fields();
         $field_names = array_keys($fields);
@@ -686,34 +686,34 @@ class Proform_mcp {
                 }
             }
         }
-        
+
         // set defaults for checkboxes
         if(!$this->EE->input->post('encryption_on')) $_POST['encryption_on'] = 'n';
         if(!$this->EE->input->post('admin_notification_on')) $_POST['admin_notification_on'] = 'n';
         if(!$this->EE->input->post('submitter_notification_on')) $_POST['submitter_notification_on'] = 'n';
         if(!$this->EE->input->post('share_notification_on')) $_POST['share_notification_on'] = 'n';
-        
+
         // copy post values defined on the form class to it and save it
         $this->prolib->copy_post($form);
         $form->save();
-        
+
         // go back to form edit
         $active_tabs = ($s = $this->EE->input->get_post('active_tabs')) ? $s : 'tab-content-settings';
         $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form->form_id.AMP.'active_tabs='.$active_tabs);
-        
+
         return TRUE;
     }
-    
+
     function assign_field()
     {
         $this->EE->load->library('formslib');
 
         $form_id = trim($this->EE->input->get_post('form_id'));
         $field_id = trim($this->EE->input->get_post('field_id'));
-        
+
         $form = $form_id ? $this->EE->formslib->forms->get($form_id) : FALSE;
         $field = $form_id ? $this->EE->formslib->fields->get($field_id) : FALSE;
-        
+
         if($form AND $field)
         {
             $form->assign_field($field);
@@ -724,34 +724,34 @@ class Proform_mcp {
             // exit(json_encode(array('status' => 'error')));
             show_error('Invalid form or field ID specified.');
         }
-        
+
 
     }
-    
+
     function delete_form()
     {
         if($this->EE->input->post('form_id') !== FALSE)
         {
             if($this->process_delete_form()) return;
         }
-        
+
         $this->EE->load->library('formslib');
         $form_id = $this->EE->input->get('form_id');
         $form = $this->EE->formslib->forms->get($form_id);
-        
+
         $vars = array();
         $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=delete_form';
         $vars['object_type'] = 'form';
         $vars['object_name'] = $form->form_name;
         $vars['hidden'] = array('form_id' => $form->form_id);
-        
+
         $this->sub_page('tab_delete_form');
-        
+
         $this->EE->load->library('table');
         return $this->EE->load->view('delete', $vars, TRUE);
     }
-    
-    
+
+
     function process_delete_form()
     {
         $form_id = trim($this->EE->input->post('form_id'));
@@ -759,10 +759,10 @@ class Proform_mcp {
         if(is_numeric($form_id))
         {
             $this->EE->load->library('formslib');
-            
+
             $form = $this->EE->formslib->forms->get($form_id);
             $this->EE->formslib->forms->delete($form);
-            
+
             // go back to form listing
             $this->EE->session->set_flashdata('message', lang('msg_form_deleted'));
             $this->EE->functions->redirect(ACTION_BASE);
@@ -774,94 +774,94 @@ class Proform_mcp {
             return FALSE;
         }
     }
-    
-    function remove_field() 
+
+    function remove_field()
     {
-        if($this->EE->input->post('form_id') !== FALSE) 
+        if($this->EE->input->post('form_id') !== FALSE)
         {
             if($this->process_remove_field()) return;
         }
-        
+
         $vars = array();
         $this->sub_page('tab_remove_field');
         $this->EE->load->library('formslib');
-        
+
         $form_id = $this->EE->input->get('form_id');
         $field_id = $this->EE->input->get('field_id');
-        
+
         $form = $this->EE->formslib->forms->get($form_id);
         $field = $this->EE->formslib->fields->get($field_id);
-        
-        
-        if(is_numeric($form_id) && is_numeric($field_id) && $form && $field) 
+
+
+        if(is_numeric($form_id) && is_numeric($field_id) && $form && $field)
         {
-            
+
             $vars['form_id'] = $form_id;
             $vars['form_name'] = $form->form_name;
-            
+
             $vars['field_id'] = $field_id;
             $vars['field_name'] = $field->field_name;
-            
+
             $vars['form_hidden'] = array(
                 'form_id' => $form_id,
                 'field_id' => $field_id
             );
-            
+
             $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=remove_field';
-            
+
             // list available fields to add to the form
-            $vars['add_item_options'] = array();  
-            foreach($this->EE->formslib->fields->get_all() as $field) 
+            $vars['add_item_options'] = array();
+            foreach($this->EE->formslib->fields->get_all() as $field)
             {
                 // don't show fields that are already on the form
-                if(!array_key_exists($field->field_name, $form->fields())) 
+                if(!array_key_exists($field->field_name, $form->fields()))
                 {
                     $vars['add_item_options'][$field->field_id] = $field->field_name;
                 }
             }
-            
-            
+
+
             $this->EE->load->library('table');
             $this->_get_flashdata($vars);
             return $this->EE->load->view('remove_field', $vars, TRUE);
-        } 
-        else 
+        }
+        else
         {
             show_error(lang('invalid_form_id_or_field_id') . ' [1]');
             return FALSE;
         }
     }
-    
+
     function process_remove_field()
     {
         $this->EE->load->library('formslib');
-        
+
         $form_id = trim($this->EE->input->post('form_id'));
         $field_id = trim($this->EE->input->post('field_id'));
-        
+
         $form = $this->EE->formslib->forms->get($form_id);
         $field = $this->EE->formslib->fields->get($field_id);
-        
+
         if(is_numeric($form_id) && is_numeric($field_id) && $form && $field)
         {
             $this->EE->load->library('formslib');
             $form->remove_field($field);
-            
+
             // go back to edit field assignments listing for this form
             $this->EE->session->set_flashdata('message', lang('msg_field_removed'));
             $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form_id.AMP.'active_tabs=tab-content-layout');
             return TRUE;
-        } 
-        else 
+        }
+        else
         {
             show_error(lang('invalid_form_id_or_field_id') . ' [2]');
             return FALSE;
         }
     }
-    
+
     ////////////////////////////////////////////////////////////////////////////////
     // FIELDS
-    
+
     function list_fields()
     {
         $this->EE->load->library('formslib');
@@ -869,12 +869,12 @@ class Proform_mcp {
         $this->EE->load->library('javascript');
         $this->EE->load->library('table');
         $this->EE->load->helper('form');
-        
+
         $this->sub_page('tab_list_fields');
-        
+
         $vars['form_hidden'] = NULL;
         $vars['fields'] = array();
-        
+
         // get data
         $rownum = (int)$this->EE->input->get_post('rownum');
         $fields = $this->EE->formslib->fields->get_all(FALSE, FALSE, FALSE, $rownum, $this->perpage);
@@ -887,78 +887,78 @@ class Proform_mcp {
         $p_config = $this->pagination_config('list_fields', $total); // creates our pagination config for us
         $this->EE->pagination->initialize($p_config);
         $vars['pagination'] = $this->EE->pagination->create_links();
-        
-        
+
+
         ////////////////////////////////////////
         // Generate table of fields
-        foreach($fields as $field) 
+        foreach($fields as $field)
         {
             $table_row = new stdClass();
-            
+
             $table_row->id                   = $field->field_id;
             $table_row->name                 = $field->field_name;
             $table_row->edit_link            = ACTION_BASE.AMP.'method=edit_field'.AMP.'field_id='.$field->field_id;
             $table_row->delete_link          = ACTION_BASE.AMP.'method=delete_field'.AMP.'field_id='.$field->field_id;
-            
+
             // Toggle checkbox
             $table_row->toggle = array(
                                     'name'      => 'toggle[]',
                                     'id'        => 'edit_box_'.$field->field_id,
                                     'value'     => $field->field_id,
                                     'class'     => 'toggle');
-            
+
             $vars['fields'][$field->field_id] = $table_row;
         }
-        
+
         ////////////////////////////////////////
         // Render view
         $this->_get_flashdata($vars);
         return $this->EE->load->view('list_fields', $vars, TRUE);
     }
-    
+
     function new_field()
     {
-        if($this->EE->input->post('field_name') !== FALSE) 
+        if($this->EE->input->post('field_name') !== FALSE)
         {
             if($this->process_new_field()) return;
         }
-        
+
         $vars = array();
         $vars['field_type'] = $this->EE->input->get('field_type');
         $vars['field_length'] = ($n = $this->EE->input->get('field_length')) ? $n : 256;
         $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_field';
         $auto_add_form_id = $this->EE->input->get_post('auto_add_form_id');
-        
+
         $vars['hidden'] = array('auto_add_form_id' => $auto_add_form_id);
-        
+
         $this->sub_page('tab_new_field');
-        
+
         // blank form object
         $vars['editing'] = FALSE;
-        
-        
+
+
         return $this->edit_field(FALSE, $vars);
     }
-    
+
     function process_new_field()
     {
         $this->EE->load->library('formslib');
-        
+
         // see if the field already exists
         $field_name = strtolower(trim($this->EE->input->post('field_name')));
         $field = $this->EE->formslib->fields->get($field_name, FALSE);
         if($field) show_error(lang('field_already_exists'));
-        
+
         // reset invalid length so it is set to the default
         if($this->EE->input->post('field_length') < 1) unset($_POST['field_length']);
-        
+
         // run form validation
         $this->_run_validation('edit_field');
-        
+
         $data = array();
         $this->prolib->copy_post($data, "PL_Field");
         unset($data['form_field_settings']);
-        
+
         // add the field
         $settings = array();
 
@@ -966,15 +966,15 @@ class Proform_mcp {
             $settings['type_list'] = $this->EE->input->post('type_list');
         if($this->EE->input->post('type_member_data'))
             $settings['type_member_data'] = $this->EE->input->post('type_member_data');
-        
+
         $data['settings'] = $settings;
-        
+
         $this->EE->formslib->fields->create($data);
         $field = $this->EE->formslib->fields->get($field_name);
 
         // automatically add the field to a form?
         $auto_add_form_id = $this->EE->input->get_post('auto_add_form_id');
-        
+
         if(!$auto_add_form_id)
         {
             // go back to field listing
@@ -986,7 +986,7 @@ class Proform_mcp {
             if($form AND $field)
             {
                 $form->assign_field($field);
-                
+
                 $this->EE->session->set_flashdata('message', lang('msg_field_created_added'));
                 $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.
                                                 AMP.'form_id='.$auto_add_form_id.AMP.'active_tabs=tab-content-layout');
@@ -994,31 +994,31 @@ class Proform_mcp {
                 show_error(lang('invalid_form_id_or_field_id') . '[11]');
             }
         }
-        
+
         return TRUE;
     }
-    
+
     function edit_field($editing=TRUE, $vars = array())
     {
         $this->EE->load->library('formslib');
-        
+
         $form_id = (int)$this->EE->input->get('form_id');
 
-        if($editing && $this->EE->input->post('field_id') !== FALSE) 
+        if($editing && $this->EE->input->post('field_id') !== FALSE)
         {
             if($this->process_edit_field()) return;
         }
-        
+
         if($editing)
         {
             $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_field'.AMP.'form_id='.$form_id;
             $this->sub_page('tab_edit_field');
-        
+
             $field_id = (int)$this->EE->input->get('field_id');
 
             //$query = $this->EE->db->get_where('proform_fields', array('field_id' => $field_id));
             $field = $this->EE->formslib->fields->get($field_id);
-        
+
             $vars['editing'] = TRUE;
             $vars['hidden'] = array('field_id' => $field_id);
         } else {
@@ -1033,30 +1033,30 @@ class Proform_mcp {
                 $field->length = $vars['field_length'];
             }
         }
-        
+
         $upload_prefs = $this->EE->pl_uploads->get_upload_prefs();
         $upload_prefs[0] = 'None';
-        
+
         $mailinglists = $this->_get_mailinglists();
         $mailinglists[0] = 'None';
-        
-        $validation_rules = $this->EE->pl_validation->available_rules; 
-        
-        if(isset($this->config_overrides['validation_rules'])) 
-        { 
-            $validation_rules = $this->_filter_array($this->config_overrides['validation_rules'], $validation_rules); 
+
+        $validation_rules = $this->EE->pl_validation->available_rules;
+
+        if(isset($this->config_overrides['validation_rules']))
+        {
+            $validation_rules = $this->_filter_array($this->config_overrides['validation_rules'], $validation_rules);
         }
-        
+
         // Make a list of assigned form names
         $field->assigned_forms = 'None';
         $edit_form_url = ACTION_BASE.'method=edit_form'.AMP.'form_id=';
         foreach($field->get_assigned_forms() as $assigned_form)
         {
             if($field->assigned_forms == 'None') $field->assigned_forms = '';
-            
+
             $field->assigned_forms .= '<a href="'.$edit_form_url.$assigned_form->form_id.'">'.$assigned_form->form_name.'</a>, ';
         }
-        
+
         // Chop off last comma and space
         $field->assigned_forms = rtrim($field->assigned_forms, ', ');
 
@@ -1069,9 +1069,9 @@ class Proform_mcp {
                 'dropdown', $this->field_type_options, $this->field_type_settings),
             'length'            => 'input',
             'upload_pref_id'    => array(
-                'dropdown', $upload_prefs), 
+                'dropdown', $upload_prefs),
             'mailinglist_id'    => array(
-                'dropdown', $mailinglists), 
+                'dropdown', $mailinglists),
             'validation'        => array(
                 'grid', array( /* options for items that can be added to the grid */
                     'headings'  => array('Rule', 'Param'),
@@ -1080,14 +1080,14 @@ class Proform_mcp {
             'assigned_forms'    => 'static',
             );
         $form = $this->EE->pl_forms->create_cp_form($field, $types);
-        
+
         $vars['form'] = $form;
         $vars['form_name'] = 'field_edit';
         $vars['hidden_fields'] = array('field_id', 'settings', 'heading');
-        
+
         $this->EE->load->library('table');
         $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/edit_field.js"></script>');
-        
+
         $result = $this->EE->load->view('generic_edit', $vars, TRUE);
         // if($this->EE->input->get('embed'))
         // {
@@ -1097,33 +1097,33 @@ class Proform_mcp {
             return $result;
         // }
     }
-    
-    private function _filter_array($array, $original) 
-    { 
-        $filtered_rules = array(); 
-     
-        foreach($original as $key => $value) 
-        { 
-            if(in_array($key, $array)) 
-            { 
-                $filtered_rules[$key] = $value; 
-            } 
-        } 
-     
-        return $filtered_rules; 
+
+    private function _filter_array($array, $original)
+    {
+        $filtered_rules = array();
+
+        foreach($original as $key => $value)
+        {
+            if(in_array($key, $array))
+            {
+                $filtered_rules[$key] = $value;
+            }
+        }
+
+        return $filtered_rules;
     }
-    
+
     function process_edit_field()
     {
         // run form validation
         $this->_run_validation('edit_field');
-        
+
         $field_id = $this->EE->input->post('field_id');
         $form_id = (int)$this->EE->input->get('form_id');
-        
+
 
         if(!$field_id || $field_id <= 0) show_error(lang('invalid_field_id'));
-        
+
         // find field
         $this->EE->load->library('formslib');
         $field = $this->EE->formslib->fields->get($field_id);
@@ -1143,7 +1143,7 @@ class Proform_mcp {
         $this->prolib->copy_post($field);
         $field->settings = $settings;
         $field->save();
-        
+
         // go back to form listing
         if($form_id)
         {
@@ -1154,42 +1154,42 @@ class Proform_mcp {
         }
         return TRUE;
     }
-    
+
     function delete_field()
     {
         if($this->EE->input->post('field_id') !== FALSE)
         {
             if($this->process_delete_field()) return;
         }
-        
+
         $this->EE->load->library('formslib');
         $field_id = $this->EE->input->get('field_id');
         $field = $this->EE->formslib->fields->get($field_id);
-        
+
         $vars = array();
         $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=delete_field';
         $vars['object_type'] = 'field';
         $vars['object_name'] = $field->field_name;
         $vars['hidden'] = array('field_id' => $field->field_id);
-        
+
         $this->sub_page('tab_delete_field');
-        
+
         $this->EE->load->library('table');
         return $this->EE->load->view('delete', $vars, TRUE);
     }
-    
-    
+
+
     function process_delete_field()
     {
         $field_id = trim($this->EE->input->post('field_id'));
-        
+
         if(is_numeric($field_id))
         {
             $this->EE->load->library('formslib');
-            
+
             $field = $this->EE->formslib->fields->get($field_id);
             $this->EE->formslib->fields->delete($field);
-            
+
             // go back to field listing
             $this->EE->session->set_flashdata('message', lang('msg_field_deleted'));
             $this->EE->functions->redirect(ACTION_BASE.AMP.'method=list_fields');
@@ -1204,11 +1204,11 @@ class Proform_mcp {
 
     function new_separator()
     {
-        if($this->EE->input->post('heading') !== FALSE) 
+        if($this->EE->input->post('heading') !== FALSE)
         {
             if($this->process_new_separator()) return;
         }
-        
+
         switch($this->EE->input->get('type'))
         {
             case PL_Form::SEPARATOR_HEADING:
@@ -1220,7 +1220,7 @@ class Proform_mcp {
                 $this->sub_page('tab_new_separator');
                 break;
         }
-        
+
         $vars = array();
         $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_separator'.AMP.'type='.$type;
         $form_id = $this->EE->input->get_post('form_id');
@@ -1229,20 +1229,20 @@ class Proform_mcp {
 
         return $this->edit_separator(FALSE, $vars);
     }
-    
+
     function process_new_separator()
     {
         $this->EE->load->library('formslib');
-        
+
         // run form validation
         $this->_run_validation('edit_separator');
-        
+
         $form_id = $this->EE->input->post('form_id');
         $heading = $this->EE->input->post('heading');
         $type = $this->EE->input->get('type');
-        
+
         $form = $this->EE->formslib->forms->get($form_id);
-        
+
         if($form && $heading)
         {
             $form->add_separator($heading, $type);
@@ -1261,19 +1261,19 @@ class Proform_mcp {
 
         return TRUE;
     }
-    
+
     function edit_separator($editing=TRUE, $vars = array())
     {
         $this->EE->load->library('formslib');
-        
-        if($editing && $this->EE->input->post('heading') !== FALSE) 
+
+        if($editing && $this->EE->input->post('heading') !== FALSE)
         {
             if($this->process_edit_separator()) return;
         }
-        
+
         $form_id = (int)$this->EE->input->get('form_id');
         $form_field_id = (int)$this->EE->input->get('form_field_id');
-        
+
         if($editing)
         {
             $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_separator'.AMP.'form_field_id='.$form_field_id.AMP.'form_id='.$form_id;
@@ -1281,7 +1281,7 @@ class Proform_mcp {
             $query = $this->EE->db->where('form_field_id', $form_field_id)->get('exp_proform_form_fields');
             $row = $query->row();
             $heading = array('form_field_id' => $row->form_field_id, 'form_id' => $row->form_id, 'heading' => $row->heading, 'type' => $row->separator_type);
-            
+
             switch($row->separator_type)
             {
                 case PL_Form::SEPARATOR_HEADING:
@@ -1291,18 +1291,18 @@ class Proform_mcp {
                     $this->sub_page('tab_edit_separator');
                     break;
             }
-        
+
             $vars['editing'] = TRUE;
         } else {
             $vars['editing'] = FALSE;
             $heading = array('form_field_id' => '', 'form_id' => $form_id, 'heading' => '', 'type' => $this->EE->input->get('type'));
         }
-        
+
         $types = array(
             'heading'           => 'input',
         );
         $form = $this->EE->pl_forms->create_cp_form($heading, $types);
-        
+
         if($heading['type'] == PL_Form::SEPARATOR_STEP)
         {
             $vars['field_names'] = array(
@@ -1312,24 +1312,24 @@ class Proform_mcp {
         $vars['form'] = $form;
         $vars['form_name'] = 'heading_edit';
         $vars['hidden_fields'] = array('form_field_id', 'form_id', 'type');
-        
+
         $this->EE->load->library('table');
         return $this->EE->load->view('generic_edit', $vars, TRUE);
     }
-    
+
     function process_edit_separator()
     {
         $this->EE->load->library('formslib');
-        
+
         // run form validation
         $this->_run_validation('edit_separator');
-        
+
         $form_id = $this->EE->input->get('form_id');
         $form_field_id = $this->EE->input->get('form_field_id');
         $heading = $this->EE->input->post('heading');
-        
+
         $form = $this->EE->formslib->forms->get($form_id);
-        
+
         if($form && $heading)
         {
             $form->update_separator($form_field_id, $heading);
@@ -1353,24 +1353,24 @@ class Proform_mcp {
     function delete_separator()
     {
         $this->EE->load->library('formslib');
-        
-        if($this->EE->input->post('form_field_id') !== FALSE) 
+
+        if($this->EE->input->post('form_field_id') !== FALSE)
         {
             if($this->process_delete_separator()) return;
         }
 
         $form_id = $this->EE->input->get('form_id');
         $form_field_id = $this->EE->input->get('form_field_id');
-    
+
         $form = $this->EE->formslib->forms->get($form_id);
-    
+
         if(is_numeric($form_id) && $form)
         {
             $heading = $form->get_separator($form_field_id);
-            
-            
+
+
             $vars = array();
-            
+
             switch($heading->separator_type)
             {
                 case PL_Form::SEPARATOR_HEADING:
@@ -1380,54 +1380,54 @@ class Proform_mcp {
                     $this->sub_page('tab_delete_separator');
                     break;
             }
-            
-            
+
+
             $vars['form_id'] = $form_id;
             $vars['form_name'] = $form->form_name;
-            
+
             $vars['form_field_id'] = $form_field_id;
             $vars['heading'] = $heading;
-            
+
             $vars['form_hidden'] = array(
                 'form_id' => $form_id,
                 'form_field_id' => $form_field_id
             );
-            
+
             $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=delete_separator';
-            
+
             $this->EE->load->library('table');
             $this->_get_flashdata($vars);
             return $this->EE->load->view('delete_separator', $vars, TRUE);
-        } 
-        else 
+        }
+        else
         {
             show_error(lang('invalid_form_id_or_field_id') . ' [11]');
             return FALSE;
         }
     }
-    
+
     function process_delete_separator()
     {
         $vars = array();
         $this->EE->load->library('formslib');
-        
+
         $form_id = $this->EE->input->get_post('form_id');
         $form_field_id = $this->EE->input->get_post('form_field_id');
-        
+
         $form = $this->EE->formslib->forms->get($form_id);
-        
+
         if(is_numeric($form_id) && $form)
         {
             $form->remove_separator($form_field_id);
             $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form_id.AMP.'active_tabs=tab-content-layout');
-        } 
-        else 
+        }
+        else
         {
             show_error(lang('invalid_form_id_or_field_id') . ' [12]');
             return FALSE;
         }
     }
-    
+
     function list_entries()
     {
         $this->EE->load->library('formslib');
@@ -1439,7 +1439,7 @@ class Proform_mcp {
         // Get params
         $form_id = $this->EE->input->get('form_id');
         $rownum = (int)$this->EE->input->get_post('rownum');
-        
+
         // Get form object
         $form = $this->EE->formslib->forms->get($form_id);
 
@@ -1476,16 +1476,16 @@ class Proform_mcp {
         ////////////////////////////////////////
         // Table Headings
         $vars['hidden_columns'] = array("ip_address", "user_agent", "dst_enabled");
-        
+
         $headings = array('ID', 'Last Updated');
         $fields = $form->fields();
 
         $vars['fields'] = array('updated');
         foreach($fields as $field)
-        {                      
+        {
             if($field->heading) continue;
             $vars['fields'][] = $field->field_name;
-            
+
             if(array_search($field->field_name, $vars['hidden_columns']) === FALSE)
             {
                 // Prepare headings from lang file and from Field configs
@@ -1507,46 +1507,46 @@ class Proform_mcp {
     function edit_form_entry()
     {
         $this->EE->load->library('formslib');
-        
+
         $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_form_entry';
         $this->sub_page('tab_edit_form_entry');
-        
+
         $form_id = (int)$this->EE->input->get('form_id');
         $form_entry_id = (int)$this->EE->input->get('entry_id');
-        
+
         $form_obj = $this->EE->formslib->forms->get($form_id);
         if($form_obj)
         {
             $query = $this->EE->db->get_where($form_obj->table_name(), array('form_entry_id' => $form_entry_id));
-            
+
             $vars['editing'] = TRUE;
             $vars['hidden'] = array('form_id' => $form_id, 'form_entry_id' => $form_entry_id);
-            
+
             $form_obj = $query->row();
-            
+
             unset($form_obj->settings);
-            
+
             $types = array(
                 'form_entry_id' => 'read_only',
                 'updated' => 'read_only',
                 'ip_address' => 'read_only',
                 'user_agent' => 'read_only'
             );
-            
+
             $field_names = array();
             foreach($form_obj->fields() as $field)
             {
                 $field_names[$field->field_name] = $field->field_label;
             }
             $vars['field_names'] = $field_names;
-            
+
             //var_dump($form_obj);
             $form = $this->EE->pl_forms->create_cp_form($form_obj, $types);
             //var_dump($form);die;
             $vars['form'] = $form;
-            
+
             $this->_add_key_warnings($vars);
-            
+
             $this->EE->load->library('table');
             return $this->EE->load->view('generic_edit', $vars, TRUE);
         }
@@ -1567,11 +1567,11 @@ class Proform_mcp {
         $this->EE->functions->redirect(ACTION_BASE.AMP.'method=list_entries'.AMP.'form_id='.$form_id);
         return TRUE;
     }
-    
+
     function export_entries()
     {
         $this->process_export_entries();
-        
+
         /*
          * // when we need options for the export:
          *
@@ -1579,7 +1579,7 @@ class Proform_mcp {
         {
             if($this->process_export_entries()) return;
         }
-                
+
         $this->EE->load->library('formslib');
         $this->EE->load->library('pagination');
         $this->EE->load->library('table'); // only use in view
@@ -1627,10 +1627,10 @@ class Proform_mcp {
         {
             fputcsv($stdout, array_values((array)$row));
         }
-        
+
         die;
     }
-    
+
     function data_table_js()
     {
         $this->EE->javascript->output(array(
@@ -1649,7 +1649,7 @@ class Proform_mcp {
         ));
         $this->EE->cp->add_js_script(array('plugin' => 'dataTables'));
     }
-    
+
     function pagination_config($method, $total_rows)
     {
         // Pass the relevant data to the paginate class
@@ -1664,17 +1664,17 @@ class Proform_mcp {
         $config['next_link'] = '<img src="'.$this->EE->cp->cp_theme_url.'images/pagination_next_button.gif" width="13" height="13" alt=">" />';
         $config['first_link'] = '<img src="'.$this->EE->cp->cp_theme_url.'images/pagination_first_button.gif" width="13" height="13" alt="< <" />';
         $config['last_link'] = '<img src="'.$this->EE->cp->cp_theme_url.'images/pagination_last_button.gif" width="13" height="13" alt="> >" />';
-        
+
         return $config;
     }
-    
+
     function sub_page($page, $added_title = '')
     {
         $this->EE->cp->set_breadcrumb(ACTION_BASE.AMP.'module=proform'.AMP, $this->EE->lang->line('proform_module_name'));
         $this->EE->cp->set_variable('cp_page_title', lang('proform_title') . ' ' . lang($page) . ($added_title != '' ? ' - ' . $added_title : ''));
-        
+
     }
-    
+
     function error($msg) {
         show_error($msg);
         return FALSE;
@@ -1688,40 +1688,40 @@ class Proform_mcp {
         $vars['allow_encrypted_form_data'] = $this->EE->config->item('proform_allow_encrypted_form_data') == 'y' || $this->EE->formslib->force_allow_encrypted_forms;
         $vars['random_key'] = $this->make_random_key();
     }
-    
+
     function _run_validation($group, $defaults=array())
     {
         // include the validation configuration since the library can't find our config
         // file in the third_party folder
         include PATH_THIRD.'proform/config/form_validation.php';
-        
+
         // get default values from config file, if needed
         if(count($defaults) == 0 AND array_key_exists($group, $config_defaults))
         {
             $defaults = $config_defaults[$group];
         }
-        
+
         // set default values for missing fields (mostly used for checkboxes)
         foreach($defaults as $field => $default)
         {
             if(!$this->EE->input->post($field)) $_POST[$field] = $default;
         }
-        
+
         // run the requested validation group, display errors if any are found
         $this->EE->load->library('form_validation', $config);
         if(!$this->EE->form_validation->run($group))
         {
             show_error('Please correct these errors: '.validation_errors());
         }
-        
+
         return TRUE;
     }
-    
-    
+
+
     function _render_grid($key, $headings, $options, $value)
     {
         $out = '';
-        
+
         $dropdown_options = array();
         $help = array();
         foreach($options as $option => $opts)
@@ -1735,39 +1735,39 @@ class Proform_mcp {
             }
         }
         $dropdown = form_dropdown('addgridrow_'.$key, $dropdown_options, array(), 'id="'.'addgridrow_'.$key.'"');
-        
+
         $out .= '<div id="field_'.$key.'" class="pl_grid" data-key="'.$key.'">';
-        
+
         $out .= '<table id="gridrow_'.$key.'" class="mainTable" border="0" cellspacing="0" cellpadding="0"><tbody><tr>';
-        
+
         $width = floor(100 / count($headings));
-        
+
         foreach($headings as $heading)
         {
             $out .= '<th width="'. $width .'%">'.$heading.'</th>';
         }
         $out .= '</tr>';
-        
+
         $rows = explode('|', $value);
         $i = 1;
         $grid = array();
-        
+
         foreach($rows as $row)
         {
             $cells = explode('[',$row);
-            
+
             if(count($cells) > 1)
             {
                 $cells[1] = str_replace(']', '', $cells[1]);
             }
-            
+
             if($cells[0] != 'none' && $cells[0] != '')
             {
                 $grid[] = $cells;
-                
+
                 $out .= '<tr class="grid_row"><td>'.$options[$cells[0]]['label'].'</td><td>';
                 $out .= '<a href="#" class="remove_grid_row" name="remove_'. $key .'_'. $i .'" data-key="'. $key .'" data-opt="'.$cells[0].'">X</a>';
-                
+
                 if(isset($options[$cells[0]]['flags']) && strpos($options[$cells[0]]['flags'], 'has_param') !== FALSE)
                 {
                     $out .=  '<input data-key="'.$key.'" data-opt="'.$cells[0].'" class="grid_param" type="text" size="5" value="'.(isset($cells[1])?$cells[1]:'').'"/><span class="help">'
@@ -1776,22 +1776,22 @@ class Proform_mcp {
                     $out .= '<span class="help">'
                         .(isset($options[$cells[0]]['flags']['help']) ? $options[$cells[0]]['flags']['help'] : '').'</span>';
                 }
-                
+
                 // $out .= '<td>'.form_button('remove_'.$key.'_'.$i, 'X', 'class="remove_grid_row" data-key="'.$key.'" data-opt="'.$cells[0].'" ').'</tr>';
                 $out .= '</td></tr>';
             }
-            
+
             $i++;
         }
-        
+
         $out .= '</tbody></table>';
 
         // $out .= '<h4>Add another rule</h4><br/>'.$dropdown.' '.form_button('addgridrow_'.$key, 'Add', 'id="addgridrow_'.$key.'" class="add_grid_row"');
         $out .= '<h4>Add another rule</h4>'.$dropdown;
         $out .= '<a href="#" name="addgridrow_'. $key .' id="addgridrow_'.$key.' class="add_grid_row">Add</a>';
-        
+
         $out .= '<input type="hidden" name="'.$key.'" value="'.$value.'" />';
-        
+
         $out .= '<script type="text/javascript">';
         $out .= 'pl_grid.options["'.$key.'"] = ' . json_encode($options) . ';';
         $out .= 'pl_grid.help["'.$key.'"] = ' . json_encode($help) . ';';
@@ -1811,10 +1811,10 @@ class Proform_mcp {
         $out .= '};';*/
         $out .= 'pl_grid.bind_events("'.$key.'", "gridrow_'.$key.'");</script>';
         $out .= '</div>';
-        
+
         return $out;
     } // function _render_grid
- 
+
     function _get_mailinglists()
     {
         $result = array();
@@ -1828,7 +1828,7 @@ class Proform_mcp {
         }
         return $result;
     }
-    
+
     function _get_flashdata(&$vars)
     {
         $vars['message'] = $this->EE->session->flashdata('message') ? $this->EE->session->flashdata('message') : false;

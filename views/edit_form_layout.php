@@ -41,31 +41,31 @@ $alt = FALSE;
     <div class="form-layout">
     <?php if (count($fields) > 0): ?>
         <ul class="form-setup">
-            
+
             <?php
             // echo '<ul class="fieldRow targetRow"></ul>';
             foreach($fields as $field):
                 if($field['type'] == 'hidden' OR $field['type'] == 'member_data') continue;
-                
+
                 if($last_field_row != $field['field_row'])
                 {
                     if($last_field_row != -1)
                     {
                         echo '</ul><ul class="form-setup fieldRow targetRow"></ul>';
                     }
-                    
+
                     echo '<ul class="form-setup fieldRow' . ($alt ? ' alt' : '') . '">';
                     $alt = !$alt;
-                    
+
                     $last_field_row = $field['field_row'];
                 }
-                
+
                 echo '<li>';
-                
+
                 print_hidden($field);
-                
+
                 $display_label = trim($field['settings']['label']) != '' ? $field['settings']['label'] :  $field['field_label'];
-                
+
                 ?>
                 <span class="move-link"></span>
                 <a href="<?php echo $field['edit_link']; ?>" class="edit action-link">Edit</a>
@@ -84,7 +84,7 @@ $alt = FALSE;
                             <input type="text" class="placeHolder" disabled="disabled" />
                     <?php
                         endif;
-                        
+
                         break;
                     case 'checkbox': ?>
                         <input type="checkbox" class="placeHolder" disabled="disabled" />
@@ -101,7 +101,7 @@ $alt = FALSE;
                         <select name="" id="" class="placeHolder" disabled="disabled" />
                             <?php
                             if(isset($field['settings']['type_list'])):
-                                foreach(explode("\n", $field['settings']['type_list']) as $option): 
+                                foreach(explode("\n", $field['settings']['type_list']) as $option):
                                 $option = explode(':', $option);
                                 if(count($option) == 1) $option[1] = $option[0];
                                 ?>
@@ -129,7 +129,7 @@ $alt = FALSE;
             echo '</ul><ul class="form-setup fieldRow targetRow"></ul>';
             ?>
         </ul>
-        
+
         <ol class="form-setup">
             <?php
             // echo '<ul class="fieldRow targetRow"></ul>';
@@ -141,9 +141,9 @@ $alt = FALSE;
                     $hidden_fields[$field['field_name']] = $field;
                 }
             }
-            
+
             ksort($hidden_fields);
-            
+
             if(count($hidden_fields) > 0): ?>
                 <h3>Hidden & Member Data Fields</h3>
                 <?php
@@ -162,11 +162,11 @@ $alt = FALSE;
 
     <?php endif; /* if (count($fields) > 0): */ ?>
     </div> <!-- end .form-layout -->
-    
+
     <div class="field-modifications">
         <div class="tab-content sidebar tab-content-add-item action-group">
             <div class="section-header">
-                <h3><strong>Toolbox</strong></h3> 
+                <h3><strong>Toolbox</strong></h3>
             </div>
             <div class="section-body">
                 <div class="form-fields">
@@ -174,13 +174,13 @@ $alt = FALSE;
                     <label for="add_item">Add item</label>&nbsp;
                     <?php echo form_dropdown('add_item', $add_item_options, Proform_mcp::NONE, 'id="add_item"'); ?>
                     */ ?>
-                
+
                     <p>Click a Field Type to create a new item, or click a field in the Library to add it to the form.</p>
-                
+
                     <ul class="toolbox">
                         <li class="first-section">Field Types</li>
                         <?php foreach($item_options as $option): ?>
-                        <li><a class="field_type" 
+                        <li><a class="field_type"
                             href="<?php
                                 echo $new_item_url.AMP.'field_type='.$option['type'];
                                 if(isset($option['length'])) echo AMP.'field_length='.$option['length'];
@@ -188,28 +188,28 @@ $alt = FALSE;
                                 <img src="<?php echo get_instance()->config->slash_item('theme_folder_url'); ?>third_party/proform/images/<?php echo $option['icon']; ?>"> <?php echo $option['label']; ?></a>
                         </li>
                         <?php endforeach; ?>
-                    
+
                         <li class="first-section">Special</li>
                         <?php foreach($special_options as $option): ?>
-                        <li><a class="field_type" 
+                        <li><a class="field_type"
                             href="<?php echo $option['url']; ?>">
                                 <img src="<?php echo get_instance()->config->slash_item('theme_folder_url'); ?>third_party/proform/images/<?php echo $option['icon']; ?>"> <?php echo $option['label']; ?></a>
                         </li>
                         <?php endforeach; ?>
-                    
+
                         <li class="section">Library</li>
-                        <?php 
+                        <?php
                         if(!count($add_item_options)): ?>
                             <li>Click the Reusable checkbox on a field to place it in the library. Only fields that are not on the current form will be shown in the library.</li>
                         <?php
                         else:
                             foreach($add_item_options as $option): ?>
-                            <li><a class="library" 
+                            <li><a class="library"
                                 href="<?php echo $add_item_url.'&field_id='.$option['field_id']; ?>">
                                     <img src="<?php echo get_instance()->config->slash_item('theme_folder_url'); ?>third_party/proform/images/<?php echo $option['icon']; ?>"> <?php echo $option['label']; ?></a>
                                 <a href="<?php echo $edit_field_url.'&field_id='.$option['field_id']; ?>" class="edit"><img src="<?php echo get_instance()->config->slash_item('theme_folder_url'); ?>third_party/proform/images/cog.png">Edit...</a>
                             </li>
-                            <?php endforeach; 
+                            <?php endforeach;
                         endif;
                         ?>
                     </ul>
@@ -219,7 +219,7 @@ $alt = FALSE;
         </div>
         <div class="tab-content sidebar tab-content-override meta-sidebar">
             <div class="section-header">
-                <h3><strong>Local Field Overrides</strong> <span id="edit-field-name"></span></h3> 
+                <h3><strong>Local Field Overrides</strong> <span id="edit-field-name"></span></h3>
                 <div class="required-field">
                     <input type="checkbox" id="field-required" name="field-required" />
                     <label for="field-required">Required</label>

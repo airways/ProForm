@@ -27,7 +27,7 @@
  * copyright to the original author, your license to  use and modify this
  * source is null and void. Use of this software constitutes your agreement
  * to this clause.
- * 
+ *
  **/ ?>
 
 <div class="list_entries">
@@ -39,27 +39,27 @@
 <?php if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>'; ?>
 <?php if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>'; ?>
 
-<?php 
+<?php
     $this->table->set_template($cp_table_template);
     $this->table->set_heading($headings);
-    
+
     if (count($entries) > 0):
         foreach($entries as $entry)
         {
             $row = array($entry->form_entry_id);
-        
+
             //$row[] = '<a href="'.$field->edit_link.'">'.entry->id.'</a>';
             foreach($fields as $field)
             {
                 $value = $entry->$field;
-            
+
                 if(array_search($field, $hidden_columns) === FALSE)
                 {
                     if(strlen($value) > 300)
                     {
                         $value = substr($value, 0, 300).'...';
                     }
-                
+
                     if($field == 'form_entry_id')
                     {
                         $row[] = '<a href="'.$edit_entry_url.'&entry_id='.$value.'">'.htmlspecialchars($value).'</a>';
@@ -72,21 +72,21 @@
             $row[] = '<a href="'.$delete_entry_url.'&entry_id='.$entry->form_entry_id.'" class="pl_confirm" rel="Are you sure you want to delete this entry?">Delete</a>';
             $this->table->add_row($row);
         }
-    
+
     else:
         $this->table->add_row(array(
             'data'      => '<div class="no_items_msg">' . lang('no_entries') . '</div>',
             'colspan'   => count($headings) ? count($headings) : 1,
         ));
     endif;
-    
+
     echo $this->table->generate();
     ?>
 
     <div class="tableFooter">
 
         <div class="tableSubmit">
-            
+
         </div>
 
         <?php echo $pagination; ?>

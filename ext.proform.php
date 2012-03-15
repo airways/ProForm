@@ -27,7 +27,7 @@
  * copyright to the original author, your license to  use and modify this
  * source is null and void. Use of this software constitutes your agreement
  * to this clause.
- * 
+ *
  **/
 
 require_once PATH_THIRD.'proform/config.php';
@@ -76,7 +76,7 @@ class Proform_ext {
                 $out = str_replace($title, $new_title, $out);
                 //var_dump($matches);
                 //exit($matches[1]);
-                
+
                 $out = preg_replace(array(
                     '/<!--start:pl_commands-->(.*?)<!--end:pl_commands-->/is',
                     '/<span id="filter_ajax_indicator".*?span>/'), '', $out);

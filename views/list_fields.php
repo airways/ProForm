@@ -27,7 +27,7 @@
  * copyright to the original author, your license to  use and modify this
  * source is null and void. Use of this software constitutes your agreement
  * to this clause.
- * 
+ *
  **/ ?>
 
 <div class="new_field">
@@ -57,17 +57,17 @@ else:
     $this->table->add_row(array(
         'data'      => '<div class="no_items_msg">' . lang('no_fields_defined') . '</div>',
         'colspan'   => 3,
-    ));     
+    ));
 endif;
     echo $this->table->generate();
     ?>
-    
+
     <div class="tableFooter">
 
         <div class="tableSubmit">
-            
+
         </div>
-        
+
         <span class="pagination"><?php echo $pagination; ?></span>
     </div>
     <?php

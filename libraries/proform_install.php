@@ -1,10 +1,10 @@
-<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed'); 
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
  * @package ProForm
  * @author Isaac Raway (MetaSushi, LLC) <isaac.raway@gmail.com>
  *
- * Copyright (c)2009, 2010, 2011. Isaac Raway and MetaSushi, LLC. 
+ * Copyright (c)2009, 2010, 2011. Isaac Raway and MetaSushi, LLC.
  * All rights reserved.
  *
  * This source is commercial software. Use of this software requires a
@@ -22,7 +22,7 @@
  * possible inclusion in future releases. No compensation will be provided
  * for patches, although where possible we will attribute each contribution
  * in file revision notes. Submitting such modifications constitutes
- * assignment of copyright to the original author (Isaac Raway and 
+ * assignment of copyright to the original author (Isaac Raway and
  * MetaSushi, LLC) for such modifications. If you do not wish to assign
  * copyright to the original author, your license to  use and modify this
  * source is null and void. Use of this software constitutes your agreement
@@ -38,19 +38,19 @@ class Proform_install
     var $version = PROFORM_VERSION;
     var $test_reinstall = FALSE;
     var $test_uninstall = FALSE;
-    
+
     function Proform_install()
     {
         prolib($this, "proform");
-        
+
     } // function Proform_install()
-    
+
     function is_installed()
     {
         return $this->EE->db->where(array('module_name' => PROFORM_CLASS))
                             ->get('modules');
     } // function is_installed()
-    
+
     function install()
     {
         ////////////////////////////////////////
@@ -60,24 +60,24 @@ class Proform_install
             'module_version'    => PROFORM_VERSION,
             'has_cp_backend'    => 'y');
         $this->EE->db->insert('modules', $data);
-        
+
         ////////////////////////////////////////
         // Actions
         $data = array(
             'class' => 'Proform',
             'method' => 'process_form_act');
         $this->EE->db->insert('actions', $data);
-        
+
         // CP:
         //$action_id  = $this->EE->cp->fetch_action_id('Proform', 'process_form');
         // View:
         //$action_id  = $this->EE->functions->fetch_action_id('Download', 'force_download');
-        
+
         if(!$this->test_reinstall)
         {
             $this->create_tables();
         }
-        
+
         ////////////////////////////////////////
         // Register tab
         //$this->EE->load->library('layout');
@@ -100,7 +100,7 @@ class Proform_install
         // These are the core tables for the forms module - other tables are created when forms are created
         $this->EE->load->dbforge();
         $forge = &$this->EE->dbforge;
-        
+
         // Create FORMS table
         $fields = array(
             'form_id'                           => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE, 'auto_increment' => TRUE),
@@ -113,7 +113,7 @@ class Proform_install
             'reply_to_name'                     => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
             'table_override'                    => array('type' => 'varchar', 'constraint' => '128',    'default' => ''),
             'settings'                          => array('type' => 'blob',                              'default' => ''),
-            
+
             'admin_notification_on'             => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
             'notification_template'             => array('type' => 'varchar', 'constraint' => '50',     'default' => ''),
             'notification_list'                 => array('type' => 'text',                              'default' => ''),
@@ -131,13 +131,13 @@ class Proform_install
             'share_notification_subject'        => array('type' => 'varchar', 'constraint' => '128',    'default' => ''),
             'share_email_field'                 => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
             'share_reply_to_field'              => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
-            
+
         );
         $forge->add_field($fields);
         $forge->add_key('form_id', TRUE);
         $forge->add_key('form_name');
         $forge->create_table('proform_forms');
-        
+
         // Create DISPLAY ENTRIES table
         $fields = array(
             'display_entry_id'  => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE, 'auto_increment' => TRUE),
@@ -149,7 +149,7 @@ class Proform_install
         $forge->add_key('form_id');
         $forge->add_key('entry_id');
         $forge ->create_table('proform_display_entries');
-        
+
         // Create FIELDS table
         $fields = array(
             'field_id'       => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE, 'auto_increment' => TRUE),
@@ -167,7 +167,7 @@ class Proform_install
         $this->EE->dbforge->add_field($fields);
         $forge->add_key('field_id', TRUE);
         $forge->create_table('proform_fields');
-        
+
         // Create FORM_FIELDS table
         $fields = array(
             'form_field_id' => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE, 'auto_increment' => TRUE),
@@ -185,7 +185,7 @@ class Proform_install
         $forge->add_key('form_field_id', TRUE);
         $forge->add_key('field_id');
         $forge->add_key('form_id');
-        $forge->create_table('proform_form_fields'); 
+        $forge->create_table('proform_form_fields');
 
         // Create PREFS table
         $fields = array(
@@ -207,12 +207,12 @@ class Proform_install
         $this->EE->load->dbforge();
 
         $this->EE->load->library('formslib');
-        
+
         // delete all defined forms
         if(!$this->test_uninstall)
         {
             $forms = $this->EE->formslib->forms->get_all();
-            foreach($forms as $form) 
+            foreach($forms as $form)
             {
                 $this->EE->formslib->forms->delete($form);
             }
@@ -227,7 +227,7 @@ class Proform_install
             $this->EE->dbforge->drop_table('proform_form_fields');
             $this->EE->dbforge->drop_table('proform_preferences');
         }
-        
+
         ////////////////////////////////////////
         // Unregister tab
         $this->EE->load->library('layout');
@@ -235,7 +235,7 @@ class Proform_install
 
         return TRUE;
     } // function uninstall
-    
+
     function update($current = '')
     {
         if ($current == $this->version)
@@ -245,7 +245,7 @@ class Proform_install
 
         $this->EE->load->dbforge();
         $forge = &$this->EE->dbforge;
-        
+
         if($current < 0.28)
         {
             if(!$this->EE->db->field_exists('form_field_settings', 'proform_form_fields'))
@@ -257,7 +257,7 @@ class Proform_install
             if($this->EE->db->field_exists('preset_value', 'proform_form_fields')) $forge->drop_column('proform_form_fields', 'preset_value');
             if($this->EE->db->field_exists('preset_forced', 'proform_form_fields')) $forge->drop_column('proform_form_fields', 'preset_forced');
         }
-        
+
         if($current < 0.38)
         {
             if(!$this->EE->db->field_exists('reply_to_address', 'proform_forms'))
@@ -267,7 +267,7 @@ class Proform_install
                 );
                 $forge->add_column('proform_forms', $fields);
             }
-            
+
             if(!$this->EE->db->field_exists('reply_to_field', 'proform_forms'))
             {
                 $fields = array(
@@ -294,7 +294,7 @@ class Proform_install
             );
             $forge->add_column('proform_form_fields', $fields);
         }
-        
+
         if($current < 0.45)
         {
             // Forge doesn't seem to be able to add a column and key at the same time, which you must do when adding a AUTO_INCREMENT to an
@@ -308,24 +308,24 @@ class Proform_install
                 'reusable' => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'),
             );
             $forge->add_column('proform_fields', $fields);
-            
+
             // Make any existing fields reusable since all fields were prior to this version,
             // even though the new default is for them NOT to be reusable.
             $this->EE->db->update('proform_fields', array('reusable' => 'y'));
         }
-        
+
         if($current < 0.50)
         {
             $fields = array(
                 'separator_type'=> array('type' => 'varchar', 'constraint' => 4, 'default' => '')
             );
             $forge->add_column('proform_form_fields', $fields);
-            
+
             // Update any existing heading rows to have the appropriate HEAD separator type, since before only heading separators were
             // available.
             $this->EE->db->update('proform_form_fields', array('separator_type' => 'HEAD'), array('heading !=' => '', 'separator_type !=' => 'STEP', 'field_id' => 0));
         }
-        
+
         if($current < 0.51)
         {
             $fields = array(
@@ -333,7 +333,7 @@ class Proform_install
             );
             $forge->add_column('proform_forms', $fields);
         }
-        
+
         if($current < 0.54)
         {
             $fields = array(
@@ -344,8 +344,8 @@ class Proform_install
 
         return TRUE;
     } // function update
-    
-    
+
+
     function tabs()
     {
         $tabs['proform'] = array(
@@ -354,7 +354,7 @@ class Proform_install
                         'collapse'      => 'false',
                         'htmlbuttons'   => 'false',
                         'width'         => '100%'));
-        
+
         return $tabs;
     } // function tabs
 }

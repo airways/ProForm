@@ -27,7 +27,7 @@
  * copyright to the original author, your license to  use and modify this
  * source is null and void. Use of this software constitutes your agreement
  * to this clause.
- * 
+ *
  **/ ?>
 
 <?php
@@ -87,7 +87,7 @@ endif;
             var_dump($field);
             die;
         }
-        
+
         if(array_key_exists('heading', $field))
         {
             echo $this->table->generate();
@@ -101,11 +101,11 @@ endif;
         {
             continue;
         }
-        
-        
+
+
         // used to look up lang entries for this field
         $lang_field = 'field_' . $field['lang_field'];
-    
+
         // construct label cell
         if(isset($field_names[$lang_field]))
         {
@@ -113,18 +113,18 @@ endif;
         } else {
             $label = '<label>' . lang($lang_field) . '</label>';
         }
-    
+
         if(array_search('required', $field) !== FALSE) {
             $label .= '<em class="required">* </em>';
         } else {
             $label .= '';
         }
-    
+
         $label .= '<br />';
         if(lang("{$lang_field}_desc") != "{$lang_field}_desc") {
             $label .= lang("{$lang_field}_desc");
         }
-    
+
         if(!array_key_exists('control', $field)) {
             $field['control'] = form_input($field['lang_field']);
         }
@@ -134,17 +134,17 @@ endif;
                 $field['control']
             );
     }
-    
+
     echo $this->table->generate();
-    
+
     if(!isset($generic_edit_embedded) || !$generic_edit_embedded)
     {
         ?>
-    
+
         <div class="tableFooter">
             <?php echo form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit'))?>
         </div>
-        <?php echo form_close(); 
+        <?php echo form_close();
     }
     ?>
 </div>
