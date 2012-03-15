@@ -126,24 +126,24 @@ ul.pf_steps li a.pf_active {
     vertical-align: baseline;
 }
 
-.pf_row li {
+.pf_row li.pf_column {
     display: inline;
     width: 40%;
     float: left;
     margin-right: 2%;
 }
 
-.pf_row li label {
+.pf_row li.pf_column label {
     display: block;
     width: 100%;
 }
 
-.pf_row li .pf_field {
+.pf_row li.pf_column .pf_field {
     display: inline-block;
     width: 100%;
 }
 
-.pf_row li .pf_field input {
+.pf_row li.pf_column .pf_field input {
 }
 
 .pf_clear {
@@ -206,6 +206,17 @@ form.proform .pf_vertical .pf_option {
     width: 50%;
 }
 
+form.proform .pf_field_errors {
+    color: red;
+    clear:both;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+    list-style: none;
+}
 /*----------------------------------------*
  * wFORMS                                 *
  *----------------------------------------*/
@@ -244,7 +255,7 @@ buttonList: [
 ]};
 $(document).ready(function() {
     $('ul.pf_row').each(function() {
-        var $items = $(this).find('li');
+        var $items = $(this).find('li.pf_column');
         $items.css('width', ((100/$items.length)-2)+'%');
     });
     $('a.pf_add_file').unbind('click').click(function() {

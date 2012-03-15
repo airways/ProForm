@@ -133,6 +133,30 @@ class Formslib
         }
         return $result;
     }
+
+    /**
+     * Implode an errors array as an UL.
+     * @param $errors array of errors to implode
+     * @param $start starting markup, an ul with class fieldErrors by default
+     * @param $end ending markup, closing ul tag by default
+     * @param $item_start starting markup for each item, starting li tag by default
+     * @param $item_end ending markup for each item, ending li tag by default
+     * @param $nl code used to insert newlines between each element in the markup, set to a blank
+     *        string to prevent newlines; "\n" by default
+     */
+    function implode_errors_array($errors, $start = '<ul class="pf_field_errors">', $end = '</ul>', $item_start = '<li>', $item_end = '</li>', $nl = "\n")
+    {
+        $result = $start.$nl;
+
+        foreach($errors as $error)
+        {
+            $result .= $item_start.$error.$item_end.$nl;
+        }
+
+        $result .= $end.$nl;
+
+        return $result;
+    }
 } // class Formslib
 }
 

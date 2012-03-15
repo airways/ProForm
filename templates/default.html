@@ -1,6 +1,10 @@
 
 {exp:proform:form form_name="{embed:form_name}" form_class="proform {embed:form_name}_proform" variable_prefix="pf_" debug="yes"}
 
+    {if pf_complete}
+        Thank you for your submission!
+    {if:else}
+
     {pf_hidden_fields}
         <input type="hidden" name="{pf_field_name}" value="{pf_field_value}" />
     {/pf_hidden_fields}
@@ -30,7 +34,7 @@
     {pf_fieldrows}
     <ul class="pf_row">
         {pf_fields}
-            <li id="{pf_field_html_id}" class="{pf_field_html_class}">
+            <li id="{pf_field_html_id}" class="pf_column {pf_field_html_class}">
             {if pf_field_heading}
                 <h3>{pf_field_heading}</h3>
             {if:else}
@@ -112,6 +116,8 @@
             <input type="submit" value="Submit" disabled="disabled" />
         {/if}
     </div>
+
+    {/if}
 </div>
 
 {/exp:proform:form}

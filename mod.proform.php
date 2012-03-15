@@ -181,7 +181,7 @@ class Proform {
             $secure = array();
         }
 
-        if(count($form_session->config) == 0)
+        if(!isset($form_session->config) OR count($form_session->config) == 0)
         {
             $form_session->config = array(
                 'in_place_errors'   => $in_place_errors,
@@ -325,7 +325,7 @@ class Proform {
                             if(is_array($form_session->errors[$field->field_name]))
                             {
                                 $field_errors[$field->field_name.'_array'] = $form_session->errors[$field->field_name];
-                                $field_errors[$field->field_name] = $this->EE->pl_uploads->implode_errors_array($form_session->errors[$field->field_name]);
+                                $field_errors[$field->field_name] = $this->EE->formslib->implode_errors_array($form_session->errors[$field->field_name]);
                             } else {
                                 $field_errors[$field->field_name.'_array'] = '';
                                 $field_errors[$field->field_name] = $form_session->errors[$field->field_name];
@@ -1079,8 +1079,11 @@ class Proform {
 
                 $this->_process_mailinglist($form_obj, $form_session);
             } else {
-                // Process step movement
-                $this->_process_steps($form_obj, $form_session);
+                // Process step movement if validation for this step passes
+                if(count($form_session->errors) == 0)
+                {
+                    $this->_process_steps($form_obj, $form_session);
+                }
             }
 
             // return any errors to the form template
@@ -1818,7 +1821,7 @@ class Proform {
             {
                 if(is_array($field_errors[$field->field_name]))
                 {
-                    $field_array['field_error'] = $this->EE->pl_uploads->implode_errors_array($field_errors[$field->field_name]);
+                    $field_array['field_error'] = $this->EE->formslib->implode_errors_array($field_errors[$field->field_name]);
                 } else {
                     $field_array['field_error'] = $field_errors[$field->field_name];
                 }
