@@ -3,7 +3,7 @@
 class PL_Field extends PL_RowInitialized
 {
     // $types maps internal type names to mysql or other DB types
-    
+
     // checkbox and mailinglist constraints are set high so encrypted
     // values will be saved correctly. varchar prevents space from being wasted.
     public static $types = array(
@@ -12,23 +12,23 @@ class PL_Field extends PL_RowInitialized
             'date'          => array('type' => 'date', 'constraint' => FALSE),
             'datetime'      => array('type' => 'datetime', 'constraint' => FALSE),
             'file'          => array('type' => 'varchar'),
-            'string'        => array('type' => 'varchar', 'limit' => 255, 'limit_promote' => 'text'),
+            'string'        => array('type' => 'varchar', 'limit' => 256, 'limit_promote' => 'text'),
             //'text'          => array('type' => 'text'),
             'int'           => array('type' => 'int', 'constraint' => '11'),
             'float'         => array('type' => 'float', 'constraint' => '53'),
             'currency'      => array('type' => 'decimal', 'constraint' => '10,2'),
             'list'          => array('type' => 'text'),
             'mailinglist'   => array('type' => 'varchar', 'constraint' => '90'),
-            'hidden'        => array('type' => 'varchar', 'limit' => 255, 'limit_promote' => 'text'),
-            'secure'        => array('type' => 'varchar', 'limit' => 255, 'limit_promote' => 'text'),
-            'member_data'   => array('type' => 'varchar', 'limit' => 255, 'limit_promote' => 'text'),
+            'hidden'        => array('type' => 'varchar', 'limit' => 256, 'limit_promote' => 'text'),
+            'secure'        => array('type' => 'varchar', 'limit' => 256, 'limit_promote' => 'text'),
+            'member_data'   => array('type' => 'varchar', 'limit' => 256, 'limit_promote' => 'text'),
         )
     );
-    
+
     public static $item_options = array(
         array('label' => 'Checkbox',                    'type' => 'checkbox',                   'icon' => 'checkbox.png'),
         array('label' => 'Text',                        'type' => 'string',                     'icon' => 'textfield.png'),
-        array('label' => 'Textarea',                    'type' => 'string',                     'icon' => 'textarea.png'),
+        array('label' => 'Textarea',                    'type' => 'string',                     'icon' => 'textarea.png',       'length' => '1000',),
         array('label' => 'Number: Integer',             'type' => 'int',                        'icon' => 'number.png'),
         array('label' => 'Number: Float',               'type' => 'float',                      'icon' => 'float.png'),
         array('label' => 'Number: Currency',            'type' => 'currency',                   'icon' => 'currency.png'),
@@ -43,7 +43,7 @@ class PL_Field extends PL_RowInitialized
         array('label' => 'Mailing List Subscription',   'type' => 'mailinglist',                'icon' => 'email_add.png'),
         // array('label' => 'Field Group',                 'type' => 'fieldgroup',                 'icon' => 'textfield.png'),
     );
-    
+
     var $field_id = FALSE;
     var $field_label = FALSE;
     var $field_name = FALSE;
@@ -54,12 +54,39 @@ class PL_Field extends PL_RowInitialized
     var $mailinglist_id = FALSE;
     var $settings = array();
     var $reusable = 'n';
-    
+    var $placeholder = FALSE;
+
+    function __construct($row=array(), &$mgr=NULL)
+    {
+        parent::__construct($row, $mgr);
+        if(!$this->field_id AND isset($this->heading))
+        {
+            $this->settings = array();
+            $this->form_field_settings = array();
+        }
+    }
+
+    function to_array()
+    {
+        $result = (array)$this;
+        unset($result['__EE']);
+        unset($result['__CI']);
+        return $result;
+    }
+
     function pre_save()
     {
         if(!isset($this->length) || is_null($this->length) || $this->length <= 0)
         {
-            $this->length = 255;
+            $this->length = 256;
+        }
+    }
+
+    function post_save()
+    {
+        foreach($this->get_assigned_forms() as $form)
+        {
+            $form->assign_field($this);
         }
     }
 
@@ -98,14 +125,14 @@ class PL_Field extends PL_RowInitialized
                 return 'hidden';
             default:
                 return 'text';
-                
+
         }
     }
-    
+
     function get_field_icon()
     {
         $result = 'textfield.png';
-        
+
         foreach(PL_Field::$item_options as $option)
         {
             if($option['type'] == $this->type)
@@ -114,16 +141,16 @@ class PL_Field extends PL_RowInitialized
                 break;
             }
         }
-        
+
         return $result;
     }
-    
+
     function get_list_options($selected_items=array())
     {
         if(!is_array($selected_items)) $selected_items = array($selected_items);
-        
+
         $result = array();
-        
+
         if(array_key_exists('type_list', $this->settings))
         {
             $list = explode("\n", $this->settings['type_list']);
@@ -139,7 +166,7 @@ class PL_Field extends PL_RowInitialized
                     $option = trim($option);
                     $key = $option;
                 }
-                
+
                 $selected = ($k = array_search($key, $selected_items)) !== FALSE ? ' selected="selected" ' : '';
                 if($selected)
                 {
@@ -158,6 +185,20 @@ class PL_Field extends PL_RowInitialized
             }
         }
         return $result;
-    }
+    } // function get_list_options
+
+    function get_assigned_forms()
+    {
+        $result = array();
+        $query = $this->__EE->db->get_where('exp_proform_form_fields', array('field_id' => $this->field_id));
+        if($query->num_rows() > 0)
+        {
+            foreach($query->result() as $form_row)
+            {
+                $result[] = $this->__EE->formslib->forms->get($form_row->form_id);
+            }
+        }
+        return $result;
+    } // function get_assigned_forms()
 
 }

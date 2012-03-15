@@ -27,7 +27,7 @@
  * copyright to the original author, your license to  use and modify this
  * source is null and void. Use of this software constitutes your agreement
  * to this clause.
- * 
+ *
  **/ ?>
 
 <div style="float: right;">
@@ -48,7 +48,7 @@
         lang('heading_template_name'),
         lang('heading_delete_template'),
         form_checkbox('select_all', 'true', FALSE, 'class="toggle_all" id="select_all"'));
-    
+
     foreach($templates as $template)
     {
         $this->table->add_row(
@@ -57,16 +57,16 @@
                 form_checkbox($template->toggle)
             );
     }
-    
+
     echo $this->table->generate();
     ?>
-    
+
     <div class="tableFooter">
 
         <div class="tableSubmit">
             <?php echo form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit')).NBS.NBS.form_dropdown('action', $options); ?>
         </div>
-        
+
     </div>
     <?php
    // form_close();

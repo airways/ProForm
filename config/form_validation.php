@@ -12,7 +12,7 @@ $config = array(
         array('field' => 'validation',          'label' => 'lang:field_validation',         'rules' => 'trim|required'),
         
     ),
-    'edit_heading' => array(
+    'edit_separator' => array(
         array('field' => 'heading',          	'label' => 'lang:field_heading',         	'rules' => 'trim|required'),
         
     ),

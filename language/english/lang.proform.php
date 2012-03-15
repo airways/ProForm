@@ -21,11 +21,11 @@ $lang = array(
     // Modules page info
     'proform_module_name' => 'ProForm',
     'proform_module_description' => 'Drag and drop public form module',
-    
+
     // Publish tab and instructions
     'display_forms' => 'Display Forms',
     'display_forms_field_instructions' => 'Select what form to display on this page',
-    
+
     // Table headings
     'heading_form_label' => 'Form Label',
     'heading_form_name' => 'Form Name',
@@ -51,17 +51,17 @@ $lang = array(
     'heading_field_forced' => 'Forced Value (cannot be set in form submit)',
     'heading_commands' => 'Actions',
     'heading_actions' => 'Actions',
-    
+
     // Table results
     'no_forms' => 'No forms created yet',
     'no_fields' => 'This form has no fields assigned',
     'no_fields_defined' => 'There are no fields defined yet',
     'no_templates' => 'There are no templates defined yet',
-    
+
     // Dropdown options
     'edit_selected' => 'Edit Selected',
     'delete_selected' => 'Delete Selected',
-    
+
     // Buttons
     'home' => 'Home',
     'global_form_preferences' => 'Module Settings',
@@ -75,14 +75,14 @@ $lang = array(
     'new_template' => 'Create New Template',
     'export_entries' => 'Export Entries',
     'save_form' => 'Save Form',
-    
+
     'form_title' => 'General Form',
     'form_desc' => 'A normal form that saves data in a database table. Good for contact forms and other forms that don\'t generally get turned into content on the site',
     'saef_title' => 'Stand Alone Entry Form',
     'saef_desc' => 'A Stand Alone Entry Form form designed to work through SafeCracker and stores it\'s data in a Channel. Good for forms who\'s values end up as content on the site',
     'share_title' => 'Share Form',
     'share_desc' => 'A form for sending email notifiacations only - does not store submitted data anywhere',
-    
+
     // "Tab" / subpages in CP
     'proform_title' => 'ProForm: ',
     'tab_global_form_preferences' => 'Module Settings',
@@ -102,9 +102,11 @@ $lang = array(
     'tab_list_templates' => 'List Templates',
     'tab_new_template' => 'New Template',
     'tab_delete_template' => 'Delete Template',
-	'tab_new_heading' => 'New Heading',
-	'tab_edit_heading' => 'Edit Heading',
-    
+    'tab_new_heading' => 'New Heading',
+    'tab_edit_heading' => 'Edit Heading',
+    'tab_new_separator' => 'New Form Step',
+    'tab_edit_separator' => 'Edit Form Step',
+
     // Fields
     'field_form_name' => 'Form Short Name',
     'field_form_name_desc' => 'Single word, no spaces, used in templates',
@@ -120,6 +122,8 @@ $lang = array(
     'field_field_name_desc' => 'Single word, no spaces, used in templates',
     'field_field_label' => 'Full Field Name (Label)',
     'field_field_label_desc' => 'human friendly form name, used in UI',
+    'field_placeholder' => 'Placeholder',
+    'field_placeholder_desc' => 'HTML5 placeholder value to use for the field',
     'field_type' => 'Type',
     'field_validation' => 'Validation',
     'field_length' => 'Length',
@@ -128,7 +132,7 @@ $lang = array(
     'field_template_name' => 'Template Name',
     'field_template' => 'Template Code',
     'field_template_desc' => 'Replaces form values as template variables, then runs through full template parser',
-    
+
     'notification_list_name' => 'Notification List Settings',
     'field_admin_notification_on' => 'Enable Notification List',
     'field_admin_notification_on_desc' => 'Send a notification to the listed addresses',
@@ -147,7 +151,7 @@ $lang = array(
     'field_mailinglist_id' => 'Mailing List',
     'field_reply_to_field' => 'Reply-To Field',
     'field_reply_to_field_desc' => 'Field on the form containing the email address to set as this notification\'s Reply-To',
-    
+
     'field_submitter_notification_name' => 'Notification Field Settings - A',
     'field_submitter_notification_on' => 'Enable Group',
     'field_submitter_notification_on_desc' => 'Enable this notification group',
@@ -176,21 +180,28 @@ $lang = array(
     'field_encryption_on' => 'Encrypt Data',
     'field_encryption_on_desc' => 'Encrypt data stored in the form\'s database table and force minimal DB column length',
     'encryption_toggle_disabled' => 'Encryption cannot be turned on or off if there are already entries in the form',
-    
+
+    'field_table_override' => 'Table Override',
+    'field_table_override_desc' => 'Direct all data to this existing table (this is an alpha feature, use with caution)',
+
     'field_safecracker_on' => 'SafeCracker Integration',
     'field_safecracker_on_desc' => 'Store data from this form in a channel through the use of SafeCracker. Note that encryption <strong>cannot</strong> be used when this option is turned on',
     'field_safecracker_channel_id' => 'SafeCracker Channel',
     'field_safecracker_channel_id_desc' => 'Channel to store data in',
     'safecracker_toggle_disabled_entries' => 'SafeCracker option cannot be turned on or off if there are already entries',
     'safecracker_toggle_disabled_option' => 'To use SafeCracker integration, first turn on and configure the option in Module Settings',
-    
+
     'field_save_entries_on' => 'Save Entries',
     'field_save_entries_on_desc' => 'Save entries entered into the form in the database',
-    
+    'field_assigned_forms' => 'Assigned Forms',
+    'field_assigned_forms_desc' => 'Forms which currently have this field assigned to them',
+
     'field_pref_notification_template_group' => 'Notification Template Group',
     'field_pref_notification_template_group_desc' => 'Template group containing email notification templates',
     'field_pref_from_address' => 'From Address',
     'field_pref_from_address_desc' => 'Email address notifications are sent from, should match the actual mail settings used to send mail',
+    'field_pref_from_name' => 'From Name',
+    'field_pref_reply_to_name_desc' => 'Name value to show in the From header, you can override this in each form\'s settings',
     'field_pref_reply_to_address' => 'Reply-To Address',
     'field_pref_reply_to_address_desc' => 'Email to set in email Reply-To header, you can override this in each form\'s settings',
     'field_pref_reply_to_name' => 'Reply-To Name',
@@ -199,16 +210,18 @@ $lang = array(
     'field_pref_safecracker_integration_on_desc' => 'Enable SafeCracker Integration to allow form data to be saved into entries',
     'field_pref_safecracker_field_group_id' => 'SafeCracker: Field Group',
     'field_pref_safecracker_separate_channels_on' => 'SafeCracker: Separate Channel Per Form',
-    
+
 
     'field_form_entry_id' => 'Entry ID',
     'field_updated' => 'Updated',
     'field_ip_address' => 'IP Address',
     'field_user_agent' => 'User Agent',
-    
+
     'field_heading' => 'Heading',
-    'field_reusable' => 'Reusable (place in library)',
-    
+    'field_step_name' => 'Step Name',
+    'field_reusable' => 'Reusable',
+    'field_reusable_desc' => 'Places the field in the Library section of the Toolbox, allowing you to easily reuse it',
+
     // Errors
     'invalid_submit' => 'The form has invalid values',
     'invalid_form_id' => 'Invalid form ID',
@@ -228,7 +241,7 @@ $lang = array(
     'no_unassigned_fields_available' => 'No unassigned fields available',
     'no_entries' => 'No entries in this form',
     'no_field_group_setting' => 'You have not selected a SafeCracker Field Group in ProForm module settings',
-    
+
     'missing_form_id' => 'Internal error: missing form_id',
     'missing_form_name' => 'Missing require field Form Name',
     'missing_form_label' => 'Missing require field Form Label',
@@ -243,7 +256,7 @@ $lang = array(
     'missing_template_name' => 'Missing require field Template Name',
     'missing_subject' => 'Missing require field Subject',
     'missing_template' => 'Missing require field Template',
-    
+
     // Messages
     'msg_form_created' => 'New form successfully created',
     'msg_form_deleted' => 'Form successfully deleted',
@@ -256,10 +269,10 @@ $lang = array(
     'msg_field_removed' => 'Field successfully removed from the form',
 
 
-	'msg_heading_added' => 'New heading successfully added to the form',
-	'msg_heading_edited'=> 'Heading successfully edited',
+    'msg_heading_added' => 'New heading successfully added to the form',
+    'msg_heading_edited'=> 'Heading successfully edited',
 
     // End
     '' => ''
-    
+
 );

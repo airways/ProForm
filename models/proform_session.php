@@ -5,7 +5,8 @@ class PL_FormSession
     var $values = array();
     var $errors = array();
     var $checked_flags = array();
-    
+    var $current_step = 1;
+
     /**
      * Add an error message for a given field
      *

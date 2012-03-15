@@ -27,29 +27,29 @@
  * copyright to the original author, your license to  use and modify this
  * source is null and void. Use of this software constitutes your agreement
  * to this clause.
- * 
+ *
  **/
 
 require_once PATH_THIRD.'proform/config.php';
 
 class Proform_upd {
     var $version    = PROFORM_VERSION;
-    
+
     function Proform_upd() {
         $this->EE = &get_instance();
     }
-    
+
     function install() {
         $this->EE->load->library('proform_install');
         return $this->EE->proform_install->install();
     }
-    
+
     function uninstall()
     {
         $this->EE->load->library('proform_install');
         return $this->EE->proform_install->uninstall();
     }
-    
+
     function update($current = '')
     {
         $this->EE->load->library('proform_install');

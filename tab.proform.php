@@ -27,7 +27,7 @@
  * copyright to the original author, your license to  use and modify this
  * source is null and void. Use of this software constitutes your agreement
  * to this clause.
- * 
+ *
  **/
 
 require_once PATH_THIRD.'proform/config.php';
@@ -38,7 +38,7 @@ class Proform_tab {
     {
         $this->EE = &get_instance();
     }
-    
+
     function publish_tabs($channel_id, $entry_id = '')
     {
         $settings = array();
@@ -46,13 +46,13 @@ class Proform_tab {
         $existing_files = array();
 
         $query = $this->EE->db->get('proform_forms');
-        
-        foreach ($query->result() as $row) 
+
+        foreach ($query->result() as $row)
         {
             $all_forms[$row->form_id] = $row->form_name;
         }
 
-        if ($entry_id != '') 
+        if ($entry_id != '')
         {
             $query = $this->EE->db->get_where('proform_display_entries', array('entry_id' => $entry_id));
 
@@ -63,7 +63,7 @@ class Proform_tab {
         }
 
         $instructions = lang('display_forms_field_instructions');
-        
+
         // Load the module lang file for the field label
         $this->EE->lang->loadfile('download');
 
@@ -71,7 +71,7 @@ class Proform_tab {
                 'field_id'              => 'display_forms',
                 'field_label'           => $this->EE->lang->line('display_forms'),
                 'field_required'        => 'n',
-                'field_data'            => $selected,               
+                'field_data'            => $selected,
                 'field_list_items'      => $all_forms,
                 'field_fmt'             => '',
                 'field_instructions'    => $instructions,
@@ -83,29 +83,29 @@ class Proform_tab {
 
         return $settings;
     }
-    
+
     function validate_publish() {
         return FALSE;
     }
-    
+
     function publish_data_db($params)
     {
         // Remove existing
         $this->EE->db->where('entry_id', $params['entry_id'])->delete('proform_display_entries');
-        
-        if (isset($forms = $params['mod_data']['display_forms']) && is_array($forms) && count($forms) > 0) 
-        {       
+
+        if (isset($forms = $params['mod_data']['display_forms']) && is_array($forms) && count($forms) > 0)
+        {
             foreach ($forms as $val) {
                 $data = array(
                     'entry_id' => $params['entry_id'],
                     'form_id'  => $val);
             }
-            
+
             $this->EE->db->insert('proform_display_entries', $data);
         }
     }
-    
-    function publish_data_delete_db($params) 
+
+    function publish_data_delete_db($params)
     {
         // Remove existing
         $this->EE->db->where_in('entry_id', $params['entry_ids'])->delete('proform_display_entries');

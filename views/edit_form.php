@@ -27,7 +27,7 @@
  * copyright to the original author, your license to  use and modify this
  * source is null and void. Use of this software constitutes your agreement
  * to this clause.
- * 
+ *
  **/ ?>
 <div class="edit_form">
 <?php if(isset($form_name)): ?>
@@ -42,17 +42,17 @@
 <div class="tabs-wrapper">
 <div class="tabs main" id="main-tabs" data-tabset="main">
     <ul>
-        <li class="active content-settings"><a href="#tab-content-settings">Form Settings</a></li>
+        <li class="active content-settings"><a href="tab-content-settings">Form Settings</a></li>
 <?php if(isset($form_id) AND $form_id): ?>
-        <li class="content-layout"><a href="#tab-content-layout">Form Layout</a></li>
+        <li class="content-layout"><a href="tab-content-layout">Form Layout</a></li>
 <?php endif; ?>
     </ul>
 </div>
 
 <div class="tabs sidebar" id="sidebar-tabs" data-tabset="sidebar">
     <ul>
-        <li class="active content-add-item"><a href="#tab-content-add-item">Add Item</a></li>
-        <li class="content-override"><a href="#tab-content-override">Overrides</a></li>
+        <li class="active content-add-item"><a href="tab-content-add-item">Add Item</a></li>
+        <li class="content-override"><a href="tab-content-override">Overrides</a></li>
     </ul>
 </div>
 </div>

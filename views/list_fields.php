@@ -27,7 +27,7 @@
  * copyright to the original author, your license to  use and modify this
  * source is null and void. Use of this software constitutes your agreement
  * to this clause.
- * 
+ *
  **/ ?>
 
 <div class="new_field">
@@ -37,14 +37,15 @@
 <?php if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>'; ?>
 <?php if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>'; ?>
 
-<?php if (count($fields) > 0):
+<?php
 //    form_open($action_url, '', $form_hidden);
 
     $this->table->set_template($cp_table_template);
     $this->table->set_heading(
         lang('heading_field_name'),
         lang('heading_commands'));
-    
+
+if (count($fields) > 0):
     foreach($fields as $field)
     {
         $this->table->add_row(
@@ -52,21 +53,23 @@
                 '<a href="'.$field->delete_link.'">'.lang('heading_delete_field').'</a>'
             );
     }
-    
+else:
+    $this->table->add_row(array(
+        'data'      => '<div class="no_items_msg">' . lang('no_fields_defined') . '</div>',
+        'colspan'   => 3,
+    ));
+endif;
     echo $this->table->generate();
     ?>
-    
+
     <div class="tableFooter">
 
         <div class="tableSubmit">
-            
+
         </div>
-        
+
         <span class="pagination"><?php echo $pagination; ?></span>
     </div>
     <?php
    // form_close();
 
-else:
-    echo '<div class="no_items_msg">' . lang('no_fields_defined') . '</div>';
-endif;

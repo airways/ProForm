@@ -27,7 +27,7 @@
  * copyright to the original author, your license to  use and modify this
  * source is null and void. Use of this software constitutes your agreement
  * to this clause.
- * 
+ *
  **/ ?>
 
 
@@ -50,8 +50,6 @@
     </div>
 <?php endif; ?>
 
-<h2 class="content-heading">Forms</h2>
-
 <div class="dropdown-wrap">
         		<span class="button content-btn"><a title="Create a Form" class="submit" href="#"> Create a Form</a></span>
     <div class="dropdown">
@@ -66,8 +64,8 @@
 <?php if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>'; ?>
 <?php if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>'; ?>
 
-<?php if (count($forms) > 0):
-//    form_open($action_url, '', $form_hidden);
+<?php
+    //    form_open($action_url, '', $form_hidden);
     $this->table->set_template($cp_table_template);
     $this->table->set_heading(
         lang('heading_form_name'),
@@ -76,23 +74,29 @@
         );
         //form_checkbox('select_all', 'true', FALSE, 'class="toggle_all" id="select_all"'));
 
-    
-    foreach($forms as $form)
-    {
-        $this->table->add_row(
-                '<a href="'.$form->edit_link.'">'.$form->form_name.'</a>',
-                $form->entries_count,
-                '<span class="action-list"> <a href="'.$form->edit_link.'">'.lang('heading_edit_form').'</a> <a href="'.$form->edit_fields_link.'">'.lang('heading_edit_fields').'</a> <a href="'.$form->list_entries_link.'">'.lang('heading_list_entries').'</a> <a href="'.$form->delete_link.'">'.lang('heading_delete_form').'</a></span>'
-                //<a href="'.$form->edit_preset_values_link.'">'.ico_defaults(lang('heading_edit_preset_values')).'</a>
-                //form_checkbox($form->toggle)
-            );
-    }
-    
+    if (count($forms) > 0):
+        foreach($forms as $form)
+        {
+            $this->table->add_row(
+                    '<a href="'.$form->edit_link.'">'.$form->form_name.'</a>',
+                    $form->entries_count,
+                    '<span class="action-list"> <a href="'.$form->edit_link.'">'.lang('heading_edit_form').'</a> <a href="'.$form->edit_fields_link.'">'.lang('heading_edit_fields').'</a> <a href="'.$form->list_entries_link.'">'.lang('heading_list_entries').'</a> <a href="'.$form->delete_link.'">'.lang('heading_delete_form').'</a></span>'
+                    //<a href="'.$form->edit_preset_values_link.'">'.ico_defaults(lang('heading_edit_preset_values')).'</a>
+                    //form_checkbox($form->toggle)
+                );
+        }
+    else:
+        $this->table->add_row(array(
+            'data'      => '<div class="no_items_msg">' . lang('no_forms') . '</div>',
+            'colspan'   => 3,
+        ));
+    endif;
+
     echo $this->table->generate();
-    
+
 if($pagination):
     ?>
-    
+
     <div class="tableFooter">
 
         <span class="pagination"><?=$pagination?></span>
@@ -100,7 +104,3 @@ if($pagination):
     <?php
 endif;
    // form_close();
-
-else:
-    echo '<div class="no_items_msg">' . lang('no_forms') . '</div>';
-endif;

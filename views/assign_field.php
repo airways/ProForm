@@ -28,18 +28,18 @@
  * copyright to the original author, your license to  use and modify this
  * source is null and void. Use of this software constitutes your agreement
  * to this clause.
- * 
+ *
  **/ ?>
 <?php echo validation_errors(); ?>
 <div class="editForm">
 <?php
     echo form_open($action_url, '', $form_hidden);
-    
-    
+
+
     $this->table->set_template($cp_table_template);
     $this->table->set_heading(
         lang('heading_assign_field'), lang('heading_field_name'));
-    $this->table->add_row('Field', 
+    $this->table->add_row('Field',
         count($field_options) > 0
             ? form_dropdown('field_id', $field_options)
             : lang('no_unassigned_fields_available')

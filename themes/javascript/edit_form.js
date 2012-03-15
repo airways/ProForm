@@ -21,8 +21,6 @@ var proform_edit_form = {
             $('.dropdown').hide();
         });
     
-        //console.log('test');
-        
         $('.tabs li a').unbind('click').click(function() {
             var $tabSet = $(this).parents('.tabs');
             var tabSet = $tabSet.attr('data-tabset');
@@ -30,38 +28,55 @@ var proform_edit_form = {
             proform_edit_form.activate_tab(tabSet, currentTab);
             return false;
         });
-    
-        if(window.location.hash.indexOf('tab-content-layout') !== -1) {
-            proform_edit_form.activate_tab('main', '#tab-content-layout', true);
+        
+        //console.log('loaded with hash #'+window.location.hash);
+        // 
+        // if(window.location.hash.indexOf('tab-content-layout') !== -1) {
+        //     proform_edit_form.activate_tab('main', '#tab-content-layout', true);
+        // } else {
+        //     proform_edit_form.activate_tab('main', '#tab-content-settings', true);
+        // }
+        // 
+        // proform_edit_form.activate_tab('sidebar', '#tab-content-add-item', true);
+        // if(window.location.hash.indexOf('tab-content-override') !== -1) {
+        //     proform_edit_form.activate_tab('sidebar', '#tab-content-override', true);
+        // } else {
+        //     proform_edit_form.activate_tab('sidebar', '#tab-content-add-item', true);
+        // }
+        // proform_edit_form.update_hash(); 
+        var active_tabs = $('input[name=active_tabs]').val();
+        
+        if(active_tabs.indexOf('tab-content-layout') !== -1) {
+            proform_edit_form.activate_tab('main', 'tab-content-layout', true);
         } else {
-            proform_edit_form.activate_tab('main', '#tab-content-settings', true);
+            proform_edit_form.activate_tab('main', 'tab-content-settings', true);
         }
-
-        proform_edit_form.activate_tab('sidebar', '#tab-content-add-item', true);
-        if(window.location.hash.indexOf('tab-content-override') !== -1) {
-            proform_edit_form.activate_tab('sidebar', '#tab-content-override', true);
+        
+        if(active_tabs.indexOf('tab-content-override') !== -1) {
+            proform_edit_form.activate_tab('sidebar', 'tab-content-override', true);
         } else {
-            proform_edit_form.activate_tab('sidebar', '#tab-content-add-item', true);
-        }
+            proform_edit_form.activate_tab('sidebar', 'tab-content-add-item', true);
+        } 
+        
+        proform_edit_form.update_active_tabs();
     },
     activate_tab: function(tabSet, currentTab, noUpdateHash)
     {
-        $('input[name=active_tab]').val(currentTab.replace('#', ''));
+        // $('input[name=active_tab]').val(currentTab.replace('#', ''));
         $('.tabs.'+tabSet+' li  a').parent('li').removeClass('active');
-        var active = currentTab.replace('tab-', '').replace('#', '.');
+        var active = '.'+currentTab.replace('tab-', ''); //.replace('#', '.');
         $(active).addClass('active');
         $('.'+tabSet+'.tab-content').hide();
-        $(currentTab.replace('#', '.')).show();
+        $('.'+currentTab).show(); //.replace('#', '.')
         
-        var activeMain = $('.tabs.main ul li.active a').attr('href');
-        var activeSidebar = $('.tabs.sidebar ul li.active a').attr('href');
-        
-        if(!noUpdateHash) window.location.hash = activeMain + ',' + activeSidebar;
+        if(!noUpdateHash) {
+            proform_edit_form.update_active_tabs();
+        }
 
         switch(tabSet)
         {
             case 'main':
-                if(currentTab == '#tab-content-layout')
+                if(currentTab == 'tab-content-layout')
                 {
                     $('.tabs.sidebar').show();
                 } else {
@@ -69,8 +84,14 @@ var proform_edit_form = {
                 }
                 break;
         }
-        console.log(window.location.href);
-        $('#main_form').attr('action', window.location.href);
+    },
+    update_active_tabs: function()
+    {
+        var active_main = $('.tabs.main ul li.active a').attr('href');
+        var active_sidebar = $('.tabs.sidebar ul li.active a').attr('href');
+        var active_tabs = active_main + ',' + active_sidebar;
+        // active_tabs = active_tabs.replace('#', '');
+        $('input[name=active_tabs]').val(active_tabs);
     }
     
 

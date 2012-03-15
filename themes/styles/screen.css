@@ -646,6 +646,13 @@ Messages / Form Errors
     width: 270px;
 }
 
+.toolbox li {
+    overflow: hidden;
+    margin-bottom: 4px;
+    color: white;
+    padding: 5px;
+}
+
 .toolbox li a img {
     vertical-align: middle;
 }
@@ -655,10 +662,18 @@ Messages / Form Errors
 
 .toolbox li a.library {
     width: 180px;
+    float: left;
+    display: inline-block;
+}
+
+.toolbox li a.library:active {
+    width: 178px;
 }
 
 .toolbox li a.edit {
     width: 50px;
+    float: left;
+    display: inline-block;
 }
 
 .toolbox li a.edit img {

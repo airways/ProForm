@@ -1,10 +1,10 @@
-<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed'); 
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
  * @package ProForm
  * @author Isaac Raway (MetaSushi, LLC) <isaac.raway@gmail.com>
  *
- * Copyright (c)2009, 2010, 2011. Isaac Raway and MetaSushi, LLC. 
+ * Copyright (c)2009, 2010, 2011. Isaac Raway and MetaSushi, LLC.
  * All rights reserved.
  *
  * This source is commercial software. Use of this software requires a
@@ -22,7 +22,7 @@
  * possible inclusion in future releases. No compensation will be provided
  * for patches, although where possible we will attribute each contribution
  * in file revision notes. Submitting such modifications constitutes
- * assignment of copyright to the original author (Isaac Raway and 
+ * assignment of copyright to the original author (Isaac Raway and
  * MetaSushi, LLC) for such modifications. If you do not wish to assign
  * copyright to the original author, your license to  use and modify this
  * source is null and void. Use of this software constitutes your agreement
@@ -36,13 +36,13 @@ require_once PATH_THIRD.'proform/models/proform_field.php';
 require_once PATH_THIRD.'proform/models/proform_session.php';
 
 if(!class_exists('Formslib')) {
-class Formslib 
+class Formslib
 {
-    var $prefs_mgr;
+    var $prefs;
     var $session_mgr;
 
     var $form_types = array('form' => 'Entry Form', 'saef' => 'SAEF Form', 'share' => 'Share Form');
-    
+
     // Fields that will not be encrypted or decrypted
     var $field_encryption_disabled = array('dst_enabled');
 
@@ -58,7 +58,7 @@ class Formslib
     function Formslib()
     {
         prolib($this, 'proform');
-        
+
         // If there are already any encrypted forms, then we will default the option to allow encryption
         // to on. This option was not available in previous versions, where encryption was always
         // available. Since it is often not implemented correctly, we are now turning off the option
@@ -66,18 +66,18 @@ class Formslib
         $query = $this->EE->db->select('*')
                               ->where('encryption_on', 'y')
                               ->get('proform_forms');
-        
+
         if($query->num_rows() > 0)
         {
             $this->force_allow_encrypted_forms = 'y';
         } else {
             $this->force_allow_encrypted_forms = '';
         }
-        
+
         // Initialize the preferences manager. This will set default preferences for us according to
         // what we have in the $default_prefs array on this object.
         $this->prefs = new PL_prefs("proform_preferences", FALSE, $this->default_prefs);
-        
+
         $this->forms = new PL_handle_mgr("proform_forms", "form", "PL_Form");
         $this->fields = new PL_handle_mgr("proform_fields", "field", "PL_Field");
 
@@ -85,35 +85,21 @@ class Formslib
 
         // Caching can cause issues with schema manipulation, so we need to turn it off.
         $this->EE->db->cache_off();
-        
+
         $this->EE->pl_encryption->field_encryption_disabled = $this->field_encryption_disabled;
-        
+
     } // function Formslib()
 
-    function get_forms_with_field($field)
-    {
-        $result = array();
-        $query = $this->EE->db->get_where('exp_proform_form_fields', array('field_id' => $field->field_id));
-        if($query->num_rows() > 0)
-        {
-            foreach($query->result() as $form_row)
-            {
-                $result[] = $this->forms->get($form_row->form_id);
-            }
-        }
-        return $result;
-    } // function get_forms_with_field()
-    
     /* ------------------------------------------------------------
-     * Session manager interface 
+     * Session manager interface
      * ------------------------------------------------------------ */
     function new_session() {
         return new PL_FormSession;
     }
-    
+
     /**
      * Get list of channels to be used in a form_dropdown field
-     * 
+     *
      * @return array
      */
     function get_channel_options($field_group_id = FALSE, $default = array())
@@ -123,7 +109,7 @@ class Formslib
         {
             $this->EE->db->where('field_group', $field_group_id);
         }
-        
+
         $query = $this->EE->db->get('exp_channels');
         foreach($query->result() as $row)
         {
@@ -131,10 +117,10 @@ class Formslib
         }
         return $result;
     }
-    
+
     /**
      * Get list of field groups to be used in a form_dropdown field
-     * 
+     *
      * @return array
      */
     function get_field_group_options()
@@ -145,6 +131,30 @@ class Formslib
         {
             $result[$row->group_id] = $row->group_name;
         }
+        return $result;
+    }
+
+    /**
+     * Implode an errors array as an UL.
+     * @param $errors array of errors to implode
+     * @param $start starting markup, an ul with class fieldErrors by default
+     * @param $end ending markup, closing ul tag by default
+     * @param $item_start starting markup for each item, starting li tag by default
+     * @param $item_end ending markup for each item, ending li tag by default
+     * @param $nl code used to insert newlines between each element in the markup, set to a blank
+     *        string to prevent newlines; "\n" by default
+     */
+    function implode_errors_array($errors, $start = '<ul class="pf_field_errors">', $end = '</ul>', $item_start = '<li>', $item_end = '</li>', $nl = "\n")
+    {
+        $result = $start.$nl;
+
+        foreach($errors as $error)
+        {
+            $result .= $item_start.$error.$item_end.$nl;
+        }
+
+        $result .= $end.$nl;
+
         return $result;
     }
 } // class Formslib

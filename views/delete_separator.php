@@ -27,7 +27,7 @@
  * copyright to the original author, your license to  use and modify this
  * source is null and void. Use of this software constitutes your agreement
  * to this clause.
- * 
+ *
  **/ ?>
 
 <?php echo validation_errors(); ?>
@@ -36,7 +36,7 @@
 <?php if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>'; ?>
 
 <?php echo form_open($action_url, '', $form_hidden); ?>
-<p class="warning">Are you sure you want to delete the heading <span><?php echo $heading; ?></span> from the form <span><?php echo $form_name; ?></span>? This cannot be undone.</p>
+<p class="warning">Are you sure you want to delete the <?php echo $heading->separator_type == PL_Form::SEPARATOR_HEADING ? 'heading' : 'page'; ?> <span><?php echo $heading->heading; ?></span> from the form <span><?php echo $form_name; ?></span>? This cannot be undone.</p>
 <div class="tableFooter">
     <?php echo form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit')); ?>
 </div>
