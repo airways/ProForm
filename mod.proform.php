@@ -3,7 +3,7 @@
 /**
  * @package ProForm
  * @author Isaac Raway <isaac.raway@gmail.com>
- * 
+ *
  * Copyright (c)2009, 2010, 2011. Isaac Raway and MetaSushi, LLC.
  * All rights reserved.
  *
@@ -29,8 +29,8 @@
  * to this clause.
  *
  **/
- 
- 
+
+
 if(!file_exists(PATH_THIRD.'prolib/prolib.php'))
 {
     echo 'ProForm requires the prolib package. Please place prolib into your third_party folder.';
@@ -53,24 +53,24 @@ class Proform {
     {
         $this->__construct();
     }
-    
+
     public function __construct()
     {
         prolib($this, 'proform');
 
         $this->EE->db->cache_off();
-        
+
         @session_start();
         if(!isset($_SESSION['pl_form']))
         {
             $_SESSION['pl_form'] = array();
         }
     }
-    
+
     ////////////////////////////////////////////////////////////////////////////////
     // Tags
     ////////////////////////////////////////////////////////////////////////////////
-    
+
     /*
      * Provides data to render a named form
      */
@@ -81,28 +81,28 @@ class Proform {
         $this->EE->load->library('formslib');
         $this->EE->load->library('user_agent');
         $this->EE->load->library('proform_notifications');
-        
-        // if(strlen($this->EE->config->item('encryption_key')) < 32) 
+
+        // if(strlen($this->EE->config->item('encryption_key')) < 32)
         // {
         //     show_error("{exp:proform:form} requires a valid (32 character) encryption_key to be set in the config file.");
         // }
 
         $varsets = array();
-        
-        //|| file_get_contents('http://metasushi.com/license_validation.php?license='.$this->EE->config->item('proform_license')) != 'pass' 
+
+        //|| file_get_contents('http://metasushi.com/license_validation.php?license='.$this->EE->config->item('proform_license')) != 'pass'
         // strlen($this->EE->config->item('proform_license')) >= 32 || exit("ProForm requires a valid proform_license value to be set in the config file.");
-        
+
         // Get params
         $form_name = $this->EE->TMPL->fetch_param('form_name', FALSE);
-        
+
         // Check required input
-        if(!$form_name) 
+        if(!$form_name)
         {
             //show_error("{exp:proform:form} requires name param.");
             //return $this->EE->output->show_user_error('general', array('exp:proform:form requires form_name param'));
             return '';
         }
-        
+
         // Get optional params
         $in_place_errors    = $this->EE->TMPL->fetch_param('in_place_errors', 'yes');
         $form_id            = $this->EE->TMPL->fetch_param('form_id', $form_name . '_proform');
@@ -118,33 +118,33 @@ class Proform {
         $error_messages     = $this->EE->pl_parser->fetch_param_group('message');
         $step               = $this->EE->TMPL->fetch_param('step', 1);
         $variable_prefix    = $this->EE->TMPL->fetch_param('variable_prefix', '');
-        
+
         if(count($error_delimiters) != 2)
         {
             $error_delimiters = array('<div class="error">', '</div>');
         }
-        
+
         $tagdata = $this->EE->TMPL->tagdata;
-        
+
         $complete = FALSE;
-        
+
         $form_session = $this->EE->formslib->new_session();
         $form_session->processed = FALSE;
-        
+
         // Get all form data for the requested form
         $form_obj = $this->EE->formslib->forms->get($form_name);
-        
+
         if($_SERVER['REQUEST_METHOD'] == 'POST' && $this->EE->input->post('__conf'))
         {
             $form_result = FALSE;
             $form_session = $this->_process_form($form_obj, $form_session, $form_result);
-            
+
             if($form_result === TRUE)
             {
                 return;
             }
         }
-        
+
         if(isset($_SESSION['pl_form']['thank_you_form']))
         {
             if($_SESSION['pl_form']['thank_you_form'] == $form_name)
@@ -153,7 +153,7 @@ class Proform {
                 $complete = 'yes';
             }
         }
-        
+
         $use_captcha = FALSE;
         if (preg_match("/({".$variable_prefix."captcha})/", $tagdata))
         {
@@ -164,8 +164,8 @@ class Proform {
             if($captcha !== '')
                 $use_captcha = TRUE;
         }
-        
-                        
+
+
         $get_params = array();
         foreach($_GET as $k => $v)
         {
@@ -180,7 +180,7 @@ class Proform {
         {
             $secure = array();
         }
-        
+
         if(count($form_session->config) == 0)
         {
             $form_session->config = array(
@@ -207,7 +207,7 @@ class Proform {
             // echo '<b>Existing session:</b>';
             // var_dump($form_session);
         }
-        
+
         // copy everything else the user may have added
         foreach($this->EE->TMPL->tagparams as $key => $value)
         {
@@ -216,7 +216,7 @@ class Proform {
                 $form_session->config[$key] = $value;
             }
         }
-        
+
         /*
         echo "<b>Form config:</b>:";
         $this->prolib->debug($form_session->config);
@@ -232,27 +232,27 @@ class Proform {
             //$form_session->config[$k] = $this->EE->TMPL->parse_variables($form_session->config[$k], array($get_params));
         }
         //var_dump($form_session->config);
-        
+
         //$form_config_enc = $this->EE->encrypt->encode(serialize($form_config));
         $form_session_enc = $this->EE->formslib->vault->put($form_session);
-        
+
         if ($this->EE->extensions->active_hook('proform_form_start') === TRUE)
         {
             $form_obj = $this->EE->extensions->call('proform_form_start', $this, $form_obj);
         }
-        
+
         if($form_obj && is_object($form_obj))
         {
             if($form_obj->fields())
             {
                 // Ready the form
                 $this->EE->load->helper('form');
-                
+
                 /*$base_url = $this->EE->functions->fetch_site_index(0, 0).QUERY_MARKER.
                     'ACT='.$this->EE->functions->fetch_action_id('Proform', 'process_form_act');*/
-                    
+
                 $base_url = $form_session->config['form_url'];
-                
+
                 $form_details = array(
                         'action'            => $this->EE->functions->remove_double_slashes($base_url),
                         'name'              => $form_name,
@@ -262,7 +262,7 @@ class Proform {
                         'secure'            => TRUE,
                         'onsubmit'          => '',
                         'enctype'           => 'multipart/form-data');
-                
+
                 if($form_obj->form_type == 'form' || $form_obj->form_type == 'share')
                 {
                     $form = $this->EE->functions->form_declaration($form_details);
@@ -276,16 +276,16 @@ class Proform {
                     } else {
                         show_error('Invalid channel on form "'.htmlentities($form_name).'": '.intval($form_obj->safecracker_channel_id).' (possibly it has been deleted)');
                     }
-                    
+
                     $form = '{exp:channel:entry_form channel="'.$channel_info->channel_name.'" return="site/index" preview="site/entry"}';
                 }
-                
-                
+
+
                 ////////////////////
                 // Setup variables
-                
+
                 $variables['use_captcha'] = $use_captcha;
-                
+
                 if(count($form_obj->settings) > 0)
                 {
                     $varsets[] = array('formpref', $form_obj->settings);
@@ -336,7 +336,7 @@ class Proform {
                         }
                     }
                 }
-                
+
                 // if($form_session)
                 // {
                 //     echo "field_values";
@@ -344,23 +344,23 @@ class Proform {
                 //     echo "field_checked_flags";
                 //     var_dump($field_checked_flags);
                 // }
-                
+
                 if(isset($form_session->errors['captcha']))
                 {
                     $field_errors['captcha_array'] = $form_session->errors['captcha'];
                     $field_errors['captcha'] = $form_session->errors['captcha'];
                 }
-                
+
                 $varsets[] = array('value', $field_values);
                 $varsets[] = array('checked', $field_checked_flags);
                 $varsets[] = array('error', $field_errors);
-                
-                
+
+
                 // Turn various arrays of values into variables
                 // $variables = array();
-                
+
                 $this->prolib->copy_values($form_obj, $variables);
-                
+
                 foreach($varsets as $varset)
                 {
                     //var_dump($varset)."<br/>";
@@ -376,17 +376,17 @@ class Proform {
                         }
                     }
                 }
-                
+
                 // Set up pagination / step variables
                 $variables['on_last_step'] = $form_session->config['step'] == $form_obj->get_step_count();
                 $variables['steps'] = $form_obj->get_steps($form_session->config['step']);
                 //var_dump($variables['steps']);
-                
+
                 // Setup template pair variables
                 $variables['fieldrows'] = $this->create_fields_array($form_obj, $form_session, $field_errors, $field_values, $field_checked_flags, TRUE, FALSE);
                 $variables['fields'] = $this->create_fields_array($form_obj, $form_session, $field_errors, $field_values, $field_checked_flags, FALSE, FALSE);
                 $variables['hidden_fields'] = $this->create_fields_array($form_obj, $form_session, $field_errors, $field_values, $field_checked_flags, FALSE, TRUE);
-                
+
                 //echo "<pre>";
                 //var_dump($variables);exit;
 
@@ -419,19 +419,19 @@ class Proform {
                     $variables['error_count'] = 0;
                     $variables['errors'] = array();
                 }
-                
+
                 // Load typography
                 $this->EE->load->library('typography');
                 $this->EE->typography->initialize();
                 $this->EE->typography->parse_images = TRUE;
                 $this->EE->typography->allow_headings = FALSE;
-                
-                
+
+
                 if ($this->EE->extensions->active_hook('proform_form_preparse') === TRUE)
                 {
                     list($$tagdata, $form_obj, $variables, $this->var_pairs) = $this->EE->extensions->call('proform_form_preparse', $this, $tagdata, $form_obj, $variables, $this->var_pairs);
                 }
-                
+
                 // Parse variables
                 $form .= $this->EE->pl_parser->parse_variables_ex(array(
                     'rowdata' => $tagdata,
@@ -439,7 +439,7 @@ class Proform {
                     'pairs' => $this->var_pairs,
                     'variable_prefix' => $variable_prefix,
                 ));
-                
+
                 // Close form
                 if($form_obj->form_type == 'form' || $form_obj->form_type == 'share')
                 {
@@ -447,11 +447,11 @@ class Proform {
                 } else {
                     $form .= '{/exp:channel:entry_form}';
                 }
-                
+
                 ////////////////////
                 // Return result
                 $this->return_data = $form;
-                
+
                 if ($this->EE->extensions->active_hook('proform_form_end') === TRUE)
                 {
                     $this->return_data = $this->EE->extensions->call('proform_form_end', $this, $form_obj, $this->return_data);
@@ -468,7 +468,7 @@ class Proform {
             show_error("{exp:proform:form} form not found: $form_name");
         }
     } // function form()
-    
+
     /*
      * Provide form post results on a success page (usually the thank you page)
      */
@@ -476,11 +476,11 @@ class Proform {
     {
         $this->EE->load->library('formslib');
 
-        $variables = $this->_get_results(); 
+        $variables = $this->_get_results();
         $this->return_data = $this->EE->pl_parser->parse_variables($this->EE->TMPL->tagdata, $variables, $this->var_pairs);
         return $this->return_data;
-    } 
-    
+    }
+
     private function _get_results()
     {
         $variables = array(
@@ -488,17 +488,17 @@ class Proform {
             'fieldrows'     => array(),
             'fields'        => array(),
         );
-        
+
         if(isset($_SESSION['pl_form']['thank_you_form'])
             AND isset($_SESSION['pl_form']['result_session'])
             AND isset($_SESSION['pl_form']['result_config']))
         {
             $form_session   = unserialize($_SESSION['pl_form']['result_session']);
             $form_name      = $_SESSION['pl_form']['thank_you_form'];
-            
+
             //$this->prolib->debug($form_session);
             //$this->prolib->debug($form_session->config);
-            
+
             if($form_name && $form_session->config['form_name'] == $form_name)
             {
                 $form_obj = $this->EE->formslib->forms->get($form_name);
@@ -506,27 +506,27 @@ class Proform {
 
                 $this->prolib->copy_values($form_session->config, $variables);
                 $this->prolib->copy_values($form_obj, $variables);
-                
+
                 $variables['fieldrows'] = $this->create_fields_array($form_obj, FALSE, $form_session->errors, $form_session->values, $form_session->checked_flags, TRUE);
                 $variables['fields'] = $this->create_fields_array($form_obj, FALSE, $form_session->errors, $form_session->values, $form_session->checked_flags, FALSE, FALSE);
                 $variables['hidden_fields'] = $this->create_fields_array($form_obj, FALSE, $form_session->errors, $form_session->values, $form_session->checked_flags, FALSE, TRUE);
-                
+
                 //$this->prolib->debug($variables);
-                
+
             }
         }
-        
+
         return $variables;
     }
-    
+
     /*
      * List entries entered into a form
      */
-    public function entries() 
+    public function entries()
     {
         // List entries posted to a form
         $this->EE->load->library('formslib');
-        
+
         // Get params
         $form_name      = $this->EE->TMPL->fetch_param('form_name');
         $paginate       = $this->EE->TMPL->fetch_param('paginate');
@@ -540,7 +540,7 @@ class Proform {
         if($sort != 'asc' AND $sort != 'desc') $sort = 'asc';
 
         $search = $this->prolib->pl_parser->fetch_param_group('search');
-        
+
         // Check required input
         if(!$form_name)
         {
@@ -548,27 +548,27 @@ class Proform {
             //return $this->EE->output->show_user_error('general', array('exp:proform:form requires form_name param'));
             return '';
         }
-        
+
         if($paginate)
         {
             // fetch and remove the {paginate} pair from tagdata
             $this->fetch_pagination_data();
         }
-        
+
         $this->return_data = "";
-        
+
         // Get all form data for the requested form
         $form_obj = $this->EE->formslib->forms->get($form_name);
-        
+
         if ($this->EE->extensions->active_hook('proform_entries_start') === TRUE)
         {
             $form_obj = $this->EE->extensions->call('proform_entries_start', $this, $form_obj);
         }
-        
+
         if($form_obj)
         {
             $tagdata = $this->EE->TMPL->tagdata;
-            
+
             // if $limit != 0 then the results wil be paginated
             if($entries = $form_obj->entries($search, ($page - 1) * $limit, $limit, $orderby, $sort))
             {
@@ -581,7 +581,7 @@ class Proform {
                 } else {
                     $total_pages = 1;
                 }
-                
+
                 foreach($entries as $row)
                 {
                     if($form_obj->encryption_on == 'y')
@@ -589,7 +589,7 @@ class Proform {
                         $this->EE->load->library('encrypt');
                         $row = $this->EE->formslib->decrypt_values($row);
                     }
-                    
+
                     $row_vars = array();
                     $row_vars['total_entries'] = $total_entries;
                     $row_vars['total_pages'] = $total_pages;
@@ -604,7 +604,7 @@ class Proform {
 
                     // add form field data
                     $this->_add_rowdata($form_obj, $row, $row_vars);
-                    
+
                     // add additional variables needed in the iteration
                     $row_vars['row:number'] = $row_i;
                     $row_vars['entries:count'] = $count;
@@ -616,11 +616,11 @@ class Proform {
                     {
                         list($form_obj, $row_vars) = $this->EE->extensions->call('proform_entries_row', $this, $form_obj, $row_vars);
                     }
-                    
+
                     $rowdata = $this->EE->pl_parser->parse_variables($tagdata, $row_vars, array('fieldrows', 'fields'), 0, array('dst_enabled' => 1));
 
                     $this->return_data .= $rowdata;
-                    
+
                     $row_i ++;
                 }
             } else {
@@ -635,9 +635,9 @@ class Proform {
                 $row_vars['fields'] = $this->create_fields_array($form_obj, FALSE, array(), array(), array(), FALSE);
                 //$row_vars['fields'] = $this->create_fields_array($form_obj);
                 $row_vars['fields:count'] = count($row_vars['fields']);
-                
+
                 $rowdata = $this->EE->pl_parser->parse_variables($tagdata, $row_vars, array('fieldrows', 'fields'));
-                
+
                 //echo $rowdata;die;
                 $this->return_data .= $rowdata;
             }
@@ -646,12 +646,12 @@ class Proform {
         {
             show_error("{exp:proform:form} form name not found: $form_name");
         }
-        
+
         if ($this->EE->extensions->active_hook('proform_entries_end') === TRUE)
         {
             $this->return_data = $this->EE->extensions->call('proform_entries_end', $this, $form_obj, $this->return_data);
         }
-        
+
         // add pagination links
         if($paginate)
         {
@@ -665,7 +665,7 @@ class Proform {
                     'last'      => $n == $total_pages ? 'yes' : '',
                 );
             }
-            
+
             $pagination_vars = array(
                 'current_page'  => $page,
                 'first_page'    => 1,
@@ -674,7 +674,7 @@ class Proform {
                 'pages'         => $pages
             );
             $this->paginate_data = $this->EE->pl_parser->parse_variables($this->paginate_data, $pagination_vars, array('pages'));
-            
+
             if($paginate == 'top')
             {
                 $this->return_data = $this->paginate_data.$this->return_data;
@@ -685,25 +685,25 @@ class Proform {
 
         return $this->return_data;
     }
-    
+
     // public function insert()
     // {
     //     // Directly insert data
     //     $this->EE->load->library('formslib');
     //     $this->EE->load->library('proform_notifications');
-    //     
+    //
     //     // Get params
     //     $form_name = $this->EE->TMPL->fetch_param('form_name', FALSE);
     //     $send_notification = $this->EE->TMPL->fetch_param('send_notification', FALSE);
     //     if(!$send_notification) $send_notification = 'yes';
     //     $debug = $this->EE->TMPL->fetch_param('debug', 'false') == 'yes';
-    //     
+    //
     //     // Make both newlines and pipes valid delimiters - useful if the value comes from Low Variables or similar
     //     $notify = explode("\n", implode("\n", explode('|', $this->EE->TMPL->fetch_param('notify', ''))));
-    // 
+    //
     //     // Get the form object
     //     $form_obj = $this->EE->formslib->forms->get($form_name);
-    //     
+    //
     //     if($form_obj)
     //     {
     //         // Check required input
@@ -712,74 +712,74 @@ class Proform {
     //             show_error("{exp:proform:form} requires form_name param.");
     //             //return $this->EE->output->show_user_error('general', array('exp:proform:insert requires form_name param'));
     //         }
-    //         
+    //
     //         // Prepare data for insert
     //         $data = array();
     //         foreach($form_obj->fields as $field)
     //         {
     //             $data[$field->field_name] = $this->EE->TMPL->fetch_param($field->field_name, '');
     //         }
-    //         
+    //
     //         if ($this->EE->extensions->active_hook('proform_insert_start') === TRUE)
     //         {
     //             $data = $this->EE->extensions->call('proform_insert_start', $this, $data);
     //         }
-    //         
+    //
     //         if($form_obj->encryption_on == 'y')
     //         {
     //             $this->EE->load->library('encrypt');
     //             $data = $this->EE->formslib->encrypt_values($data);
     //         }
-    // 
+    //
     //         $data['dst_enabled'] = $this->prolib->dst_enabled ? 'y' : 'n';
-    //         
+    //
     //         // Insert data into the form
     //         $this->EE->db->insert($form_obj->table_name(), $data);
-    //         
+    //
     //         // Send notifications
     //         if($send_notification == 'yes') {
     //             $data['entry_id'] = $this->EE->db->insert_id();
-    //             
+    //
     //             $entry_data = $form_obj->get_entry($data['entry_id']);
-    // 
-    // 
+    //
+    //
     //             $form_config = array(
     //                 'notify' => $notify,
     //                 'debug' => $debug,
     //             );
-    // 
+    //
     //             $fieldrows = $this->create_fields_array($form_obj, array(), $data, array(), TRUE);
     //             $fields = $this->create_fields_array($form_obj, array(), $data, array(), FALSE);
     //             $data['fieldrows'] = $fieldrows;
     //             $data['fields'] = $fields;
-    // 
+    //
     //             $this->_process_notifications($form_obj, $form_session, $data, $entry_data);
     //         }
-    //         
+    //
     //         if ($this->EE->extensions->active_hook('proform_insert_end') === TRUE)
     //         {
     //             $this->EE->extensions->call('proform_insert_end', $this, $data);
     //         }
-    // 
+    //
     //     }
     //     else
     //     {
     //         show_error("{exp:proform:form} form name not found: $form_name");
     //     }
     // }
-    
+
     public function debug($value, $exit=TRUE)
     {
         echo "<pre>";
         var_dump($value);
         if($exit) exit;
     }
-    
+
     function forms()
     {
         // List available forms
         $this->EE->load->library('formslib');
-        
+
         // Get params
         $form_name      = $this->EE->TMPL->fetch_param('form_name');
         $paginate       = $this->EE->TMPL->fetch_param('paginate');
@@ -787,35 +787,35 @@ class Proform {
         $p_page         = $this->EE->TMPL->fetch_param('page');
         $page           = $p_page > 0 ? $p_page : 1;
         $limit          = $this->EE->TMPL->fetch_param('limit');
-        
+
         // Check required input
         // if(!$form_name)
         // {
         //     show_error("{exp:proform:form} requires name param.");
         //     //return $this->EE->output->show_user_error('general', array('exp:proform:form requires form_name param'));
         // }
-        
+
         if($paginate)
         {
             // fetch and remove the {paginate} pair from tagdata
             $this->fetch_pagination_data();
         }
-        
+
         $this->return_data = "";
-        
+
         // Get all form data for the requested form
         $forms = $this->EE->formslib->forms->get_all(FALSE, FALSE, FALSE, $limit, ($page-1) * $limit);
         $total_forms = $this->EE->formslib->forms->count();
-        
+
         if ($this->EE->extensions->active_hook('proform_forms_start') === TRUE)
         {
             $forms = $this->EE->extensions->call('proform_forms_start', $this, $forms);
         }
-        
+
         if($forms && count($forms) > 0)
         {
             $tagdata = $this->EE->TMPL->tagdata;
-            
+
             $row_i = 1;
             $count = count($forms);
             if($limit > 0)
@@ -824,7 +824,7 @@ class Proform {
             } else {
                 $total_pages = 1;
             }
-                
+
             foreach($forms as $row)
             {
                 $row_vars = array();
@@ -840,7 +840,7 @@ class Proform {
                         $row_vars[$key] = $value;
                     }
                 }
-                
+
                 // add additional variables needed in the iteration
                 $row_vars['row_number'] = $row_i;
                 $row_vars['forms_count'] = $count;
@@ -851,11 +851,11 @@ class Proform {
                 {
                     $row_vars = $this->EE->extensions->call('proform_forms_row', $this, $form_obj, $row_vars);
                 }
-                
+
                 $rowdata = $this->EE->pl_parser->parse_variables($tagdata, $row_vars, array());
 
                 $this->return_data .= $rowdata;
-                
+
                 $row_i ++;
             }
         }
@@ -868,17 +868,17 @@ class Proform {
             $row_vars['row_number'] = 1;
             $row_vars['forms_count'] = 0;
             $row_vars['forms_no_results'] = TRUE;
-            
+
             $rowdata = $this->EE->pl_parser->parse_variables($tagdata, $row_vars, array());
-            
+
             $this->return_data .= $rowdata;
         }
-        
+
         if ($this->EE->extensions->active_hook('proform_forms_end') === TRUE)
         {
             $this->return_data = $this->EE->extensions->call('proform_forms_end', $this, $forms, $this->return_data);
         }
-        
+
         // add pagination links
         if($paginate)
         {
@@ -892,7 +892,7 @@ class Proform {
                     'last'      => $n == $total_pages ? 'yes' : '',
                 );
             }
-            
+
             $pagination_vars = array(
                 'current_page'  => $page,
                 'first_page'    => 1,
@@ -901,7 +901,7 @@ class Proform {
                 'pages'         => $pages
             );
             $this->paginate_data = $this->EE->pl_parser->parse_variables($this->paginate_data, $pagination_vars, array('pages'));
-            
+
             if($paginate == 'top')
             {
                 $this->return_data = $this->paginate_data.$this->return_data;
@@ -912,7 +912,7 @@ class Proform {
 
         return $this->return_data;
     }
-    
+
 
     private function _add_rowdata(&$form_obj, &$row, &$row_vars)
     {
@@ -947,13 +947,13 @@ class Proform {
             }
         }
     }
-    
-    
-    
+
+
+
     ////////////////////////////////////////////////////////////////////////////////
     // Actions
     ////////////////////////////////////////////////////////////////////////////////
-    
+
     private function _copy_post_to_session(&$form_obj, &$form_session)
     {
         // copy values for all fields to the form_session
@@ -961,7 +961,7 @@ class Proform {
         {
             // Only copy values for fields in the current step
             if($field->step_no != $form_session->config['step']) continue;
-            
+
             if($field->type != 'file')
             {
                 if($field->form_field_settings['preset_forced'] == 'y')
@@ -970,7 +970,7 @@ class Proform {
                     $_POST[$field->field_name] = $field->form_field_settings['preset_value'];
                 } else {
                     $value = $this->EE->input->get_post($field->field_name);
-                    
+
                     // force checkboxes to store "y" or "n"
                     if($field->type == 'checkbox' || $field->type == 'mailinglist')
                     {
@@ -978,12 +978,12 @@ class Proform {
                         #echo "{$field->field_name} value = $value<br/>";
                     }
                 }
-                
+
                 if(!isset($form_session->values[$field->field_name]))
                 {
                     $form_session->values[$field->field_name] = '';
                 }
-                
+
                 if($value !== FALSE)
                 {
                     $form_session->values[$field->field_name] = $value;
@@ -994,7 +994,7 @@ class Proform {
                         $_POST[$field->field_name] = $field->form_field_settings['preset_value'];
                     }
                 }
-                
+
                 if($field->type == 'mailinglist' || $field->type == 'checkbox')
                 {
                     if(array_key_exists($field->field_name, $form_session->values) && $form_session->values[$field->field_name] == 'y')
@@ -1007,14 +1007,14 @@ class Proform {
             }
         }
     }
-    
+
     private function _process_form(&$form_obj, &$form_session, &$result)
     {
         $result = FALSE;
-        
+
         // can be set by extensions when processing some of our hooks to ask the action to end early
         $this->EE->extensions->end_script = FALSE;
-        
+
         if($this->EE->config->item('proform_disable_xid', 'n') == 'n'
           OR ($this->EE->input->is_ajax_request() AND
               $this->EE->config->item('proform_disable_xid_ajax', 'n') == 'n'))
@@ -1038,18 +1038,18 @@ class Proform {
         {
             return $result;
         }
-        
+
         // find the form
         $form_name = $form_session->config['form_name'];
         $form_obj = $this->EE->formslib->forms->get($form_name);
-        
+
         $form_session->processed = TRUE;
-        
+
         $form_session->errors = array();
-        
+
         // Copy values for current step
         $this->_copy_post_to_session($form_obj, $form_session);
-        
+
         if ($this->EE->extensions->active_hook('proform_process_start') === TRUE)
         {
             list($form_obj, $form_session) = $this->EE->extensions->call('proform_process_start', $this, $form_obj, $form_session);
@@ -1059,7 +1059,7 @@ class Proform {
         if($form_obj)
         {
             $this->_process_data($form_obj, $form_session);
-            
+
             $this->_process_uploads($form_obj, $form_session);
 
             $this->_process_secure_fields($form_obj, $form_session);
@@ -1107,7 +1107,7 @@ class Proform {
                     $entry_data = $form_obj->get_entry($form_session->values['entry_id']);
 
                     $this->_process_notifications($form_obj, $form_session, $entry_data);
-                
+
                     if ($this->EE->extensions->active_hook('proform_process_end') === TRUE)
                     {
                         $this->EE->extensions->call('proform_process_end', $form_obj, $form_session, $this);
@@ -1117,7 +1117,7 @@ class Proform {
                     // Go to thank you URL
                     $_SESSION['pl_form']['thank_you_form'] = $form_name;
                     $_SESSION['pl_form']['result_session'] = serialize($form_session);
-                
+
                     if($this->EE->input->is_ajax_request())
                     {
                         $entry_data['status'] = 'success';
@@ -1126,15 +1126,15 @@ class Proform {
                     } else {
                         $this->EE->functions->redirect($form_session->config['thank_you_url']);
                     }
-                
+
                     $result = TRUE;
                 }
                 return $form_session;
             }
         }
     }
-    
-    
+
+
     private function _process_notifications(&$form_obj, &$form_session, &$entry_row)
     {
         if($this->EE->proform_notifications->has_notifications($form_obj, $form_session))
@@ -1142,7 +1142,7 @@ class Proform {
             $parse_data = array();
             $this->prolib->copy_values($form_session->config, $parse_data);
             $this->prolib->copy_values($form_session->values, $parse_data);
-            
+
             $fieldrows = $this->create_fields_array($form_obj, FALSE, array(), $form_session->values, array(), TRUE);
             $fields = $this->create_fields_array($form_obj, FALSE, array(), $form_session->values, array(), FALSE);
 
@@ -1189,7 +1189,7 @@ class Proform {
         {
             // only process the current step
             if($field->step_no != $form_session->config['step']) continue;
-            
+
             // reformat date and datetime values into a format that can be stored in the database
             switch($field->type)
             {
@@ -1218,7 +1218,7 @@ class Proform {
         {
             // attempt to convert the value
             $timestamp = strtotime($value);
-            
+
             // reset a failed conversion to a blank string - otherwise we will be storing
             // the familiar 1970-01-01 instead of a blank date ("0000-00-00")
             if(!$timestamp) $timestamp = '';
@@ -1240,14 +1240,14 @@ class Proform {
             //echo 'Going to step '.$step.'<br/>';
             $form_session->config['step'] = $step;
         }
-        
+
         if($this->EE->input->get_post('_pf_goto_next'))
         {
             $step = $form_session->config['step'] + 1;
             if($step > $step_count) $step = $step_count;
             $form_session->config['step'] = $step;
         }
-        
+
         if($this->EE->input->get_post('_pf_goto_next'))
         {
             $step = $form_session->config['step'] - 1;
@@ -1255,7 +1255,7 @@ class Proform {
             $form_session->config['step'] = $step;
         }
     }
-    
+
     private function _process_secure_fields(&$form_obj, &$form_session)
     {
         // set secure fields values from the session or other backend sources
@@ -1270,7 +1270,7 @@ class Proform {
                     $form_session->values[$field->field_name] = 'Invalid member key ' . $field->settings['type_member_data'];
                 }
             }
-            
+
             if($field->type == 'secure')
             {
                 if(array_key_exists($field->field_name, $form_session->config['secure']))
@@ -1301,10 +1301,10 @@ class Proform {
                     {
                         // "upload" the file to it's permanent home
                         $upload_data = $this->EE->pl_uploads->handle_upload($field->upload_pref_id, $field->field_name, $field->is_required == 'y');
-                        
+
                         // default to no file saved
                         $form_session->values[$field->field_name] = '';
-                        
+
                         // we should get back an array if the transfer was successful
                         // if the file was required and was not uploaded, we'll get back FALSE
                         // if the file was not required and was in fact not uploaded, we'll get back a TRUE
@@ -1313,19 +1313,19 @@ class Proform {
                             // save the filename to the session's values array so we don't clobber it if there are
                             // other errors
                             $form_session->values[$field->field_name] = $upload_data['file_name'];
-                            
+
                             // save the filename in case we get to actually save the form insert this time
                             $form_session->values[$field->field_name] = $upload_data['file_name'];
                         } elseif(count($this->EE->pl_uploads->errors) > 0) {
                             // if the file wasn't required, there would be no errors in the array
                             $form_session->add_error($field->field_name, $this->EE->pl_uploads->errors);
                         }
-                    } // else array_key_exists($field->field_name, $form_session->values) 
+                    } // else array_key_exists($field->field_name, $form_session->values)
                 } // $field->type == 'file'
             }
         } // save_entries_on == 'y'
     } // function _process_uploads
-    
+
     private function _process_captcha(&$form_obj, &$form_session)
     {
         if ( ! isset($_POST['captcha']) OR $_POST['captcha'] == '')
@@ -1333,42 +1333,42 @@ class Proform {
             $form_session->add_error('captcha', array($this->EE->lang->line('captcha_required')));
             return;
         }
-        
+
         $query = $this->EE->db->query("SELECT COUNT(*) AS count FROM exp_captcha
                              WHERE word='".$this->EE->db->escape_str($_POST['captcha'])."'
                              AND ip_address = '".$this->EE->input->ip_address()."'
                              AND date > UNIX_TIMESTAMP()-7200");
-        
+
         if ($query->row('count')  == 0)
         {
             $form_session->add_error('captcha', array($this->EE->lang->line('captcha_incorrect')));
             return;
         }
-        
+
         $this->EE->db->query("DELETE FROM exp_captcha
                     WHERE (word='".$this->EE->db->escape_str($_POST['captcha'])."'
                     AND ip_address = '".$this->EE->input->ip_address()."')
                     OR date < UNIX_TIMESTAMP()-7200");
     } // function _process_captch
-    
+
     private function _process_validation(&$form_obj, &$form_session)
     {
         $this->EE->lang->loadfile('proform');
-        
+
         // process validation rules and check for required fields
-        
+
         if ($this->EE->extensions->active_hook('proform_validation_start') === TRUE)
         {
             list($form_obj, $form_session) = $this->EE->extensions->call('proform_validation_start', $this, $form_obj, $form_session);
         }
-        
+
         // override delimiter values from form configuration
         $this->EE->pl_validation->set_error_delimiters($form_session->config['error_delimiters'][0], $form_session->config['error_delimiters'][1]);
-        
+
         // check rules for sanity then pass them on to the validation class
         $validation_rules = array();
         foreach($form_obj->fields() as $field)
-        {                                                                 
+        {
             // Only process validation for the current form
             if($field->step_no != $form_session->config['step']) continue;
             if($field->type == 'list')
@@ -1388,12 +1388,12 @@ class Proform {
                                 $option_valid = TRUE;
                             }
                         }
-                    } else 
+                    } else
                     {
                         echo 'values:';
                         var_dump($form_session->values);
                     }
-                    
+
                     $valid = $option_valid;
                 } else {
                     $multi = TRUE;
@@ -1401,7 +1401,7 @@ class Proform {
                     {
                         $form_session->values[$field->field_name] = array($form_session->values[$field->field_name]);
                     }
-                    
+
                     $valid = TRUE;
                     foreach($form_session->values[$field->field_name] as $selected_option)
                     {
@@ -1417,7 +1417,7 @@ class Proform {
                         if(!$valid) break;
                     }
                 }
-                
+
                 if(!$valid)
                 {
                     $form_session->add_error($field->field_name, ($multi ? 'One of the values for' : 'The value for ').htmlentities($field->field_name).' is not a valid choice.');
@@ -1436,7 +1436,7 @@ class Proform {
                 {
                     $field_rules[] = 'required';
                 }
-                
+
                 foreach($field_rules as $srule)
                 {
                     //echo $srule."<br/>";
@@ -1446,7 +1446,7 @@ class Proform {
                         {
                             // has a param - remove the ']' from the end
                             if($srule[strlen($srule)-1] == ']') $srule = substr($srule, 0, -1);
-                            
+
                             // split on [ - but just the first one
                             $rule = explode('[', $srule, 2);
                         } else {
@@ -1465,13 +1465,13 @@ class Proform {
                             // note: callbacks do not work in EE
                             $checked_rules .= 'callback_'.$rule[0];
                         }
-                        
+
                         if(count($rule) > 1 && trim($rule[1]))
                         {
                             $checked_rules .= '['.$rule[1].']';
                         }
                         $checked_rules .= '|';
-                        
+
                         if($rule[0] == 'matches_value')
                         {
                             // force required - otherwise rule param for matches_value is stripped
@@ -1479,7 +1479,7 @@ class Proform {
                         }
                     }
                 }
-                
+
                 $checked_rules = substr($checked_rules, 0, -1);
 
                 $validation_rules[] = array(
@@ -1489,10 +1489,10 @@ class Proform {
                 );
             }
         }
-        
+
         /*echo "<b>Rules:</b>";
         krumo($validation_rules);*/
-        
+
         if ($this->EE->extensions->active_hook('proform_validation_check_rules') === TRUE)
         {
             $validation_rules = $this->EE->extensions->call('proform_validation_rules', $this, $form_obj, $form_session, $validation_rules);
@@ -1510,7 +1510,7 @@ class Proform {
             foreach($form_obj->fields() as $field)
             {
                 $field_error = $this->EE->pl_validation->error($field->field_name);
-                
+
                 if ($this->EE->extensions->active_hook('proform_validation_field') === TRUE)
                 {
                     $field_error = $this->EE->extensions->call('proform_validation_field', $this, $form_obj, $field, $field_error);
@@ -1535,24 +1535,24 @@ class Proform {
     private function _process_insert(&$form_obj, &$form_session)
     {
         $form_session->values['dst_enabled'] = $this->prolib->dst_enabled ? 'y' : 'n';
-        
+
         if($form_obj->form_type == 'form')
         {
             if ($this->EE->extensions->active_hook('proform_insert_start') === TRUE)
             {
                 $form_session->values = $this->EE->extensions->call('proform_insert_start', $this);
             }
-        
+
             if($form_obj->encryption_on == 'y')
             {
                 $this->EE->load->library('encrypt');
                 $save_data = $this->EE->formslib->encrypt_values($form_session->values);
-            
+
                 /*
                 echo "<b>Encrypted data:</b>";
                 $this->prolib->debug($save_data);
                 // */
-            
+
                 // TODO: check for constraint overflows in encrypted values?
                 // TODO: how do we handle encrypted numbers?
             } else {
@@ -1563,7 +1563,7 @@ class Proform {
                 $this->prolib->debug($save_data);
                 // */
             }
-            
+
             // collapse multiselect options and other array values to a single string
             foreach($save_data as $k => $v)
             {
@@ -1572,9 +1572,9 @@ class Proform {
                     $save_data[$k] = implode("|", $v);
                 }
             }
-            
+
             if(isset($save_data[''])) unset($save_data['']);
-            
+
             if(!$result = $this->EE->db->insert($form_obj->table_name(), $save_data))
             {
                 show_error("{exp:proform:form} could not insert into form: ".$form_obj->form_name);
@@ -1590,17 +1590,17 @@ class Proform {
         } else {
             $form_session->values['form:entry_id'] = 0;
             $form_session->values['form:name'] = $form_obj->form_name;
-            
+
             if ($this->EE->extensions->active_hook('proform_no_insert') === TRUE)
             {
                 $form_session = $this->EE->extensions->call('proform_no_insert', $this, $form_session);
             }
         }
-        
-        
-        
+
+
+
     } // function _process_insert
-    
+
     private function _process_mailinglist(&$form_obj, &$form_session)
     {
         //$form_session->values['form:entry_id']
@@ -1609,23 +1609,23 @@ class Proform {
             require_once(APPPATH.'modules/mailinglist/mod.mailinglist.php');
         }
         $mailinglist = new Mailinglist();
-        
+
         foreach($form_obj->fields() as $field)
         {
             if($field->type == 'mailinglist')
             {
                 $this->EE->lang->loadfile('mailinglist');
-                
+
                 if ($this->EE->config->item('mailinglist_enabled') == 'n')
                 {
                     exit($this->EE->output->show_user_error('general', $this->EE->lang->line('mailinglist_disabled')));
                 }
-                
+
                 if ($this->EE->blacklist->blacklisted == 'y' && $this->EE->blacklist->whitelisted == 'n')
                 {
                     exit($this->EE->output->show_user_error('general', $this->EE->lang->line('not_authorized')));
                 }
-                
+
                 // get email and list info
                 $email_field = $form_obj->submitter_email_field;
                 if(array_key_exists($email_field, $form_session->values))
@@ -1635,41 +1635,41 @@ class Proform {
                     $email = FALSE;
                 }
                 $list_id = $field->mailinglist_id;
-                
+
                 // if the checkbox was checked and we have enough information to subscribe someone
                 if($this->EE->input->get_post($field->field_name) && $email && $list_id)
                 {
                     $this->EE->load->helper('email');
-                    
+
                     // just in case the email field doesn't have the CI email validator on it, we still need
                     // to make sure that the email is valid or it will mess up the mailinglist module
                     if (!valid_email($email))
                     {
                         $form_session->errors[$email_field][] = $this->EE->lang->line('ml_invalid_email');
                     }
-                    
+
                     if (!isset($form_session->errors[$email_field]) || count($form_session->errors[$email_field]) == 0)
                     {
                         // Kill duplicate emails from authorization queue.  This prevents an error if a user
                         // signs up but never activates their email, then signs up again.  Note- check for list_id
                         // as they may be signing up for two different llists
-                        
+
                         $this->EE->db->query(
-                            "DELETE FROM exp_mailing_list_queue 
+                            "DELETE FROM exp_mailing_list_queue
                              WHERE email = '".$this->EE->db->escape_str($email)."' AND list_id = '".$this->EE->db->escape_str($list_id)."'");
-                        
+
                         $query = $this->EE->db->query(
-                            "SELECT count(*) AS count FROM exp_mailing_list 
+                            "SELECT count(*) AS count FROM exp_mailing_list
                              WHERE email = '".$this->EE->db->escape_str($email)."' AND list_id = '".$this->EE->db->escape_str($list_id)."'");
-                        
+
                         $is_duplicate = $query->row('count') > 0;
-                        
+
                         // is this really an error?
                         /*if ($query->row('count')  > 0)
                         {
                             $form_session->errors[$field->field_name][] = $this->EE->lang->line('ml_email_already_in_list');
                         }*/
-                    
+
                         if(!$is_duplicate && count($form_session->errors) == 0)
                         {
                             $code = $this->EE->functions->random('alnum', 10);
@@ -1706,16 +1706,16 @@ class Proform {
 
         $result = array();
         $last_field_row = -1;
-        
+
         foreach($form_obj->fields() as $field)
         {
             // skip secured fields such as member_id, member_name, etc.
             if($field->type == 'secure' OR $field->type == 'member_data') continue;
             // skip hidden fields when we don't want them, skip everything else when we do
-            
+
             // Only return fields for the current step, if we are on a particular step
             if($form_session AND $field->step_no != $form_session->config['step']) continue;
-            
+
             if($hidden !== -1)
             {
                 if($field->get_control() == 'hidden')
@@ -1731,7 +1731,7 @@ class Proform {
                     }
                 }
             }
-            
+
             // handle normal posted fields
             $is_required = $field->is_required == 'y';
             if(!$is_required)
@@ -1746,7 +1746,7 @@ class Proform {
                     }
                 }
             }
-            
+
             $field_array = array(
                     //'field_callback'    => function($form_session->values, $key=FALSE) { return time(); },
                     'field_id'          => $field->field_id,
@@ -1755,9 +1755,9 @@ class Proform {
                                             ? $field->form_field_settings['label'] : $field->field_label,
                     'field_placeholder' => (array_key_exists('placeholder', $field->form_field_settings) AND trim($field->form_field_settings['placeholder']) != '')
                                             ? $field->form_field_settings['placeholder'] : (
-                                                    $field->placeholder != '' 
-                                                    ? $field->placeholder : ( 
-                                                        isset($this->default_placeholders[$field->type]) 
+                                                    $field->placeholder != ''
+                                                    ? $field->placeholder : (
+                                                        isset($this->default_placeholders[$field->type])
                                                         ? $this->default_placeholders[$field->type] : '')),
                     'field_type'        => $field->type,
                     'field_length'      => $field->length,
@@ -1770,7 +1770,7 @@ class Proform {
                                                           && $field_checked_flags[$field->field_name]) ? 'checked="checked"' : '',
                     'field_control'     => $field->get_control()
                 );
-            
+
             if(is_array($field->form_field_settings))
             {
                 // var_dump($field->form_field_settings);
@@ -1780,7 +1780,7 @@ class Proform {
                     if(trim($v) != '' OR !isset($field_array['field_'.$k]))
                     {
                         $field_array['field_'.$k] = $v;
-                        
+
                         if(substr($k, 0, 5) == 'extra')
                         {
                             $field_array['field_'.str_replace('extra', 'extra_', $k)] = $v;
@@ -1788,7 +1788,7 @@ class Proform {
                     }
                 }
             }
-            
+
             if(is_array($field->settings))
             {
                 foreach($field->settings as $k => $v)
@@ -1805,8 +1805,8 @@ class Proform {
                     }
                     $field_array['field_setting_'.$k] = $v;
                 }
-            }            
-            
+            }
+
             // if($field_array['field_type'] == 'list')
             // {
             //     var_dump($field_array);
@@ -1849,13 +1849,13 @@ class Proform {
             } else {
                 $field_array['field_no'] = count($result) + 1;
                 $result[] = $field_array;
-            }    
+            }
         } // foreach($form_obj->fields() as $field)
 
 //        if($create_field_rows){var_dump($result);die;}
         return $result;
     } // function create_fields_array
-    
+
     /**
       *  Fetch pagination data
       */
@@ -1870,7 +1870,7 @@ class Proform {
             {
                 $edata = $this->EE->extensions->call('proform_fetch_pagination_data', $this);
             }
-            
+
             $this->paginate = TRUE;
             $this->paginate_data = $match[1];
 
