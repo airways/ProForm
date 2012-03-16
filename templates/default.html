@@ -41,14 +41,18 @@
                 <label for="{pf_field_name}">{pf_field_label} {if pf_field_is_required}<span class="required">*</span>{/if}</label>
                 <div class="pf_field {if pf_vertical}pf_vertical{/if}">
                     {if pf_field_type == "string"}
-                        {if pf_field_length <= 256}
-                            <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="{pf_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
+                        {if pf_field_validation:valid_email}
+                            <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="validate-email {pf_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
                         {if:else}
-                            {if pf_wysiwyg}
-                                <textarea name="{pf_field_name}" id="{pf_field_name}" class="{pf_required}">{pf_field_value}</textarea>
-                                <script type="text/javascript">bkLib.onDomLoaded(function() { new nicEditor(pf_nic_config).panelInstance('{pf_field_name}'); });</script>
+                            {if pf_field_length <= 256}
+                                <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="{pf_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
                             {if:else}
-                                <textarea name="{pf_field_name}" id="{pf_field_name}" class="{pf_required}">{pf_field_value}</textarea>
+                                {if pf_wysiwyg}
+                                    <textarea name="{pf_field_name}" id="{pf_field_name}" class="{pf_required}">{pf_field_value}</textarea>
+                                    <script type="text/javascript">bkLib.onDomLoaded(function() { new nicEditor(pf_nic_config).panelInstance('{pf_field_name}'); });</script>
+                                {if:else}
+                                    <textarea name="{pf_field_name}" id="{pf_field_name}" class="{pf_required}">{pf_field_value}</textarea>
+                                {/if}
                             {/if}
                         {/if}
                     {if:elseif pf_field_type == "date"}
@@ -61,8 +65,6 @@
                         <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="validate-integer {pf_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
                     {if:elseif pf_field_type == "float"}
                         <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="validate-float {pf_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
-                    {if:elseif pf_field_type == "email"}
-                        <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="validate-email {pf_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
                     {if:elseif pf_field_type == "file"}
                         <div class="pf_files">
                             <input name="{pf_field_name}[]" id="{pf_field_name}" type="file" class="{pf_required}" />

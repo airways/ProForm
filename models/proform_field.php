@@ -201,4 +201,30 @@ class PL_Field extends PL_RowInitialized
         return $result;
     } // function get_assigned_forms()
 
+    function get_form_field_setting($key, $default = '')
+    {
+        $result = $default;
+        if(array_key_exists($key, $this->form_field_settings) AND trim($this->form_field_settings[$key]) != '')
+        {
+            $result = $this->form_field_settings[$key];
+        }
+        return $result;
+    }
+    
+    function get_property($key, $default = '')
+    {
+        $result = $default;
+        if($this->$key != '')
+        {
+            $result = $this->$key;
+        }
+        return $result;
+    }
+    
+    function get_validation()
+    {
+        // Explode the validation string, and remove any blank values found in it, as well as the 'none'
+        // value used to indicate a lack of validation.
+        return array_filter_values(explode('|', $this->validation), array('none', ''));
+    }
 }

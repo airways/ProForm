@@ -45,10 +45,19 @@ require_once PATH_THIRD.'proform/config.php';
 class Proform {
 
     var $return_data    = '';
-    var $var_pairs = array('fieldrows', 'fields', 'hidden_fields', 'errors', 'steps');
+    var $var_pairs = array('fieldrows', 'fields', 'hidden_fields', 'errors', 'steps', 'field_validation');
     var $paginate = FALSE;
     var $paginate_data = '';
-    var $default_placeholders = array('date' => 'mm/dd/yyyy!!', 'datetime' => 'mm/dd/yyyy hh:mm am/pm', 'time' => 'hh:mm am/pm', 'integer' => '###', 'float' => '0.0', 'email' => '@');
+    var $default_placeholders = array(
+        'date'          => 'mm/dd/yyyy',
+        'datetime'      => 'mm/dd/yyyy hh:mm am/pm',
+        'time'          => 'hh:mm am/pm',
+        'integer'       => '###',
+        'float'         => '0.0',
+        'valid_email'   => '@',
+    );
+    var $prefix_included = FALSE;
+    
     public function Proform()
     {
         $this->__construct();
@@ -60,6 +69,12 @@ class Proform {
 
         $this->EE->db->cache_off();
 
+        if (!isset($this->EE->session->cache['proform']))
+        {
+            $this->EE->session->cache['proform'] = array();
+        }
+        $this->cache =& $this->EE->session->cache['proform'];
+        
         @session_start();
         if(!isset($_SESSION['pl_form']))
         {
@@ -67,10 +82,57 @@ class Proform {
         }
     }
 
+
     ////////////////////////////////////////////////////////////////////////////////
     // Tags
     ////////////////////////////////////////////////////////////////////////////////
 
+    public function head()
+    {
+        $result = '';
+        // The prefix should only ever be sent once. This can be done in the header as a tag:
+        // {exp:proform:prefix}, or it will be done automatically on the first call to
+        // {exp:proform:simple}.
+        if(!isset($this->cache['prefix_included']) || !$this->cache['prefix_included'])
+        {
+            $result = file_get_contents(PATH_THIRD.'proform/templates/prefix.html');
+            $this->cache['prefix_included'] = TRUE;
+        }
+        return $result;
+    }
+    
+    public function disable_head()
+    {
+        // This just disables the head script completely - use this only when you've created
+        // custom styling and javascript for the simple template.
+        $this->cache['prefix_included'] = TRUE;
+        return '';
+    }
+    
+    public function simple()
+    {
+        $template = $this->EE->TMPL->fetch_param('template', 'default');
+        $template = preg_replace("/[^a-zA-Z0-9\s]/", "", $template);
+        
+        $form_name = $this->EE->TMPL->fetch_param('form_name', $this->EE->TMPL->fetch_param('form', FALSE));
+        
+        if(!$form_name)
+        {
+            show_error('Invalid form_name provided to {exp:proform:simple}');
+        }
+        
+        // Get our template components
+        $prefix = $this->head();
+        $template = file_get_contents(PATH_THIRD.'proform/templates/'.$template.'.html');
+        
+        // Swap out the "embed" parameter for form_name in the template
+        $template = str_replace(LD.'embed:form_name'.RD, $form_name, $template);
+        
+        // Return the template code so the parser can handle it normally
+        return $prefix.$template;
+        
+    }
+    
     /*
      * Provides data to render a named form
      */
@@ -93,7 +155,7 @@ class Proform {
         // strlen($this->EE->config->item('proform_license')) >= 32 || exit("ProForm requires a valid proform_license value to be set in the config file.");
 
         // Get params
-        $form_name = $this->EE->TMPL->fetch_param('form_name', FALSE);
+        $form_name = $this->EE->TMPL->fetch_param('form_name', $this->EE->TMPL->fetch_param('form', FALSE));
 
         // Check required input
         if(!$form_name)
@@ -378,8 +440,11 @@ class Proform {
                 }
 
                 // Set up pagination / step variables
+                $variables['on_first_step'] = $form_session->config['step'] == 1;
                 $variables['on_last_step'] = $form_session->config['step'] == $form_obj->get_step_count();
                 $variables['steps'] = $form_obj->get_steps($form_session->config['step']);
+                $variables['step_count'] = count($variables['steps']) > 1;
+                $variables['multistep'] = count($variables['steps']) > 1;
                 //var_dump($variables['steps']);
 
                 // Setup template pair variables
@@ -1233,7 +1298,6 @@ class Proform {
     {
         $step_count = $form_obj->get_step_count();
         //echo 'Found ' . $step_count . ' steps<br/>';
-
         // Check for step movement commands
         if($step = $this->EE->input->get_post('_pf_goto_step'))
         {
@@ -1251,7 +1315,7 @@ class Proform {
             $form_session->config['step'] = $step;
         }
 
-        if($this->EE->input->get_post('_pf_goto_next'))
+        if($this->EE->input->get_post('_pf_goto_previous'))
         {
             $step = $form_session->config['step'] - 1;
             if($step < 1) $step = 1;
@@ -1679,12 +1743,14 @@ class Proform {
                             $return = '';
                             if ($mailinglist->email_confirm == FALSE)
                             {
-                                $this->EE->db->query("INSERT INTO exp_mailing_list (list_id, authcode, email, ip_address)
-                                                      VALUES ('".$this->EE->db->escape_str($list_id)."', '".$code."', '".$this->EE->db->escape_str($email)."', '".$this->EE->db->escape_str($this->EE->input->ip_address())."')");
+                                $this->EE->db->query("INSERT INTO exp_mailing_list (list_id, authcode, email, ip_address) VALUES ('"
+                                                      .$this->EE->db->escape_str($list_id)."', '".$code."', ".
+                                                      "'".$this->EE->db->escape_str($email)."', '".$this->EE->db->escape_str($this->EE->input->ip_address())."')");
                             }
                             else
                             {
-                                $this->EE->db->query("INSERT INTO exp_mailing_list_queue (email, list_id, authcode, date) VALUES ('".$this->EE->db->escape_str($email)."', '".$this->EE->db->escape_str($list_id)."', '".$code."', '".time()."')");
+                                $this->EE->db->query("INSERT INTO exp_mailing_list_queue (email, list_id, authcode, date) VALUES ('"
+                                        .$this->EE->db->escape_str($email)."', '".$this->EE->db->escape_str($list_id)."', '".$code."', '".time()."')");
 
                                 $mailinglist->send_email_confirmation($email, $code, $list_id);
                             }
@@ -1699,7 +1765,8 @@ class Proform {
     // Helpers
     ////////////////////////////////////////////////////////////////////////////////
 
-    private function create_fields_array($form_obj, $form_session = FALSE, $field_errors = array(), $field_values = array(), $field_checked_flags = array(), $create_field_rows = TRUE, $hidden = -1)
+    private function create_fields_array($form_obj, $form_session = FALSE, $field_errors = array(), $field_values = array(),
+                                         $field_checked_flags = array(), $create_field_rows = TRUE, $hidden = -1)
     {
 
         if(is_object($field_values))
@@ -1750,30 +1817,52 @@ class Proform {
                 }
             }
 
+            $validation = $this->EE->pl_parser->wrap_array($field->get_validation(), 'rule_no', 'rule');
+            $validation_count = count($validation->array);
+            
+            // Determine placeholder based on validation rules, if possible - if not, use the type place
+            // holder as a fallback.
+            $default_placeholder = $this->_get_placeholder($field->type);
+            foreach($validation->array as $rule)
+            {
+                if($this->_get_placeholder($rule))
+                {
+                    $default_placeholder = $this->_get_placeholder($rule);
+                }
+            }
+
             $field_array = array(
                     //'field_callback'    => function($form_session->values, $key=FALSE) { return time(); },
-                    'field_id'          => $field->field_id,
-                    'field_name'        => $field->field_name,
-                    'field_label'       => (array_key_exists('label', $field->form_field_settings) AND trim($field->form_field_settings['label']) != '')
-                                            ? $field->form_field_settings['label'] : $field->field_label,
-                    'field_placeholder' => (array_key_exists('placeholder', $field->form_field_settings) AND trim($field->form_field_settings['placeholder']) != '')
-                                            ? $field->form_field_settings['placeholder'] : (
-                                                    $field->placeholder != ''
-                                                    ? $field->placeholder : (
-                                                        isset($this->default_placeholders[$field->type])
-                                                        ? $this->default_placeholders[$field->type] : '')),
-                    'field_type'        => $field->type,
-                    'field_length'      => $field->length,
-                    'field_heading'     => $field->heading,
-                    'field_is_required' => $is_required ? 'y' : '',
-                    'field_validation'  => $field->validation,
-                    'field_error'       => array_key_exists($field->field_name, $field_errors) ? $field_errors[$field->field_name] : '',
-                    'field_value'       => array_key_exists($field->field_name, $field_values) ? $field_values[$field->field_name] : '',
-                    'field_checked'     => (array_key_exists($field->field_name, $field_checked_flags)
-                                                          && $field_checked_flags[$field->field_name]) ? 'checked="checked"' : '',
-                    'field_control'     => $field->get_control()
+                    'field_id'                  => $field->field_id,
+                    'field_name'                => $field->field_name,
+                    'field_label'               => $field->get_form_field_setting('label', $field->field_label),
+                    'field_placeholder'         => $field->get_form_field_setting('placeholder',
+                                                        $field->get_property('placeholder', $default_placeholder)),
+                    'field_type'                => $field->type,
+                    'field_length'              => $field->length,
+                    'field_heading'             => $field->heading,
+                    'field_is_required'         => $is_required ? 'y' : '',
+                    'field_validation'          => $validation,
+                    'field_validation_count'    => $validation_count,
+                    'field_error'               => array_key_exists($field->field_name, $field_errors)
+                                                        ? $field_errors[$field->field_name]
+                                                            : '',
+                    'field_value'               => array_key_exists($field->field_name, $field_values)
+                                                        ? $field_values[$field->field_name]
+                                                            : $field->get_form_field_setting('preset_value'),
+                    'field_checked'             => (array_key_exists($field->field_name, $field_checked_flags)
+                                                                  && $field_checked_flags[$field->field_name]) ? 'checked="checked"' : '',
+                    'field_control'             => $field->get_control()
                 );
 
+            // Create a fieldset for field_validation: to contain rows that are applied to each field, makes conditionals
+            // a lot easier
+            foreach($validation->array as $rule)
+            {
+                $field_array['field_validation:'.$rule] = '1';
+            }
+
+            // Copy field settings for each field type into the field array
             if(is_array($field->form_field_settings))
             {
                 // var_dump($field->form_field_settings);
@@ -1859,6 +1948,16 @@ class Proform {
         return $result;
     } // function create_fields_array
 
+    private function _get_placeholder($type, $default = '')
+    {
+        $result = $default;
+        if(isset($this->default_placeholders[$type]))
+        {
+            $result = $this->default_placeholders[$type];
+        }
+        return $result;
+    }
+    
     /**
       *  Fetch pagination data
       */

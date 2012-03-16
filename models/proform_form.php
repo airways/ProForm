@@ -150,7 +150,7 @@ class PL_Form extends PL_RowInitialized {
             'heading'       => $this->form_label,
             'step'          => $this->form_label,
             'step_no'       => 1,
-            'step_active'   => $current_step == $step_count ? 'active' : ''
+            'step_active'   => $current_step == $step_count ? 'pf_active' : ''
         );
 
         foreach($this->fields() as $field)
@@ -176,7 +176,7 @@ class PL_Form extends PL_RowInitialized {
                     'heading'           => $field->heading,
                     'step'              => $field->heading,
                     'step_no'           => $step_count,
-                    'step_active'       => $current_step == $step_count ? 'active' : '',
+                    'step_active'       => $current_step == $step_count ? 'pf_active' : '',
                 );
             }
         }
