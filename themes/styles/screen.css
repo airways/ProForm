@@ -412,6 +412,7 @@ ul.targetRow .ui-sortable-placeholder {
 
 .ui-sortable-helper {
     width: 400px !important;
+    max-width: 400px !important;
 }
 
 .fieldWidget a {
@@ -435,14 +436,15 @@ ul.targetRow .ui-sortable-placeholder {
 
 .form-setup {
 	overflow: hidden;
+	width: 100%;
 }
 
 .form-setup li {
 	padding: 10px;
-	border: 1px solid transparent;
+    border: 1px solid transparent;
 	position: relative;
 	float: left;
-	width: 90%;
+	width: 90% !important;
 	margin: 0 10px 10px 0;
 }
 
@@ -460,7 +462,6 @@ ul.targetRow .ui-sortable-placeholder {
 	display: none;
 	background: url(../images/icon_handle.gif) no-repeat;
 }
-
 
 .form-setup li:hover {
 	border: 1px solid #ccc;

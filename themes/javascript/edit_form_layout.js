@@ -63,9 +63,9 @@ var proform_edit_form_layout = {
             items.each(function() {
                 if(count == 1)
                 {
-                    $(this).width('90%');
+                    $(this).width('90% !important');
                 } else {
-                    $(this).width(80/count+'%');
+                    $(this).width(80/count+'% !important');
                 }
             });
         }
@@ -200,3 +200,4 @@ var proform_edit_form_layout = {
 $(document).ready(function() {
     proform_edit_form_layout.bind_events();
 });
+

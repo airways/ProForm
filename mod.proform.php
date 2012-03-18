@@ -1841,7 +1841,7 @@ class Proform {
                     'field_type'                => $field->type,
                     'field_length'              => $field->length,
                     'field_heading'             => $field->heading,
-                    'field_is_required'         => $is_required ? 'y' : '',
+                    'field_is_required'         => $is_required ? 'required' : '',
                     'field_validation'          => $validation,
                     'field_validation_count'    => $validation_count,
                     'field_error'               => array_key_exists($field->field_name, $field_errors)
