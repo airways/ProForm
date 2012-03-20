@@ -1092,6 +1092,8 @@ class Proform {
 
         $this->EE->load->library('formslib');
         $this->EE->load->library('proform_notifications');
+        
+        $this->EE->proform_notifications->var_pairs = $this->var_pairs;
 
         // decrypt the form's configuration array
         $form_session_enc = $this->EE->input->post('__conf');

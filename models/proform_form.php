@@ -47,6 +47,7 @@ class PL_Form extends PL_RowInitialized {
         'extra1'            => '',
         'extra2'            => '',
         'placeholder'       => '',
+        'show_in_listing'   => 'y',
     );
 
     function init()
@@ -260,6 +261,7 @@ class PL_Form extends PL_RowInitialized {
                             'extra1' => '',
                             'extra2' => '',
                             'placeholder' => '',
+                            'show_in_listing' => 'n',
                         );
                     }
                 }
@@ -310,7 +312,7 @@ class PL_Form extends PL_RowInitialized {
 
     function set_all_form_field_settings($field_order, $settings_map)
     {
-        // if needed, load field for this form
+        // if needed, load fields for this form
         if(!$this->__fields)
         {
             $this->fields();

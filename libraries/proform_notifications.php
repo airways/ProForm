@@ -46,7 +46,8 @@ class Proform_notifications
     var $template_mgr;
     var $debug = FALSE;
     var $debug_str = '<b>Debug Output</b><br/>';
-
+    var $var_pairs = array();
+    
     function __construct()
     {
         prolib($this, 'proform');
@@ -106,7 +107,7 @@ class Proform_notifications
         $this->debug_str .= htmlentities($msg) . '<br/>';
     }
 
-    function has_notifications($form, $data, $form_session)
+    function has_notifications($form, $form_session)
     {
 
         if ($this->EE->extensions->active_hook('proform_notification_exists') === TRUE)
@@ -274,8 +275,20 @@ class Proform_notifications
         {
             // parse data from the entry
             $this->_debug($template);
-            $message = $this->EE->parser->parse_string($template, $data, TRUE);
-            $subject = $this->EE->parser->parse_string($subject, $data, TRUE);
+            // $message = $this->EE->parser->parse_string($template, $data, TRUE);
+            // $subject = $this->EE->parser->parse_string($subject, $data, TRUE);
+
+            $message = $this->EE->pl_parser->parse_variables_ex(array(
+                'rowdata' => $message,
+                'row_vars' => $data,
+                'pairs' => $this->var_pairs,
+            ));
+
+            $subject = $this->EE->pl_parser->parse_variables_ex(array(
+                'rowdata' => $subject,
+                'row_vars' => $data,
+                'pairs' => $this->var_pairs,
+            ));
 
             // parse the template for EE tags, conditionals, etc.
             $this->EE->template->template = &$message;

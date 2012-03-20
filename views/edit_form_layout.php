@@ -2,24 +2,26 @@
 
 function print_hidden($field)
 {
-    echo '<input type="hidden" class="removeLink" value="'              . $field['remove_link']                             . '">'.
-         '<input type="hidden" name="required_'                         . $field['field_name']                              . '" value="'.$field['is_required'].'" class="fieldRequired" />'.
-         '<input type="hidden" name="form_field_id[]" value="'          . $field['form_field_id']                           . '" class="formFieldId" />'.
-         '<input type="hidden" name="field_is_heading[]" value="'       . ($field['heading'] != '' ? '1' : '')              . '" class="isHeading" />'.
-         '<input type="hidden" name="field_id[]" value="'               . $field['field_id']                                . '" class="fieldId" />'.
-         '<input type="hidden" name="field_order[]" value="'            . $field['field_id']                                . '" />'.
-         '<input type="hidden" name="field_row[]" value="'              . $field['field_row']                               . '" class="fieldRowFlag" />'.
-         '<input type="hidden" name="field_label[]" value="'            . htmlentities($field['settings']['label'])         . '" class="fieldLabel" />'.
-         '<input type="hidden" name="field_original_label[]" value="'   . htmlentities($field['field_label'])               . '" class="fieldOriginalLabel" />'.
-         '<input type="hidden" name="field_placeholder[]" value="'      . htmlentities($field['settings']['placeholder'])   . '" class="fieldPlaceholder" />'.
-         '<input type="hidden" name="field_preset_value[]" value="'     . htmlentities($field['settings']['preset_value'])  . '" class="fieldPresetValue" />'.
-         '<input type="hidden" name="field_preset_forced[]" value="'    . $field['settings']['preset_forced']               . '" class="fieldPresetForced" />'.
-         '<input type="hidden" name="field_html_id[]" value="'          . htmlentities($field['settings']['html_id'])       . '" class="fieldHtmlId" />'.
-         '<input type="hidden" name="field_html_class[]" value="'       . htmlentities($field['settings']['html_class'])    . '" class="fieldHtmlClass" />'.
-         '<input type="hidden" name="field_extra1[]" value="'           . htmlentities($field['settings']['extra1'])        . '" class="fieldExtra1" />'.
-         '<input type="hidden" name="field_extra2[]" value="'           . htmlentities($field['settings']['extra2'])        . '" class="fieldExtra2" />'.
-         '<input type="hidden" name="field_heading[]" value="'          . htmlentities($field['heading'])                   . '" class="fieldHeading" />'.
-         '<input type="hidden" name="field_separator_type[]" value="'   . htmlentities($field['separator_type'])            . '" class="fieldSeparatorType" />'.
+    // var_dump($field);
+    echo '<input type="hidden" class="removeLink" value="'              . $field['remove_link']                                 . '">'.
+         '<input type="hidden" name="required_'                         . $field['field_name']                                  . '" value="'.$field['is_required'].'" class="fieldRequired" />'.
+         '<input type="hidden" name="form_field_id[]" value="'          . $field['form_field_id']                               . '" class="formFieldId" />'.
+         '<input type="hidden" name="field_is_heading[]" value="'       . ($field['heading'] != '' ? '1' : '')                  . '" class="isHeading" />'.
+         '<input type="hidden" name="field_id[]" value="'               . $field['field_id']                                    . '" class="fieldId" />'.
+         '<input type="hidden" name="field_order[]" value="'            . $field['field_id']                                    . '" />'.
+         '<input type="hidden" name="field_row[]" value="'              . $field['field_row']                                   . '" class="fieldRowFlag" />'.
+         '<input type="hidden" name="field_label[]" value="'            . htmlentities($field['settings']['label'])             . '" class="fieldLabel" />'.
+         '<input type="hidden" name="field_original_label[]" value="'   . htmlentities($field['field_label'])                   . '" class="fieldOriginalLabel" />'.
+         '<input type="hidden" name="field_placeholder[]" value="'      . htmlentities($field['settings']['placeholder'])       . '" class="fieldPlaceholder" />'.
+         '<input type="hidden" name="field_preset_value[]" value="'     . htmlentities($field['settings']['preset_value'])      . '" class="fieldPresetValue" />'.
+         '<input type="hidden" name="field_preset_forced[]" value="'    . $field['settings']['preset_forced']                   . '" class="fieldPresetForced" />'.
+         '<input type="hidden" name="field_html_id[]" value="'          . htmlentities($field['settings']['html_id'])           . '" class="fieldHtmlId" />'.
+         '<input type="hidden" name="field_html_class[]" value="'       . htmlentities($field['settings']['html_class'])        . '" class="fieldHtmlClass" />'.
+         '<input type="hidden" name="field_extra1[]" value="'           . htmlentities($field['settings']['extra1'])            . '" class="fieldExtra1" />'.
+         '<input type="hidden" name="field_extra2[]" value="'           . htmlentities($field['settings']['extra2'])            . '" class="fieldExtra2" />'.
+         '<input type="hidden" name="field_show_in_listing[]" value="'  . $field['settings']['show_in_listing']                 . '" class="fieldShowInListing" />'.
+         '<input type="hidden" name="field_heading[]" value="'          . htmlentities($field['heading'])                       . '" class="fieldHeading" />'.
+         '<input type="hidden" name="field_separator_type[]" value="'   . htmlentities($field['separator_type'])                . '" class="fieldSeparatorType" />'.
          ''
          ;
 }
@@ -236,8 +238,7 @@ $alt = FALSE;
                     <input type="text" id="field-preset-value" />
                 </li>
                 <li>
-                    <label for="">Force Default Value</label>
-                    <input type="checkbox" id="field-preset-forced" />
+                    <input type="checkbox" id="field-preset-forced" /> <label for="field-preset-forced" class="checkbox">Force Default Value</label>
                 </li>
                 <li>
                     <label for="">Field Placeholder</label>
@@ -258,6 +259,9 @@ $alt = FALSE;
                 <li>
                     <label for="">Extra 2</label>
                     <input type="text" id="field-extra2" />
+                </li>
+                <li>
+                    <input type="checkbox" id="field-show-in-listing" /> <label for="field-show-in-listing" class="checkbox">Show in Listing?</label>
                 </li>
             </ul>
         </div>

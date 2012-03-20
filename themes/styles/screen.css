@@ -233,6 +233,13 @@ Form Layout
 	width: 300px;
 }
 
+.field-modifications .checkbox {
+    display: inline-block;
+    padding-left: 10px;
+}
+
+
+
 .section-header {
 	color: #fff;
 	background: #333e46;
