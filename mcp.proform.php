@@ -1453,8 +1453,7 @@ class Proform_mcp {
         $vars['delete_entry_url'] = ACTION_BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=delete_form_entry'.AMP.'form_id='.$form_id;
 
         // Get page of data
-
-        $entries = $form->entries($rownum, $this->perpage);
+        $entries = $form->entries(array(), $rownum, $this->perpage);
         if(!is_array($entries)) $entries = array();
         if($form->encryption_on == 'y')
         {
