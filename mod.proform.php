@@ -180,7 +180,8 @@ class Proform {
         $error_messages     = $this->EE->pl_parser->fetch_param_group('message');
         $step               = $this->EE->TMPL->fetch_param('step', 1);
         $variable_prefix    = $this->EE->TMPL->fetch_param('variable_prefix', '');
-
+        $hidden_fields_mode = strtolower($this->EE->TMPL->fetch_param('hidden_fields_mode', 'split'));
+        
         if(count($error_delimiters) != 2)
         {
             $error_delimiters = array('<div class="error">', '</div>');
@@ -448,8 +449,18 @@ class Proform {
                 //var_dump($variables['steps']);
 
                 // Setup template pair variables
-                $variables['fieldrows'] = $this->create_fields_array($form_obj, $form_session, $field_errors, $field_values, $field_checked_flags, TRUE, FALSE);
-                $variables['fields'] = $this->create_fields_array($form_obj, $form_session, $field_errors, $field_values, $field_checked_flags, FALSE, FALSE);
+                if($hidden_fields_mode == 'split')
+                {
+                    // Do not include any hidden fields in the {fieldrows} and {fields} variables
+                    $variables['fieldrows'] = $this->create_fields_array($form_obj, $form_session, $field_errors, $field_values, $field_checked_flags, TRUE, FALSE);
+                    $variables['fields'] = $this->create_fields_array($form_obj, $form_session, $field_errors, $field_values, $field_checked_flags, FALSE, FALSE);
+                } elseif($hidden_fields_mode == 'hybrid') {
+                    // Include all hidden fields in {fieldrows} and {fields} - using this is not recommended, the new
+                    // default behavior is to only use hidden fields from the {hidden_fields} loop, which is always registered.
+                    $variables['fieldrows'] = $this->create_fields_array($form_obj, $form_session, $field_errors, $field_values, $field_checked_flags, TRUE);
+                    $variables['fields'] = $this->create_fields_array($form_obj, $form_session, $field_errors, $field_values, $field_checked_flags, FALSE);
+                }
+                
                 $variables['hidden_fields'] = $this->create_fields_array($form_obj, $form_session, $field_errors, $field_values, $field_checked_flags, FALSE, TRUE);
 
                 //echo "<pre>";
