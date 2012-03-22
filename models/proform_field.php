@@ -10,6 +10,7 @@ class PL_Field extends PL_RowInitialized
         'mysql' => array(
             'checkbox'      => array('type' => 'varchar', 'constraint' => '90'),
             'date'          => array('type' => 'date', 'constraint' => FALSE),
+            'time'          => array('type' => 'time', 'constraint' => FALSE),
             'datetime'      => array('type' => 'datetime', 'constraint' => FALSE),
             'file'          => array('type' => 'varchar'),
             'string'        => array('type' => 'varchar', 'limit' => 256, 'limit_promote' => 'text'),
@@ -33,7 +34,8 @@ class PL_Field extends PL_RowInitialized
         array('label' => 'Number: Float',               'type' => 'float',                      'icon' => 'float.png'),
         array('label' => 'Number: Currency',            'type' => 'currency',                   'icon' => 'currency.png'),
         array('label' => 'Date',                        'type' => 'date',                       'icon' => 'calendar_view_day.png'),
-        array('label' => 'Date Time',                   'type' => 'datetime',                   'icon' => 'time.png'),
+        array('label' => 'Time',                        'type' => 'time',                       'icon' => 'time.png'),
+        array('label' => 'Date Time',                   'type' => 'datetime',                   'icon' => 'datetime.png'),
         array('label' => 'File Upload',                 'type' => 'file',                       'icon' => 'page_attach.png'),
         array('label' => 'List',                        'type' => 'list',                       'icon' => 'select.png'),
         // array('label' => 'Quantity Group List',         'type' => 'Quantity Group List',         'icon' => 'email_add.png'),
@@ -50,11 +52,11 @@ class PL_Field extends PL_RowInitialized
     var $type = 'string';
     var $length = FALSE;
     var $validation = FALSE;
+    var $placeholder = FALSE;
     var $upload_pref_id = FALSE;
     var $mailinglist_id = FALSE;
     var $settings = array();
     var $reusable = 'n';
-    var $placeholder = FALSE;
 
     function __construct($row=array(), &$mgr=NULL)
     {
@@ -201,4 +203,30 @@ class PL_Field extends PL_RowInitialized
         return $result;
     } // function get_assigned_forms()
 
+    function get_form_field_setting($key, $default = '')
+    {
+        $result = $default;
+        if(array_key_exists($key, $this->form_field_settings) AND trim($this->form_field_settings[$key]) != '')
+        {
+            $result = $this->form_field_settings[$key];
+        }
+        return $result;
+    }
+    
+    function get_property($key, $default = '')
+    {
+        $result = $default;
+        if($this->$key != '')
+        {
+            $result = $this->$key;
+        }
+        return $result;
+    }
+    
+    function get_validation()
+    {
+        // Explode the validation string, and remove any blank values found in it, as well as the 'none'
+        // value used to indicate a lack of validation.
+        return array_filter_values(explode('|', $this->validation), array('none', ''));
+    }
 }

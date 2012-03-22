@@ -64,6 +64,7 @@ class Proform_mcp {
         $this->field_type_options = array(
             'checkbox'      => 'Checkbox',
             'date'          => 'Date',
+            'time'          => 'Time',
             'datetime'      => 'Date and Time',
             'file'          => 'File',
             'string'        => 'String',
@@ -635,8 +636,10 @@ class Proform_mcp {
                 'html_class'    => $this->EE->input->post('field_html_class'),
                 'extra1'        => $this->EE->input->post('field_extra1'),
                 'extra2'        => $this->EE->input->post('field_extra2'),
+                'show_in_listing'        => $this->EE->input->post('field_show_in_listing'),
                 'placeholder'   => $this->EE->input->post('field_placeholder'),
             );
+            // var_dump($this->EE->input->post('field_show_in_listing'));exit;
             $form->set_all_form_field_settings($this->EE->input->post('field_order'), $settings_map);
         }
 
@@ -1450,8 +1453,7 @@ class Proform_mcp {
         $vars['delete_entry_url'] = ACTION_BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=delete_form_entry'.AMP.'form_id='.$form_id;
 
         // Get page of data
-
-        $entries = $form->entries($rownum, $this->perpage);
+        $entries = $form->entries(array(), $rownum, $this->perpage);
         if(!is_array($entries)) $entries = array();
         if($form->encryption_on == 'y')
         {
@@ -1484,6 +1486,8 @@ class Proform_mcp {
         foreach($fields as $field)
         {
             if($field->heading) continue;
+            if($field->get_form_field_setting('show_in_listing', 'n') != 'y') continue;
+            
             $vars['fields'][] = $field->field_name;
 
             if(array_search($field->field_name, $vars['hidden_columns']) === FALSE)

@@ -64,6 +64,11 @@
                     {
                         $row[] = '<a href="'.$edit_entry_url.'&entry_id='.$value.'">'.htmlspecialchars($value).'</a>';
                     } else {
+                        $value = strip_tags($value);
+                        if(strlen($value) > 150)
+                        {
+                            $value = substr($value, 0, 150).'...';
+                        }
                         $row[] = htmlspecialchars($value);
                     }
                 }

@@ -63,9 +63,9 @@ var proform_edit_form_layout = {
             items.each(function() {
                 if(count == 1)
                 {
-                    $(this).width('90%');
+                    $(this).width('90% !important');
                 } else {
-                    $(this).width(80/count+'%');
+                    $(this).width(80/count+'% !important');
                 }
             });
         }
@@ -117,6 +117,8 @@ var proform_edit_form_layout = {
                 $active_field.find('.fieldHtmlClass').val($('#field-html-class').val());
                 $active_field.find('.fieldExtra1').val($('#field-extra1').val());
                 $active_field.find('.fieldExtra2').val($('#field-extra2').val());
+                $active_field.find('.fieldShowInListing').val($('#field-show-in-listing').is(':checked') ? 'y' : 'n');
+                
                 label_updated();
                 default_updated();
             }
@@ -143,6 +145,7 @@ var proform_edit_form_layout = {
                 $('#field-html-class').val($active_field.find('.fieldHtmlClass').val());
                 $('#field-extra1').val($active_field.find('.fieldExtra1').val());
                 $('#field-extra2').val($active_field.find('.fieldExtra2').val());
+                $('#field-show-in-listing').attr('checked', $active_field.find('.fieldShowInListing').val() == 'y');
                 
                 loading_meta = false;
             }
@@ -200,3 +203,4 @@ var proform_edit_form_layout = {
 $(document).ready(function() {
     proform_edit_form_layout.bind_events();
 });
+
