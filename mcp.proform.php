@@ -309,7 +309,7 @@ class Proform_mcp {
     {
         $this->EE->load->library('formslib');
         // returns an array of preferences as name => value pairs
-        $prefs = $this->EE->formslib->prefs_mgr->get_preferences();
+        $prefs = $this->EE->formslib->prefs->get_preferences();
         foreach($prefs as $pref => $existing_value)
         {
             $f_name = 'pref_' . $pref;
@@ -319,13 +319,13 @@ class Proform_mcp {
                 if($value)
                 {
                     $value = $this->EE->input->post($f_name);
-                    $this->EE->formslib->prefs_mgr->set($pref, $value);
+                    $this->EE->formslib->prefs->set($pref, $value);
                 } else {
                     switch($f_name)
                     {
                         case 'pref_safecracker_integration_on':
                         case 'pref_safecracker_separate_channels_on':
-                            $this->EE->formslib->prefs_mgr->set($pref, 'n');
+                            $this->EE->formslib->prefs->set($pref, 'n');
                     }
                 }
             }
