@@ -109,6 +109,8 @@ var pl_grid = {
         });
         
         $('form.generic_edit').unbind('submit').submit(function() {
+            proform_mod.dirty = false;
+            
             $(this).find('.pl_grid').each(function() {
                 var key = $(this).attr('data-key');
                 var val = '';
