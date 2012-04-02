@@ -1,3 +1,7 @@
+{!--* DO NOT MODIFY THIS FILE!
+    * This file will be replace when you upgrade ProForm. Instead of modifying this template, you should create your
+    * own embed template with this code as a starting point and use that embed instead of the {exp:proform:simple} tag.
+    *--}
 
 {exp:proform:form form_name="{embed:form_name}" form_class="proform {embed:form_name}_proform" variable_prefix="pf_" debug="yes"}
 
@@ -13,7 +17,6 @@
     <input type="hidden" name="_pf_goto_step" value="" />
 
     <ul class="pf_steps">
-        <!-- These comments prevent whitespace in layouts that may not use Reset CSS.-->
         {pf_steps}
             <li><a href="#{pf_step_no}" class="pf_step {pf_step_active}">{pf_step}</a></li>
         {/pf_steps}
@@ -71,7 +74,6 @@
                     <div class="pf_files">
                         <input name="{pf_field_name}[]" id="{pf_field_name}" type="file" class="{pf_field_is_required}" />
                     </div>
-                    <a href="#" class="pf_add_file">Add Additional File</a>
                 {if:elseif pf_field_type == "checkbox"}
                     <div class="pf_field">
                         <div class="pf_option">

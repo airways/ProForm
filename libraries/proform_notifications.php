@@ -279,7 +279,7 @@ class Proform_notifications
             // $subject = $this->EE->parser->parse_string($subject, $data, TRUE);
 
             $message = $this->EE->pl_parser->parse_variables_ex(array(
-                'rowdata' => $message,
+                'rowdata' => $template,
                 'row_vars' => $data,
                 'pairs' => $this->var_pairs,
             ));
