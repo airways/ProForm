@@ -6,14 +6,26 @@
 
 <ul>
     <li>{exp:proform:simple} - the <kbd>Simple Form Tag</kbd> - this tag allows you to render any form with one line of code</li>
-    <li>{exp:proform:full} - the <kbd>Full Form Tag</kbd> - this tag allows you to custom markup for any form</li>
+    <li>{exp:proform:full} - the <kbd>Full Form Tag</kbd> - this tag allows you to customize the markup and behavior rendered forms</li>
 </ul>
 
 <!-- ********************************************************************** -->
 
-<h2>Simple Tag</h2>
+<h2>Contents</h2>
+<ul>
+    <li><a href="#simple">Simple Form Tag</a></li>
+    <li><a href="#full">Full Form Tag</a></li>
+</ul>
+
+<!-- ********************************************************************** -->
+
+<h2><a name="simple">Simple Tag</a></h2>
 
 <p>The <kbd>Simple Form Tag</kbd> - <b>{exp:proform:simple}</b> - allows you to render a complete form built through the drag and drop interface with a single line of template code.</p>
+
+
+<p>In fact, the <kbd>Simple Form Tag</kbd> actually calls the <kbd>Full Form Tag</kbd> behind the scenes to generate it's markup. <dfn>ProForm</dfn> will never force any particular markup on you - you should have full control over the layout and implementation of your forms, if you so desire. At the same time, we provide the default markup in order to allow a easier time getting started with the add-on if your design does not require a custom layout.</p>
+
 
 <ul>
     <li><a href="#simple_parameters">Parameters</a></li>
@@ -28,22 +40,22 @@
     <li><a href="#param_form">form="contact_us"</a></li>
 </ul>
 
-<h2><a name="simple_variables">Simple Tag - Variables</a></h2>
+<h2><a name="simple_variables">Variables</a></h2>
 
 <p>The <kbd>Simple Form Tag</kbd> supports the same  <a href="#variables">Single Variables</a> and <a href="#variable_pairs">Variables Pairs</a> supported by the full tag.</p>
 
-<h2><a name="simple_sample">Simple Tag - Sample Template Code</a></h2>
+<h2><a name="simple_sample">Sample Template Code</a></h2>
 
 <p>Using the <kbd>Simple Form Tag</kbd> couldn't be easier:</p>
 
 <p class="strongbox">Example Template</p>
 <pre class="brush: xml">
-&#123;exp:proform:simple form_name="contact_us" &#125;
+&#123;exp:proform:simple form="contact_us" &#125;
 </pre>
 
-<p>That's it! You're done. If you'd like more control over the markup of the template, you can make use of the full template tag.</p>
+<p>That's it! You're done. If you'd like more control over the markup of the template, you can make use of the <kbd>Full Form tag</kbd>.</p>
 
-<h2>Full Tag</h2>
+<h2><a name="full">Full Form Tag</a></h2>
 <p>The <kbd>Full Form Tag</kbd> - <b>{exp:proform:form}</b> - provides you with precise tools to control the exact HTML produced for your forms built through ProForm. Like the Simple Tag, it is capable of rendering any form created through the drag and drop interface.</p>
 
 <ul>
@@ -66,12 +78,7 @@
     <li><a href="#param_error_url">error_url="forms/contact-us/error"</a></li>
     <li><a href="#param_thank_you_url">thank_you_url="forms/thank-you"</a></li>
     <li><a href="#param_notify">notify="sample@example.com"</a></li>
-    <li><a href="#param_custom">Custom Params</a>
-        <ul>
-            <li><a href="#param_download_url">download_url="downloads/confirm"</a></li>
-            <li><a href="#param_download_label">download_label="Download available"</a></li>
-        </ul>
-    </li>
+    <li><a href="#param_custom">Custom Params</a></li>
 </ul>
 
 <h3><a name="param_form">form="contact_us"</a></h3>
@@ -133,14 +140,6 @@
 <p>Any additional params sent to the <kbd>Form Tag</kbd> will be packed into the form configuration value and sent along with the rest of the form&#39;s data when it is submitted. This is a secure way to pass additional information to the thank you or error templates.</p>
 
 <p>The next two parameters in particular are specifically handled in a way to allow you to create form that act as a gate for a file download.</p>
-
-<h3><a name="param_download_url">download_url="downloads/confirm"</a></h3>
-
-<p>This documentation section is still under development.</p>
-
-<h3><a name="param_download_label">download_label="Download available"</a></h3>
-
-<p>This documentation section is still under development.</p>
 
 <!-- ********************************************************************** -->
 <h2><a name="variables">Single Variables</a></h2>

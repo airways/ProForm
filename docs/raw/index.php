@@ -43,8 +43,12 @@
 
 <h3>Tags</h3>
 <ul>
-    <li><a href="{root_url}tags/form.html#simple">Simple Form Tag</a></li>
-    <li><a href="{root_url}tags/form.html#full">Full Form Tag</a></li>
+    <li><a href="{root_url}tags/form.html">Form Tags</a></li>
+        <ul>
+            <li><a href="{root_url}tags/form.html#simple">Simple Form Tag</a></li>
+            <li><a href="{root_url}tags/form.html#full">Full Form Tag</a></li>
+        </ul>
+    </li>
     <li><a href="{root_url}tags/results.html">Results Tag</a></li>
     <li><a href="{root_url}tags/entries.html">Entries Tag</a></li>
 </ul>

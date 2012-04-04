@@ -60,14 +60,13 @@
 <h2><a name="form_settings">Form Settings</a></h2>
 <p>After creating a new form, the same settings that are set when it is initially created can be updated at any time by clicking the <kbd>Edit Settings</kbd> link on the form listing.</p>
 <p>The following settings are available for the various types of forms.</p>
+<p>Certain options are only available in one Form Type or the other, as noted in the <b>Form Types</b> column.</p>
 <h4><a name="form_settings_basic">Basic Settings</a></h4>
 <table>
     <tbody>
         <tr>
-            <th width="170">
-                Field</th>
-            <th width="90">
-                Form Types</th>
+            <th width="170">Option</th>
+            <th width="90">Form Types</th>
             <th>
                 Description</th>
         </tr>
@@ -82,18 +81,18 @@
             <td>Similar in concept to a "channel" name - used in templates to indicate what form&#39;s information is to be retrieved in order to render the form, or to list it&#39;s entries.</td>
         </tr>
         <tr>
-            <td><b>Encrypt Data</b></td>
-            <td>Basic Only</td>
-            <td>Turns database encryption on or off for the current form. Note that this option cannot be changed after data has been entered into the form&#39;s entries.<br />
-                <br />
-                Encryption comes in two flavors - a simple and insecure XOR technique and a more secure method based on the Mcrypt extension, which must be installed. The default is the insecure XOR unless you have Mcrypt installed and have set a secure encryption key in your <dfn>config.php</dfn> file. Please refer to the CodeIgniter reference&#39;s warnings about their encryption class for more details and instructions for how to set your encryption key:<br />
-                <br />
-                <a href="http://codeigniter.com/user_guide/libraries/encryption.html">http://codeigniter.com/user_guide/libraries/encryption.html</a><br />
-                <br />
-                (The config file is usually located at <dfn>system/expressionengine/config/config.php</dfn> instead of the location noted on that page.)</td>
+            <td><b>Reply-To Address</b></td>
+            <td>Basic, Share</td>
+            <td>Optional email address to use in the Reply-To header for all notifications sent from this form. If not provided, the global <a href="./../cp/settings.html">Module Setting</a> of the same name will be used instead.</td>
+        </tr>
+        <tr>
+            <td><b>Reply-To Name</b></td>
+            <td>Basic, Share</td>
+            <td>Optional name to use in the Reply-To header for all notifications sent from this form. If not provided, the global <a href="./../cp/settings.html">Module Setting</a> of the same name will be used instead.</td>
         </tr>
     </tbody>
 </table>
+<p>Additionally there are some <a href="./../cp/forms/advanced-settings.html">Advanced Settings</a> available.</p>
 <h4>
     <a name="form_settings_notification_list">Notification List Settings</a></h4>
 <p>
@@ -128,12 +127,20 @@
             <td>Basic, Share</td>
             <td>The subject line of the notification email. This line is rendered as an ExpressionEngine template, and therefore can use conditionals and plugins in addition to the variables available in <a href="http://localhost/index.php/documentation/proform/notifications">Notification Templates</a>.</td>
         </tr>
+        <tr>
+            <td><b>Reply-To Field</b></td>
+            <td>Basic, Share</td>
+            <td>This option can be set to the name of a field, the value of which will be used as the notification's email address in the Reply-To header. This means that any recipient of the notification will automatically be able to reply to the email address entered into this field in the form.<br/><br/>
+                For instance, often times this option would be set to a field filled out by the visitor such as <b>my_email_address</b>. Whatever value is entered by the user would then be set as the Reply-To for the notifications. Assuming that the Notification List is sent to a customer service rep, or other person who would like to easily contact the submitter of the form, they can simply use their email client's <b>Reply</b> command to compose a new return message directly to the visitor.</td>
+        </tr>
     </tbody>
 </table>
 <h4>
     <a name="form_settings_notification_fields">Notification Field Settings - A and B</a></h4>
 <p>
     There are two groups of Notification Field Settings available for each form. Using a Notification Field allows the destination for your notifications to be entered by the visitor when they fill out the form.</p>
+<p>These notification settings are useful in a situation where you want to provide a pre-set list of available contact addresses, and ask the user to pick one of these options. By specifying the field which contains these options as the Notification Field Setting's <b>Email Field</b> option, you will then get a notification sent only to that individual address.</p>
+<p>This is different from the Notification List settings above, in that the entire list of addresses specified on the Notification List always receive the notification - while there is only ever <b>one</b> recipient of a notification sent from a Notification Field. Another difference is that the Notification List uses a static list of addresses defined on the form's settings, while Notification Fields take their options form a field instead.</p>
 <p class="important">
     <strong>Warning</strong> Keep in mind that this feature provides what is essentially an open relay, which can allow anyone to send a message to any email address. It&#39;s very important that all forms that send notifications to addresses specified through a Notification Field have a CAPTCHA or other mechanisms in place to prevent the sending of spam.</p>
 <table>
@@ -166,6 +173,12 @@
             <td>Basic, Share</td>
             <td>The email address to send notifications to will be taken from this field in the form.</td>
         </tr>
+        <tr>
+            <td><b>Reply-To Field</b></td>
+            <td>Basic, Share</td>
+            <td>This option can be set to the name of a field, the value of which will be used as the notification's email address in the Reply-To header. This means that any recipient of the notification will automatically be able to reply to the email address entered into this field in the form.<br/><br/>
+                For instance, often times this option would be set to a field filled out by the visitor such as <b>my_email_address</b>. Whatever value is entered by the user would then be set as the Reply-To for the notifications. Assuming that the Notification Field is used to specify a particular customer service rep or department to send this notification to, that person can simply use their email client's <b>Reply</b> command to compose a new return message directly to the visitor.</td>
+        </tr>
     </tbody>
 </table>
 <h2><a name="layout">Form Layout</a></h2>
@@ -189,7 +202,7 @@
 <h3><a name="layout_adding_fields">Adding a Field</a></h3>
 <p>To add a new field to the form, click the type of the field you wish to create in the <kbd>Toolbox</kbd> under the <kbd>Add an Item</kbd> tab on the right side of the layout screen.</p>
 <p>This will bring you directly to the <a href="./../cp/fields.html#create_field">New Field</a> page, and return you to the form's layout after adding the field to the form.</p>
-<h3><a name="layoutfield_overrides">Field Overrides</a></h4>
+<h3><a name="layout_field_overrides">Field Overrides</a></h4>
 <p>Certain values can be overridden for each field on the form. To set a field&#39;s overridden values, click on the field to select it. The Edit Field box on the right will then display the field&#39;s current override values.</p>
 <h4>Field Override Values</h4>
 <table>
@@ -238,6 +251,7 @@
 <p>Note that only fields that are not already assigned to the form will be listed in the <kbd>Library</kbd>.</p>
 <h3><a name="layout_adding_headings">Adding a Heading</a></h3>
 <p>Adding a heading to a form layout is very similar to adding a field. To add a new heading to a form, first click the form's <b>Edit Layout</b> link from the form listing (or click the form's <b>Layout</b> tab if you already have the form open). Then, scroll down in the <kbd>Toolbox</kbd> to the <kbd>Special</kbd> section and click the <b>Heading</b> button.</p>
+<p>After adding a heading, it can be moved around the form layout similarly to a field. Simply click the heading to select it, then drag to move it to a new position. To edit a heading, click its <b>Edit</b> link after selecting it.</p>
 <p>Each heading contains a single configuration value:</p>
 <table>
     <tbody>
@@ -249,7 +263,26 @@
         <tr>
             <td>Heading Label</td>
             <td>{heading}</td>
-            <td>The value to use as the heading's text.</td>
+            <td>The value to use as the heading's text. In the sample template and the markup generated by the <kbd>Simple Form Tag</kbd>, headings are added as &lt;h3&gt; HTML elements.</td>
+        </tr>
+    </tbody>
+</table>
+<h2><a name="multistep">Multistep Forms</a></h2>
+<p><dfn>ProForm</dfn> profiles the capability to build multistep forms. Separating a form into multiple steps is extremely simple, and very similar to use the previously discusses headings.</p>
+<p>Adding a step to a form is similar to adding a heading or a field. To add a new step in a form, first click the form's <b>Edit Layout</b> link from the form listing (or click the form's <b>Layout</b> tab if you already have the form open). Then, scroll down in the <kbd>Toolbox</kbd> to the <kbd>Special</kbd> section and click the <b>Step</b> button.</p>
+<p>After adding a step, it can be moved around the form layout similarly to a field. Moving the step around the layout splits the form into different sized steps. To move a step (and therefore move fields between them into different steps), simply click the step to select it, then drag to move it to a new position. To edit a step, click its <b>Edit</b> link after selecting it.</p>
+<p>Step options:</p>
+<table>
+    <tbody>
+        <tr>
+            <th width="170">Name</th>
+            <th>Template Var</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>Step Label</td>
+            <td>{step}</td>
+            <td>The value to use as the step's text. In the sample template and the markup generated by the <kbd>Simple Form Tag</kbd>, each step is represented as a tab.</td>
         </tr>
     </tbody>
 </table>
