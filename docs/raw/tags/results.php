@@ -1,46 +1,17 @@
----
-entry_id: '35'
-site_id: '1'
-channel_id: '4'
-author_id: '1'
-pentry_id: '0'
-forum_topic_id: null
-ip_address: 75.73.88.195
-title: 'Results Tag'
-url_title: proform-results-tag
-status: open
-versioning_enabled: y
-view_count_one: '0'
-view_count_two: '0'
-view_count_three: '0'
-view_count_four: '0'
-allow_comments: y
-sticky: n
-entry_date: '1329698521'
-dst_enabled: n
-year: '2012'
-month: '02'
-day: '19'
-expiration_date: '0'
-comment_expiration_date: '0'
-edit_date: '20120219171303'
-recent_comment_date: '0'
-comment_total: '0'
-last_written: '0'
-fe_type: entry
----
+{ce:core:include template="global/_header"}
+
 <h1>Results Tag</h1>
 
 <p>The <kbd>Results Tag</kbd> allows display of a thank you message along with the submitted data from a form.</p>
 
 <!-- ********************************************************************** -->
 <h2>
-	Contents</h2>
+    Contents</h2>
 <ul>
-	<li><a href="#parameters">Parameters</a></li>
-	<li><a href="#variables">Variables</a></li>
-	<li><a href="#variable_pairs">Variable Pairs</a></li>
-	<li><a href="#sample_template_code">Sample Template</a></li>
+    <li><a href="#parameters">Parameters</a></li>
+    <li><a href="#variables">Variables</a></li>
+    <li><a href="#variable_pairs">Variable Pairs</a></li>
+    <li><a href="#sample_template_code">Sample Template</a></li>
 </ul>
 <!-- ********************************************************************** -->
 
@@ -94,3 +65,5 @@ fe_type: entry
     &#123;/if&#125;
 &#123;/exp:proform:results&#125;
 </pre>
+
+{ce:core:include template="global/_footer"}

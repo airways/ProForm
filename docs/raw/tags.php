@@ -10,7 +10,6 @@
         </ul>
     </li>
     <li><a href="{root_url}tags/entries.html">Entries Tag</a></li>
-    <li><a href="{root_url}tags/insert.html">Insert Tag</a> <i>(docs coming soon)</i></li>
 </ul>
 
 {ce:core:include template="global/_footer"}
