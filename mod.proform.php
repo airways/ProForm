@@ -130,9 +130,9 @@ class Proform {
         // We need to remove any EE comments since they will not be handled correctly if they are left in place
         // (the template parser has already removed normal comments before the simple() tag we're processing was
         // called).
-        $output = preg_replace('/\{\!--.*?--\}/s', '', $prefix.$template);
-        // echo htmlentities($output);exit;
-        
+        //$output = preg_replace('/\{\!--.*?--\}/s', '', $prefix.$template);
+        $output = $prefix.$template;
+        //echo htmlentities($output);exit;
         // Return the template code so the parser can handle it as if the developer had inserted it directly
         // into the template
         return $output;
@@ -1205,7 +1205,7 @@ class Proform {
 
                     if($this->EE->input->is_ajax_request())
                     {
-                        $entry_data['status'] = 'success';
+                        $entry_data->status = 'success';
                         $this->EE->output->send_ajax_response($entry_data);
                         exit;
                     } else {
