@@ -188,103 +188,122 @@ value : label&#10;value</pre>
 
 <p><dfn>ProForm</dfn> provides a robust set of validation rules and filtering operations. This system is based on the <a href="http://codeigniter.com/user_guide/libraries/form_validation.html">Form Validation Class</a> provided by CodeIgniter.</p>
 
-<h4>Validation Rules</h4>
-<p>The following validation rules can be applied to a field.</p>
+<h4><a name="validation_rules">Validation Rules</a></h4>
+<p>The following validation rules can be applied to a field. The <b>key</b> column specifies what key should be used with other features such as the <a href="{root_url}tags/form.html#param_message">message:*=""</a> param of the <kbd>Full Form Tag</kbd>.</p>
 
 <table>
     <tbody>
         <tr>
             <th>Rule</th>
+            <th>Key</th>
             <th>Description</th>
             <th>Requires Param</th>
         </tr>
         <tr>
             <td>Always Required</td>
+            <td>required</td>
             <td>Marks the field as required on all forms that it is used on.</td>
             <td>None</td>
         </tr>
         <tr>
             <td>Matches Value</td>
+            <td>matches_value</td>
             <td>Fails if the field&#39;s value does not match the value specified.</td>
             <td>Value</td>
         </tr>
         <tr>
             <td>Matches Field</td>
+            <td>matches</td>
             <td>Fails if the field&#39;s value does not match the value of another field.</td>
             <td>Field name</td>
         </tr>
         <tr>
             <td>Min Length</td>
+            <td>min_length</td>
             <td>Fails if the field&#39;s value is not of the required length.</td>
             <td>Length</td>
         </tr>
         <tr>
             <td>Max Length</td>
+            <td>max_length</td>
             <td>Fails if the field&#39;s value is longer than the set length.</td>
             <td>Length</td>
         </tr>
         <tr>
             <td>Exact Length</td>
+            <td>exact_length</td>
             <td>Fails if the field&#39;s value is shorter or longer than the set length.</td>
             <td>Length</td>
         </tr>
         <tr>
             <td>Alpha Characters Only</td>
+            <td>alpha</td>
             <td>Fails if any characters not in the alphabet are used in the field&#39;s value.</td>
             <td>None</td>
         </tr>
         <tr>
             <td>Alpha Numeric Characters Only</td>
+            <td>alphanumeric</td>
             <td>Fails if any characters not in the alphabet or the counting numbers (0-9) are used in the field&#39;s value.</td>
             <td>None</td>
         </tr>
         <tr>
             <td>Alpha Numeric Characters, Underscores and Dashes Only</td>
+            <td>alpha_dash</td>
             <td>Fails if any characters not in the alphabet, the counting numbers (0-9), or underscores (_) or dashes (-) are used in the field&#39;s value.</td>
             <td>None</td>
         </tr>
         <tr>
             <td>Numeric Characters Only</td>
+            <td>numeric</td>
             <td>Fails if any characters other than the counting numbers (0-9) are used in the field&#39;s value.</td>
             <td>None</td>
         </tr>
         <tr>
             <td>Numeric Characters and Dashes Only</td>
+            <td>numeric_dash</td>
             <td>Fails if any characters other than the counting numbers (0-9), or dashes (-) are used in the field&#39;s value.</td>
             <td>None</td>
         </tr>
         <tr>
             <td>Integer Number</td>
+            <td>integer</td>
             <td>Fails if the field&#39;s value is not an integer number.</td>
             <td>None</td>
         </tr>
         <tr>
             <td>Natural Number</td>
+            <td>is_natural</td>
             <td>Fails if the field&#39;s value is not a natural number.</td>
             <td>None</td>
         </tr>
         <tr>
             <td>Natural Number other than zero</td>
+            <td>is_natural_no_zero</td>
             <td>Fails if the field&#39;s value is not a natural number above or below zero.</td>
             <td>None</td>
         </tr>
         <tr>
             <td>Valid E-mail Address</td>
+            <td>valid_email</td>
             <td>Fails if the field&#39;s value is not a properly formatted email address.</td>
             <td>None</td>
         </tr>
         <tr>
             <td>Valid E-mail Addresses separated by commas</td>
+            <td>valid_emails</td>
             <td>Fails if the field&#39;s value is not list of one or more properly formatted email address separated by commas.</td>
             <td>None</td>
         </tr>
         <tr>
             <td>Valid IP Address</td>
+            <td>valid_ip</td>
             <td>Fails if the field&#39;s value is not a properly formatted IPv4 dotted decimal address.</td>
             <td>None</td>
         </tr>
         <tr>
             <td>Valid Base 64 Encoded Value</td>
+            <td>valid_base64</td>
             <td>Fails if the value is not a valid Base 64 value.</td>
             <td>None</td>
         </tr>

@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
     <title>ProForm Docs - Form Management</title>
     <link rel="stylesheet" media="screen, projection" href="./../assets/styles/reset.css" />
@@ -47,11 +48,12 @@
     <li><a href="#delete_form">Deleting a Form</a></li>
 </ul>
 <h2><a name="create_form">Creating a New Form</a></h2>
-<p>To create a new form, use the <kbd>Create a Form</kbd> drop down menu to select one of the available types.</p>
+<p>To create a new form, use the <kbd>Create a Form</kbd> drop down menu to select one of the available types:</p>
 <ul>
     <li>Basic Form</li>
     <li>Share Form</li>
 </ul>
+<br/>
 <p>When you create either type of form you will be asked to specify various settings settings as listed in the <a href="#form_settings">Form Settings</a> section.</p>
 <h3>Basic Form</h3>
 <p>A Basic Form is used to create typical contact forms and other forms that save their data into the database. This data can be encrypted, and notification of new entries can be sent to various locations.</p>
@@ -60,124 +62,120 @@
 <h2><a name="form_settings">Form Settings</a></h2>
 <p>After creating a new form, the same settings that are set when it is initially created can be updated at any time by clicking the <kbd>Edit Settings</kbd> link on the form listing.</p>
 <p>The following settings are available for the various types of forms.</p>
-<p>Certain options are only available in one Form Type or the other, as noted in the <b>Form Types</b> column.</p>
+<p>These basic settings are available to all types of forms.</p>
 <h4><a name="form_settings_basic">Basic Settings</a></h4>
 <table>
     <tbody>
         <tr>
-            <th width="170">Option</th>
-            <th width="90">Form Types</th>
-            <th>
-                Description</th>
+            <th width="20%">Option</th>
+            <th>Description</th>
+            <th width="20%">Example Value</th>
         </tr>
         <tr>
-            <td><b>Full Form Name</b></td>
-            <td>Basic, Share</td>
+            <td><strong>Full Form Name</strong></td>
             <td>Human friendly form name, used in UI and likely displayed on your website.</td>
+            <td>Contact Us</td>
         </tr>
         <tr>
-            <td><b>Form Short Name</b></td>
-            <td>Basic, Share</td>
+            <td><strong>Form Short Name</strong></td>
             <td>Similar in concept to a "channel" name - used in templates to indicate what form&#39;s information is to be retrieved in order to render the form, or to list it&#39;s entries.</td>
+            <td>contact_us</td>
         </tr>
         <tr>
-            <td><b>Reply-To Address</b></td>
-            <td>Basic, Share</td>
+            <td><strong>Reply-To Address</strong></td>
             <td>Optional email address to use in the Reply-To header for all notifications sent from this form. If not provided, the global <a href="./../cp/settings.html">Module Setting</a> of the same name will be used instead.</td>
+            <td>noreply@example.com</td>
         </tr>
         <tr>
-            <td><b>Reply-To Name</b></td>
-            <td>Basic, Share</td>
+            <td><strong>Reply-To Name</strong></td>
             <td>Optional name to use in the Reply-To header for all notifications sent from this form. If not provided, the global <a href="./../cp/settings.html">Module Setting</a> of the same name will be used instead.</td>
+            <td>Example Co. Notifications</td>
         </tr>
     </tbody>
 </table>
 <p>Additionally there are some <a href="./../cp/forms/advanced-settings.html">Advanced Settings</a> available.</p>
-<h4>
-    <a name="form_settings_notification_list">Notification List Settings</a></h4>
-<p>
-    The Notification List is a preconfigured list of email addresses to send notifications to. It has the following settings for each form.</p>
+<h4><a name="form_settings_notification_list">Notification List Settings</a></h4>
+<p>The Notification List is a preconfigured list of email addresses to send notifications to.</p>
+<p>When a new entry is submitted to the form, each of the addresses in the Notification List will be sent a separate email message, generated from the selected template. The Notification List is available to all types of forms.</p>
+<p>The Notification List has the following settings for each form.</p>
 <table>
     <tbody>
         <tr>
-            <th width="170">
-                Field</th>
-            <th width="90">
-                Form Types</th>
-            <th>
-                Description</th>
+            <th width="20%">Field</th>
+            <th>Description</th>
+            <th width="20%">Example Value</th>
         </tr>
         <tr>
-            <td><b>Enable Notification List</b></td>
-            <td>Basic, Share</td>
+            <td><strong>Enable Notification List</strong></td>
             <td>Turns the Notification List on or off. Notifications to the listed addresses will not be sent if this option is not checked.</td>
+            <td>n/a</td>
         </tr>
         <tr>
-            <td><b>Notification Template</b></td>
-            <td>Basic, Share</td>
+            <td><strong>Notification Template</strong></td>
             <td>ExpressionEngine Template used to render the emails sent to the Notification List. The available templates are listed from the Notification Template Group selected in <a href="http://localhost/index.php/documentation/proform/cp/settings">Module Settings</a>. For more information about what tags are available in a notification template, see <a href="http://localhost/index.php/documentation/proform/notifications">Notification Templates</a>.</td>
+            <td>n/a</td>
         </tr>
         <tr>
-            <td><b>Notification List</b></td>
-            <td>Basic, Share</td>
+            <td><strong>Notification List</strong></td>
             <td>List of email addresses to send this notification to. This constitutes the actual Notification List itself. List each email address to send the notification to on it&#39;s own line.</td>
+            <td>admin@example.com<br/>
+                support@example.com<br/>
+                jdoe@example.com<br/>
+            </td>
         </tr>
         <tr>
-            <td><b>Subject</b></td>
-            <td>Basic, Share</td>
+            <td><strong>Subject</strong></td>
             <td>The subject line of the notification email. This line is rendered as an ExpressionEngine template, and therefore can use conditionals and plugins in addition to the variables available in <a href="http://localhost/index.php/documentation/proform/notifications">Notification Templates</a>.</td>
+            <td>New submission to form: {form_name}</td>
         </tr>
         <tr>
-            <td><b>Reply-To Field</b></td>
-            <td>Basic, Share</td>
+            <td><strong>Reply-To Field</strong></td>
             <td>This option can be set to the name of a field, the value of which will be used as the notification's email address in the Reply-To header. This means that any recipient of the notification will automatically be able to reply to the email address entered into this field in the form.<br/><br/>
-                For instance, often times this option would be set to a field filled out by the visitor such as <b>my_email_address</b>. Whatever value is entered by the user would then be set as the Reply-To for the notifications. Assuming that the Notification List is sent to a customer service rep, or other person who would like to easily contact the submitter of the form, they can simply use their email client's <b>Reply</b> command to compose a new return message directly to the visitor.</td>
+                For instance, often times this option would be set to a field filled out by the visitor such as <strong>my_email_address</strong>. Whatever value is entered by the user would then be set as the Reply-To for the notifications. Assuming that the Notification List is sent to a customer service rep, or other person who would like to easily contact the submitter of the form, they can simply use their email client's <strong>Reply</strong> command to compose a new return message directly to the visitor.</td>
+            <td>submitter_email_address</td>
         </tr>
     </tbody>
 </table>
 <h4>
     <a name="form_settings_notification_fields">Notification Field Settings - A and B</a></h4>
-<p>
-    There are two groups of Notification Field Settings available for each form. Using a Notification Field allows the destination for your notifications to be entered by the visitor when they fill out the form.</p>
-<p>These notification settings are useful in a situation where you want to provide a pre-set list of available contact addresses, and ask the user to pick one of these options. By specifying the field which contains these options as the Notification Field Setting's <b>Email Field</b> option, you will then get a notification sent only to that individual address.</p>
-<p>This is different from the Notification List settings above, in that the entire list of addresses specified on the Notification List always receive the notification - while there is only ever <b>one</b> recipient of a notification sent from a Notification Field. Another difference is that the Notification List uses a static list of addresses defined on the form's settings, while Notification Fields take their options form a field instead.</p>
+<p>There are two groups of Notification Field Settings available for each form. Using a Notification Field allows the destination for your notifications to be entered by the visitor when they fill out the form.</p>
+<p>These notification settings are useful in a situation where you want to provide a pre-set list of available contact addresses, and ask the user to pick one of these options. By specifying the field which contains these options as the Notification Field Setting's <strong>Email Field</strong> option, you will then get a notification sent only to that individual address.</p>
+<p>This is different from the Notification List settings above, in that the entire list of addresses specified on the Notification List always receive the notification - while there is only ever <strong>one</strong> recipient of a notification sent from a Notification Field. Another difference is that the Notification List uses a static list of addresses defined on the form's settings, while Notification Fields take their options form a field instead.</p>
+<p>Notification Field settings are available to all types of forms.</p>
 <p class="important">
     <strong>Warning</strong> Keep in mind that this feature provides what is essentially an open relay, which can allow anyone to send a message to any email address. It&#39;s very important that all forms that send notifications to addresses specified through a Notification Field have a CAPTCHA or other mechanisms in place to prevent the sending of spam.</p>
 <table>
     <tbody>
         <tr>
-            <th width="170">
-                Field</th>
-            <th width="90">
-                Form Types</th>
-            <th>
-                Description</th>
+            <th width="20%">Field</th>
+            <th>Description</th>
+            <th width="20%">Example Value</th>
         </tr>
         <tr>
-            <td><b>Enable Group</b></td>
-            <td>Basic, Share</td>
+            <td><strong>Enable Group</strong></td>
             <td>Turns the Notification Field on or off. Notifications to the addresses provided in the Email Field will not be sent if this option is not checked.</td>
+            <td>&nbsp;</td>
         </tr>
         <tr>
-            <td><b>Template</b></td>
-            <td>Basic, Share</td>
+            <td><strong>Template</strong></td>
             <td>ExpressionEngine Template used to render the emails sent to the specified email address. The available templates are listed from the Notification Template Group selected in <a href="http://localhost/index.php/documentation/proform/cp/settings">Module Settings</a>. For more information about what tags are available in a notification template, see <a href="http://localhost/index.php/documentation/proform/notifications">Notification Templates</a>.</td>
+            <td>&nbsp;</td>
         </tr>
         <tr>
-            <td><b>Subject</b></td>
-            <td>Basic, Share</td>
+            <td><strong>Subject</strong></td>
             <td>The subject line of the notification email. This line is rendered as an ExpressionEngine template, and therefore can use conditionals and plugins in addition to the variables available in <a href="http://localhost/index.php/documentation/proform/notifications">Notification Templates</a>.</td>
+            <td>Thank you for submitting the {form_name} form</td>
         </tr>
         <tr>
-            <td><b>Email Field</b></td>
-            <td>Basic, Share</td>
+            <td><strong>Email Field</strong></td>
             <td>The email address to send notifications to will be taken from this field in the form.</td>
+            <td>select_department</td>
         </tr>
         <tr>
-            <td><b>Reply-To Field</b></td>
-            <td>Basic, Share</td>
+            <td><strong>Reply-To Field</strong></td>
             <td>This option can be set to the name of a field, the value of which will be used as the notification's email address in the Reply-To header. This means that any recipient of the notification will automatically be able to reply to the email address entered into this field in the form.<br/><br/>
-                For instance, often times this option would be set to a field filled out by the visitor such as <b>my_email_address</b>. Whatever value is entered by the user would then be set as the Reply-To for the notifications. Assuming that the Notification Field is used to specify a particular customer service rep or department to send this notification to, that person can simply use their email client's <b>Reply</b> command to compose a new return message directly to the visitor.</td>
+                For instance, often times this option would be set to a field filled out by the visitor such as <strong>my_email_address</strong>. Whatever value is entered by the user would then be set as the Reply-To for the notifications. Assuming that the Notification Field is used to specify a particular customer service rep or department to send this notification to, that person can simply use their email client's <strong>Reply</strong> command to compose a new return message directly to the visitor.</td>
+            <td>submitter_email_address</td>
         </tr>
     </tbody>
 </table>
@@ -250,8 +248,8 @@
 <p>To edit a field from the library, click it's <kbd>Edit...</kbd> button. This allows you to modify the field's settings, applying all of those changes to each form that uses the field from a single place.</p>
 <p>Note that only fields that are not already assigned to the form will be listed in the <kbd>Library</kbd>.</p>
 <h3><a name="layout_adding_headings">Adding a Heading</a></h3>
-<p>Adding a heading to a form layout is very similar to adding a field. To add a new heading to a form, first click the form's <b>Edit Layout</b> link from the form listing (or click the form's <b>Layout</b> tab if you already have the form open). Then, scroll down in the <kbd>Toolbox</kbd> to the <kbd>Special</kbd> section and click the <b>Heading</b> button.</p>
-<p>After adding a heading, it can be moved around the form layout similarly to a field. Simply click the heading to select it, then drag to move it to a new position. To edit a heading, click its <b>Edit</b> link after selecting it.</p>
+<p>Adding a heading to a form layout is very similar to adding a field. To add a new heading to a form, first click the form's <strong>Edit Layout</strong> link from the form listing (or click the form's <strong>Layout</strong> tab if you already have the form open). Then, scroll down in the <kbd>Toolbox</kbd> to the <kbd>Special</kbd> section and click the <strong>Heading</strong> button.</p>
+<p>After adding a heading, it can be moved around the form layout similarly to a field. Simply click the heading to select it, then drag to move it to a new position. To edit a heading, click its <strong>Edit</strong> link after selecting it.</p>
 <p>Each heading contains a single configuration value:</p>
 <table>
     <tbody>
@@ -268,9 +266,9 @@
     </tbody>
 </table>
 <h2><a name="multistep">Multistep Forms</a></h2>
-<p><dfn>ProForm</dfn> profiles the capability to build multistep forms. Separating a form into multiple steps is extremely simple, and very similar to use the previously discusses headings.</p>
-<p>Adding a step to a form is similar to adding a heading or a field. To add a new step in a form, first click the form's <b>Edit Layout</b> link from the form listing (or click the form's <b>Layout</b> tab if you already have the form open). Then, scroll down in the <kbd>Toolbox</kbd> to the <kbd>Special</kbd> section and click the <b>Step</b> button.</p>
-<p>After adding a step, it can be moved around the form layout similarly to a field. Moving the step around the layout splits the form into different sized steps. To move a step (and therefore move fields between them into different steps), simply click the step to select it, then drag to move it to a new position. To edit a step, click its <b>Edit</b> link after selecting it.</p>
+<p><dfn>ProForm</dfn> provides the capability to build multistep forms. Separating a form into multiple steps is extremely simple.</p>
+<p>Adding a step to a form is similar to adding a heading or a field. To add a new step in a form, first click the form's <strong>Edit Layout</strong> link from the form listing (or click the form's <strong>Layout</strong> tab if you already have the form open). Then, scroll down in the <kbd>Toolbox</kbd> to the <kbd>Special</kbd> section and click the <strong>Step</strong> button. Enter a name for the step, then click <strong>Submit</strong>.</p>
+<p>After adding a step, it can be moved around the form layout similarly to a field. Moving the step around the layout splits the form into different sized steps. To move a step (and therefore move fields between them into different steps), simply click the step to select it, then drag to move it to a new position. To edit a step, click its <strong>Edit</strong> link after selecting it.</p>
 <p>Step options:</p>
 <table>
     <tbody>

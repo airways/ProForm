@@ -487,6 +487,15 @@ head:first-child+body #documentation #toc ul {
  	padding-left: 20px;
 	}
 
+#documentation .tip h6 {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    font-weight: bold;
+    color: black;
+    font-style: normal;
+    text-decoration: none;
+}
 #documentation .searchbox {
 	background-color: #eee;
 	border: 1px solid #222;
