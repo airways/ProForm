@@ -16,11 +16,13 @@
     <input type="hidden" name="_pf_current_step" value="{pf_current_step}" />
     <input type="hidden" name="_pf_goto_step" value="" />
 
-    <ul class="pf_steps">
-        {pf_steps}
-            <li><a href="#{pf_step_no}" class="pf_step {pf_step_active}">{pf_step}</a></li>
-        {/pf_steps}
-    </ul>
+    {if pf_multistep}
+        <ul class="pf_steps">
+            {pf_steps}
+                <li><a href="#{pf_step_no}" class="pf_step {pf_step_active}">{pf_step}</a></li>
+            {/pf_steps}
+        </ul>
+    {/if}
 
     <div class="pf_wrap">
 

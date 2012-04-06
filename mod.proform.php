@@ -111,14 +111,13 @@ class Proform {
     
     public function simple()
     {
-        $template = $this->EE->TMPL->fetch_param('template', 'default');
-        $template = preg_replace("/[^a-zA-Z0-9\s]/", "", $template);
+        $template = pf_strip_id(strip_tags($this->EE->TMPL->fetch_param('template', 'default')));
         
-        $form_name = $this->EE->TMPL->fetch_param('form_name', $this->EE->TMPL->fetch_param('form', FALSE));
+        $form_name = strip_tags($this->EE->TMPL->fetch_param('form_name', $this->EE->TMPL->fetch_param('form', FALSE)));
         
         if(!$form_name)
         {
-            show_error('Invalid form_name provided to {exp:proform:simple}');
+            show_error('Invalid form_name provided to {exp:proform:simple}: "'.htmlentities($form_name).'"');
         }
         
         // Get our template components
@@ -128,8 +127,15 @@ class Proform {
         // Swap out the "embed" parameter for form_name in the template
         $template = str_replace(LD.'embed:form_name'.RD, $form_name, $template);
         
-        // Return the template code so the parser can handle it normally
-        return $prefix.$template;
+        // We need to remove any EE comments since they will not be handled correctly if they are left in place
+        // (the template parser has already removed normal comments before the simple() tag we're processing was
+        // called).
+        $output = preg_replace('/\{\!--.*?--\}/s', '', $prefix.$template);
+        // echo htmlentities($output);exit;
+        
+        // Return the template code so the parser can handle it as if the developer had inserted it directly
+        // into the template
+        return $output;
         
     }
     
@@ -155,7 +161,7 @@ class Proform {
         // strlen($this->EE->config->item('proform_license')) >= 32 || exit("ProForm requires a valid proform_license value to be set in the config file.");
 
         // Get params
-        $form_name = $this->EE->TMPL->fetch_param('form_name', $this->EE->TMPL->fetch_param('form', FALSE));
+        $form_name = strip_tags($this->EE->TMPL->fetch_param('form_name', $this->EE->TMPL->fetch_param('form', FALSE)));
 
         // Check required input
         if(!$form_name)
@@ -166,7 +172,6 @@ class Proform {
         }
 
         // Get optional params
-        $in_place_errors    = $this->EE->TMPL->fetch_param('in_place_errors', 'yes');
         $form_id            = $this->EE->TMPL->fetch_param('form_id', $form_name . '_proform');
         $form_class         = $this->EE->TMPL->fetch_param('form_class', $form_name . '_proform');
         $form_url           = $this->EE->TMPL->fetch_param('form_url', $this->EE->functions->remove_double_slashes($_SERVER['REQUEST_URI']));
@@ -175,11 +180,11 @@ class Proform {
         $notify             = explode('|', $this->EE->TMPL->fetch_param('notify', ''));
         $download_url       = $this->EE->TMPL->fetch_param('download_url',  '');
         $download_label     = $this->EE->TMPL->fetch_param('download_label',  '');
-        $debug              = $this->EE->TMPL->fetch_param('debug',  'false') == 'yes';
+        $debug              = $this->EE->TMPL->fetch_param('debug', 'false') == 'yes';
         $error_delimiters   = explode('|', $this->EE->TMPL->fetch_param('error_delimiters',  '<div class="error">|</div>'));
         $error_messages     = $this->EE->pl_parser->fetch_param_group('message');
-        $step               = $this->EE->TMPL->fetch_param('step', 1);
-        $variable_prefix    = $this->EE->TMPL->fetch_param('variable_prefix', '');
+        $step               = (int)$this->EE->TMPL->fetch_param('step', 1);
+        $variable_prefix    = pf_strip_id($this->EE->TMPL->fetch_param('variable_prefix', ''));
         $hidden_fields_mode = strtolower($this->EE->TMPL->fetch_param('hidden_fields_mode', 'split'));
         
         if(count($error_delimiters) != 2)
@@ -247,7 +252,6 @@ class Proform {
         if(!isset($form_session->config) OR count($form_session->config) == 0)
         {
             $form_session->config = array(
-                'in_place_errors'   => $in_place_errors,
                 'use_captcha'       => $use_captcha,
                 'form_name'         => $form_name,
                 'form_id'           => (int)$form_id,
