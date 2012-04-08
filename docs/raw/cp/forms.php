@@ -106,7 +106,7 @@
         </tr>
         <tr>
             <td><strong>Notification Template</strong></td>
-            <td>ExpressionEngine Template used to render the emails sent to the Notification List. The available templates are listed from the Notification Template Group selected in <a href="{site_url}documentation/proform/cp/settings">Module Settings</a>. For more information about what tags are available in a notification template, see <a href="{site_url}documentation/proform/notifications">Notification Templates</a>.</td>
+            <td>ExpressionEngine Template used to render the emails sent to the Notification List. The available templates are listed from the Notification Template Group selected in <a href="{root_url}cp/settings.html">Module Settings</a>. For more information about what tags are available in a notification template, see <a href="{root_url}notifications.html">Notification Templates</a>.</td>
             <td>n/a</td>
         </tr>
         <tr>
@@ -119,7 +119,7 @@
         </tr>
         <tr>
             <td><strong>Subject</strong></td>
-            <td>The subject line of the notification email. This line is rendered as an ExpressionEngine template, and therefore can use conditionals and plugins in addition to the variables available in <a href="{site_url}documentation/proform/notifications">Notification Templates</a>.</td>
+            <td>The subject line of the notification email. This line is rendered as an ExpressionEngine template, and therefore can use conditionals and plugins in addition to the variables available in <a href="{root_url}notifications.html">Notification Templates</a>.</td>
             <td>New submission to form: {form_name}</td>
         </tr>
         <tr>
@@ -157,12 +157,12 @@
         </tr>
         <tr>
             <td><strong>Template</strong></td>
-            <td>ExpressionEngine Template used to render the emails sent to the specified email address. The available templates are listed from the Notification Template Group selected in <a href="{site_url}documentation/proform/cp/settings">Module Settings</a>. For more information about what tags are available in a notification template, see <a href="{site_url}documentation/proform/notifications">Notification Templates</a>.</td>
+            <td>ExpressionEngine Template used to render the emails sent to the specified email address. The available templates are listed from the Notification Template Group selected in <a href="{root_url}cp/settings.html">Module Settings</a>. For more information about what tags are available in a notification template, see <a href="{root_url}notifications.html">Notification Templates</a>.</td>
             <td>&nbsp;</td>
         </tr>
         <tr>
             <td><strong>Subject</strong></td>
-            <td>The subject line of the notification email. This line is rendered as an ExpressionEngine template, and therefore can use conditionals and plugins in addition to the variables available in <a href="{site_url}documentation/proform/notifications">Notification Templates</a>.</td>
+            <td>The subject line of the notification email. This line is rendered as an ExpressionEngine template, and therefore can use conditionals and plugins in addition to the variables available in <a href="{root_url}notifications.html">Notification Templates</a>.</td>
             <td>Thank you for submitting the {form_name} form</td>
         </tr>
         <tr>

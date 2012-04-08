@@ -7,7 +7,7 @@
 
 <p>Certain options are only available in one Form Type or the other, as noted in the <b>Form Types</b> column.</p>
 
-<p class="tip">These options are considered experimental and should be used with caution. Always make sure to keep frequent backups and verify the behavior of any advanced settings you are using (for instance, if you use the options to store form data in an encrypted format - ensure you are able to decrypt data and move it to other systems you need to move it to).</p>
+<p class="critical"><strong>Warning</strong> These options are considered experimental and should be used with caution. Always make sure to keep frequent backups and verify the behavior of any advanced settings you are using (for instance, if you use the options to store form data in an encrypted format - ensure you are able to decrypt data and move it to other systems you need to move it to).</p>
 
 
 <table>

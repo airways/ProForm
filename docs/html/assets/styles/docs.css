@@ -456,7 +456,8 @@ head:first-child+body #documentation #toc ul {
 }
 	
 	
-#documentation .critical {
+#documentation .critical,
+#documentation .warning {
 	background: #FBE6F2;
 	border: 1px solid #E68F8F;
 	color: #000;
@@ -464,7 +465,8 @@ head:first-child+body #documentation #toc ul {
 	padding: 10px;
 	}
 	
-#documentation .critical p {
+#documentation .critical p,
+#documentation .warning p {
 	margin: 5px 0 6px 0;
 	padding: 0;
 	}

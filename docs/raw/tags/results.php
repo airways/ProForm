@@ -19,13 +19,14 @@
 
 <p>The <kbd>Results Tag</kbd> does not accept parameters. It takes all data from the visitor's session.</p>
 
-<p>This tag should be used in the template that handled the <a href="{site_url}documentation/proform/tags/form/#param_thank_you_url">thank_you_url</a> path sent to the <kbd>Form Tag</kbd>.</p>
+<p>This tag should be used in the template that handles the <a href="{site_url}documentation/proform/tags/form/#param_thank_you_url">thank_you_url</a> path sent to the <kbd>Form Tag</kbd>.</p>
 
 <!-- ********************************************************************** -->
 <h2><a name="variables">Single Variables</a></h2>
 
-<p>See the single variables of the <a href="{site_url}documentation/proform/tags/entries/#variables">Entries Tag</a> tag for more information.</p>
+<p>See the single variables of the <a href="{root_url}tags/form.html#variables">Entries Tag</a> tag for more information.</p>
 
+<p>Additionally, any unknown <a href="{root_url}tags/form.html#param_custom">custom parameters</a> sent to the form tag will be available as single variables within the <kbd>Results Tag</kbd>.</p>
 
 <!-- ********************************************************************** -->
 <h2><a name="variable_pairs">Variable Pairs</a></h2>

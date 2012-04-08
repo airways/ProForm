@@ -354,7 +354,7 @@ value : label&#10;value</pre>
     </tbody>
 </table>
 
-<h2><a name="delete_form">Deleting a Field</a></h2>
+<h2><a name="delete_field">Deleting a Field</a></h2>
 <p>Deleting a field removes all of it&#39;s settings, removes it from all forms that it is assigned to, deletes all of it&#39;s data from all forms in the database.</p>
 
 <p>You can delete a field and all of it&#39;s data through the Delete command on the Fields page. You must confirm the deletion in the following page.</p>

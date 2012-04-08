@@ -33,14 +33,14 @@
     <li><a href="#simple_variables">Variable Pairs</a></li>
 </ul>
 
-<h2><a name="simple_parameters">Parameters</a></h2>
-<p>Of the parameters supported by the <kbd>Full Form Tag</kbd>, the simple variation supports the following option:</p>
+<h2><a name="simple_parameters">Simple Parameters</a></h2>
+<p>Of the parameters supported by the <kbd>Full Form Tag</kbd>, the simple variation supports the following parameter:</p>
 
 <ul>
     <li><a href="#param_form">form="contact_us"</a></li>
 </ul>
 
-<h2><a name="simple_variables">Variables</a></h2>
+<h2><a name="simple_variables">Simple Variables</a></h2>
 
 <p>The <kbd>Simple Form Tag</kbd> supports the same  <a href="#variables">Single Variables</a> and <a href="#variable_pairs">Variables Pairs</a> supported by the full tag.</p>
 
@@ -99,9 +99,9 @@
 
 <h3><a name="param_custom">Custom Params</a></h3>
 
-<p>Any additional params sent to the <kbd>Form Tag</kbd> will be packed into the form configuration value and sent along with the rest of the form&#39;s data when it is submitted. This is a secure way to pass additional information to the thank you or error templates.</p>
+<p>Any parameters sent to the <kbd>Form Tag</kbd> which it does not know how to handle will be packed into the form session and sent along with the rest of the form's data when it is submitted. These values can then be extracted on the <strong>thank_you_url</strong> or <strong>error_url</strong> pages with the <a href="{root_url}tags/results.html">Results Tag</a>.</p>
 
-<p>The next two parameters in particular are specifically handled in a way to allow you to create form that act as a gate for a file download.</p>
+<p>Because the form session is stored in the database temporarily and only referred to by an opaque hash value in the form's submission, a user cannot discover the contents of parameters sent in this way to the <strong>thank_you_url</strong> or <strong>error_url</strong> pages.</p>
 
 <h3><a name="param_debug">debug="yes"</a></h3>
 
@@ -211,7 +211,7 @@
 
 <h3><a name="param_message">message:required="This field is required!", message:*=""</a></h3>
 
-<p>The <b>message*</b> parameter allows you to specify a custom error message to be displayed for each validation rule. The * should be replaced with a <b>key</b> corresponding to the validation rule you wish to set the message for. You may use the <b>message:*</b> parameter many times.</p>
+<p>The <b>message:*</b> parameter allows you to specify a custom error message to be displayed for each validation rule. The * should be replaced with a <b>key</b> corresponding to the validation rule you wish to set the message for. You may use the <b>message:*</b> parameter many times.</p>
 
 <p>Within each error string, the sequence <strong>%s</strong> will be replaced with the label for the field which has the error.</p>
 
@@ -541,9 +541,7 @@
     <li><a href="#var_field_type">{field_type}</a></li>
     <li><a href="#var_field_length">{field_length}</a></li>
     <li><a href="#var_field_is_required">{field_is_required}</a></li>
-    <li><a href="#var_field_validation">{field_validation}</a></li>
     <li><a href="#var_field_error">{field_error}</a></li>
-    <li><a href="#var_field_value">{field_value}</a></li>
     <li><a href="#var_field_checked">{field_checked}</a></li>
     <li><a href="#var_field_control">{field_control}</a></li>
     <li><a href="#var_field_preset_value">{field_preset_value}</a></li>
@@ -551,6 +549,8 @@
     <li><a href="#var_field_html_class">{field_html_class}</a></li>
     <li><a href="#var_field_extra_1">{field_extra_1}</a></li>
     <li><a href="#var_field_extra_2">{field_extra_2}</a></li>
+    <li><a href="#var_field_validation">{field_validation:*}</a></li>
+    <li><a href="#var_field_value">{field_value}</a></li>
 </ul>
 
 <h4>{fields} Variable Pairs</h4>
@@ -558,6 +558,7 @@
 
 <ul>
     <li><a href="#pair_field_setting_list">{field_setting_list}</a></li>
+    <li><a href="#pair_field_validation">{field_validation}</a></li>
 </ul>
 
 <h5>{fields} Single Variables</h5>
@@ -590,10 +591,6 @@
 
 <p>Presents a string value of an error for this field. If there is no error detected in the field, or if it is the initial form load, this value will be blank.</p>
 
-<h6><a name="var_field_value">{field_value}</a></h6>
-
-<p>The value of the field as it was submitted. Use this to preserve values when errors have occurred in other fields.</p>
-
 <h6><a name="var_field_checked">{field_checked}</a></h6>
 
 <p>A flag indicating if the field is checked. Use this to preserve values when errors have occurred in other fields.</p>
@@ -602,7 +599,7 @@
 
 <p>The suggested input type to use to render this field. This will be set to one of the valid HTML input type values ("text" or "file"), or "textarea".</p>
 
-<h6><a name="var_preset_value">{field_preset_value}</a></h6>
+<h6><a name="var_field_preset_value">{field_preset_value}</a></h6>
 
 <p>A preset value for this field as set in the Default Value field of the form&#39;s layout editor.</p>
 
@@ -614,17 +611,43 @@
 
 <p>A HTML class value for this field as set in the form&#39;s layout editor.</p>
 
-<h6><a name="var_extra_1">{field_extra_1}</a></h6>
+<h6><a name="var_field_extra_1">{field_extra_1}</a></h6>
 
 <p>An extra meta value for this field as set in the form&#39;s layout editor.</p>
 
-<h6><a name="var_extra_1">{field_extra_2}</a></h6>
+<h6><a name="var_field_extra_2">{field_extra_2}</a></h6>
 
 <p>An extra meta value for this field as set in the form&#39;s layout editor.</p>
 
 <h6><a name="var_pair_field_setting_multiselect">{field_setting_multiselect}</a></h6>
 
 <p><strong>Only valid for 'select' type fields</strong>. This field is set to "y" if the select is a multiselect, or a blank value otherwise.</p>
+
+<h6><a name="var_field_validation">{field_validation:*}</a></h6>
+
+<p>Provides a boolean value for each validation rule key, indicating if that validation rule is applied to this field or not. Replace the * with the validation rule you would like to check.</p>
+
+<p>For a list of valid keys, see the complete list of <a href="{root_url}cp/fields.html#validation_filtering">Validation Rules</a>.</p>
+
+
+<div class="tip">
+    <h6>Example Usage</h6>
+    <p>This example checks to see which fields are required, for those that are, it will add a <strong>* Required!</strong> message next to the label.</p>
+    <pre class="brush: xml">
+        &#123;fields&#125;
+            <label>
+                {field_label}
+                &#123;if field_validation:required&#125;* Required!&#123;/if&#125;
+            </label>
+            &lt;input name="{field_name}" /&gt;
+        &#123;/fields&#125;
+    </pre>
+</div>
+
+
+<h6><a name="var_field_value">{field_value}</a></h6>
+
+<p>The value of the field as it was submitted. Use this to preserve values when errors have occurred in other fields.</p>
 
 <h5>{fields} Variable Pairs</h5>
 
@@ -652,6 +675,30 @@
         &#123;/fields&#125;
     </pre>
 </div>
+
+<h6><a name="pair_field_validation">&#123;field_validation&#125;</a></h6>
+
+<p>The &#123;field_validation&#125; loop, which must be used inside of the &#123;fields&#125; pair, provides a list of the validation rules attached to the current field.</p>
+
+<p>This variable pair has two variables available for each validation rule applied to the field:</p>
+
+<ul>
+  <li><strong>&#123;rule_no&#125;</strong> - a counter starting at 1 for each rule applied (this is a temporary value which may change if the field is edited)</li>
+  <li><strong>&#123;rule&#125;</strong> - the rule key as defined in the list of <a href="{root_url}cp/fields.html#validation_filtering">Validation Rules</a> </li>
+</ul>
+
+<div class="tip">
+    <h6>Example Usage</h6>
+    <p>This example puts every validation key attached to a field into the field's class="" HTML attribute.</p>
+    <pre class="brush: xml">
+        &#123;fields&#125;
+            <label>&#123;field_label&#125;</label>
+            &lt;input name="&#123;field_name&#125;" class="&#123;field_validation&#125;&#123;rule&#125; &#123;/field_validation&#125;" /&gt;
+        &#123;/fields&#125;
+    </pre>
+</div>
+
+
 
 <h2><a name="var_fieldrows">{fieldrows}</a></h2>
 <p>The <b>fieldrows</b> variable pair provides a list of the selected form&#39;s field rows. Each of these rows represents one of the visible rows in the control panel view of the layout for a form.</p>

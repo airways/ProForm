@@ -16,15 +16,13 @@
     <li>Mailing list opt-in</li>
     <li>CAPTCHA support to help prevent spam</li>
     <li>File uploads</li>
-    <li>Send notifications, also rendered using EE templates, to admins and/or any email address entered in the form</li>
+    <li>Send notifications, rendered using EE templates, to admins and/or any email address entered in the form</li>
     <li>CodeIgniter based validation including content filtering and encoding options (required, valid e-mail, strip HTML, base64 encode, etc.)</li>
     <li>Plentiful <a href="{root_url}extending.html">hooks</a>, allowing third party customization</li>
     <li>Separate database table for each form - no more field count limits, easy to work with in custom code</li>
     <li>IP address and user agent recording</li>
     <li>Optional database Encryption</li>
     <li>Preset values for use in share forms such as <dfn>Tell a Friend</dfn> to prevent email spam</li>
-    <li>Cleanly organized OOP model</li>
-    <li>Reusable <dfn>ProLib</dfn> library extending core EE and CI capabilities</li>
 </ul>
 
 <h2>ProForm Documentation</h2>
