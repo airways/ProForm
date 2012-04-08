@@ -484,7 +484,8 @@ class Proform {
                 $variables['fields:count'] = count($variables['fields']);
                 $variables['fields_count'] = count($variables['fields']);
                 $variables['complete'] = $complete;
-                if($form_session->processed)
+                if(isset($form_session->processed) AND $form_session->processed 
+                    AND isset($form_session->config['form_name']) AND $form_session->config['form_name'] != $form_obj->form_name)
                 {
                     $variables['errors'] = array();
                     foreach($form_session->errors as $field => $errors)
@@ -1113,13 +1114,15 @@ class Proform {
         // decrypt the form's configuration array
         $form_session_enc = $this->EE->input->post('__conf');
         //$form_config = unserialize($this->EE->encrypt->decode($form_config_enc));
-        $form_session = $this->EE->formslib->vault->get($form_session_enc);
+        $form_session_decoded = $this->EE->formslib->vault->get($form_session_enc);
 
         // make sure the form object data we have is for this form, if not bail
-        if(!$form_session || !isset($form_session->config['form_name']) || $form_session->config['form_name'] != $form_obj->form_name)
+        if(!$form_session_decoded || !isset($form_session_decoded->config['form_name']) || $form_session_decoded->config['form_name'] != $form_obj->form_name)
         {
-            return $result;
+            return $form_session;
         }
+        
+        $form_session = $form_session_decoded;
 
         // find the form
         $form_name = $form_session->config['form_name'];
@@ -1174,6 +1177,7 @@ class Proform {
                 if($this->EE->input->is_ajax_request())
                 {
                     $form_session->status = 'error';
+                    $form_session->new_captcha = $this->EE->functions->create_captcha();
                     $this->EE->output->send_ajax_response((array)$form_session);
                     exit;
                 } else {
@@ -1206,7 +1210,7 @@ class Proform {
                     if($this->EE->input->is_ajax_request())
                     {
                         $entry_data->status = 'success';
-                        $this->EE->output->send_ajax_response($entry_data);
+                        $this->EE->output->send_ajax_response((array)$entry_data);
                         exit;
                     } else {
                         $this->EE->functions->redirect($form_session->config['thank_you_url']);

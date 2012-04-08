@@ -147,11 +147,12 @@
 </table>
 <h3><a name="param_message">message:required="This field is required!", message:*=""</a></h3>
 <p>The <b>message*</b> parameter allows you to specify a custom error message to be displayed for each validation rule. The * should be replaced with a <b>key</b> corresponding to the validation rule you wish to set the message for. You may use the <b>message:*</b> parameter many times.</p>
+<p>Within each error string, the sequence <strong>%s</strong> will be replaced with the label for the field which has the error.</p>
 <p>See the list of <a href="./../cp/fields.html#validation_rules">Validation Rules</a> for a list of what keys to use for each validation rule.</p>
 <div class="tip">
     <h6>Example Usage</h6>
     <pre class="brush: xml">
-        &#123;exp:proform:form form="contact_us" message:required="Please enter a value for this field!"&#125;
+        &#123;exp:proform:form form="contact_us" message:required="Please enter a value for the field %s!"&#125;
         ...
         &#123;/exp:proform:form&#125;
     </pre>

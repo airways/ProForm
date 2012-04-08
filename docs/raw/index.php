@@ -32,7 +32,8 @@
 <h3>Control Panel</h3>
 
 <ul>
-    <li><a href="{root_url}cp.html">Control Panel</a>
+    <li><a href="{root_url}installation.html">Installation</a></li>
+        <li><a href="{root_url}cp.html">Control Panel</a>
         <ul>
             <li><a href="{root_url}cp/forms.html">Managing Forms</a></li>
             <li><a href="{root_url}cp/fields.html">Managing Fields</a></li>
