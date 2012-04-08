@@ -1,4 +1,4 @@
-{ce:core:include template="global/_header"}
+{ce:core:include template="global/_header" index="yes"}
 
 <h1>ProForm Module</h1>
 

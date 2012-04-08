@@ -25,3 +25,6 @@
     <div class="nav-global-top grid-group">&nbsp;
     </div>
     <div class="section-content-wide content-box" id="documentation">
+        {if index != "yes"}
+        <a href="{root_url}">&larr; ProForm Documentation Index</a>
+        {/if}

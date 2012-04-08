@@ -23,40 +23,29 @@
     </div>
     <div class="section-content-wide content-box" id="documentation">
         <a href="./../">&larr; ProForm Documentation Index</a>
-<h1>Module Settings</h1>
-<p>
-    The following options are available to globally configure <dfn>ProForm</dfn>&#39;s functionality.</p>
-<h4>
-    Module Settings</h4>
+<h1>Hidden Settings</h1>
+<p>The following options must be set within your ExpressionEngine config file, usually located at <dfn>system/expressionengine/config/config.php</dfn>.</p>
+<p class="tip">These options are considered experimental and should be used with caution. Always make sure to keep frequent backups and verify the behavior of any hidden settings you are using (for instance, if you use the options to store form data in an encrypted format - ensure you are able to decrypt data and move it to other systems >
+<h4>Hidden Settings</h4>
 <table>
     <tbody>
         <tr>
-            <th width="170">Field</th>
+            <th width="170">config.php entry</th>
+            <th>Values</th>
             <th>Description</th>
         </tr>
         <tr>
-            <td><b>Notification Template Group</b></td>
-            <td>Selects the template group which contains notification templates for your forms. This should be a template group dedicated only to email notification templates. Until a template group is created and selected here, notifications cannot be sent from form submissions.</td>
+            <td><b>proform_allow_encryption</b></td>
+            <td>yes/no (default: no)</td>
+            <td>Allows use of the Encrypt Data option for forms. See the <a href="./../cp/forms/advanced-settings">Form's Advanced Settings</a> page for more information.</td>
         </tr>
         <tr>
-            <td><b>From Address</b></td>
-            <td>Optional address to use in the notification email's From header. *</td>
-        </tr>
-        <tr>
-            <td><b>From Name</b></td>
-            <td>Optional name to use in the notification email's From header. *</td>
-        </tr>
-        <tr>
-            <td><b>Reply-To Address</b></td>
-            <td>Optional email address to use in the Reply-To header for all notifications sent by <dfn>ProForm</dfn>. Each form may also override this value in it's <a href="./../cp/forms.html#form_settings_basic">Form Settings</a>.</td>
-        </tr>
-        <tr>
-            <td><b>Reply-To Name</b></td>
-            <td>Optional name to use in the Reply-To header for all notifications sent by <dfn>ProForm</dfn>. Each form may also override this value in it's <a href="./../cp/forms.html#form_settings_basic">Form Settings</a>.</td>
+            <td><b>proform_allow_table_override</b></td>
+            <td>yes/no (default: no)</td>
+            <td>Allows use of the Table OVerride option for forms. See the <a href="./../cp/forms/advanced-settings">Form's Advanced Settings</a> page for more information.</td>
         </tr>
     </tbody>
 </table>
-<p><b>*</b> The From Address typically should match your ExpressionEngine email settings in order to avoid having your notifications marked as spam. If not provided, the value will default to that set in ExpressionEngine's global settings - so setting this option isn't recommended. Instead, use the Reply-To settings.</p>
     </div>
 </div>
 </body>

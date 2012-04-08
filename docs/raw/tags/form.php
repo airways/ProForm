@@ -60,6 +60,14 @@
 <h2><a name="full">Full Form Tag</a></h2>
 <p>The <kbd>Full Form Tag</kbd> - <b>{exp:proform:form}</b> - provides you with precise tools to control the exact HTML produced for your forms built through ProForm. Like the Simple Tag, it is capable of rendering any form created through the drag and drop interface.</p>
 
+<div class="tip">
+    <h6>Crash Course</h6>
+    <p>The single most important parameter is the <a href="#param_form">form</a> parameter, and the two most important variable pairs are the <a href="#var_fieldrows">&#123;fieldrows&#125;</a> and <a href="#var_fields">&#123;fields&#125;</a> variable pairs.</p>
+    <p>Reading about this parameter and these variable pairs is the first step to creating or understanding a custom form layout template.</p>
+</div>
+
+<br/>
+
 <ul>
     <li><a href="#parameters">Parameters</a></li>
     <li><a href="#variables">Variables</a></li>
@@ -119,18 +127,39 @@
 
 <h3><a name="param_form">form="contact_us"</a></h3>
 
-<p>The <b>form</b> parameter is used to specify which form&#39;s information should be loaded. Typically this value can be taken from a URL segment, or from an entry field.</p>
+<p>The <b>form</b> parameter is used to specify which form&#39;s information should be loaded. Since ProForm doesn't know which form you want to render, you need to specify using this parameter.</p>
+
+<p>This value can be taken from a URL segment, or from an entry field. The form name can also be hard coded, although in general I recommend creating a more generic template that can be reused for multiple forms.</p>
+
+<p><b>Next Step:</b> After getting the correct form by using the <b>form</b> parameter as in one of these examples, you'll want to look at it's structure using the <a href="#var_fieldrows">&#123;fieldrows&#125;</a> and <a href="#var_fields">&#123;fields&#125;</a> variable pairs in order to recreate it's structure.</p>
 
 <div class="tip"><b>Example Usage</b><br/>
-    Assuming the URL for all forms on a site is <b>http://example.com/site/forms/url-title</b>, such as <b>http://example.com/site/forms/request-quote</b>, the template could load the requested form from {segment_3} like so:
+    <p>Assuming the URL for all forms on a site is <b>http://example.com/site/forms/form-name</b>, such as <b>http://example.com/site/forms/request-quote</b>, the <strong>forms</strong> template in the <strong>site</strong> template group could load the requested form in {segment_3} like so:</p>
     <pre class="brush: xml">
     &#123;exp:proform:form form="{segment_3}"&#125;
-
+    ...
+    &#123;/exp:proform:form&#125;
     </pre>
-    
-    </div>
+    <p>See the <a href="#cond_no_results">&#123;if no_results&#125;</a> conditional for a way to know if the requested form name was valid or not.</p>
 
-<p>The first approach allows you to create a single URL that can serve all templates - such as <dfn>/forms/contact-us</dfn> - while the second allows your forms to be placed arbitrarily on any other template. Using this tag within an embed template would then allow the display logic to be used anywhere on the site.</p>
+</div>
+
+<p>This approach allows you to create a single URL that can serve all templates - such as <dfn>/site/forms/contact-us</dfn>.</p>
+
+<p>Using this tag within an embed template, where you pass in the argument through an embed parameter instead of directly accessing a segment variable is even more powerful and allows you to reuse your custom display logic anywhere on the site for multiple embedded forms:</p>
+
+<div class="tip"><b>Example Usage</b><br/>
+    <p>Assuming you have a <strong>.form</strong> template within a <strong>global</strong> template group that looked like this, with all your custom display logic:</p>
+    <pre class="brush: xml">
+    &#123;exp:proform:form form="&#123;embed:form&#125;"&#125;
+    ... custom display logic here ...
+    &#123;/exp:proform:form&#125;
+    </pre>
+    Using it is quite simple:
+    <pre class="brush: xml">
+        &#123;embed="gobal/.form" form="newsletter-subscribe"&#125;
+    </pre>
+</div>
 
 <h3><a name="param_form_class">form_class="form_layout_wide"</a></h3>
 
@@ -263,7 +292,7 @@
 <!-- ********************************************************************** -->
 <h2><a name="variables">Single Variables</a></h2>
 
-<p>The following variables are available within the <kbd>Form Tag</kbd>:</p>
+<p>The following variables are available within the <kbd>Form Tag</kbd>. Each of these variables can also be used as a conditional.</p>
 
 <ul>
     <li><a href="#var_captcha">&#123;captcha&#125;, &#123;use_captcha&#125;</a></li>
@@ -282,8 +311,15 @@
     <li><a href="#var_step_count">&#123;step_count&#125;</a></li>
     <li><a href="#var_multistep">&#123;multistep&#125;</a></li>
     <li><a href="#var_value">&#123;value:*&#125;</a></li>
-
 </ul>
+
+<br/><br/>
+<p>The following special <a href="#conditional_variables">conditional variables</a> are also available as well:</p>
+
+<ul>
+    <li><a href="#cond_no_results">&#123;if no_results&#125;</a></li>
+</ul>
+
 
 <h3><a name="var_captcha">&#123;captcha&#125;, &#123;use_captcha&#125;</a></h3>
 
@@ -413,11 +449,48 @@
     </pre>
 </div>
 
+<!-- ********************************************************************** -->
+<h2><a name="conditional_variables">Conditional Variables</a></h2>
+
+<p>Conditional variables can only be used in conditional statements. In <kbd>ProForm</kbd>, all normal <a href="#variables">variables</a> are also conditional variables.</p>
+
+<p>The following special conditional variables are available:</p>
+
+<ul>
+    <li><a href="#cond_no_results">&#123;if no_results&#125;</a></li>
+</ul>
+
+<h3><a name="cond_no_results">&#123;if no_results&#125;</a></h3>
+
+<p>The &#123;if no_results&#125; conditional works exactly as it does for the <kbd>Channel Entries</kbd> tag and other module tags: if the form requested is not found, this conditional's contents are returned instead of the rest of the template.</p>
+
+<p>You cannot use a &#123;if:else&#125; clause with this conditional - it is parsed differently than normal conditionals to make it easier to insert without having to nest the rest of your template within a &#123;if:else&#125; clause.</p>
+
+<div class="tip">
+    <h6>Example Usage</h6>
+    <p>As in the example for the <a href="#param_form">form</a> parameter, assuming the <strong>forms</strong> template in the <strong>site</strong> template group is setup to load any requested form, and we want to display an error message when the requested form isn't found, we could do this:</p>
+    <pre class="brush: xml">
+    &#123;exp:proform:form form="{segment_3}"&#125;
+        &#123;if no_results&#125;
+        The requested form could not be found!
+        &#123;/if&#125;
+        &#123;!-- if the form is found, we'll get to here and continue processing... --&#125;
+        &#123;fieldrows&#125;
+            &lt;p&gt;
+            &#123;fields&#125;
+                <label for="&#123;field_name&#125;">{field_label}</label>
+                <input type="&#123;field_type&#125;" name="&#123;field_name&#125;" value="&#123;field_value&#125;" placeholder="&#123;field_placeholder&#125;" />
+            &#123;/fields&#125;
+            &lt;/p&gt;
+        &#123;/fieldrows&#125;
+    &#123;/exp:proform:form&#125;
+    </pre>
+</div>
 
 <!-- ********************************************************************** -->
 <h2><a name="variable_pairs">Variable Pairs</a></h2>
 
-<p>The following variable pair are available within the <kbd>Form Tag</kbd>:</p>
+<p>The following variable pairs are available within the <kbd>Form Tag</kbd>:</p>
 
 <ul>
     <li><a href="#var_errors">&#123;errors&#125;</a></li>
@@ -453,10 +526,9 @@
 
 <p>The <b>fields</b> variable pair provides a list of all of the fields in the selected form, regardless of the row they are set on.</p>
 
-<div class="tip">
-    <h6>Example Usage</h6>
-    <p>See the full <a href="{root_url}tags/form/template.html">Sample Template</a> for the <kbd>Form Tag</kbd> to see how to use the {fields} variable pair.</p>
-</div>
+<p>Be sure to read the documentation for the <a href="#var_fieldrows">&#123;fieldrows&#125;</a> variable pair in order to see how to preserve the drag &amp; drop layout for a form in your custom markup, including simple examples of the &#123;fields&#125; loop itself.</p>
+
+<p>Also see the full <a href="{root_url}tags/form/template.html">Sample Template</a> for a more complete example.</p>
 
 
 <h4>{fields} Variables</h4>
@@ -582,9 +654,64 @@
 </div>
 
 <h2><a name="var_fieldrows">{fieldrows}</a></h2>
-<p>The <b>fieldrows</b> variable pair provides a list of the selected form&#39;s field rows. Each row contains a nested {fields} list that provides a list of only the fields on each individual row. See the <a href="#var_fields">{fields}</a> documentation for more information on the data available inside the nested fields pair.</p>
+<p>The <b>fieldrows</b> variable pair provides a list of the selected form&#39;s field rows. Each of these rows represents one of the visible rows in the control panel view of the layout for a form.</p>
 
-<p>To preserve the view of the form as presented in the layout editor, this loop should create for each row a new strip of fields - typically in the form of a &lt;ul&gt; element with it&#39;s &lt;li&gt; elements floated to the left. See the <a href="{root_url}tags/form/template.html">Sample Template</a> for one way this can be accomplished.</p>
+<p>Within each row there is a nested &#123;fields&#125; list that provides the fields that are placed in each row. See the <a href="#var_fields">{fields}</a> documentation for more information on the data available inside the nested fields pair.</p>
+
+<p>To preserve the view of the form as presented in the layout editor, you should create a new strip of elements of some kind for each row in the &#123;fieldrows&#125; loop. This would typically by a &lt;ul&gt; element with &lt;li&gt; elements floated to the left, a table &lt;tr&gt; with a &lt;td&gt; element for each field, or a number of other possibilities - the key is just that there should be a visual arrangement of the fields in a horizontal layout for each row.</p>
+
+<p>Here are two examples of how this structure can be used to recreate the layout of the form. Also see the <a href="{root_url}tags/form/template.html">Sample Template</a> for a more complete example incorporating this.</p>
+
+<div class="tip">
+    <h6>Example Usage</h6>
+    <p>A simple layout using CSS and lists.</p>
+    <pre class="brush: xml">
+        &lt;style&gt;
+            /* Each row consists of an independent UL. Within this we will float each LI to the left. */
+            .form-wrap li &#123;
+                float: left;
+            &#125;
+        &lt;/style&gt;
+        &lt;div class="form-wrap"&gt;
+        &#123;exp:proform:form form="{segment_3}"&#125;
+            &#123;fieldrows&#125;
+                &lt;ul&gt; &#123;!-- create a new UL for each row of the form --&#125;
+                &#123;fields&#125;
+                    &lt;li&gt; &#123;!-- create a new LI for each field on a row --&#125;
+                        <label for="&#123;field_name&#125;">{field_label}</label>
+                        <input type="&#123;field_type&#125;" name="&#123;field_name&#125;" value="&#123;field_value&#125;"
+                            placeholder="&#123;field_placeholder&#125;" />
+                    &lt;/li&gt;
+                &#123;/fields&#125;
+                &lt;/ul&gt;
+            &#123;/fieldrows&#125;
+        &#123;/exp:proform:form&#125;
+        &lt;/div&gt;
+    </pre>
+</div>
+
+<div class="tip">
+    <h6>Example Usage</h6>
+    <p>Using the dreaded tables for layout purposes...</p>
+    <pre class="brush: xml">
+        &#123;exp:proform:form form="{segment_3}"&#125;
+            &lt;table&gt; &#123;!-- the exp:proform:form tag generates a &lt;form&gt; element, so this must be inside it --&#125;
+            &#123;fieldrows&#125;
+                &lt;tr&gt; &#123;!-- create a new table row for each row of the form --&#125;
+                &#123;fields&#125;
+                    &lt;td&gt; &#123;!-- create a new table cell for each field on a row --&#125;
+                        <label for="&#123;field_name&#125;">{field_label}</label>
+                        <input type="&#123;field_type&#125;" name="&#123;field_name&#125;" value="&#123;field_value&#125;"
+                            placeholder="&#123;field_placeholder&#125;" />
+                    &lt;/td&gt;
+                &#123;/fields&#125;
+                &lt;/tr&gt;
+            &#123;/fieldrows&#125;
+            &lt;/table&gt;
+        &#123;/exp:proform:form&#125;
+    </pre>
+</div>
+
 
 <h2><a name="var_hidden_fields">{hidden_fields}</a></h2>
 

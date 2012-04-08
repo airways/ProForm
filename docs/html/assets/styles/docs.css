@@ -727,3 +727,8 @@ html>body #footer .validation {
 	margin-bottom: -3px;
 	border: 0;
 }
+
+#documentation ol {
+    list-style: decimal;
+    margin-left: 60px;
+}

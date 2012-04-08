@@ -200,7 +200,12 @@ class Proform {
         $form_session->processed = FALSE;
 
         // Get all form data for the requested form
-        $form_obj = $this->EE->formslib->forms->get($form_name);
+        $form_obj = $this->EE->formslib->forms->get($form_name, FALSE);
+        
+        if(!$form_obj)
+        {
+            return $this->EE->TMPL->no_results();
+        }
 
         if($_SERVER['REQUEST_METHOD'] == 'POST' && $this->EE->input->post('__conf'))
         {

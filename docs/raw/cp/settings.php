@@ -1,7 +1,6 @@
 {ce:core:include template="global/_header" title="Module Settings"}
 
-<h1>
-    Module Settings (BETA)</h1>
+<h1>Module Settings</h1>
 <p>
     The following options are available to globally configure <dfn>ProForm</dfn>&#39;s functionality.</p>
 <h4>
