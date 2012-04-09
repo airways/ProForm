@@ -19,7 +19,7 @@
 
 <p>The <kbd>Results Tag</kbd> does not accept parameters. It takes all data from the visitor's session.</p>
 
-<p>This tag should be used in the template that handles the <a href="{site_url}documentation/proform/tags/form/#param_thank_you_url">thank_you_url</a> path sent to the <kbd>Form Tag</kbd>.</p>
+<p>This tag should be used in the template that handles the <a href="{root_url}tags/form.html#param_thank_you_url">thank_you_url</a> path sent to the <kbd>Form Tag</kbd>.</p>
 
 <!-- ********************************************************************** -->
 <h2><a name="variables">Single Variables</a></h2>
@@ -31,13 +31,13 @@
 <!-- ********************************************************************** -->
 <h2><a name="variable_pairs">Variable Pairs</a></h2>
 
-<p>See the variable pairs of the <a href="{site_url}documentation/proform/tags/entries/#variable_pairs">Entries Tag</a> tag for more information.</p>
+<p>See the variable pairs of the <a href="{root_url}tags/entries.html#variable_pairs">Entries Tag</a> tag for more information.</p>
 
 <!-- ********************************************************************** -->
 <h2><a name="sample_template_code">Sample Template Code</a></h2>
 
 <p class="strongbox">Example Template</p>
-<p>This tag should be used in the template specified by the URL passed in through a form tag's <a href="{site_url}documentation/proform/tags/form/#param_thank_you_url">thank_you_url</a> parameter.</p>
+<p>This tag should be used in the template specified by the URL passed in through a form tag's <a href="{root_url}tags/form.html#param_thank_you_url">thank_you_url</a> parameter.</p>
 <pre class="brush: xml">
 &#123;exp:proform:results&#125;
     &#123;if form_name&#125;
@@ -53,16 +53,12 @@
         
         &lt;p&gt;&#123;thank_you_message&#125;&lt;/p&gt;
         
-        &#123;if download_url&#125;
-            &lt;p&gt;You may now download your file: &lt;a href="{download_url}"&gt;{download_label}&lt;/a&gt;&lt;/p&gt;
-        &#123;/if&#125;
-        
         &#123;if referrer_url&#125;
             &lt;p&gt;Return to &lt;a href="{referrer_url}"&gt;previous page&lt;/a&gt;.&lt;/p&gt;
         &#123;/if&#125;
     &#123;if:else&#125;
-        &lt;h1&gt;Thanks for the form&lt;/h1&gt;
-        &lt;p&gt;But, aw snap something went wrong and I can't confirm your submission.&lt;/p&gt;
+        &lt;h1&gt;Error&lt;/h1&gt;
+        &lt;p&gt;Something went wrong, and we are unable to confirm your submission.&lt;/p&gt;
     &#123;/if&#125;
 &#123;/exp:proform:results&#125;
 </pre>

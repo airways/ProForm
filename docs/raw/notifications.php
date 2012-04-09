@@ -7,10 +7,10 @@
 <p>If you do not need a fancy display or other information about the entry, this is probably all you will need - a single template can render notifications for any form submitted to <dfn>ProForm</dfn>.</p>
 
 <h2>Single Variables</h2>
-<p>All of the <a href="{site_url}documentation/proform/tags/entries#variables">variables</a> available in the <kbd>Entries Tag</kbd> are available in the notification template when notifications are generated for a newly created entry.</p>
+<p>All of the <a href="{root_url}tags/entries.html#variables">variables</a> available in the <kbd>Entries Tag</kbd> are available in the notification template when notifications are generated for a newly created entry.</p>
 
 <h2>Variable Pairs</h2>
-<p>Similarly, all of the <a href="{site_url}documentation/proform/tags/entries#variable_pairs">variable pairs</a> available in the <kbd>Entries Tag</kbd> are available in the notification template when notifications are generated for a newly created entry.</p>
+<p>Similarly, all of the <a href="{root_url}tags/entries.html#variable_pairs">variable pairs</a> available in the <kbd>Entries Tag</kbd> are available in the notification template when notifications are generated for a newly created entry.</p>
 
 <h2>Sample Template</h2>
 <p>One of the simplest possible notification templates looks like this:</p>
