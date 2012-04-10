@@ -14,7 +14,7 @@ class PL_Field extends PL_RowInitialized
             'datetime'      => array('type' => 'datetime', 'constraint' => FALSE),
             'file'          => array('type' => 'varchar'),
             'string'        => array('type' => 'varchar', 'limit' => 256, 'limit_promote' => 'text'),
-            //'text'          => array('type' => 'text'),
+            'text'          => array('type' => 'text'),
             'int'           => array('type' => 'int', 'constraint' => '11'),
             'float'         => array('type' => 'float', 'constraint' => '53'),
             'currency'      => array('type' => 'decimal', 'constraint' => '10,2'),
@@ -29,7 +29,7 @@ class PL_Field extends PL_RowInitialized
     public static $item_options = array(
         array('label' => 'Checkbox',                    'type' => 'checkbox',                   'icon' => 'checkbox.png'),
         array('label' => 'Text',                        'type' => 'string',                     'icon' => 'textfield.png'),
-        array('label' => 'Textarea',                    'type' => 'string',                     'icon' => 'textarea.png',       'length' => '1000',),
+        array('label' => 'Textarea',                    'type' => 'text',                       'icon' => 'textarea.png',       'length' => '1000',),
         array('label' => 'Number: Integer',             'type' => 'int',                        'icon' => 'number.png'),
         array('label' => 'Number: Float',               'type' => 'float',                      'icon' => 'float.png'),
         array('label' => 'Number: Currency',            'type' => 'currency',                   'icon' => 'currency.png'),
@@ -71,13 +71,16 @@ class PL_Field extends PL_RowInitialized
     function to_array()
     {
         $result = (array)$this;
+        unset($result['EE']);
         unset($result['__EE']);
         unset($result['__CI']);
+        unset($result['__mgr']);
         return $result;
     }
 
     function pre_save()
     {
+        // Make sure we always have a resonable length limit
         if(!isset($this->length) || is_null($this->length) || $this->length <= 0)
         {
             $this->length = 256;
@@ -86,9 +89,19 @@ class PL_Field extends PL_RowInitialized
 
     function post_save()
     {
+        // Notify assigned forms that they need to update their database structure
         foreach($this->get_assigned_forms() as $form)
         {
             $form->assign_field($this);
+        }
+    }
+    
+    function pre_delete()
+    {
+        // Remove the field from any forms it may have been assigned to
+        foreach($this->get_assigned_forms() as $form)
+        {
+            $form->remove_field($this);
         }
     }
 
@@ -109,8 +122,8 @@ class PL_Field extends PL_RowInitialized
                     return 'text';
                 else
                     return 'textarea';
-            //case 'text';
-            //    return 'textarea';
+            case 'text';
+                return 'textarea';
             case 'int':
                 return 'text';
             case 'float':

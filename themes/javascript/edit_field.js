@@ -19,8 +19,17 @@ var proform_edit_field = {
         });       
     },
     update_settings_fields: function() {
+        var type = $('select[name=type]').val();
+        var show_length_types = ['string','hidden','secure','member_data'];
+        if(show_length_types.indexOf(type) != -1)
+        {
+            $('input[name=length]').closest('tr').show();
+        } else {
+            $('input[name=length]').closest('tr').hide();
+        }
+        
         $('.edit_settings').hide();
-        $('#type_'+$('select[name=type]').val()).show();
+        $('#type_'+type).show();
     }
 }
 
