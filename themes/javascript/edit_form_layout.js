@@ -63,9 +63,9 @@ var proform_edit_form_layout = {
             items.each(function() {
                 if(count == 1)
                 {
-                    $(this).width('90% !important');
+                    $(this).width('90%');
                 } else {
-                    $(this).width(80/count+'% !important');
+                    $(this).width(80/count+'%');
                 }
             });
         }

@@ -451,7 +451,7 @@ ul.targetRow .ui-sortable-placeholder {
     border: 1px solid transparent;
 	position: relative;
 	float: left;
-	width: 90% !important;
+	width: 90%;
 	margin: 0 10px 10px 0;
 }
 
