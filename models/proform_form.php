@@ -783,4 +783,25 @@ class PL_Form extends PL_RowInitialized {
         $this->__EE->load->library('formslib');
         $this->__EE->formslib->forms->save($this);
     }
+    
+    function field_pos($key)
+    {
+        $i = 0;
+        foreach($this as $k => $v)
+        {
+            if($k == $key) {
+                $pos = $i;
+                break;
+            }
+            $i++;
+        }
+        return $pos;
+    }
+    
+    function cmp_fields_sort($a, $b)
+    {
+        $pos_a = $this->field_pos($a['lang_field']);
+        $pos_b = $this->field_pos($b['lang_field']);
+        return $pos_a - $pos_b;
+    }
 }

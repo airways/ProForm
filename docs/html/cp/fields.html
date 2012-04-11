@@ -60,7 +60,7 @@
         </tr>
         <tr>
             <td><b>Length</b></td>
-            <td>Length limit on the field. If the length is not specified, it will be set to 255 characters. Settings the limit to longer than this may cause a slight performance degradation as a different database column must be used for longer values.</td>
+            <td>Length limit on the field. If the length is not specified, it will be set to 255 characters. This option is not required for many field types - only text, secure, and member_data require it.</td>
         </tr>
         <tr>
             <td><b>Validation</b></td>
@@ -126,16 +126,16 @@
             <td>VARHCAR</td>
         </tr>
         <tr>
-            <td><b>String</b></td>
+            <td><b>Text</b></td>
             <td>&lt;input type="input" ... /&gt; or<br />
                 &lt;textarea&gt;</td>
             <td>A simple text value. The length of the field determines which Database Type is used to store this field. If the length is 255 or less, a VARCHAR field is used, otherwise a TEXT field is used.</td>
             <td>VARCHAR or TEXT</td>
         </tr>
         <tr>
-            <td><b>Text</b></td>
+            <td><b>Textarea</b></td>
             <td>&lt;textarea&gt;</td>
-            <td>A simple text value, for longer form values such as messages.</td>
+            <td>A memo field, for longer form values such as messages.</td>
             <td>TEXT</td>
         </tr>
         <tr>
