@@ -77,8 +77,8 @@ $alt = FALSE;
                     <h3><?php echo $field['heading']; ?></h3>
                 <?php else:
                     switch($field['type']):
-                        case 'string':
-                        if($field['length'] > 256): ?>
+                        case 'string': case 'text':
+                        if($field['length'] > 256 || $field['type'] == 'text'): ?>
                             <label for="" class=""><?php echo $display_label; ?></label>
                             <textarea name="" id="" class="placeHolder" cols="30" rows="10" disabled="disabled"></textarea>
                         <?php else: ?>
