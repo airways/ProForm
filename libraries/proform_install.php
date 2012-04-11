@@ -226,6 +226,11 @@ class Proform_install
             $this->EE->dbforge->drop_table('proform_fields');
             $this->EE->dbforge->drop_table('proform_form_fields');
             $this->EE->dbforge->drop_table('proform_preferences');
+            
+            if($this->EE->db->table_exists('proform_vault'))
+            {
+                $this->EE->dbforge->drop_table('proform_vault');
+            }
         }
 
         ////////////////////////////////////////
