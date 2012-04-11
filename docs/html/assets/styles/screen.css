@@ -1,0 +1,587 @@
+/* ---------------------------------------------------------------------
+Original Author: Lynn Wloszek
+Contributors: N/A
+
+Target Browsers: All
+Media Type: Screen, Projection
+Width: All Sizes
+------------------------------------------------------------------------ */
+
+/* ---------------------------------------------------------------------
+    Global styles
+------------------------------------------------------------------------ */
+
+body {
+    font: 14px/1.3 Helvetica, Arial, sans-serif;
+    background: #eee;
+}
+
+.text-replace, 
+.nav-global-top li a,
+.nav-global-top li span {
+    color: white;
+    padding-top: 12px;
+    font: 400 24px/1 "Puritan";
+}
+
+.grid-group {
+    overflow: hidden;
+}
+
+.grid, 
+.nav-global-top li,
+.list-screenshots li {
+    float: left;
+}
+
+.grid-right {
+    float: right;
+}
+
+.section-content-wrapper {
+    width: 980px;
+    margin: 10px auto;
+}
+
+a {
+    text-decoration: none;
+	font-weight: bold;
+	color: #302d6c;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+.content-box,
+.aside-buttons li.box {
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    border: 1px #ccc solid;
+    -webkit-box-shadow: 1px -2px 4px #999999;
+    -moz-box-shadow: 1px -2px 4px #999999;
+    box-shadow: 1px -2px 4px #999999;
+    margin: 0 0 20px;
+}
+
+
+/* ---------------------------------------------------------------------
+    Top Nav styles
+------------------------------------------------------------------------ */
+
+.nav-global-top .nav-logo-header {
+    background: url('../images/logo-header.png') no-repeat;
+    width: 161px;
+    text-indent: -9999px;
+}
+
+.nav-global-top li,
+.nav-global-top li a,
+.nav-global-top li span {
+    text-align: center;
+    height: 50px;
+    display: block;
+}
+
+.nav-2-prod {
+    background: url('../images/nav-2.png') no-repeat;
+    width: 151px;
+}
+
+.nav-3-doc {
+    background: url('../images/nav-3.png') no-repeat;
+    width: 179px;
+}
+
+.nav-4-links {
+    background: url('../images/nav-4.png') no-repeat;
+    width: 121px;
+}
+
+.nav-5-con {
+    background: url('../images/nav-5.png') no-repeat;
+    width: 137px;
+}
+
+.nav-right-end-search {
+    background: url('../images/nav-right-end-search.png') no-repeat;
+    width: 231px;
+    padding-top: 12px;
+}
+
+.nav-right-end-search input {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    vertical-align: middle;
+    font-size: 16px;
+    color: #6a6a6a;
+}
+
+.nav-right-end-search input[type=submit] {
+    width: 36px;
+    height: 26px;
+    padding: 0 0 0 10px;
+    cursor: pointer;
+}
+
+/* ---------------------------------------------------------------------
+    Content styles
+------------------------------------------------------------------------ */
+
+h2, h3, h4, h5, h6 {
+    font: 700 32px/1 "Puritan";
+    margin-bottom: 5px;
+}
+
+h2 a,
+h3 a,
+h4 a,
+h5 a,
+h6 a {
+    color: #131369;
+}
+
+h2 {
+    font-size: 30px !important;
+    font-weight: 400;
+}
+
+h3 {
+    font-size: 30px;
+    font-weight: 400;
+/*    font-variant: small-caps;*/
+}
+
+
+h4 {
+    font-size: 25px !important;
+    font-weight: 400;
+/*    font-variant: small-caps;*/
+}
+
+h5 {
+    font-size: 25px;
+    font-weight: 400;
+/*    font-variant: small-caps;*/
+}
+
+.wysiwyg h3, h4, h5, h6 {
+    margin-top: 20px;
+}
+
+.section-products {
+    position: relative;
+    background: url('../images/shine-bg.jpg') repeat-y white;
+    width: 895px;
+    min-height: 251px;
+    padding: 40px;
+    margin: 0 0 20px;
+}
+
+.list-key-features, 
+.list-full-features {
+    font-size: 20px;
+    margin: 0 0 30px 35px;
+    list-style-image: url('../images/features-arrow-20.png');
+    line-height: 1.7;
+}
+
+.product-available img {
+    vertical-align: middle;
+    margin-top: -7px;
+}
+
+.product-available {
+    font-size: 20px;
+    color: #000;
+    text-decoration: none;
+}
+
+.section-products-proform-bg {
+    background: no-repeat;
+    height: 454px;
+    width: 432px;
+    position: absolute;
+    top: 0;
+    right: 0;
+
+
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    
+}
+
+.ee-support-icon-1 {
+    background: url('../images/ee-support-icon-1.png') no-repeat;
+    position: absolute;
+    height: 20px;
+    width: 65px;
+    top: 10px;
+    left: 40px;
+}
+
+.ee-support-icon-2 {
+    background: url('../images/ee-support-icon-2.png') no-repeat;
+    position: absolute;
+    height: 20px;
+    width: 65px;
+    top: 10px;
+    left: 40px;
+}
+
+.ee-support-icon-both {
+    background: url('../images/ee-support-icon-both.png') no-repeat;
+    position: absolute;
+    height: 20px;
+    width: 65px;
+    top: 10px;
+    left: 40px;
+}
+
+
+/* ---------------------------------------------------------------------
+    Aside Button styles
+------------------------------------------------------------------------ */
+
+.aside-buttons {
+    margin: 0 25px 0 0;
+}
+
+.aside-buttons li.box {
+    background: url('../images/aside-button-bg.jpg') no-repeat;
+    height: 52px;
+    width: 230px;
+    padding: 2px 10px;
+}
+
+.aside-buttons li.box a {
+    width: 210px;
+    margin: 0 auto;
+    display: block;
+}
+
+.aside-buttons li.text {
+    width: 250px;
+}
+
+.aside-buttons li.box p {
+    font-size: 20px;
+    width: 150px;
+    text-align: center;
+}
+
+.aside-buttons img {
+    max-height: 52px;
+    max-width: 52px;
+    vertical-align: middle
+}
+
+ul.recent-posts {
+	list-style-type: disc;
+	list-style-position: inside;
+	margin-left: 8px;
+}
+ul.recent-posts li {
+    margin-bottom: 10px;
+    
+}
+/* ---------------------------------------------------------------------
+    Content Area styles
+------------------------------------------------------------------------ */
+
+.section-content {
+    background: #fff;
+    width: 660px;
+    padding: 20px;
+    font-size: 16px;
+}
+
+.section-content h3,
+.section-content-wide h4 {
+    display: inline;
+    line-height: 1;
+    color: #402868;
+    padding-right: 40px;
+    background: url('../images/features-bg.png') no-repeat right center; 
+}
+
+.section-content-wide {
+    position: relative;
+    background: white;
+    width: 935px;
+    padding: 20px;
+    margin: 0 0 20px;
+}
+
+.section-content-wysiwyg {
+    background: #fff;
+    width: 660px;
+    padding: 20px;
+    font-size: 16px;
+}
+
+h3.screenshots-header {
+    background-image: url('../images/screenshots-bg.png');
+}
+
+.list-full-features {
+    font-size: 16px;
+    margin: 0 0 10px 35px;
+    list-style-image: url('../images/features-arrow-15.png');
+}
+
+.list-screenshots li {
+    margin: 15px;
+}
+
+/* ---------------------------------------------------------------------
+    Content Area styles
+------------------------------------------------------------------------ */
+
+.section-footer {
+	clear:both;
+    text-align: center;
+    margin: 20px auto 20px;
+}
+
+.info-nav li {
+    display: inline;
+    padding-left: 10px;
+}
+
+.section-footer a {
+    color: #1a1a80;
+}
+
+.info-nav a {
+    text-decoration: underline;
+    color: #1a5e80;
+}
+
+/* ---------------------------------------------------------------------
+    WYSIWYG
+------------------------------------------------------------------------ */
+
+.wysiwyg {
+    font-size: 14px;
+}
+
+.wysiwyg p {
+    font-size: 14px;
+    padding-bottom: 5px;
+}
+
+#documentation .box,
+.wysiwyg .box,
+#documentation .strongbox,
+.wysiwyg .strongbox {
+	background: #f2f1ff;
+	padding-top: 5px;;
+	padding-left: 5px;;
+	padding-right: 5px;;
+	margin-bottom: 10px;
+}
+
+#documentation .strongbox,
+.wysiwyg .strongbox {
+	font-weight: bold;
+}
+
+#documentation .box,
+#documentation .strongbox {
+	margin-top: 10px;
+	padding: 4px;
+}
+
+#documentation .strongbox p,
+.wysiwyg .box p {
+	margin-bottom: 0;
+}
+
+.wysiwyg .box strong {
+	color: #201d5e;
+	font-weight: bold;
+}
+/* ---------------------------------------------------------------------
+    Search
+------------------------------------------------------------------------ */
+
+.searchword {
+    background: url(../images/nav-5.png) #1A1A80;
+    color: #fff;
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+
+/* ---------------------------------------------------------------------
+Wysiwyg Styles
+------------------------------------------------------------------------ */
+
+.wysiwyg {
+	margin-top: 10px;
+	margin-bottom: 30px;
+}
+.wysiwyg ol,
+.wysiwyg ul { 
+    margin-bottom: 20px; 
+}
+
+.wysiwyg li {
+    list-style: disc outside;
+    margin: 0 57px;
+    margin-bottom: 10px;
+    line-height: 18px;
+}
+
+.wysiwyg ol li {
+    list-style: decimal;
+    margin-bottom: 10px;
+}
+
+.wysiwyg strong { 
+    font-weight: bold !important;
+}
+
+.wysiwyg p { 
+/*    margin-bottom: 15px; */
+}
+
+.wysiwyg em { 
+    font-style: italic; 
+}
+
+.wysiwyg sup { 
+    vertical-align: top; 
+}
+
+.wysiwyg sub { 
+    vertical-align: bottom; 
+}
+
+.wysiwyg h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
+	text-decoration: none;
+	font-weight: normal;
+	
+}
+.wysiwyg h1 {
+    font-weight: normal;
+    font-size: 20px;
+}
+
+.wysiwyg h2 {
+    font-size: 18px;
+    margin-bottom: 5px;
+    font-weight: normal;
+}
+
+.wysiwyg h3 {
+    margin-bottom: 5px;
+    font-weight: normal;
+}
+
+.wysiwyg h4 {
+    font-size: 14px;
+    margin-bottom: 5px;
+    font-weight: normal;
+}
+
+.wysiwyg h5 {
+    font-size: 13px;
+    margin-bottom: 5px;
+    font-weight: normal;
+}
+
+.wysiwyg h6 {
+    font-size: 12px;
+    margin-bottom: 5px;
+    font-weight: normal;
+}
+
+.wysiwyg img { 
+    max-width: 730px;
+    margin: 10px 0;
+}
+
+.user-content-has-aside img {
+    max-width: 475px;
+}
+
+.wysiwyg hr { 
+    border: 1px solid #ccc; 
+}
+
+.wysiwyg table {
+    border: 1px solid #d5dae0;
+    width: 90%;
+    max-width: 97%;
+    margin: 0 10px 20px 0;
+}
+
+.wysiwyg thead th {
+    background-color: #eff2f6;
+    border-top: 1px solid #d5dae0;
+    border-bottom: 1px solid #d5dae0;
+    padding: 5px 10px;
+    text-align: left;
+    font-weight: bold;
+}
+
+.wysiwyg td { 
+    padding: 5px 10px; 
+}
+
+.wysiwyg blockquote { 
+    margin: 20px 30px; 
+}
+
+.list-content { 
+    margin-bottom: 20px; 
+}
+
+.content-block { 
+    margin-bottom: 16px; 
+}
+
+.aside-media {
+    margin-bottom: 20px;
+}
+
+
+.disqus h3 {
+    font-size: 25px;
+}
+
+#dsq-footer {
+    font-size: 12px;
+}
+
+.wysiwyg b {
+    font-weight: bold;
+}
+
+/* ---------------------------------------------------------------------
+SyntaxHighliter Styles
+------------------------------------------------------------------------ */
+
+.syntaxhighlighter .container {
+	margin-top: 15px !important;
+	margin-bottom: 15px !important;
+}
+
+/* ---------------------------------------------------------------------
+Form
+------------------------------------------------------------------------ */
+
+form.basic {
+    margin-bottom: 10px;
+}
+
+form.basic label {
+    display: block;
+    font-weight: bold;
+}

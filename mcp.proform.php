@@ -67,8 +67,8 @@ class Proform_mcp {
             'time'          => 'Time',
             'datetime'      => 'Date and Time',
             'file'          => 'File',
-            'string'        => 'String',
-            // 'text'          => 'Text',
+            'string'        => 'Text',
+            'text'          => 'Textarea',
             'Number'        => array(
                 'int'       => 'Integer',
                 'float'     => 'Float',
