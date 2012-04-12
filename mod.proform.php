@@ -228,7 +228,7 @@ class Proform {
         }
 
         $use_captcha = FALSE;
-        if(isset($form_session->config) AND $form_session->config['step'] == $form_obj->get_step_count())
+        if($form_obj->get_step_count() == 1 OR (isset($form_session->config) AND $form_session->config['step'] == $form_obj->get_step_count()))
         {
             if (preg_match("/({".$variable_prefix."captcha})/", $tagdata))
             {
