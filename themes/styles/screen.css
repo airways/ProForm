@@ -158,6 +158,10 @@ Create Form
 	text-decoration: underline;
 }
 
+.action-list {
+    white-space: nowrap;
+}
+
 .action-list a {
 /*  text-decoration: underline !important;*/
 	display: inline-block;
@@ -581,14 +585,22 @@ Messages / Form Errors
 
 .tabs {
 	overflow: hidden;
-	margin-bottom: 15px;
 /*  border-bottom: 1px solid #d1d7df; */
 }
 
 .tabs-wrapper {
+	margin-bottom: 15px;
     height: 28px;
     min-width: 900px;
 	border-bottom: 1px solid #d1d7df;
+}
+
+.tabs-wrapper .action-list {
+    margin-left: 10px;
+}
+
+.tabs-wrapper .action-list a {
+    margin-top: 5px;
 }
 
 .tabs li {
@@ -815,4 +827,15 @@ Create Form
 }
      
 
+
+/* ---------------------------------------------------------------------
+Form Entries
+------------------------------------------------------------------------ */
+
+span.date,
+span.datetime,
+span.time,
+span.short {
+    white-space: nowrap;
+}
 

@@ -92,6 +92,10 @@ endif;
         {
             echo $this->table->generate();
             echo '<h3 class="sub-heading">'.$field['heading'].'</h3>';
+            if(isset($field['description']))
+            {
+                echo '<p>'.$field['description'].'</p>';
+            }
             $this->table->set_template($table_template);
             $this->table->set_heading($table_heading);
             continue;

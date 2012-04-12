@@ -138,9 +138,10 @@
     </tbody>
 </table>
 <h4>
-    <a name="form_settings_notification_fields">Notification Field Settings - A and B</a></h4>
+    <a name="form_settings_notification_fields">Notification Field Settings</a></h4>
 <p>There are two groups of Notification Field Settings available for each form. Using a Notification Field allows the destination for your notifications to be entered by the visitor when they fill out the form.</p>
 <p>These notification settings are useful in a situation where you want to provide a pre-set list of available contact addresses, and ask the user to pick one of these options. By specifying the field which contains these options as the Notification Field Setting's <strong>Email Field</strong> option, you will then get a notification sent only to that individual address.</p>
+<p>You can also use a Notification Field setting group to send a notification a the visitor, thanking them for their submission.</p>
 <p>This is different from the Notification List settings above, in that the entire list of addresses specified on the Notification List always receive the notification - while there is only ever <strong>one</strong> recipient of a notification sent from a Notification Field. Another difference is that the Notification List uses a static list of addresses defined on the form's settings, while Notification Fields take their options form a field instead.</p>
 <p>Notification Field settings are available to all types of forms.</p>
 <p class="important">
@@ -241,6 +242,11 @@
             <td>{field_extra1}, {field_extra2}</td>
             <td>Extra meta values to be used by the template. These values can be used for any purpose desired, such as additional HTML classes or a custom field description for the form.</td>
         </tr>
+        <tr>
+            <td>Show in Listing?</td>
+            <td>{show_in_listing}</td>
+            <td>Determines if the field will be shown in the <a href="#entries">entries listing</a> for the form. Hiding fields can be helpful to make the entries listing more usable.</td>
+        </tr>
     </tbody>
 </table>
 <h3><a name="layout_library_fields">Library Fields</a></h3>
@@ -288,6 +294,9 @@
 <h2><a name="entries">Viewing and Exporting Entries</a></h2>
 <p>Entries for a form can be viewed by clicking the View Entries link of the form listing. The entries list for a form provides all of it&#39;s entries in a paginated list.</p>
 <p>On the entries list for a form, you may export the entries from the form through the Export Entries button. The file will be downloaded in a CSV formatted text file.</p>
+<h3>Listing Configuration and View Entry</h3>
+<p>You can hide certain columns from the entries listing by turning off the <strong>Show in Listing?</strong> override for the field (see <a href="#layout_field_overrides">Overriding Field Settings</a>). This can help make the view much more usable for more complex forms.</p>
+<p>You may view all of the values recorded for an entry by clicking it's View link or it's ID in the entry listing. This will also show the full content of any longer text fields, which are truncated on the listing screen.</p>
 <h2><a name="delete_form">Deleting a Form</a></h2>
 <p>Deleting a form removes all of it&#39;s settings and deletes all of it&#39;s data from the database.</p>
 <p>You can delete a form and all of it&#39;s data through the Delete command on the form listing. You must confirm the deletion in the following page.</p>

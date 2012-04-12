@@ -1,9 +1,9 @@
 <?php
 
-// @version 0.62
-// @prolib 0.37
+// @version 0.63
+// @prolib 0.38
 
-define('PROFORM_VERSION', '0.62');
+define('PROFORM_VERSION', '0.63');
 define('PROFORM_NAME', 'ProForm');
 define('PROFORM_CLASS', 'Proform'); // must match module class name
 define('PROFORM_DESCRIPTION', 'ProForm is an advanced form management module for ExpressionEngine 2.0, designed to make creation and management of forms easier for developers and end users.');

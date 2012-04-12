@@ -106,7 +106,8 @@ $lang = array(
     'tab_edit_heading' => 'Edit Heading',
     'tab_new_separator' => 'New Form Step',
     'tab_edit_separator' => 'Edit Form Step',
-
+    'tab_view_form_entry' => 'View Entry',
+    
     // Fields
     'field_form_name' => 'Form Short Name',
     'field_form_name_desc' => 'Single word, no spaces, used in templates',
@@ -134,6 +135,7 @@ $lang = array(
     'field_template_desc' => 'Replaces form values as template variables, then runs through full template parser',
 
     'notification_list_name' => 'Notification List Settings',
+    'notification_list_desc' => 'When a new entry is submitted to the form, each of the addresses in the Notification List will be sent a separate email message, generated from the selected template.',
     'field_admin_notification_on' => 'Enable Notification List',
     'field_admin_notification_on_desc' => 'Send a notification to the listed addresses',
     'field_from_address' => 'From Address',
@@ -153,14 +155,15 @@ $lang = array(
     'field_reply_to_field_desc' => 'Field on the form containing the email address to set as this notification\'s Reply-To',
 
     'field_submitter_notification_name' => 'Notification Field Settings - A',
+    'notification_field_desc' => 'Notification Field settings allow the destination for a notification to be entered by the visitor when they fill out the form. Simply specify the name of a List or Text field that will store the address to send the notification to. For more, see the Notification Fields section of the documentation.',
     'field_submitter_notification_on' => 'Enable Group',
     'field_submitter_notification_on_desc' => 'Enable this notification group',
     'field_submitter_notification_template' => 'Template',
     'field_submitter_notification_template_desc' => 'Template from the assigned notifications group to use for generating the notification email body',
     'field_submitter_notification_subject' => 'Subject',
     'field_submitter_notification_subject_desc' => 'Subject line used in notification emails sent to this group',
-    'field_submitter_email_field' => 'Email Field',
-    'field_submitter_email_field_desc' => 'Field on the form containing the email address to send notifications to',
+    'field_submitter_email_field' => 'To Email Field',
+    'field_submitter_email_field_desc' => 'Field on the form containing the email address to send notifications to: use a List type to allow the user to choose a department or individual, or use a Text field to allow them to enter their own address',
     'field_submitter_reply_to_field' => 'Reply-To Field',
     'field_submitter_reply_to_field_desc' => 'Field on the form containing the email address to set as this notification\'s Reply-To',
 
@@ -171,8 +174,8 @@ $lang = array(
     'field_share_notification_template_desc' => 'Template from the assigned notifications group to use for generating the notification email body',
     'field_share_notification_subject' => 'Subject',
     'field_share_notification_subject_desc' => 'Subject line used in notification emails sent to this group',
-    'field_share_email_field' => 'Email Field',
-    'field_share_email_field_desc' => 'Field on the form containing the email address to send notifications to',
+    'field_share_email_field' => 'To Email Field',
+    'field_share_email_field_desc' => 'Field on the form containing the email address to send notifications to: use a List type to allow the user to choose a department or individual, or use a Text field to allow them to enter their own address',
     'field_share_reply_to_field' => 'Reply-To Field',
     'field_share_reply_to_field_desc' => 'Field on the form containing the email address to set as this notification\'s Reply-To',
 
@@ -182,7 +185,7 @@ $lang = array(
     'encryption_toggle_disabled' => 'Encryption cannot be turned on or off if there are already entries in the form',
 
     'field_table_override' => 'Table Override',
-    'field_table_override_desc' => 'Direct all data to this existing table (this is an alpha feature, use with caution)',
+    'field_table_override_desc' => 'Direct all data to this existing table (this is an experimental feature, use with caution)',
 
     'field_safecracker_on' => 'SafeCracker Integration',
     'field_safecracker_on_desc' => 'Store data from this form in a channel through the use of SafeCracker. Note that encryption <strong>cannot</strong> be used when this option is turned on',

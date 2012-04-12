@@ -152,7 +152,7 @@ $alt = FALSE;
                 foreach($hidden_fields as $field):
                     echo '<li>';
                     print_hidden($field); ?>
-                        <label><?php echo $field['field_name']; ?></label>
+                        <label><?php echo $field['field_label']; ?></label>
                         <a href="<?php echo $field['edit_link']; ?>" class="edit action-link">Edit</a>
                         <a href="<?php echo $field['remove_link']; ?>" class="delete action-link">Remove</a>
                     <?php

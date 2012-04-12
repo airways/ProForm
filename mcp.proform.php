@@ -389,7 +389,6 @@ class Proform_mcp {
         if($editing)
         {
             $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_form';
-            $this->sub_page('tab_edit_form');
 
             $form_id = (int)$this->EE->input->get('form_id');
             $query = $this->EE->db->get_where('proform_forms', array('form_id' => $form_id));
@@ -400,6 +399,8 @@ class Proform_mcp {
                 show_error(lang('invalid_form_id').' [9]');
                 return FALSE;
             }
+
+            $this->sub_page(lang('tab_edit_form') . ' <em>' . $form->form_name . '</em>');
 
             $vars['editing'] = TRUE;
             $vars['hidden']['form_id'] = $form_id;
@@ -442,6 +443,10 @@ class Proform_mcp {
         //                                                              array(0 => 'None'));
         $channel_options = array();
 
+        $form_field_options = $form_obj->fields();
+        $form_field_options = $this->prolib->make_options($form_field_options, 'field_name', 'field_label');
+        $form_field_options = array('' => 'None') + $form_field_options;
+
         $types = array(
             'form_id' => 'read_only',
             'entries_count' => 'read_only',
@@ -455,21 +460,31 @@ class Proform_mcp {
             'encryption_on' => (isset($form) AND $form AND $form->count_entries())
                                         ? array('read_only_checkbox', lang('encryption_toggle_disabled'))
                                         : array('checkbox', 'y'),
-            'safecracker_channel_id' => array('dropdown', $channel_options)
+            'safecracker_channel_id' => array('dropdown', $channel_options),
+            
+            
+            'reply_to_address' => array('dropdown', $form_field_options),
+            'reply_to_name' => array('dropdown', $form_field_options),
+            'reply_to_field' => array('dropdown', $form_field_options),
+            'submitter_email_field' => array('dropdown', $form_field_options),
+            'submitter_reply_to_field' => array('dropdown', $form_field_options),
+            'share_email_field' => array('dropdown', $form_field_options),
+            'share_reply_to_field' => array('dropdown', $form_field_options),
         );
 
         $extra = array('after' => array());
 
         if($form_obj->form_type == 'form')
-            $extra['after']['reply_to_name'] = array(array('heading' => lang('notification_list_name')));
+            $extra['after']['reply_to_name'] = array(array('lang_field' => 'reply_to_name', 'heading' => lang('notification_list_name'), 'description' => lang('notification_list_desc')));
         if($form_obj->form_type == 'form' OR $form_obj->form_type == 'share')
-            $extra['after']['reply_to_field'] = array(array('heading' => lang('field_submitter_notification_name')));
+            $extra['after']['reply_to_field'] = array(array('lang_field' => 'reply_to_field', 'heading' => lang('field_submitter_notification_name'), 'description' => lang('notification_field_desc')));
         if($form_obj->form_type == 'form' OR $form_obj->form_type == 'share')
-            $extra['after']['submitter_reply_to_field'] = array(array('heading' => lang('field_share_notification_name')));
+            $extra['after']['submitter_reply_to_field'] = array(array('lang_field' => 'submitter_reply_to_field', 'heading' => lang('field_share_notification_name'), 'description' => lang('notification_field_desc')));
 
         $edit_form = $this->EE->pl_forms->create_cp_form($form_obj, $types, $extra);
 
-
+        // usort($edit_form, array($form_obj, 'cmp_fields_sort'));
+        
         $vars['form'] = $edit_form;
         $vars['_form_title'] = lang($form_obj->form_type.'_title');
         $vars['_form_description'] = lang($form_obj->form_type.'_desc');
@@ -548,6 +563,8 @@ class Proform_mcp {
 
         if($form)
         {
+            $vars['view_entries_link']     = ACTION_BASE.'method=list_entries'.AMP.'form_id='.$form->form_id;
+            
             foreach($form->fields() as $field)
             {
                 $row_array = $field->to_array();;
@@ -1447,13 +1464,14 @@ class Proform_mcp {
         $form = $this->EE->formslib->forms->get($form_id);
 
         // Set up UI
-        $this->sub_page('tab_list_entries', $form->form_name);
+        $this->sub_page(lang('tab_list_entries').' in <em>'.$form->form_name.'</em>');
         $vars['form_id'] = $form_id;
-        $vars['edit_entry_url'] = ACTION_BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_form_entry'.AMP.'form_id='.$form_id;
-        $vars['delete_entry_url'] = ACTION_BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=delete_form_entry'.AMP.'form_id='.$form_id;
+        $vars['view_entry_url'] = ACTION_BASE.'method=view_form_entry'.AMP.'form_id='.$form_id;
+        $vars['delete_entry_url'] = ACTION_BASE.'method=delete_form_entry'.AMP.'form_id='.$form_id;
+        $vars['edit_form_url']     = ACTION_BASE.'method=edit_form'.AMP.'form_id='.$form->form_id;
 
         // Get page of data
-        $entries = $form->entries(array(), $rownum, $this->perpage);
+        $entries = $form->entries(array(), $rownum, $this->perpage, 'updated', 'DESC');
         if(!is_array($entries)) $entries = array();
         if($form->encryption_on == 'y')
         {
@@ -1483,13 +1501,15 @@ class Proform_mcp {
         $fields = $form->fields();
 
         $vars['fields'] = array('updated');
+        $vars['field_types'] = array('updated' => 'datetime');
         foreach($fields as $field)
         {
             if($field->heading) continue;
             if($field->get_form_field_setting('show_in_listing', 'n') != 'y') continue;
             
             $vars['fields'][] = $field->field_name;
-
+            $vars['field_types'][$field->field_name] = $field->type;
+            
             if(array_search($field->field_name, $vars['hidden_columns']) === FALSE)
             {
                 // Prepare headings from lang file and from Field configs
@@ -1507,13 +1527,13 @@ class Proform_mcp {
 
         return $this->EE->load->view('list_entries', $vars, TRUE);
     }
+    
 
-    function edit_form_entry()
+    function view_form_entry()
     {
         $this->EE->load->library('formslib');
 
-        $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_form_entry';
-        $this->sub_page('tab_edit_form_entry');
+        $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=view_form_entry';
 
         $form_id = (int)$this->EE->input->get('form_id');
         $form_entry_id = (int)$this->EE->input->get('entry_id');
@@ -1521,12 +1541,14 @@ class Proform_mcp {
         $form_obj = $this->EE->formslib->forms->get($form_id);
         if($form_obj)
         {
+            $this->sub_page(lang('tab_view_form_entry').' in <em>'.$form_obj->form_name.'</em>');
+
             $query = $this->EE->db->get_where($form_obj->table_name(), array('form_entry_id' => $form_entry_id));
 
             $vars['editing'] = TRUE;
             $vars['hidden'] = array('form_id' => $form_id, 'form_entry_id' => $form_entry_id);
 
-            $form_obj = $query->row();
+            $entry = $query->row();
 
             unset($form_obj->settings);
 
@@ -1536,20 +1558,34 @@ class Proform_mcp {
                 'ip_address' => 'read_only',
                 'user_agent' => 'read_only'
             );
-
+            
             $field_names = array();
             foreach($form_obj->fields() as $field)
             {
-                $field_names[$field->field_name] = $field->field_label;
+                $field_names['field_'.$field->field_name] = $field->field_label;
+                switch($field->type)
+                {
+                    case 'string':
+                        if($field->length > 256)
+                        {
+                            $types[$field->field_name] = 'textarea';
+                        }
+                        break;
+                    case 'text':
+                        $types[$field->field_name] = 'textarea';
+                        break;
+                    default:
+                        break;
+                }
+                $types[$field->field_name] = 'read_only';
             }
             $vars['field_names'] = $field_names;
-
+            $vars['hidden_fields'] = array('dst_enabled');
+            $vars['generic_edit_embedded'] = TRUE;
             //var_dump($form_obj);
-            $form = $this->EE->pl_forms->create_cp_form($form_obj, $types);
+            $form = $this->EE->pl_forms->create_cp_form($entry, $types);
             //var_dump($form);die;
             $vars['form'] = $form;
-
-            $this->_add_key_warnings($vars);
 
             $this->EE->load->library('table');
             return $this->EE->load->view('generic_edit', $vars, TRUE);
