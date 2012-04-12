@@ -228,14 +228,17 @@ class Proform {
         }
 
         $use_captcha = FALSE;
-        if (preg_match("/({".$variable_prefix."captcha})/", $tagdata))
+        if(isset($form_session->config) AND $form_session->config['step'] == $form_obj->get_step_count())
         {
-            $captcha = $this->EE->functions->create_captcha();
-            if(!$captcha && $captcha !== '') $captcha = "[CAPTCHA ERROR]";
-            $tagdata = preg_replace("/{".$variable_prefix."captcha}/", $captcha, $tagdata);
+            if (preg_match("/({".$variable_prefix."captcha})/", $tagdata))
+            {
+                $captcha = $this->EE->functions->create_captcha();
+                if(!$captcha && $captcha !== '') $captcha = "[CAPTCHA ERROR]";
+                $tagdata = preg_replace("/{".$variable_prefix."captcha}/", $captcha, $tagdata);
 
-            if($captcha !== '')
-                $use_captcha = TRUE;
+                if($captcha !== '')
+                    $use_captcha = TRUE;
+            }
         }
 
 

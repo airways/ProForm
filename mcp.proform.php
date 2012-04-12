@@ -444,7 +444,7 @@ class Proform_mcp {
         $channel_options = array();
 
         $form_field_options = $form_obj->fields();
-        $form_field_options = $this->prolib->make_options($form_field_options, 'field_label', 'field_name');
+        $form_field_options = $this->prolib->make_options($form_field_options, 'field_name', 'field_label');
         $form_field_options = array('' => 'None') + $form_field_options;
 
         $types = array(
