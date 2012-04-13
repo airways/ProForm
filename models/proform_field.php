@@ -13,16 +13,16 @@ class PL_Field extends PL_RowInitialized
             'time'          => array('type' => 'time', 'constraint' => FALSE),
             'datetime'      => array('type' => 'datetime', 'constraint' => FALSE),
             'file'          => array('type' => 'varchar'),
-            'string'        => array('type' => 'varchar', 'limit' => 256, 'limit_promote' => 'text'),
+            'string'        => array('type' => 'varchar', 'limit' => 255, 'limit_promote' => 'text'),
             'text'          => array('type' => 'text'),
             'int'           => array('type' => 'int', 'constraint' => '11'),
             'float'         => array('type' => 'float', 'constraint' => '53'),
             'currency'      => array('type' => 'decimal', 'constraint' => '10,2'),
             'list'          => array('type' => 'text'),
             'mailinglist'   => array('type' => 'varchar', 'constraint' => '90'),
-            'hidden'        => array('type' => 'varchar', 'limit' => 256, 'limit_promote' => 'text'),
-            'secure'        => array('type' => 'varchar', 'limit' => 256, 'limit_promote' => 'text'),
-            'member_data'   => array('type' => 'varchar', 'limit' => 256, 'limit_promote' => 'text'),
+            'hidden'        => array('type' => 'varchar', 'limit' => 255, 'limit_promote' => 'text'),
+            'secure'        => array('type' => 'varchar', 'limit' => 255, 'limit_promote' => 'text'),
+            'member_data'   => array('type' => 'varchar', 'limit' => 255, 'limit_promote' => 'text'),
         )
     );
 
@@ -83,7 +83,7 @@ class PL_Field extends PL_RowInitialized
         // Make sure we always have a resonable length limit
         if(!isset($this->length) || is_null($this->length) || $this->length <= 0)
         {
-            $this->length = 256;
+            $this->length = 255;
         }
     }
 
@@ -118,7 +118,7 @@ class PL_Field extends PL_RowInitialized
             case 'file':
                 return 'file';
             case 'string':
-                if($this->length < 256)
+                if($this->length < 255)
                     return 'text';
                 else
                     return 'textarea';

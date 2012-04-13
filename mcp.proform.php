@@ -945,7 +945,7 @@ class Proform_mcp {
 
         $vars = array();
         $vars['field_type'] = $this->EE->input->get('field_type');
-        $vars['field_length'] = ($n = $this->EE->input->get('field_length')) ? $n : 256;
+        $vars['field_length'] = ($n = $this->EE->input->get('field_length')) ? $n : 255;
         $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_field';
         $auto_add_form_id = $this->EE->input->get_post('auto_add_form_id');
 
@@ -1566,7 +1566,7 @@ class Proform_mcp {
                 switch($field->type)
                 {
                     case 'string':
-                        if($field->length > 256)
+                        if($field->length > 255)
                         {
                             $types[$field->field_name] = 'textarea';
                         }
