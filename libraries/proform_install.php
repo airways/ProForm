@@ -109,7 +109,7 @@ class Proform_install
             'form_type'                         => array('type' => 'varchar', 'constraint' => '10',     'default' => 'form'),
             'encryption_on'                     => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
             'safecracker_channel_id'            => array('type' => 'int', 'constraint' => '10',         'default' => 0),
-            'reply_to_address'                  => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
+            'reply_to_address'                  => array('type' => 'varchar', 'constraint' => '255',    'default' => ''),
             'reply_to_name'                     => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
             'table_override'                    => array('type' => 'varchar', 'constraint' => '128',    'default' => ''),
             'settings'                          => array('type' => 'blob',                              'default' => ''),
@@ -178,7 +178,7 @@ class Proform_install
             'field_name'    => array('type' => 'varchar', 'constraint' => '32'),
             'is_required'   => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'),
             'form_field_settings'      => array('type' => 'blob'),
-            'heading'       => array('type' => 'varchar', 'constraint' => 256, 'default' => ''),
+            'heading'       => array('type' => 'varchar', 'constraint' => 255, 'default' => ''),
             'separator_type'=> array('type' => 'varchar', 'constraint' => 4, 'default' => ''),
         );
         $this->EE->dbforge->add_field($fields);
@@ -191,7 +191,7 @@ class Proform_install
         $fields = array(
             'preference_id'    => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE, 'auto_increment' => TRUE),
             'preference_name'  => array('type' => 'varchar', 'constraint' => '64'),
-            'value'            => array('type' => 'varchar', 'constraint' => '256'),
+            'value'            => array('type' => 'varchar', 'constraint' => '255'),
             'settings'         => array('type' => 'text')
         );
         $forge->add_field($fields);
@@ -295,7 +295,7 @@ class Proform_install
         if($current < 0.44)
         {
             $fields = array(
-                'heading' => array('type' => 'varchar', 'constraint' => 256, 'default' => '')
+                'heading' => array('type' => 'varchar', 'constraint' => 255, 'default' => '')
             );
             $forge->add_column('proform_form_fields', $fields);
         }
@@ -345,6 +345,19 @@ class Proform_install
                 'placeholder' => array('type' => 'varchar', 'constraint' => '250', 'default' => ''),
             );
             $forge->add_column('proform_fields', $fields);
+        }
+        
+        if($current < 1.02)
+        {
+            // Fix length restrictions in MySQL prior to 5.0.3.
+            $fields = array(
+                'reply_to_address' => array('name' => 'reply_to_address', 'type' => 'varchar', 'constraint' => '255',     'default' => ''),
+            );
+            $forge->modify_column('proform_forms', $fields);
+            $fields = array(
+                'heading' => array('name' => 'heading', 'type' => 'varchar', 'constraint' => 255, 'default' => ''),
+            );
+            $forge->modify_column('proform_form_fields', $fields);
         }
 
         return TRUE;

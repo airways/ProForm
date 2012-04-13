@@ -13,6 +13,8 @@
     <li>Drag &amp; drop form layout in Control Panel</li>
     <li>Simple one line tag to render any form on your site</li>
     <li>Optional full ExpressionEngine template support for rendering multiple forms from a <strong>single</strong> custom template</li>
+    <li>Multistep form support</li>
+    <li>AJAX posting</li>
     <li>Mailing list opt-in</li>
     <li>CAPTCHA support to help prevent spam</li>
     <li>File uploads</li>

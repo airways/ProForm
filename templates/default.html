@@ -40,7 +40,7 @@
                         {if pf_field_validation:valid_email}
                             <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="validate-email {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
                         {if:else}
-                            {if pf_field_length <= 256}
+                            {if pf_field_length <= 255}
                                 <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="{pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
                             {if:else}
                                 {if pf_wysiwyg}
