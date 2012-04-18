@@ -438,6 +438,19 @@ class PL_Form extends PL_RowInitialized {
         return TRUE;
     }
 
+    function get_inserted_id()
+    {
+        switch($this->form_type)
+        {
+            case 'form':
+                return $this->__EE->db->insert_id();
+                break;
+            case 'share':
+                return 0;
+                break;
+        }
+    }
+    
     function get_entry($entry_id)
     {
         return $this->__EE->db->get_where($this->table_name(), array('form_entry_id' => $entry_id))->row();
