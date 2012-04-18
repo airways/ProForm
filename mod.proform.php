@@ -1258,7 +1258,9 @@ class Proform {
             //     "parse_data:" => $parse_data,
             //     "entry_row:" => $entry_row,
             // ));
-
+            
+            $this->EE->proform_notifications->debug = $form_session->config['debug'];
+            
             if(!$this->EE->proform_notifications->send_notifications($form_obj, $parse_data, $form_session))
             {
                 if($form_session->config['debug'])
