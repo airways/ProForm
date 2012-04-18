@@ -277,7 +277,7 @@ class Proform_notifications
             $this->_debug($template);
             // $message = $this->EE->parser->parse_string($template, $data, TRUE);
             // $subject = $this->EE->parser->parse_string($subject, $data, TRUE);
-
+// echo "<b>_send_notifications TEMPLATE PARSING</b>";
             $message = $this->EE->pl_parser->parse_variables_ex(array(
                 'rowdata' => $template,
                 'row_vars' => $data,
@@ -296,7 +296,10 @@ class Proform_notifications
 
             // final output to send
             $message = $this->EE->template->final_template;
-
+// var_dump($this->EE->pl_parser->variable_prefix);
+// var_dump($data);
+// echo htmlentities($message);
+// exit;
             $result = TRUE;
             foreach($notification_list as $to_email)
             {

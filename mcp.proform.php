@@ -517,7 +517,7 @@ class Proform_mcp {
             $vars['hidden_fields'][] = 'encryption_on';
         }
 
-        if($this->EE->config->item('proform_allow_table_override') != 'y')
+        if($this->EE->config->item('proform_allow_table_override') != 'y' || $form_obj->form_type != 'form')
         {
             $vars['hidden_fields'][] = 'table_override';
         }

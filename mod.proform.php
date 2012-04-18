@@ -1200,8 +1200,13 @@ class Proform {
 
                     $this->_process_insert($form_obj, $form_session);
 
-                    $form_session->values['entry_id'] = $this->EE->db->insert_id();
-                    $entry_data = $form_obj->get_entry($form_session->values['entry_id']);
+                    $form_session->values['entry_id'] = $form_obj->get_inserted_id();
+                    if($form_session->values['entry_id'])
+                    {
+                        $entry_data = $form_obj->get_entry($form_session->values['entry_id']);
+                    } else {
+                        $entry_data = $form_session->values;
+                    }
 
                     $this->_process_notifications($form_obj, $form_session, $entry_data);
 
@@ -1253,7 +1258,9 @@ class Proform {
             //     "parse_data:" => $parse_data,
             //     "entry_row:" => $entry_row,
             // ));
-
+            
+            $this->EE->proform_notifications->debug = $form_session->config['debug'];
+            
             if(!$this->EE->proform_notifications->send_notifications($form_obj, $parse_data, $form_session))
             {
                 if($form_session->config['debug'])
