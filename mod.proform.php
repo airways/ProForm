@@ -1160,7 +1160,7 @@ class Proform {
             $this->_process_validation($form_obj, $form_session);
 
             // Do final processing before inserting
-            if($this->EE->input->get_post('_pf_finish') != FALSE)
+            if($this->EE->input->get_post('_pf_finish') != FALSE OR $form_obj->get_step_count() == 1)
             {
                 if($form_session->config['use_captcha'])
                 {
@@ -1193,7 +1193,7 @@ class Proform {
                 }
             } else {
                 // If no errors and we are on the last step of the form, insert the data.
-                if($this->EE->input->get_post('_pf_finish') != FALSE)
+                if($this->EE->input->get_post('_pf_finish') != FALSE OR $form_obj->get_step_count() == 1)
                 {
                     $form_session->values['ip_address'] = $this->EE->input->ip_address();
                     $form_session->values['user_agent'] = $this->EE->agent->agent_string();

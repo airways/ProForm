@@ -118,7 +118,7 @@ class PL_Field extends PL_RowInitialized
             case 'file':
                 return 'file';
             case 'string':
-                if($this->length < 255)
+                if($this->length <= 255)
                     return 'text';
                 else
                     return 'textarea';
