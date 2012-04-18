@@ -493,7 +493,7 @@ class Proform {
                 $variables['fields_count'] = count($variables['fields']);
                 $variables['complete'] = $complete;
                 if(isset($form_session->processed) AND $form_session->processed 
-                    AND isset($form_session->config['form_name']) AND $form_session->config['form_name'] != $form_obj->form_name)
+                    AND isset($form_session->config['form_name']) AND $form_session->config['form_name'] == $form_obj->form_name)
                 {
                     $variables['errors'] = array();
                     foreach($form_session->errors as $field => $errors)
