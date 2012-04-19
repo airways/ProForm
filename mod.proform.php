@@ -57,7 +57,10 @@ class Proform {
         'valid_email'   => '@',
     );
     var $prefix_included = FALSE;
-    
+    var $debug = FALSE;
+    var $debug_str = '<b>Debug Output</b><br/>';
+
+
     public function Proform()
     {
         $this->__construct();
@@ -180,7 +183,7 @@ class Proform {
         $notify             = explode('|', $this->EE->TMPL->fetch_param('notify', ''));
         $download_url       = $this->EE->TMPL->fetch_param('download_url',  '');
         $download_label     = $this->EE->TMPL->fetch_param('download_label',  '');
-        $debug              = $this->EE->TMPL->fetch_param('debug', 'false') == 'yes';
+        $this->debug        = $this->EE->TMPL->fetch_param('debug', 'false') == 'yes';
         $error_delimiters   = explode('|', $this->EE->TMPL->fetch_param('error_delimiters',  '<div class="error">|</div>'));
         $error_messages     = $this->EE->pl_parser->fetch_param_group('message');
         $step               = (int)$this->EE->TMPL->fetch_param('step', 1);
@@ -272,7 +275,7 @@ class Proform {
                 'download_url'      => $download_url,
                 'download_label'    => $download_label,
                 'referrer_url'      => $this->EE->agent->is_referral() ? $this->EE->agent->referrer() : '',
-                'debug'             => $debug,
+                'debug'             => $this->debug,
                 'error_delimiters'  => $error_delimiters,
                 'secure'            => $secure,
                 'error_messages'    => $error_messages,
@@ -565,8 +568,13 @@ class Proform {
     {
         $this->EE->load->library('formslib');
 
+        $this->debug              = $this->EE->TMPL->fetch_param('debug', 'false') == 'yes';
+
         $variables = $this->_get_results();
         $this->return_data = $this->EE->pl_parser->parse_variables($this->EE->TMPL->tagdata, $variables, $this->var_pairs);
+        
+        $this->dump_debug();
+        
         return $this->return_data;
     }
 
@@ -579,8 +587,7 @@ class Proform {
         );
 
         if(isset($_SESSION['pl_form']['thank_you_form'])
-            AND isset($_SESSION['pl_form']['result_session'])
-            AND isset($_SESSION['pl_form']['result_config']))
+            AND isset($_SESSION['pl_form']['result_session']))
         {
             $form_session   = unserialize($_SESSION['pl_form']['result_session']);
             $form_name      = $_SESSION['pl_form']['thank_you_form'];
@@ -603,6 +610,8 @@ class Proform {
                 //$this->prolib->debug($variables);
 
             }
+        } else {
+            $this->_debug('Incomplete session data', $_SESSION['pl_form']);
         }
 
         return $variables;
@@ -1259,6 +1268,7 @@ class Proform {
             //     "entry_row:" => $entry_row,
             // ));
             
+            $this->debug = $form_session->config['debug'];
             $this->EE->proform_notifications->debug = $form_session->config['debug'];
             
             if(!$this->EE->proform_notifications->send_notifications($form_obj, $parse_data, $form_session))
@@ -2016,5 +2026,20 @@ class Proform {
         }
     } // function fetch_pagination_data
 
+    function _debug($msg, $object=FALSE)
+    {
+        if($this->debug)
+        {
+            $this->debug_str .= ($object ? '<b>' : '') . htmlentities($msg) . ($object ? ':</b><br/>' . print_r($object, TRUE) : '') . '<br/>';
+        }
+    }
+
+    function dump_debug()
+    {
+        if($this->debug)
+        {
+            echo $this->debug_str;
+        }
+    }
 }
 
