@@ -255,12 +255,16 @@ class Proform_notifications
             if($this->debug)
             {
                 echo $this->debug_str;
+                echo lang('debug_stop');
+                exit;
             }
             return $result;
         } else {
             if($this->debug)
             {
                 echo $this->debug_str;
+                echo lang('debug_stop');
+                exit;
             }
             return FALSE;
         }

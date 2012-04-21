@@ -2039,6 +2039,9 @@ class Proform {
         if($this->debug)
         {
             echo $this->debug_str;
+            $this->EE->lang->loadfile('proform');
+            echo lang('debug_stop');
+            exit;
         }
     }
 }

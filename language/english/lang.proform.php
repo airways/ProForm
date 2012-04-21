@@ -275,6 +275,8 @@ $lang = array(
     'msg_heading_added' => 'New heading successfully added to the form',
     'msg_heading_edited'=> 'Heading successfully edited',
 
+    'debug_stop' => '<hr/>Processing stopped to review debug output - remove the debug="yes" parameter from your tag if you do not wish to see this message any more.',
+    
     // End
     '' => ''
 

@@ -13,7 +13,7 @@
 
 <p class="strongbox">Example Template</p>
 <pre class="brush: xml">
-&#123;exp:proform:form form_name="&#123;segment_2&#125;" variable_prefix="pf_" debug="yes"&#125;
+&#123;exp:proform:form form_name="&#123;segment_2&#125;" variable_prefix="pf_"&#125;
     &#123;if no_results&#125;
         Invalid form name specified!
     &#123;/if&#125;
