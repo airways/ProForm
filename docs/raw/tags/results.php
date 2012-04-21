@@ -17,9 +17,21 @@
 
 <h2><a name="parameters">Parameters</a></h2>
 
-<p>The <kbd>Results Tag</kbd> does not accept parameters. It takes all data from the visitor's session.</p>
+
+<p>The <kbd>Results Tag</kbd> takes all of it's data from the visitor's session.</p>
 
 <p>This tag should be used in the template that handles the <a href="{root_url}tags/form.html#param_thank_you_url">thank_you_url</a> path sent to the <kbd>Form Tag</kbd>.</p>
+
+<p>It does however accept one parameter:</p>
+
+<ul>
+    <li><a href="#param_debug">debug="yes"</a></li>
+</ul>
+
+<h3><a name="param_debug">debug="yes"</a></h3>
+
+<p>The <b>debug</b> parameter turns on debug mode for <dfn>ProForm</dfn>, which will provide some additional information in order to assist in tracing it's behavior.</p>
+
 
 <!-- ********************************************************************** -->
 <h2><a name="variables">Single Variables</a></h2>
