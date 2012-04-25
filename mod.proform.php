@@ -1927,6 +1927,8 @@ class Proform {
                 }
             }
 
+            $field_array['field_value_label'] = '';
+            
             if(is_array($field->settings))
             {
                 foreach($field->settings as $k => $v)
@@ -1940,7 +1942,15 @@ class Proform {
                     {
 //  var_dump($field_values[$field->field_name]);exit;
                         $v = $field->get_list_options($field_values[$field->field_name]);
+                        foreach($v as $list_option)
+                        {
+                            if($list_option['selected'])
+                            {
+                                $field_array['field_value_label'] = $list_option['label'];
+                            }
+                        }
                     }
+                    
                     $field_array['field_setting_'.$k] = $v;
                 }
             }
