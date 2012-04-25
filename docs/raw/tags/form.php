@@ -561,6 +561,7 @@
     <li><a href="#var_field_extra_2">{field_extra_2}</a></li>
     <li><a href="#var_field_validation">{field_validation:*}</a></li>
     <li><a href="#var_field_value">{field_value}</a></li>
+    <li><a href="#var_field_value_label">{field_value_label}</a></li>
 </ul>
 
 <h4>{fields} Variable Pairs</h4>
@@ -658,6 +659,10 @@
 <h6><a name="var_field_value">{field_value}</a></h6>
 
 <p>The value of the field as it was submitted. Use this to preserve values when errors have occurred in other fields.</p>
+
+<h6><a name="var_field_value_label">{field_value_label}</a></h6>
+
+<p><b>Only valid for list type fields.</b> Provides the label of the selected option. This is useful for notification templates primarily, where you may want to display the label of the selected value rather than the actual value stored in the DB.</p>
 
 <h5>{fields} Variable Pairs</h5>
 
