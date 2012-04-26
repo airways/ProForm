@@ -73,9 +73,17 @@ $alt = FALSE;
                 <a href="<?php echo $field['edit_link']; ?>" class="edit action-link">Edit</a>
                 <a href="<?php echo $field['remove_link']; ?>" class="delete action-link">Remove</a>
                 <?php
-                if($field['heading']): ?>
-                    <h3><?php echo $field['heading']; ?></h3>
-                <?php else:
+                if($field['heading']): 
+                    switch($field['separator_type']):
+                        case 'HTML': ?>
+                            <div><?php echo nl2br(strip_tags($field['heading'])); ?></div>
+                            <?
+                            break;
+                        default: ?>
+                            <h3><?php echo $field['heading']; ?></h3>
+                <?php 
+                    endswitch;
+                else:
                     switch($field['type']):
                         case 'string': case 'text':
                         if($field['length'] > 255 || $field['type'] == 'text'): ?>

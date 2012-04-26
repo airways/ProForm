@@ -43,8 +43,10 @@
         &lt;ul class="pf_row"&gt;
             &#123;pf_fields&#125;
                 &lt;li id="&#123;pf_field_html_id&#125;" class="pf_column &#123;pf_field_html_class&#125;"&gt;
-                &#123;if pf_field_heading&#125;
-                    &lt;h3&gt;&#123;pf_field_heading&#125;&lt;/h3&gt;
+                &#123;if pf_field_html_block&#125;
+                    &#123;pf_field_html_block&#125;
+                &#123;if:elseif pf_field_heading&#125;
+                    <h3>&#123;pf_field_heading&#125;</h3>
                 &#123;if:else&#125;
                     &#123;if pf_field_type != "checkbox"&#125;
                         &lt;label for="&#123;pf_field_name&#125;"&gt;&#123;pf_field_label&#125; &#123;if pf_field_is_required&#125;&lt;span class="required"&gt;*&lt;/span&gt;&#123;/if&#125;&lt;/label&gt;
