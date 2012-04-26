@@ -106,6 +106,10 @@ $lang = array(
     'tab_edit_heading' => 'Edit Heading',
     'tab_new_separator' => 'New Form Step',
     'tab_edit_separator' => 'Edit Form Step',
+    'tab_delete_separator' => 'Delete Step',
+    'tab_new_html_block' => 'New HTML Block',
+    'tab_edit_html_block' => 'Edit HTML Block',
+    'tab_delete_html_block' => 'Delete HTML Block',
     'tab_view_form_entry' => 'View Entry',
     
     // Fields
@@ -222,6 +226,8 @@ $lang = array(
 
     'field_heading' => 'Heading',
     'field_step_name' => 'Step Name',
+    'field_html_block' => 'HTML Content',
+    
     'field_reusable' => 'Reusable',
     'field_reusable_desc' => 'Places the field in the Library section of the Toolbox, allowing you to easily reuse it',
 
@@ -274,7 +280,12 @@ $lang = array(
 
     'msg_heading_added' => 'New heading successfully added to the form',
     'msg_heading_edited'=> 'Heading successfully edited',
-
+    'msg_step_added' => 'New step successfully added to the form',
+    'msg_step_edited' => 'Step successfully edited',
+    'msg_html_block_added' => 'New HTML Block successfully added to the form',
+    'msg_html_block_edited' => 'HTML Block successfully edited',
+    
+    
     'debug_stop' => '<hr/>Processing stopped to review debug output - remove the debug="yes" parameter from your tag if you do not wish to see this message any more.',
     
     // End

@@ -37,6 +37,7 @@ class PL_Form extends PL_RowInitialized {
 
     const SEPARATOR_HEADING  = 'HEAD';
     const SEPARATOR_STEP     = 'STEP';
+    const SEPARATOR_HTML     = 'HTML';
 
     public static $default_form_field_settings = array(
         'label'             => '',

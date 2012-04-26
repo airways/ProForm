@@ -548,6 +548,8 @@
     <li><a href="#var_field_id">{field_id}</a></li>
     <li><a href="#var_field_name">{field_name}</a></li>
     <li><a href="#var_field_label">{field_label}</a></li>
+    <li><a href="#var_field_heading">{field_heading}</a></li>
+    <li><a href="#var_field_html_block">{field_html_block}</a></li>
     <li><a href="#var_field_type">{field_type}</a></li>
     <li><a href="#var_field_length">{field_length}</a></li>
     <li><a href="#var_field_is_required">{field_is_required}</a></li>
@@ -585,6 +587,14 @@
 <h6><a name="var_field_label">{field_label}</a></h6>
 
 <p>A human friendly label for the field, typically contained within a label tag attached to the input element.</p>
+
+<h6><a name="var_field_heading">{field_heading}</a></h6>
+
+<p>For items that are actually Headings within a form, will be set to the heading value. If this value is not blank, the item is either a normal field or a HTML block.</p>
+
+<h6><a name="var_field_html_block">{field_html_block}</a></h6>
+
+<p>For items that are actually HTML blocks within a form, will be set to the block of HTML. If this value is not blank, the item is either a normal field or a Heading.</p>
 
 <h6><a name="var_field_type">{field_type}</a></h6>
 

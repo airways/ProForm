@@ -29,7 +29,9 @@
         <ul class="pf_row">
             {pf_fields}
                 <li id="{pf_field_html_id}" class="pf_column {pf_field_html_class}">
-                {if pf_field_heading}
+                {if pf_field_html_block}
+                    {pf_field_html_block}
+                {if:elseif pf_field_heading}
                     <h3>{pf_field_heading}</h3>
                 {if:else}
                     {if pf_field_type != "checkbox"}
