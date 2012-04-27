@@ -374,24 +374,31 @@ class PL_Form extends PL_RowInitialized {
                     foreach($search as $field => $val)
                     {
                         if(!$this->__fields) $this->fields();
-                        if(array_search($field, array_keys($this->__fields)) === FALSE)
+                        switch($field)
                         {
-                            show_error($this->__EE->lang->line('invalid_field_name').': "'.$field.'"');
-                        }
-
-                        if(preg_match("/([|<|>|!|=|]+)/i", $val, $matches))
-                        {
-                            // delete old field pair
-                            unset($search[$field]);
-
-                            // remove the operator from value
-                            $val = str_replace($matches[1], '', $val);
-
-                            // move it to the end of the field name
-                            $field = $field.' '.$matches[1];
-
-                            // set new pair
-                            $search[$field] = $val;
+                            case 'form_entry_id':
+                                $search['form_entry_id'] = $val;
+                                break;
+                            default:
+                                if(array_search($field, array_keys($this->__fields)) === FALSE)
+                                {
+                                    show_error($this->__EE->lang->line('invalid_field_name').': "'.$field.'"');
+                                }
+        
+                                if(preg_match("/([|<|>|!|=|]+)/i", $val, $matches))
+                                {
+                                    // delete old field pair
+                                    unset($search[$field]);
+        
+                                    // remove the operator from value
+                                    $val = str_replace($matches[1], '', $val);
+        
+                                    // move it to the end of the field name
+                                    $field = $field.' '.$matches[1];
+        
+                                    // set new pair
+                                    $search[$field] = $val;
+                                }
                         }
                     }
                     $this->__EE->db->where($search);
