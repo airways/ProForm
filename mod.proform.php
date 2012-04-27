@@ -1939,7 +1939,7 @@ class Proform {
                         $k = substr($k, 5);
                     }
 
-                    if($k == 'list')
+                    if($k == 'list' && isset($field_values[$field->field_name]))
                     {
 //  var_dump($field_values[$field->field_name]);exit;
                         $v = $field->get_list_options($field_values[$field->field_name]);
