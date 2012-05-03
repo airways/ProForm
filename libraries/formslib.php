@@ -59,6 +59,8 @@ class Formslib
     {
         prolib($this, 'proform');
 
+        $this->prolib->pl_plugins->init();
+        
         // If there are already any encrypted forms, then we will default the option to allow encryption
         // to on. This option was not available in previous versions, where encryption was always
         // available. Since it is often not implemented correctly, we are now turning off the option

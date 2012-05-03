@@ -3,8 +3,9 @@
 class PL_Form extends PL_RowInitialized {
 
     var $__fields = FALSE;
+    var $__db_fields = FALSE;
     var $__entries = FALSE;
-
+    
     var $form_id;
     var $form_type = 'form';
     var $form_label;
@@ -272,6 +273,15 @@ class PL_Form extends PL_RowInitialized {
         return $this->__fields;
     }
 
+    function db_fields()
+    {
+        if(!$this->__db_fields)
+        {
+            $this->__db_fields = $this->EE->db->list_fields($this->table_name());
+        }
+        return $this->__db_fields;
+    }
+
     // unserialize settings for a form field assignment row and merge with default values
     function get_form_field_settings($settings='')
     {
@@ -301,6 +311,11 @@ class PL_Form extends PL_RowInitialized {
 
     function get_field($field_id)
     {
+        if(!$this->__fields)
+        {
+            $this->fields();
+        }
+        
         foreach($this->__fields as $field)
         {
             if($field->field_id == $field_id)
@@ -374,31 +389,31 @@ class PL_Form extends PL_RowInitialized {
                     foreach($search as $field => $val)
                     {
                         if(!$this->__fields) $this->fields();
-                        switch($field)
+                        if(!$this->__db_fields) $this->db_fields();
+                        
+                        if(in_array($field, $this->__db_fields))
                         {
-                            case 'form_entry_id':
-                                $search['form_entry_id'] = $val;
-                                break;
-                            default:
-                                if(array_search($field, array_keys($this->__fields)) === FALSE)
-                                {
-                                    show_error($this->__EE->lang->line('invalid_field_name').': "'.$field.'"');
-                                }
-        
-                                if(preg_match("/([|<|>|!|=|]+)/i", $val, $matches))
-                                {
-                                    // delete old field pair
-                                    unset($search[$field]);
-        
-                                    // remove the operator from value
-                                    $val = str_replace($matches[1], '', $val);
-        
-                                    // move it to the end of the field name
-                                    $field = $field.' '.$matches[1];
-        
-                                    // set new pair
-                                    $search[$field] = $val;
-                                }
+                            $search[$field] = $val;
+                        } else {
+                            if(array_search($field, array_keys($this->__fields)) === FALSE)
+                            {
+                                show_error($this->__EE->lang->line('invalid_field_name').': "'.$field.'"');
+                            }
+    
+                            if(preg_match("/([|<|>|!|=|]+)/i", $val, $matches))
+                            {
+                                // delete old field pair
+                                unset($search[$field]);
+    
+                                // remove the operator from value
+                                $val = str_replace($matches[1], '', $val);
+    
+                                // move it to the end of the field name
+                                $field = $field.' '.$matches[1];
+    
+                                // set new pair
+                                $search[$field] = $val;
+                            }
                         }
                     }
                     $this->__EE->db->where($search);
@@ -651,6 +666,7 @@ class PL_Form extends PL_RowInitialized {
 
         // trigger refresh on next request for field list
         $this->__fields = FALSE;
+        $this->__db_fields = FALSE;
     } // function assign_field()
 
 
@@ -691,6 +707,7 @@ class PL_Form extends PL_RowInitialized {
 
         // trigger refresh on next request for field list
         $this->__fields = FALSE;
+        $this->__db_fields = FALSE;
     }
 
     function update_separator($form_field_id, $heading, $type=PL_Form::SEPARATOR_HEADING)
@@ -771,6 +788,7 @@ class PL_Form extends PL_RowInitialized {
 
         // trigger refresh on next request for field list
         $this->__fields = FALSE;
+        $this->__db_fields = FALSE;
     }
 
     static function make_table_name($form_name)

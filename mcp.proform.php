@@ -46,7 +46,7 @@ if(!defined('ACTION_BASE'))
     define('ACTION_BASE', BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP);
 }
 
-class Proform_mcp {
+class Proform_mcp extends Prolib_mcp {
 
     var $pipe_length = 1;
     var $perpage = 20;
@@ -1141,10 +1141,18 @@ class Proform_mcp {
         $this->_run_validation('edit_field');
 
         $field_id = $this->EE->input->post('field_id');
+        $field_name = (int)$this->EE->input->post('field_name');
         $form_id = (int)$this->EE->input->get('form_id');
 
 
         if(!$field_id || $field_id <= 0) show_error(lang('invalid_field_id'));
+        
+        // Check for a valid field name. We need to prevent some built-in reserved field
+        // names from being used.
+        if(!trim($field_name) 
+            || $field_name == "form_entry_id" || $field_name == "updated" || $field_name == "ip_address"
+            || $field_name == "user_agent" || $field_name == "dst_enabled")
+                show_error(lang('invalid_field_name'));
 
         // find field
         $this->EE->load->library('formslib');
@@ -1487,7 +1495,7 @@ class Proform_mcp {
         $rownum = (int)$this->EE->input->get_post('rownum');
 
         // Get form object
-        $form = $this->EE->formslib->forms->get($form_id);
+        $form = &$this->EE->formslib->forms->get($form_id);
 
         // Set up UI
         $this->sub_page(lang('tab_list_entries').' in <em>'.$form->form_name.'</em>');
@@ -1497,7 +1505,9 @@ class Proform_mcp {
         $vars['edit_form_url']     = ACTION_BASE.'method=edit_form'.AMP.'form_id='.$form->form_id;
 
         // Get page of data
-        $entries = $form->entries(array(), $rownum, $this->perpage, 'updated', 'DESC');
+        $search = $this->prolib->pl_plugins->list_entries_search($form_id, array());
+        //var_dump($form->__internal_fields);exit;
+        $entries = $form->entries($search, $rownum, $this->perpage, 'updated', 'DESC');
         if(!is_array($entries)) $entries = array();
         if($form->encryption_on == 'y')
         {
@@ -1551,7 +1561,11 @@ class Proform_mcp {
         $headings[] = lang('heading_commands');
         $vars['headings'] = $headings;
 
-        return $this->EE->load->view('list_entries', $vars, TRUE);
+        
+        $vars = $this->prolib->pl_plugins->list_entries($vars);
+        $vars['pl_plugins'] = &$this->prolib->pl_plugins;
+        $output = $this->EE->load->view('list_entries', $vars, TRUE);
+        return $this->prolib->pl_plugins->list_entries_view($output);
     }
     
 
@@ -1900,6 +1914,7 @@ class Proform_mcp {
         $vars['message'] = $this->EE->session->flashdata('message') ? $this->EE->session->flashdata('message') : false;
         $vars['error'] = $this->EE->session->flashdata('error') ? $this->EE->session->flashdata('error') : false;
     }
+    
 }
 
 
