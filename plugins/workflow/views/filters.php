@@ -1,25 +1,9 @@
-<style>
-    .filters {
-        margin-bottom: 10px;
-    }
-
-    .filters label {
-        margin-right: 10px;
-    }
-
-    .filters input,
-    .filters select {
-        margin-right: 20px;
-    }
-</style>
+<?php include $this->view_path.'header.php'; ?>
 
 <form method="get">
-    <?php echo $this->form_cp_action_fields(); ?>
+    <?php echo $this->form_cp_action_fields('fields', array('workflow_status', 'workflow_assignment', 'rownum')); ?>
     <label for="workflow_status">Status</label>
-    <?php echo form_dropdown('workflow_status', array(
-        'all' => 'All',
-        'open' => 'Open',
-        'closed' => 'Closed'), $workflow_status); ?>
+    <?php echo form_dropdown('workflow_status', $status_options, $workflow_status); ?>
     
     <label for="workflow_assignment">Assignment</label>
     <?php echo form_dropdown('workflow_assignment', array(

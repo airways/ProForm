@@ -66,30 +66,39 @@ END
             $row = array('<a href="'.$view_entry_url.'&entry_id='.$entry->form_entry_id.'">'.htmlspecialchars($entry->form_entry_id).'</a>');
 
             //$row[] = '<a href="'.$field->edit_link.'">'.entry->id.'</a>';
-            foreach($fields as $field)
+            foreach($entry as $field => $value)
             {
-                $value = $entry->$field;
+//                $value = $entry->$field;
 
                 if(array_search($field, $hidden_columns) === FALSE)
                 {
-                    if(strlen($value) > 300)
+                    if(isset($field_types[$field]))
                     {
-                        $value = substr($value, 0, 300).'...';
-                    }
-
-                    $value = strip_tags($value);
-                    if(strlen($value) > 150)
-                    {
-                        $value = substr($value, 0, 150).'...';
-                    }
+                        if($field_types[$field] == 'control')
+                        {
+                            $row[] = '<span class="'.$field_types[$field].$short.'">'.$value.'</span>';
+                        } else {
+                            if(strlen($value) > 300)
+                            {
+                                $value = substr($value, 0, 300).'...';
+                            }
+        
+                            $value = strip_tags($value);
+                            if(strlen($value) > 150)
+                            {
+                                $value = substr($value, 0, 150).'...';
+                            }
+                            
+                            if(strlen($value) < 20)
+                            {
+                                $short = ' short';
+                            } else {
+                                $short = '';
+                            }
                     
-                    if(strlen($value) < 20)
-                    {
-                        $short = ' short';
-                    } else {
-                        $short = '';
+                            $row[] = '<span class="'.$field_types[$field].$short.'">'.htmlspecialchars($value).'</span>';
+                        }
                     }
-                    $row[] = '<span class="'.$field_types[$field].$short.'">'.htmlspecialchars($value).'</span>';
                 }
             }
 

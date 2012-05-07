@@ -356,7 +356,7 @@ class PL_Form extends PL_RowInitialized {
         }
     } // function set_all_form_field_settings()
 
-    function count_entries()
+    function count_entries($search=array())
     {
         $result = 0;
         switch($this->form_type)
@@ -364,7 +364,14 @@ class PL_Form extends PL_RowInitialized {
             case 'form':
                 if($this->__EE->db->table_exists($this->table_name()))
                 {
-                    $result = $this->__EE->db->count_all($this->table_name());
+                    //$result = $this->__EE->db->count_all($this->table_name());
+                    $this->__EE->db->select('form_entry_id');
+                    if(is_array($search) AND count($search) > 0)
+                    {
+                        $search = $this->_translate_search($search);
+                        $this->__EE->db->where($search);
+                    }
+                    $result = $this->__EE->db->count_all_results($this->table_name());
                 }
                 break;
             case 'saef':
@@ -386,36 +393,7 @@ class PL_Form extends PL_RowInitialized {
 
                 if(is_array($search) AND count($search) > 0)
                 {
-                    foreach($search as $field => $val)
-                    {
-                        if(!$this->__fields) $this->fields();
-                        if(!$this->__db_fields) $this->db_fields();
-                        
-                        if(in_array($field, $this->__db_fields))
-                        {
-                            $search[$field] = $val;
-                        } else {
-                            if(array_search($field, array_keys($this->__fields)) === FALSE)
-                            {
-                                show_error($this->__EE->lang->line('invalid_field_name').': "'.$field.'"');
-                            }
-    
-                            if(preg_match("/([|<|>|!|=|]+)/i", $val, $matches))
-                            {
-                                // delete old field pair
-                                unset($search[$field]);
-    
-                                // remove the operator from value
-                                $val = str_replace($matches[1], '', $val);
-    
-                                // move it to the end of the field name
-                                $field = $field.' '.$matches[1];
-    
-                                // set new pair
-                                $search[$field] = $val;
-                            }
-                        }
-                    }
+                    $search = $this->_translate_search($search);
                     $this->__EE->db->where($search);
                 }
 
@@ -450,6 +428,41 @@ class PL_Form extends PL_RowInitialized {
         }
     } // function entries()
 
+    function _translate_search($search)
+    {
+        foreach($search as $field => $val)
+        {
+            if(!$this->__fields) $this->fields();
+            if(!$this->__db_fields) $this->db_fields();
+            
+            if(in_array($field, $this->__db_fields))
+            {
+                $search[$field] = $val;
+            } else {
+                if(array_search($field, array_keys($this->__fields)) === FALSE)
+                {
+                    show_error($this->__EE->lang->line('invalid_field_name').': "'.$field.'"');
+                }
+
+                if(preg_match("/([|<|>|!|=|]+)/i", $val, $matches))
+                {
+                    // delete old field pair
+                    unset($search[$field]);
+
+                    // remove the operator from value
+                    $val = str_replace($matches[1], '', $val);
+
+                    // move it to the end of the field name
+                    $field = $field.' '.$matches[1];
+
+                    // set new pair
+                    $search[$field] = $val;
+                }
+            }
+        }
+        return $search;
+    }
+    
     function _has_operator($str)
     {
         $str = trim($str);
@@ -477,6 +490,11 @@ class PL_Form extends PL_RowInitialized {
     function get_entry($entry_id)
     {
         return $this->__EE->db->get_where($this->table_name(), array('form_entry_id' => $entry_id))->row();
+    }
+
+    function update_entry($entry_id, $data)
+    {
+        return $this->__EE->db->where(array('form_entry_id' => $entry_id))->update($this->table_name(), $data);
     }
 
     function delete_entry($entry_id)

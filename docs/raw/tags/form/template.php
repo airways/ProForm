@@ -79,7 +79,7 @@
                         &lt;input type="text" name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;" class="validate-float &#123;pf_field_is_required&#125;" value="&#123;pf_field_value&#125;" placeholder="&#123;pf_field_placeholder&#125;" /&gt;
                     &#123;if:elseif pf_field_type == "file"&#125;
                         &lt;div class="pf_files"&gt;
-                            &lt;input name="&#123;pf_field_name&#125;[]" id="&#123;pf_field_name&#125;" type="file" class="&#123;pf_field_is_required&#125;" /&gt;
+                            &lt;input name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;" type="file" class="&#123;pf_field_is_required&#125;" /&gt;
                         &lt;/div&gt;
                     &#123;if:elseif pf_field_type == "checkbox"&#125;
                         &lt;div class="pf_field"&gt;

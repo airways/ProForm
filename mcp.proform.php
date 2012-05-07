@@ -274,7 +274,8 @@ class Proform_mcp extends Prolib_mcp {
         $this->EE->load->library('formslib');
         $this->EE->load->library('proform_notifications');
         $prefs = $this->EE->formslib->prefs->get_preferences();
-
+        $prefs = $this->EE->pl_plugins->get_preferences($prefs);
+        
         foreach($prefs as $pref => $value)
         {
             $f_name = 'pref_' . $pref;
@@ -310,6 +311,10 @@ class Proform_mcp extends Prolib_mcp {
         $this->EE->load->library('formslib');
         // returns an array of preferences as name => value pairs
         $prefs = $this->EE->formslib->prefs->get_preferences();
+        $prefs = $this->EE->pl_plugins->get_preferences($prefs);
+        
+        $this->EE->pl_plugins->set_preferences();
+        
         foreach($prefs as $pref => $existing_value)
         {
             $f_name = 'pref_' . $pref;
@@ -1524,7 +1529,7 @@ class Proform_mcp extends Prolib_mcp {
 
         ////////////////////////////////////////
         // Pagination
-        $total = $form->count_entries();
+        $total = $form->count_entries($search);
         $p_config = $this->pagination_config('list_entries&form_id='.$form_id, $total); // creates our pagination config for us
         $this->EE->pagination->initialize($p_config);
         $vars['pagination'] = $this->EE->pagination->create_links();
@@ -1562,7 +1567,7 @@ class Proform_mcp extends Prolib_mcp {
         $vars['headings'] = $headings;
 
         
-        $vars = $this->prolib->pl_plugins->list_entries($vars);
+        $vars = $this->prolib->pl_plugins->list_entries_data($vars);
         $vars['pl_plugins'] = &$this->prolib->pl_plugins;
         $output = $this->EE->load->view('list_entries', $vars, TRUE);
         return $this->prolib->pl_plugins->list_entries_view($output);
@@ -1583,13 +1588,15 @@ class Proform_mcp extends Prolib_mcp {
         {
             $this->sub_page(lang('tab_view_form_entry').' in <em>'.$form_obj->form_name.'</em>');
 
-            $query = $this->EE->db->get_where($form_obj->table_name(), array('form_entry_id' => $form_entry_id));
+//             $query = $this->EE->db->get_where($form_obj->table_name(), array('form_entry_id' => $form_entry_id));
+//             $entry = $query->row();
+
+            $entry = $form_obj->get_entry($form_entry_id);
 
             $vars['editing'] = TRUE;
             $vars['hidden'] = array('form_id' => $form_id, 'form_entry_id' => $form_entry_id);
-
-            $entry = $query->row();
-
+            $vars['hidden_fields'] = array('dst_enabled');
+            
             unset($form_obj->settings);
 
             $types = array(
@@ -1619,8 +1626,18 @@ class Proform_mcp extends Prolib_mcp {
                 }
                 $types[$field->field_name] = 'read_only';
             }
+            
+            // Hide any special db fields added by plugins
+            foreach($form_obj->db_fields() as $field_name)
+            {
+                if(!isset($types[$field_name]))
+                {
+                    $vars['hidden_fields'][] = $field_name;
+                }
+            }
+            
             $vars['field_names'] = $field_names;
-            $vars['hidden_fields'] = array('dst_enabled');
+            
             $vars['generic_edit_embedded'] = TRUE;
             //var_dump($form_obj);
             $form = $this->EE->pl_forms->create_cp_form($entry, $types);
