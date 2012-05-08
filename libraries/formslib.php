@@ -78,10 +78,13 @@ class Formslib
 
         // Initialize the preferences manager. This will set default preferences for us according to
         // what we have in the $default_prefs array on this object.
-        $this->prefs = new PL_prefs("proform_preferences", FALSE, $this->default_prefs);
+        $this->prefs = new PL_prefs("proform_preferences", FALSE, $this->default_prefs, $this->prolib->site_id);
 
         $this->forms = new PL_handle_mgr("proform_forms", "form", "PL_Form");
         $this->fields = new PL_handle_mgr("proform_fields", "field", "PL_Field");
+
+        $this->forms->site_id = $this->prolib->site_id;
+        $this->fields->site_id = $this->prolib->site_id;
 
         $this->vault = new PL_Vault('proform');
 

@@ -67,6 +67,14 @@
                                 &#123;/if&#125;
                             &#123;/if&#125;
                         &#123;/if&#125;
+                    &#123;if:elseif pf_field_type == "text"&#125;
+                        &#123;if pf_wysiwyg&#125;
+                            <textarea name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;" class="&#123;pf_field_is_required&#125;">&#123;pf_field_value&#125;</textarea>
+                            <script type="text/javascript">bkLib.onDomLoaded(function() &#123; new nicEditor(pf_nic_config).panelInstance('&#123;pf_field_name&#125;'); &#125;);</script>
+                        &#123;if:else&#125;
+                            <textarea name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;" class="&#123;pf_field_is_required&#125;">&#123;pf_field_value&#125;</textarea>
+                        &#123;/if&#125;
+
                     &#123;if:elseif pf_field_type == "date"&#125;
                         &lt;input type="text" name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;" class="date &#123;pf_field_is_required&#125;" value="&#123;pf_field_value&#125;" placeholder="&#123;pf_field_placeholder&#125;" /&gt;
                     &#123;if:elseif pf_field_type == "datetime"&#125;

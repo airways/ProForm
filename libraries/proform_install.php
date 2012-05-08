@@ -131,6 +131,7 @@ class Proform_install
             'share_notification_subject'        => array('type' => 'varchar', 'constraint' => '128',    'default' => ''),
             'share_email_field'                 => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
             'share_reply_to_field'              => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
+            'site_id'                           => array('type' => 'int', 'constraint' => '4', 'default' => 1),
 
         );
         $forge->add_field($fields);
@@ -163,6 +164,7 @@ class Proform_install
             'reusable'       => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
             'placeholder'    => array('type' => 'varchar', 'constraint' => '250', 'default' => ''),
             'settings'       => array('type' => 'blob'),
+            'site_id'        => array('type' => 'int', 'constraint' => '4', 'default' => 1),
         );
         $this->EE->dbforge->add_field($fields);
         $forge->add_key('field_id', TRUE);
@@ -192,7 +194,8 @@ class Proform_install
             'preference_id'    => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE, 'auto_increment' => TRUE),
             'preference_name'  => array('type' => 'varchar', 'constraint' => '64'),
             'value'            => array('type' => 'varchar', 'constraint' => '255'),
-            'settings'         => array('type' => 'text')
+            'settings'         => array('type' => 'text'),
+            'site_id'          => array('type' => 'int', 'constraint' => '4', 'default' => 1),
         );
         $forge->add_field($fields);
         $forge->add_key('preference_id', TRUE);
@@ -358,6 +361,16 @@ class Proform_install
                 'heading' => array('name' => 'heading', 'type' => 'varchar', 'constraint' => 255, 'default' => ''),
             );
             $forge->modify_column('proform_form_fields', $fields);
+        }
+        
+        if($current < 1.11)
+        {
+            $fields = array(
+                'site_id'   => array('type' => 'int', 'constraint' => '4', 'default' => 1),
+            );
+            if(!$this->EE->db->field_exists('site_id', 'proform_forms')) $forge->add_column('proform_forms', $fields);
+            if(!$this->EE->db->field_exists('site_id', 'proform_fields')) $forge->add_column('proform_fields', $fields);
+            if(!$this->EE->db->field_exists('site_id', 'proform_preferences')) $forge->add_column('proform_preferences', $fields);
         }
 
         return TRUE;

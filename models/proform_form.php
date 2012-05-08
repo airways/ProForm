@@ -811,11 +811,18 @@ class PL_Form extends PL_RowInitialized {
 
     static function make_table_name($form_name)
     {
+        global $PROLIB;
+        
         // change a few characters to underscores so we still have separated words
         $table_name = str_replace(array('-', ':', '.', ' '), '_', $form_name);
 
         // remove everything else
         $table_name = preg_replace('/[^_a-zA-Z0-9]/', '', $table_name);
+        
+        if($PROLIB->site_id != 1)
+        {
+            $table_name .= '__site_'.$PROLIB->site_id;
+        }
 
         return 'proform__' . $table_name;
     }

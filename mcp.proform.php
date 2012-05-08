@@ -369,6 +369,8 @@ class Proform_mcp extends Prolib_mcp {
 
         // create new form and table
         $this->EE->load->library('formslib');
+        $form_exists = $this->EE->formslib->forms->get($data['form_name'], FALSE);
+        if($form_exists) show_error(lang('form_already_exists'));
         $form = $this->EE->formslib->forms->create($data);
 
         // go back to form edit page
@@ -518,6 +520,8 @@ class Proform_mcp extends Prolib_mcp {
                 );
                 break;
         }
+        
+        $vars['hidden_fields'][] = 'site_id';
 
         if($this->EE->config->item('proform_allow_encrypted_form_data') != 'y')
         {
@@ -1110,7 +1114,7 @@ class Proform_mcp extends Prolib_mcp {
 
         $vars['form'] = $form;
         $vars['form_name'] = 'field_edit';
-        $vars['hidden_fields'] = array('field_id', 'settings', 'heading');
+        $vars['hidden_fields'] = array('field_id', 'settings', 'heading', 'site_id');
 
         $this->EE->load->library('table');
         $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/edit_field.js"></script>');
@@ -1142,11 +1146,12 @@ class Proform_mcp extends Prolib_mcp {
 
     function process_edit_field()
     {
+ 
         // run form validation
         $this->_run_validation('edit_field');
 
-        $field_id = $this->EE->input->post('field_id');
-        $field_name = (int)$this->EE->input->post('field_name');
+        $field_id = (int)$this->EE->input->post('field_id');
+        $field_name = $this->EE->input->post('field_name');
         $form_id = (int)$this->EE->input->get('form_id');
 
 
@@ -1157,7 +1162,7 @@ class Proform_mcp extends Prolib_mcp {
         if(!trim($field_name) 
             || $field_name == "form_entry_id" || $field_name == "updated" || $field_name == "ip_address"
             || $field_name == "user_agent" || $field_name == "dst_enabled")
-                show_error(lang('invalid_field_name'));
+                show_error(lang('invalid_field_name') . ': ' . htmlentities($field_name));
 
         // find field
         $this->EE->load->library('formslib');
