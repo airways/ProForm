@@ -74,29 +74,35 @@ END
                 {
                     if(isset($field_types[$field]))
                     {
-                        if($field_types[$field] == 'control')
+                        switch($field_types[$field])
                         {
-                            $row[] = '<span class="'.$field_types[$field].$short.'">'.$value.'</span>';
-                        } else {
-                            if(strlen($value) > 300)
-                            {
-                                $value = substr($value, 0, 300).'...';
-                            }
-        
-                            $value = strip_tags($value);
-                            if(strlen($value) > 150)
-                            {
-                                $value = substr($value, 0, 150).'...';
-                            }
-                            
-                            if(strlen($value) < 20)
-                            {
-                                $short = ' short';
-                            } else {
-                                $short = '';
-                            }
-                    
-                            $row[] = '<span class="'.$field_types[$field].$short.'">'.htmlspecialchars($value).'</span>';
+                            case 'file':
+                                $row[] = '<span class="'.$field_types[$field].$short.'">'.
+                                    '<a href="'.$field_upload_prefs[$field]['url'].$value.'">'.$value.'</a></span>';
+                                break;
+                            case 'control':
+                                $row[] = '<span class="'.$field_types[$field].$short.'">'.$value.'</span>';
+                                break;
+                            default:
+                                if(strlen($value) > 300)
+                                {
+                                    $value = substr($value, 0, 300).'...';
+                                }
+            
+                                $value = strip_tags($value);
+                                if(strlen($value) > 150)
+                                {
+                                    $value = substr($value, 0, 150).'...';
+                                }
+                                
+                                if(strlen($value) < 20)
+                                {
+                                    $short = ' short';
+                                } else {
+                                    $short = '';
+                                }
+                        
+                                $row[] = '<span class="'.$field_types[$field].$short.'">'.htmlspecialchars($value).'</span>';
                         }
                     }
                 }

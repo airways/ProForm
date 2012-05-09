@@ -331,6 +331,10 @@ class Proform_mcp extends Prolib_mcp {
                         case 'pref_safecracker_integration_on':
                         case 'pref_safecracker_separate_channels_on':
                             $this->EE->formslib->prefs->set($pref, 'n');
+                                break;
+                        default:
+                            $this->EE->formslib->prefs->set($pref, $value);
+                                break;
                     }
                 }
             }
@@ -1555,6 +1559,7 @@ class Proform_mcp extends Prolib_mcp {
             
             $vars['fields'][] = $field->field_name;
             $vars['field_types'][$field->field_name] = $field->type;
+            $vars['field_upload_prefs'][$field->field_name] = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
             
             if(array_search($field->field_name, $vars['hidden_columns']) === FALSE)
             {
