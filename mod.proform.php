@@ -1653,49 +1653,55 @@ class Proform {
         {
             if ($this->EE->extensions->active_hook('proform_insert_start') === TRUE)
             {
-                $form_session->values = $this->EE->extensions->call('proform_insert_start', $this);
+                $form_session->values = $this->EE->extensions->call('proform_insert_start', $this, $form_obj, $form_session->values);
             }
 
-            if($form_obj->encryption_on == 'y')
+            if(count($form_session->values) > 0)
             {
-                $this->EE->load->library('encrypt');
-                $save_data = $this->EE->formslib->encrypt_values($form_session->values);
-
-                /*
-                echo "<b>Encrypted data:</b>";
-                $this->prolib->debug($save_data);
-                // */
-
-                // TODO: check for constraint overflows in encrypted values?
-                // TODO: how do we handle encrypted numbers?
-            } else {
-                $save_data = $form_session->values;
-
-                /*
-                echo "<b>Non-encrypted data:</b>";
-                $this->prolib->debug($save_data);
-                // */
-            }
-
-            // collapse multiselect options and other array values to a single string
-            foreach($save_data as $k => $v)
-            {
-                if(is_array($v))
+                if($form_obj->encryption_on == 'y')
                 {
-                    $save_data[$k] = implode("|", $v);
+                    $this->EE->load->library('encrypt');
+                    $save_data = $this->EE->formslib->encrypt_values($form_session->values);
+    
+                    /*
+                    echo "<b>Encrypted data:</b>";
+                    $this->prolib->debug($save_data);
+                    // */
+    
+                    // TODO: check for constraint overflows in encrypted values?
+                    // TODO: how do we handle encrypted numbers?
+                } else {
+                    $save_data = $form_session->values;
+    
+                    /*
+                    echo "<b>Non-encrypted data:</b>";
+                    $this->prolib->debug($save_data);
+                    // */
                 }
+    
+                // collapse multiselect options and other array values to a single string
+                foreach($save_data as $k => $v)
+                {
+                    if(is_array($v))
+                    {
+                        $save_data[$k] = implode("|", $v);
+                    }
+                }
+    
+                if(isset($save_data[''])) unset($save_data['']);
+    
+                if(!$result = $this->EE->db->insert($form_obj->table_name(), $save_data))
+                {
+                    show_error("{exp:proform:form} could not insert into form: ".$form_obj->form_name);
+                }
+    
+                $form_session->values['form:entry_id'] = $this->EE->db->insert_id();
+                $form_session->values['form:name'] = $form_obj->form_name;
+            } else {
+                $form_session->values['form:entry_id'] = 0;
+                $form_session->values['form:name'] = $form_obj->form_name;
             }
-
-            if(isset($save_data[''])) unset($save_data['']);
-
-            if(!$result = $this->EE->db->insert($form_obj->table_name(), $save_data))
-            {
-                show_error("{exp:proform:form} could not insert into form: ".$form_obj->form_name);
-            }
-
-            $form_session->values['form:entry_id'] = $this->EE->db->insert_id();
-            $form_session->values['form:name'] = $form_obj->form_name;
-
+            
             if ($this->EE->extensions->active_hook('proform_insert_end') === TRUE)
             {
                 $this->EE->extensions->call('proform_insert_end', $this, $form_session);
