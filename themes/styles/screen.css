@@ -332,6 +332,10 @@ Form Layout
 Form Layout > Fields
 ------------------------------------------------------------------------ */
 
+.form-layout li.STEP {
+    background: #e2edf4;
+}
+
 .form-name {
 	margin-bottom: 20px;
 }
@@ -839,3 +843,10 @@ span.short {
     white-space: nowrap;
 }
 
+
+span.file a {
+    background: url(../images/page_attach.png) no-repeat;
+    padding-left: 20px;
+    height: 16px;
+    display: inline-block;
+}

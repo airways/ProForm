@@ -33,8 +33,15 @@
 <div class="list_entries">
     <div class="tabs-wrapper">
         <div class="new_field">
-            <span class="button"><a href="<?php echo BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=export_entries'.AMP.'form_id='.$form_id; ?>"><?php echo lang('export_entries'); ?></a></span>
-    
+            
+            <?php
+            $base = BASE.'&C=addons_modules&M=show_module_cp&module=proform';
+            $export_entries_label = lang('export_entries');
+            echo $pl_plugins->list_entries_commands($form_id, <<<END
+    <span class="button"><a href="{$base}&method=export_entries&form_id={$form_id}">{$export_entries_label}</a></span>
+END
+); ?>
+            
             <span class="action-list">
                 <a href="<?php echo $edit_form_url; ?>">Edit Form Settings</a>
             </span>
@@ -44,6 +51,10 @@
 
 <?php if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>'; ?>
 <?php if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>'; ?>
+
+<div class="filters">
+    <?php echo $pl_plugins->list_entries_filters_view(); ?>
+</div>
 
 <?php
     $this->table->set_template($cp_table_template);
@@ -55,35 +66,59 @@
             $row = array('<a href="'.$view_entry_url.'&entry_id='.$entry->form_entry_id.'">'.htmlspecialchars($entry->form_entry_id).'</a>');
 
             //$row[] = '<a href="'.$field->edit_link.'">'.entry->id.'</a>';
-            foreach($fields as $field)
+            foreach($entry as $field => $value)
             {
-                $value = $entry->$field;
+//                $value = $entry->$field;
 
                 if(array_search($field, $hidden_columns) === FALSE)
                 {
-                    if(strlen($value) > 300)
+                    if(isset($field_types[$field]))
                     {
-                        $value = substr($value, 0, 300).'...';
+                        switch($field_types[$field])
+                        {
+                            case 'file':
+                                $row[] = '<span class="'.$field_types[$field].$short.'">'.
+                                    '<a href="'.$field_upload_prefs[$field]['url'].$value.'">'.$value.'</a></span>';
+                                break;
+                            case 'control':
+                                $row[] = '<span class="'.$field_types[$field].$short.'">'.$value.'</span>';
+                                break;
+                            default:
+                                if(strlen($value) > 300)
+                                {
+                                    $value = substr($value, 0, 300).'...';
+                                }
+            
+                                $value = strip_tags($value);
+                                if(strlen($value) > 150)
+                                {
+                                    $value = substr($value, 0, 150).'...';
+                                }
+                                
+                                if(strlen($value) < 20)
+                                {
+                                    $short = ' short';
+                                } else {
+                                    $short = '';
+                                }
+                        
+                                $row[] = '<span class="'.$field_types[$field].$short.'">'.htmlspecialchars($value).'</span>';
+                        }
                     }
-
-                    $value = strip_tags($value);
-                    if(strlen($value) > 150)
-                    {
-                        $value = substr($value, 0, 150).'...';
-                    }
-                    
-                    if(strlen($value) < 20)
-                    {
-                        $short = ' short';
-                    } else {
-                        $short = '';
-                    }
-                    $row[] = '<span class="'.$field_types[$field].$short.'">'.htmlspecialchars($value).'</span>';
                 }
             }
 
-            $row[] = '<div class="action-list"> <a href="'.$view_entry_url.'&entry_id='.$entry->form_entry_id.'">View</a> '.
-                     '<a href="'.$delete_entry_url.'&entry_id='.$entry->form_entry_id.'" class="pl_confirm" rel="Are you sure you want to delete this entry?">Delete</a></div>';
+            $action_list = '<div class="action-list">';
+            $action_list .= $pl_plugins->list_entries_action_list_view(
+                    $form_id,
+                    $entry,
+                    '<a href="'.$view_entry_url.'&entry_id='.$entry->form_entry_id.'">View</a> '.
+                    '<a href="'.$delete_entry_url.'&entry_id='.$entry->form_entry_id.'" class="pl_confirm" rel="Are you sure you want to delete this entry?">Delete</a>');
+                     
+            $action_list .= '</div>';
+            
+            $row[] = $action_list;
+            
                      
             $this->table->add_row($row);
         }

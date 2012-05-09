@@ -3,8 +3,9 @@
 class PL_Form extends PL_RowInitialized {
 
     var $__fields = FALSE;
+    var $__db_fields = FALSE;
     var $__entries = FALSE;
-
+    
     var $form_id;
     var $form_type = 'form';
     var $form_label;
@@ -272,6 +273,15 @@ class PL_Form extends PL_RowInitialized {
         return $this->__fields;
     }
 
+    function db_fields()
+    {
+        if(!$this->__db_fields)
+        {
+            $this->__db_fields = $this->EE->db->list_fields($this->table_name());
+        }
+        return $this->__db_fields;
+    }
+
     // unserialize settings for a form field assignment row and merge with default values
     function get_form_field_settings($settings='')
     {
@@ -301,6 +311,11 @@ class PL_Form extends PL_RowInitialized {
 
     function get_field($field_id)
     {
+        if(!$this->__fields)
+        {
+            $this->fields();
+        }
+        
         foreach($this->__fields as $field)
         {
             if($field->field_id == $field_id)
@@ -341,7 +356,7 @@ class PL_Form extends PL_RowInitialized {
         }
     } // function set_all_form_field_settings()
 
-    function count_entries()
+    function count_entries($search=array())
     {
         $result = 0;
         switch($this->form_type)
@@ -349,7 +364,14 @@ class PL_Form extends PL_RowInitialized {
             case 'form':
                 if($this->__EE->db->table_exists($this->table_name()))
                 {
-                    $result = $this->__EE->db->count_all($this->table_name());
+                    //$result = $this->__EE->db->count_all($this->table_name());
+                    $this->__EE->db->select('form_entry_id');
+                    if(is_array($search) AND count($search) > 0)
+                    {
+                        $search = $this->_translate_search($search);
+                        $this->__EE->db->where($search);
+                    }
+                    $result = $this->__EE->db->count_all_results($this->table_name());
                 }
                 break;
             case 'saef':
@@ -371,36 +393,7 @@ class PL_Form extends PL_RowInitialized {
 
                 if(is_array($search) AND count($search) > 0)
                 {
-                    foreach($search as $field => $val)
-                    {
-                        if(!$this->__fields) $this->fields();
-                        switch($field)
-                        {
-                            case 'form_entry_id':
-                                $search['form_entry_id'] = $val;
-                                break;
-                            default:
-                                if(array_search($field, array_keys($this->__fields)) === FALSE)
-                                {
-                                    show_error($this->__EE->lang->line('invalid_field_name').': "'.$field.'"');
-                                }
-        
-                                if(preg_match("/([|<|>|!|=|]+)/i", $val, $matches))
-                                {
-                                    // delete old field pair
-                                    unset($search[$field]);
-        
-                                    // remove the operator from value
-                                    $val = str_replace($matches[1], '', $val);
-        
-                                    // move it to the end of the field name
-                                    $field = $field.' '.$matches[1];
-        
-                                    // set new pair
-                                    $search[$field] = $val;
-                                }
-                        }
-                    }
+                    $search = $this->_translate_search($search);
                     $this->__EE->db->where($search);
                 }
 
@@ -435,6 +428,41 @@ class PL_Form extends PL_RowInitialized {
         }
     } // function entries()
 
+    function _translate_search($search)
+    {
+        foreach($search as $field => $val)
+        {
+            if(!$this->__fields) $this->fields();
+            if(!$this->__db_fields) $this->db_fields();
+            
+            if(in_array($field, $this->__db_fields))
+            {
+                $search[$field] = $val;
+            } else {
+                if(array_search($field, array_keys($this->__fields)) === FALSE)
+                {
+                    show_error($this->__EE->lang->line('invalid_field_name').': "'.$field.'"');
+                }
+
+                if(preg_match("/([|<|>|!|=|]+)/i", $val, $matches))
+                {
+                    // delete old field pair
+                    unset($search[$field]);
+
+                    // remove the operator from value
+                    $val = str_replace($matches[1], '', $val);
+
+                    // move it to the end of the field name
+                    $field = $field.' '.$matches[1];
+
+                    // set new pair
+                    $search[$field] = $val;
+                }
+            }
+        }
+        return $search;
+    }
+    
     function _has_operator($str)
     {
         $str = trim($str);
@@ -462,6 +490,11 @@ class PL_Form extends PL_RowInitialized {
     function get_entry($entry_id)
     {
         return $this->__EE->db->get_where($this->table_name(), array('form_entry_id' => $entry_id))->row();
+    }
+
+    function update_entry($entry_id, $data)
+    {
+        return $this->__EE->db->where(array('form_entry_id' => $entry_id))->update($this->table_name(), $data);
     }
 
     function delete_entry($entry_id)
@@ -651,6 +684,7 @@ class PL_Form extends PL_RowInitialized {
 
         // trigger refresh on next request for field list
         $this->__fields = FALSE;
+        $this->__db_fields = FALSE;
     } // function assign_field()
 
 
@@ -691,6 +725,7 @@ class PL_Form extends PL_RowInitialized {
 
         // trigger refresh on next request for field list
         $this->__fields = FALSE;
+        $this->__db_fields = FALSE;
     }
 
     function update_separator($form_field_id, $heading, $type=PL_Form::SEPARATOR_HEADING)
@@ -771,15 +806,23 @@ class PL_Form extends PL_RowInitialized {
 
         // trigger refresh on next request for field list
         $this->__fields = FALSE;
+        $this->__db_fields = FALSE;
     }
 
     static function make_table_name($form_name)
     {
+        global $PROLIB;
+        
         // change a few characters to underscores so we still have separated words
         $table_name = str_replace(array('-', ':', '.', ' '), '_', $form_name);
 
         // remove everything else
         $table_name = preg_replace('/[^_a-zA-Z0-9]/', '', $table_name);
+        
+        if($PROLIB->site_id != 1)
+        {
+            $table_name .= '__site_'.$PROLIB->site_id;
+        }
 
         return 'proform__' . $table_name;
     }

@@ -376,7 +376,7 @@ class Proform_notifications
     function get_template_group_names()
     {
         $result = array();
-        $query = $this->EE->db->query($sql = "SELECT group_name FROM exp_template_groups;");
+        $query = $this->EE->db->where('site_id', $this->prolib->site_id)->get('exp_template_groups');
         foreach($query->result() as $row)
         {
             $result[$row->group_name] = $row->group_name;

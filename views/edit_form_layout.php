@@ -62,7 +62,25 @@ $alt = FALSE;
                     $last_field_row = $field['field_row'];
                 }
 
-                echo '<li>';
+                $edit_label = 'Field';
+                if($field['heading'])
+                {
+                    echo '<li class="'.$field['separator_type'].'">';
+                    switch($field['separator_type'])
+                    {
+                        case 'HTML':
+                            $edit_label = 'Block';
+                            break;
+                        case 'HEAD':
+                            $edit_label = 'Heading';
+                            break;
+                        case 'STEP':
+                            $edit_label = 'Step';
+                            break;
+                    }
+                } else {
+                    echo '<li>';
+                }
 
                 print_hidden($field);
 
@@ -70,7 +88,7 @@ $alt = FALSE;
 
                 ?>
                 <span class="move-link"></span>
-                <a href="<?php echo $field['edit_link']; ?>" class="edit action-link">Edit</a>
+                <a href="<?php echo $field['edit_link']; ?>" class="edit action-link">Edit <?php echo $edit_label; ?></a>
                 <a href="<?php echo $field['remove_link']; ?>" class="delete action-link">Remove</a>
                 <?php
                 if($field['heading']): 
@@ -80,7 +98,7 @@ $alt = FALSE;
                             <?
                             break;
                         default: ?>
-                            <h3><?php echo $field['heading']; ?></h3>
+                            <h3 class="<?php echo $field['separator_type']; ?>"><?php echo $field['heading']; ?></h3>
                 <?php 
                     endswitch;
                 else:

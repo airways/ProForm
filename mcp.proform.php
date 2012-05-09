@@ -46,7 +46,7 @@ if(!defined('ACTION_BASE'))
     define('ACTION_BASE', BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP);
 }
 
-class Proform_mcp {
+class Proform_mcp extends Prolib_mcp {
 
     var $pipe_length = 1;
     var $perpage = 20;
@@ -274,7 +274,8 @@ class Proform_mcp {
         $this->EE->load->library('formslib');
         $this->EE->load->library('proform_notifications');
         $prefs = $this->EE->formslib->prefs->get_preferences();
-
+        $prefs = $this->EE->pl_plugins->get_preferences($prefs);
+        
         foreach($prefs as $pref => $value)
         {
             $f_name = 'pref_' . $pref;
@@ -310,6 +311,10 @@ class Proform_mcp {
         $this->EE->load->library('formslib');
         // returns an array of preferences as name => value pairs
         $prefs = $this->EE->formslib->prefs->get_preferences();
+        $prefs = $this->EE->pl_plugins->get_preferences($prefs);
+        
+        $this->EE->pl_plugins->set_preferences();
+        
         foreach($prefs as $pref => $existing_value)
         {
             $f_name = 'pref_' . $pref;
@@ -326,6 +331,10 @@ class Proform_mcp {
                         case 'pref_safecracker_integration_on':
                         case 'pref_safecracker_separate_channels_on':
                             $this->EE->formslib->prefs->set($pref, 'n');
+                                break;
+                        default:
+                            $this->EE->formslib->prefs->set($pref, $value);
+                                break;
                     }
                 }
             }
@@ -364,6 +373,8 @@ class Proform_mcp {
 
         // create new form and table
         $this->EE->load->library('formslib');
+        $form_exists = $this->EE->formslib->forms->get($data['form_name'], FALSE);
+        if($form_exists) show_error(lang('form_already_exists'));
         $form = $this->EE->formslib->forms->create($data);
 
         // go back to form edit page
@@ -465,8 +476,6 @@ class Proform_mcp {
             'safecracker_channel_id' => array('dropdown', $channel_options),
             
             
-            'reply_to_address' => array('dropdown', $form_field_options),
-            'reply_to_name' => array('dropdown', $form_field_options),
             'reply_to_field' => array('dropdown', $form_field_options),
             'submitter_email_field' => array('dropdown', $form_field_options),
             'submitter_reply_to_field' => array('dropdown', $form_field_options),
@@ -513,6 +522,8 @@ class Proform_mcp {
                 );
                 break;
         }
+        
+        $vars['hidden_fields'][] = 'site_id';
 
         if($this->EE->config->item('proform_allow_encrypted_form_data') != 'y')
         {
@@ -1105,7 +1116,7 @@ class Proform_mcp {
 
         $vars['form'] = $form;
         $vars['form_name'] = 'field_edit';
-        $vars['hidden_fields'] = array('field_id', 'settings', 'heading');
+        $vars['hidden_fields'] = array('field_id', 'settings', 'heading', 'site_id');
 
         $this->EE->load->library('table');
         $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/edit_field.js"></script>');
@@ -1137,14 +1148,23 @@ class Proform_mcp {
 
     function process_edit_field()
     {
+ 
         // run form validation
         $this->_run_validation('edit_field');
 
-        $field_id = $this->EE->input->post('field_id');
+        $field_id = (int)$this->EE->input->post('field_id');
+        $field_name = $this->EE->input->post('field_name');
         $form_id = (int)$this->EE->input->get('form_id');
 
 
         if(!$field_id || $field_id <= 0) show_error(lang('invalid_field_id'));
+        
+        // Check for a valid field name. We need to prevent some built-in reserved field
+        // names from being used.
+        if(!trim($field_name) 
+            || $field_name == "form_entry_id" || $field_name == "updated" || $field_name == "ip_address"
+            || $field_name == "user_agent" || $field_name == "dst_enabled")
+                show_error(lang('invalid_field_name') . ': ' . htmlentities($field_name));
 
         // find field
         $this->EE->load->library('formslib');
@@ -1487,7 +1507,7 @@ class Proform_mcp {
         $rownum = (int)$this->EE->input->get_post('rownum');
 
         // Get form object
-        $form = $this->EE->formslib->forms->get($form_id);
+        $form = &$this->EE->formslib->forms->get($form_id);
 
         // Set up UI
         $this->sub_page(lang('tab_list_entries').' in <em>'.$form->form_name.'</em>');
@@ -1497,7 +1517,9 @@ class Proform_mcp {
         $vars['edit_form_url']     = ACTION_BASE.'method=edit_form'.AMP.'form_id='.$form->form_id;
 
         // Get page of data
-        $entries = $form->entries(array(), $rownum, $this->perpage, 'updated', 'DESC');
+        $search = $this->prolib->pl_plugins->list_entries_search($form_id, array());
+        //var_dump($form->__internal_fields);exit;
+        $entries = $form->entries($search, $rownum, $this->perpage, 'updated', 'DESC');
         if(!is_array($entries)) $entries = array();
         if($form->encryption_on == 'y')
         {
@@ -1514,7 +1536,7 @@ class Proform_mcp {
 
         ////////////////////////////////////////
         // Pagination
-        $total = $form->count_entries();
+        $total = $form->count_entries($search);
         $p_config = $this->pagination_config('list_entries&form_id='.$form_id, $total); // creates our pagination config for us
         $this->EE->pagination->initialize($p_config);
         $vars['pagination'] = $this->EE->pagination->create_links();
@@ -1535,6 +1557,7 @@ class Proform_mcp {
             
             $vars['fields'][] = $field->field_name;
             $vars['field_types'][$field->field_name] = $field->type;
+            $vars['field_upload_prefs'][$field->field_name] = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
             
             if(array_search($field->field_name, $vars['hidden_columns']) === FALSE)
             {
@@ -1551,7 +1574,11 @@ class Proform_mcp {
         $headings[] = lang('heading_commands');
         $vars['headings'] = $headings;
 
-        return $this->EE->load->view('list_entries', $vars, TRUE);
+        
+        $vars = $this->prolib->pl_plugins->list_entries_data($vars);
+        $vars['pl_plugins'] = &$this->prolib->pl_plugins;
+        $output = $this->EE->load->view('list_entries', $vars, TRUE);
+        return $this->prolib->pl_plugins->list_entries_view($output);
     }
     
 
@@ -1569,13 +1596,15 @@ class Proform_mcp {
         {
             $this->sub_page(lang('tab_view_form_entry').' in <em>'.$form_obj->form_name.'</em>');
 
-            $query = $this->EE->db->get_where($form_obj->table_name(), array('form_entry_id' => $form_entry_id));
+//             $query = $this->EE->db->get_where($form_obj->table_name(), array('form_entry_id' => $form_entry_id));
+//             $entry = $query->row();
+
+            $entry = $form_obj->get_entry($form_entry_id);
 
             $vars['editing'] = TRUE;
             $vars['hidden'] = array('form_id' => $form_id, 'form_entry_id' => $form_entry_id);
-
-            $entry = $query->row();
-
+            $vars['hidden_fields'] = array('dst_enabled');
+            
             unset($form_obj->settings);
 
             $types = array(
@@ -1589,8 +1618,15 @@ class Proform_mcp {
             foreach($form_obj->fields() as $field)
             {
                 $field_names['field_'.$field->field_name] = $field->field_label;
+                $field_name = $field->field_name;
                 switch($field->type)
                 {
+                    case 'file':
+                        $upload_pref = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
+                        $entry->$field_name = '<span class="file">'.
+                            '<a href="'.$upload_pref['url'].$entry->$field_name.'">'.$entry->$field_name.'</a></span>';
+                        $types[$field->field_name] = 'static';
+                        break;
                     case 'string':
                         if($field->length > 255)
                         {
@@ -1601,12 +1637,23 @@ class Proform_mcp {
                         $types[$field->field_name] = 'textarea';
                         break;
                     default:
+                        $types[$field->field_name] = 'read_only';
                         break;
                 }
-                $types[$field->field_name] = 'read_only';
+                
             }
+            
+            // Hide any special db fields added by plugins
+            foreach($form_obj->db_fields() as $field_name)
+            {
+                if(!isset($types[$field_name]))
+                {
+                    $vars['hidden_fields'][] = $field_name;
+                }
+            }
+            
             $vars['field_names'] = $field_names;
-            $vars['hidden_fields'] = array('dst_enabled');
+            
             $vars['generic_edit_embedded'] = TRUE;
             //var_dump($form_obj);
             $form = $this->EE->pl_forms->create_cp_form($entry, $types);
@@ -1900,6 +1947,7 @@ class Proform_mcp {
         $vars['message'] = $this->EE->session->flashdata('message') ? $this->EE->session->flashdata('message') : false;
         $vars['error'] = $this->EE->session->flashdata('error') ? $this->EE->session->flashdata('error') : false;
     }
+    
 }
 
 
