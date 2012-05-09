@@ -1620,8 +1620,15 @@ class Proform_mcp extends Prolib_mcp {
             foreach($form_obj->fields() as $field)
             {
                 $field_names['field_'.$field->field_name] = $field->field_label;
+                $field_name = $field->field_name;
                 switch($field->type)
                 {
+                    case 'file':
+                        $upload_pref = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
+                        $entry->$field_name = '<span class="file">'.
+                            '<a href="'.$upload_pref['url'].$entry->$field_name.'">'.$entry->$field_name.'</a></span>';
+                        $types[$field->field_name] = 'static';
+                        break;
                     case 'string':
                         if($field->length > 255)
                         {
@@ -1632,9 +1639,10 @@ class Proform_mcp extends Prolib_mcp {
                         $types[$field->field_name] = 'textarea';
                         break;
                     default:
+                        $types[$field->field_name] = 'read_only';
                         break;
                 }
-                $types[$field->field_name] = 'read_only';
+                
             }
             
             // Hide any special db fields added by plugins

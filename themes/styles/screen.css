@@ -843,3 +843,10 @@ span.short {
     white-space: nowrap;
 }
 
+
+span.file a {
+    background: url(../images/page_attach.png) no-repeat;
+    padding-left: 20px;
+    height: 16px;
+    display: inline-block;
+}
