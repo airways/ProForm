@@ -476,8 +476,6 @@ class Proform_mcp extends Prolib_mcp {
             'safecracker_channel_id' => array('dropdown', $channel_options),
             
             
-            'reply_to_address' => array('dropdown', $form_field_options),
-            'reply_to_name' => array('dropdown', $form_field_options),
             'reply_to_field' => array('dropdown', $form_field_options),
             'submitter_email_field' => array('dropdown', $form_field_options),
             'submitter_reply_to_field' => array('dropdown', $form_field_options),
