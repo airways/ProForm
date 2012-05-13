@@ -108,7 +108,7 @@ class Proform {
     {
         // This just disables the head script completely - use this only when you've created
         // custom styling and javascript for the simple template.
-        $this->cache['prefix_included'] = TRUE;
+        $this->cache['prefix_disabled'] = TRUE;
         return '';
     }
     
@@ -124,7 +124,13 @@ class Proform {
         }
         
         // Get our template components
-        $prefix = $this->head();
+        if((!isset($this->cache['prefix_disabled']) || !$this->cache['prefix_disabled']) && $this->EE->TMPL->fetch_param('disable_head') != 'yes' )
+        {
+            $prefix = $this->head();
+        } else {
+            $prefix = '';
+        }
+        
         $template = file_get_contents(PATH_THIRD.'proform/templates/'.$template.'.html');
         
         // Swap out the "embed" parameter for form_name in the template
