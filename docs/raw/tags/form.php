@@ -585,6 +585,7 @@
     <li><a href="#var_field_type">{field_type}</a></li>
     <li><a href="#var_field_length">{field_length}</a></li>
     <li><a href="#var_field_is_required">{field_is_required}</a></li>
+    <li><a href="#var_field_is_step">{field_is_step}</a></li>
     <li><a href="#var_field_error">{field_error}</a></li>
     <li><a href="#var_field_checked">{field_checked}</a></li>
     <li><a href="#var_field_control">{field_control}</a></li>
@@ -622,11 +623,13 @@
 
 <h6><a name="var_field_heading">{field_heading}</a></h6>
 
-<p>For items that are actually Headings within a form, will be set to the heading value. If this value is not blank, the item is either a normal field or a HTML block.</p>
+<p>For items that are actually Headings within a form, will be set to the heading value. If this value is blank, the item is either a normal field or a HTML block.</p>
+
+<p>Headings are also rendered for steps beyond the first step. You can tell the difference by using the <b>{field_is_step}</b> variable, which will be set to "step" if the heading is from a step, or blank otherwise.</p>
 
 <h6><a name="var_field_html_block">{field_html_block}</a></h6>
 
-<p>For items that are actually HTML blocks within a form, will be set to the block of HTML. If this value is not blank, the item is either a normal field or a Heading.</p>
+<p>For items that are actually HTML blocks within a form, will be set to the block of HTML. If this value is blank, the item is either a normal field or a Heading.</p>
 
 <h6><a name="var_field_type">{field_type}</a></h6>
 
@@ -638,7 +641,11 @@
 
 <h6><a name="var_field_is_required">{field_is_required}</a></h6>
 
-<p>A flag indicating if this field is required or not. A conditional on this field will allow you to flag the field with a character or other visual indication that the field is required.</p>
+<p>A flag indicating if this field is required or not. A conditional on this value will allow you to flag the field with a character or other visual indication that the field is required.</p>
+
+<h6><a name="var_field_is_step">{field_is_step}</a></h6>
+
+<p>A flag indicating if this Heading is from a step or not. Headings are rendered for each step beyond the first step. This value will be set to "step" if the heading is from a step, or blank otherwise.</p>
 
 <h6><a name="var_field_error">{field_error}</a></h6>
 
