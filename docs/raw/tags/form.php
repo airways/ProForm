@@ -36,11 +36,9 @@
 </ul>
 
 <h2><a name="simple_parameters">Simple Parameters</a></h2>
-<p>Of the parameters supported by the <kbd>Full Form Tag</kbd>, the simple variation supports the following parameter:</p>
+<p>The <kbd>Simple Form Tag</kbd> supports all of the same parameters as the <kbd>Full Form Tag</kbd> <strong>except</strong> the variable_prefix parameter (since it does not make sense for a simple form).</p>
 
-<ul>
-    <li><a href="#param_form">form="contact_us"</a></li>
-</ul>
+<p>See the full <a href="#parameters">list of parameters</a> for more information.</p>
 
 <h2><a name="simple_variables">Simple Variables</a></h2>
 
@@ -95,7 +93,7 @@
     <li><a href="#param_message">message:required="This field is required!", message:*=""</a></li>
     <li><a href="#param_notify">notify="sample@example.com"</a></li>
     <li><a href="#param_step">step="1"</a></li>
-    <li><a href="#param_variable_prefix">param_variable_prefix="pf_"</a></li>
+    <li><a href="#param_variable_prefix">variable_prefix="pf_"</a></li>
     <li><a href="#param_thank_you_url">thank_you_url="forms/thank-you"</a></li>
 </ul>
 
@@ -260,6 +258,8 @@
 <h3><a name="param_variable_prefix">variable_prefix="pf_"</a></h3>
 
 <p>The <b>variable_prefix</b> parameter is used to specify a prefix to add to all variables provided by <dfn>ProForm</dfn>.</p>
+
+<p>This parameter is not supported by the <kbd>Simple Form Tag</kbd> since you cannot provide a custom loop for that tag and therefore it is not needed.</p>
 
 <div class="tip">
     <h6>Example Usage</h6>

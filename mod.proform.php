@@ -128,15 +128,27 @@ class Proform {
         $template = file_get_contents(PATH_THIRD.'proform/templates/'.$template.'.html');
         
         // Swap out the "embed" parameter for form_name in the template
-        $template = str_replace(LD.'embed:form_name'.RD, $form_name, $template);
+        // $template = str_replace(LD.'embed:form_name'.RD, $form_name, $template);
+        
+        // Replace parameters in the template with those from the simple tag. Simulate embed:* parameters
+        // for each param as well.
+        $params = '';
+        foreach($this->EE->TMPL->tagparams as $param => $value)
+        {
+            $params .= $param.'="'.$value.'" ';
+            $template = str_replace(LD.'embed:'.$param.RD, $value, $template);
+        }
+        $template = str_replace('[%params%]', $params, $template);
         
         // We need to remove any EE comments since they will not be handled correctly if they are left in place
         // (the template parser has already removed normal comments before the simple() tag we're processing was
         // called).
         //$output = preg_replace('/\{\!--.*?--\}/s', '', $prefix.$template);
+        
+        // Tack on the prefix JS/CSS etc
         $output = $prefix.$template;
-        //echo htmlentities($output);exit;
-        // Return the template code so the parser can handle it as if the developer had inserted it directly
+        
+        // Return the final template code so the parser can handle it as if the developer had inserted it directly
         // into the template
         return $output;
         
@@ -521,7 +533,7 @@ class Proform {
 
                 if ($this->EE->extensions->active_hook('proform_form_preparse') === TRUE)
                 {
-                    list($$tagdata, $form_obj, $variables, $this->var_pairs) = $this->EE->extensions->call('proform_form_preparse', $this, $tagdata, $form_obj, $variables, $this->var_pairs);
+                    list($tagdata, $form_obj, $variables, $this->var_pairs) = $this->EE->extensions->call('proform_form_preparse', $this, $tagdata, $form_obj, $variables, $this->var_pairs);
                 }
 
                 // Parse variables
@@ -1656,6 +1668,11 @@ class Proform {
                 $form_session->values = $this->EE->extensions->call('proform_insert_start', $this, $form_obj, $form_session->values);
             }
 
+            if ($this->EE->extensions->active_hook('proform_insert_start_session') === TRUE)
+            {
+                $form_session = $this->EE->extensions->call('proform_insert_start_session', $this, $form_obj, $form_session);
+            }
+
             if(count($form_session->values) > 0)
             {
                 if($form_obj->encryption_on == 'y')
@@ -1894,6 +1911,7 @@ class Proform {
                     'field_length'              => $field->length,
                     'field_heading'             => $field->separator_type != PL_Form::SEPARATOR_HTML ? $field->heading : '',
                     'field_html_block'          => $field->separator_type == PL_Form::SEPARATOR_HTML ? $field->heading : '',
+                    'field_is_step'             => $field->separator_type == PL_Form::SEPARATOR_STEP ? 'step' : '',
                     'field_is_required'         => $is_required ? 'required' : '',
                     'field_validation'          => $validation,
                     'field_validation_count'    => $validation_count,
