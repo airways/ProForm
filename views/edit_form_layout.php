@@ -206,6 +206,7 @@ $alt = FALSE;
                     <p>Click a Field Type to create a new item, or click a field in the Library to add it to the form.</p>
 
                     <ul class="toolbox">
+
                         <li class="first-section">Field Types</li>
                         <?php foreach($item_options as $option): ?>
                         <li><a class="field_type"
@@ -216,6 +217,31 @@ $alt = FALSE;
                                 <img src="<?php echo get_instance()->config->slash_item('theme_folder_url'); ?>third_party/proform/images/<?php echo $option['icon']; ?>"> <?php echo $option['label']; ?></a>
                         </li>
                         <?php endforeach; ?>
+
+                        <li class="first-section">Field Plugins</li>
+                        <?php
+                        if(!count($plugin_options)): ?>
+                            <li>You don't have any plugins that provide fields installed yet. You can get more on <a href="http://devot-ee.com/developers/isaac-raway">Devot:ee</a>.</li>
+                        <?php
+                        else:
+                            foreach($plugin_options as $option): ?>
+                            <li><a class="field_type"
+                                href="<?php
+                                    echo $new_item_url.AMP.'field_type='.$option['key'];
+                                    if(isset($option['add_params']))
+                                    {
+                                        foreach($option['add_params'] as $param => $value)
+                                        {
+                                            echo AMP.$param.'='.urlencode($value);
+                                        }
+                                    }
+                                    
+                                 ?>">
+                                    <img src="<?php echo get_instance()->config->slash_item('theme_folder_url'); ?>third_party/proform/images/icons/<?php echo isset($option['icon']) ? $option['icon'] : 'plugin.png'; ?>"> <?php echo $option['name']; ?></a>
+                            </li>
+                            <?php endforeach;
+                        endif;
+                        ?>
 
                         <li class="first-section">Special</li>
                         <?php foreach($special_options as $option): ?>

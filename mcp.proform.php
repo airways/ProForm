@@ -54,7 +54,8 @@ class Proform_mcp extends Prolib_mcp {
     function Proform_mcp()
     {
         prolib($this, 'proform');
-
+        $this->EE->pl_plugins->init();
+        
         $this->EE->cp->set_right_nav(array(
                 'home' => TAB_ACTION,
                 'list_fields' => TAB_ACTION.'method=list_fields',
@@ -86,6 +87,17 @@ class Proform_mcp extends Prolib_mcp {
         if(isset($this->config_overrides['field_type_options']))
         {
             $this->field_type_options = $this->config_overrides['field_type_options'];
+        }
+        
+        // list available plugin field types to add to the form
+        $field_plugins = $this->EE->pl_plugins->get_plugins('field');
+        if(count($field_plugins))
+        {
+            $this->field_type_options['Plugins'] = array();
+            foreach($field_plugins as $plugin)
+            {
+                $this->field_type_options['Plugins'][$plugin->meta['key']] = $plugin->meta['name'];
+            }
         }
 
         if(isset($this->config_overrides['member_field_options']))
@@ -569,6 +581,16 @@ class Proform_mcp extends Prolib_mcp {
         }
 
         $vars['item_options'] = PL_Field::$item_options;
+
+
+        // list available plugin field types to add to the form
+        $vars['plugin_options'] = array();
+        $field_count = 0;
+        foreach($this->EE->pl_plugins->get_plugins('field') as $plugin)
+        {
+            $vars['plugin_options'][] = $plugin->meta;
+        }
+
 
         ////////////////////////////////////////
         // Generate table of fields
