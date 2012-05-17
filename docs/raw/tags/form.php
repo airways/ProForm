@@ -292,6 +292,8 @@
 
 <p>The <b>last_step_summary</b> parameter turns on a special mode for the last step of a multistep form, where all fields are returned by the {fields} loop. This can be used to present a summary of the form about to be submitted before the user actually submits it, giving them a chance to go back and change their responses.</p>
 
+<p>This parameter is not supported by the <kbd>Simple Form Tag</kbd> since you cannot provide a custom loop for that tag and therefore it is not needed.</p>
+
 <div class="tip">
     <h6>Example Usage</h6>
     <pre class="brush: xml">
