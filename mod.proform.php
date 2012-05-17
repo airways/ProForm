@@ -207,6 +207,7 @@ class Proform {
         $step               = (int)$this->EE->TMPL->fetch_param('step', 1);
         $variable_prefix    = pf_strip_id($this->EE->TMPL->fetch_param('variable_prefix', ''));
         $hidden_fields_mode = strtolower($this->EE->TMPL->fetch_param('hidden_fields_mode', 'split'));
+        $last_step_summary  = $this->EE->TMPL->fetch_param('last_step_summary') == 'yes';
         
         if(count($error_delimiters) != 2)
         {
@@ -298,6 +299,7 @@ class Proform {
                 'secure'            => $secure,
                 'error_messages'    => $error_messages,
                 'step'              => $step,
+                'last_step_summary' => $last_step_summary,
             );
         } else {
             // echo '<b>Existing session:</b>';
@@ -1859,7 +1861,10 @@ class Proform {
             // skip hidden fields when we don't want them, skip everything else when we do
 
             // Only return fields for the current step, if we are on a particular step
-            if($form_session AND $field->step_no != $form_session->config['step']) continue;
+            if(
+                $form_session && $field->step_no != $form_session->config['step']
+                && !($form_session->config['last_step_summary'] && $form_session->config['step'] == $form_obj->get_step_count())
+            ) continue;
 
             if($hidden !== -1)
             {

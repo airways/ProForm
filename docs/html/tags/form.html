@@ -77,7 +77,7 @@
     <li><a href="#simple_sample">Sample Templates</a></li>
 </ul>
 <h2><a name="simple_parameters">Simple Parameters</a></h2>
-<p>The <kbd>Simple Form Tag</kbd> supports all of the same parameters as the <kbd>Full Form Tag</kbd> <strong>except</strong> the variable_prefix parameter (since it does not make sense for a simple form).</p>
+<p>The <kbd>Simple Form Tag</kbd> supports all of the same parameters as the <kbd>Full Form Tag</kbd> <strong>except</strong> the variable_prefix and last_step_summary parameters (since they do not make sense for a simple form).</p>
 <p>See the full <a href="#parameters">list of parameters</a> for more information.</p>
 <h2><a name="simple_variables">Simple Variables</a></h2>
 <p>The <kbd>Simple Form Tag</kbd> supports the same  <a href="#variables">Single Variables</a> and <a href="#variable_pairs">Variables Pairs</a> supported by the full tag.</p>
@@ -129,6 +129,7 @@
     <li><a href="#param_form_id">form_id="form_contact_us"</a></li>
     <li><a href="#param_form_url">form_url="forms/contact-us"</a></li>
     <li><a href="#param_hidden_fields">hidden_fields="split"</a></li>
+    <li><a href="#param_last_step_summary">last_step_summary="yes"</a></li>
     <li><a href="#param_message">message:required="This field is required!", message:*=""</a></li>
     <li><a href="#param_notify">notify="sample@example.com"</a></li>
     <li><a href="#param_step">step="1"</a></li>
@@ -245,6 +246,35 @@
 <h3><a name="param_step">step="1"</a></h3>
 <p>The <b>step</b> parameter allows you to explicitly request a particular step be loaded for the form.</p>
 <p>By default, <dfn>ProForm</dfn> manages the active step using a session and hidden values passed inside the form. This parameter allows you to override this default behavior and specify the step to load based on your own criteria.</p>
+<h3><a name="param_last_step_summary">last_step_summary="yes"</a></h3>
+<p>The <b>last_step_summary</b> parameter turns on a special mode for the last step of a multistep form, where all fields are returned by the {fields} loop. This can be used to present a summary of the form about to be submitted before the user actually submits it, giving them a chance to go back and change their responses.</p>
+<div class="tip">
+    <h6>Example Usage</h6>
+    <pre class="brush: xml">
+        &#123;exp:proform:form form="support_request" last_step_summary="yes"&#125;
+            &lt;!-- Step tabs, hidden fields, etc. here --&gt;
+            &#123;if on_last_step&#125;
+                &lt;h3&gt;Summary&lt;/h3&gt;
+                &lt;p&gt;Be sure to click &lt;b&gt;Submit&lt;/b&gt; to send the request.&lt;/p&gt;
+                &lt;p&gt;If you need to make revisions, use the Previous button or the tabs above.&lt;/p&gt;
+                &lt;hr/&gt;
+                &#123;fields&#125;
+                    &#123;if field_label&#125;
+                        &lt;p&gt;&lt;strong&gt;&#123;field_label&#125;:&lt;/strong&gt; &#123;field_value&#125;&lt;/p&gt;
+                    &#123;/if&#125;
+                &#123;/fields&#125;
+                &lt;hr/&gt;
+            &#123;if:else&#125;
+                &#123;fieldrows&#125;
+                    &#123;fields&#125;
+                        &lt;!-- Render fields normally based on their type (see the full example template) --&gt;
+                    &#123;/fields&#125;
+                &#123;/fieldrows&#125;
+            &#123;/if&#125;
+            &lt;!-- Previous and Submit buttons and CAPTCHA here --&gt;
+        &#123;/exp:proform:form&#125;
+    </pre>
+</div>
 <h3><a name="param_variable_prefix">variable_prefix="pf_"</a></h3>
 <p>The <b>variable_prefix</b> parameter is used to specify a prefix to add to all variables provided by <dfn>ProForm</dfn>.</p>
 <p>This parameter is not supported by the <kbd>Simple Form Tag</kbd> since you cannot provide a custom loop for that tag and therefore it is not needed.</p>
