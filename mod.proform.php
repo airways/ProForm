@@ -2013,6 +2013,20 @@ class Proform {
                 $dir = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
                 $field_array['field_value'] = $dir['url'].$field_array['field_value'];
             }
+            
+            if($plugin = $field->get_plugin())
+            {
+                // Field plugins should set this key to some default representation so that they will work in the
+                // default and sample templates. If this is not set, the default template will use a single input
+                // element for the field.
+                $field_array['field_plugin'] = '';
+                if(method_exists($plugin, 'field_tag_array'))
+                {
+                    $field_array = $plugin->field_tag_array($form_obj, $field_array);
+                }
+            } else {
+                $field_array['field_plugin'] = FALSE;
+            }
 
             if($create_field_rows)
             {

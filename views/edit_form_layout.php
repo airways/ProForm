@@ -146,10 +146,14 @@ $alt = FALSE;
                         <input type="file" class="placeHolder" disabled="disabled" />
                     <?php
                         break;
-                    default: ?>
-                        <label for="" class=""><?php echo $display_label; ?></label>
-                        <input type="text" class="placeHolder" disabled="disabled" />
+                    default:
+                        if($field['plugin']):
+                            echo $field['plugin']->render_field_cp($form, $field);
+                        else: ?>
+                            <label for="" class=""><?php echo $display_label; ?></label>
+                            <input type="text" class="placeHolder" disabled="disabled" />
                     <?php
+                        endif;
                     endswitch;
                 endif;
                 echo '</li>';
@@ -214,7 +218,7 @@ $alt = FALSE;
                                 echo $new_item_url.AMP.'field_type='.$option['type'];
                                 if(isset($option['length'])) echo AMP.'field_length='.$option['length'];
                              ?>">
-                                <img src="<?php echo get_instance()->config->slash_item('theme_folder_url'); ?>third_party/proform/images/<?php echo $option['icon']; ?>"> <?php echo $option['label']; ?></a>
+                                <img src="<?php echo get_instance()->config->slash_item('theme_folder_url'); ?>third_party/proform/images/icons/<?php echo $option['icon']; ?>"> <?php echo $option['label']; ?></a>
                         </li>
                         <?php endforeach; ?>
 
@@ -247,7 +251,7 @@ $alt = FALSE;
                         <?php foreach($special_options as $option): ?>
                         <li><a class="field_type"
                             href="<?php echo $option['url']; ?>">
-                                <img src="<?php echo get_instance()->config->slash_item('theme_folder_url'); ?>third_party/proform/images/<?php echo $option['icon']; ?>"> <?php echo $option['label']; ?></a>
+                                <img src="<?php echo get_instance()->config->slash_item('theme_folder_url'); ?>third_party/proform/images/icons/<?php echo $option['icon']; ?>"> <?php echo $option['label']; ?></a>
                         </li>
                         <?php endforeach; ?>
 
@@ -260,7 +264,7 @@ $alt = FALSE;
                             foreach($add_item_options as $option): ?>
                             <li><a class="library"
                                 href="<?php echo $add_item_url.'&field_id='.$option['field_id']; ?>">
-                                    <img src="<?php echo get_instance()->config->slash_item('theme_folder_url'); ?>third_party/proform/images/<?php echo $option['icon']; ?>"> <?php echo $option['label']; ?></a>
+                                    <img src="<?php echo get_instance()->config->slash_item('theme_folder_url'); ?>third_party/proform/images/icons/<?php echo $option['icon']; ?>"> <?php echo $option['label']; ?></a>
                                 <a href="<?php echo $edit_field_url.'&field_id='.$option['field_id']; ?>" class="edit"><img src="<?php echo get_instance()->config->slash_item('theme_folder_url'); ?>third_party/proform/images/cog.png">Edit...</a>
                             </li>
                             <?php endforeach;

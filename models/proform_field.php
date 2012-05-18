@@ -147,13 +147,22 @@ class PL_Field extends PL_RowInitialized
     function get_field_icon()
     {
         $result = 'textfield.png';
-
-        foreach(PL_Field::$item_options as $option)
+        if($plugin = $this->get_plugin())
         {
-            if($option['type'] == $this->type)
+            if(isset($plugin->meta['icon']))
             {
-                $result = $option['icon'];
-                break;
+                $result = $plugin->meta['icon'];
+            } else {
+                $result = 'plugin.png';
+            }
+        } else {
+            foreach(PL_Field::$item_options as $option)
+            {
+                if($option['type'] == $this->type)
+                {
+                    $result = $option['icon'];
+                    break;
+                }
             }
         }
 
@@ -241,5 +250,11 @@ class PL_Field extends PL_RowInitialized
         // Explode the validation string, and remove any blank values found in it, as well as the 'none'
         // value used to indicate a lack of validation.
         return array_filter_values(explode('|', $this->validation), array('none', ''));
+    }
+    
+    function get_plugin()
+    {
+        $this->__EE->pl_plugins->init();
+        return $this->__EE->pl_plugins->get_plugin($this->type);
     }
 }

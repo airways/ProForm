@@ -623,6 +623,8 @@ class Proform_mcp extends Prolib_mcp {
                                         'value'     => $field->field_id,
                                         'class'     =>'toggle');
 
+                $row_array['plugin'] = $field->get_plugin();
+                
                 $vars['fields'][] = $row_array;
             }
         }
@@ -875,9 +877,11 @@ class Proform_mcp extends Prolib_mcp {
                 }
             }
 
-
             $this->EE->load->library('table');
             $this->_get_flashdata($vars);
+            
+            $vars = $this->EE->pl_plugins->call($this->EE->input->post('type'), 'field_remove', array($field, $vars));
+            
             return $this->EE->load->view('remove_field', $vars, TRUE);
         }
         else
@@ -896,6 +900,8 @@ class Proform_mcp extends Prolib_mcp {
 
         $form = $this->EE->formslib->forms->get($form_id);
         $field = $this->EE->formslib->fields->get($field_id);
+
+        $this->EE->pl_plugins->call($this->EE->input->post('type'), 'field_remove_process', array($form, $field));
 
         if(is_numeric($form_id) && is_numeric($field_id) && $form && $field)
         {
@@ -991,13 +997,15 @@ class Proform_mcp extends Prolib_mcp {
         // blank form object
         $vars['editing'] = FALSE;
 
-
-        return $this->edit_field(FALSE, $vars);
+        $vars = $this->EE->pl_plugins->call($vars['field_type'], 'new_field_data', array($vars));
+        return $this->EE->pl_plugins->call($vars['field_type'], 'new_field_view', array($this->edit_field(FALSE, $vars)));
     }
 
     function process_new_field()
     {
         $this->EE->load->library('formslib');
+
+        $this->EE->pl_plugins->call($this->EE->input->post('type'), 'new_field_process');
 
         // see if the field already exists
         $field_name = strtolower(trim($this->EE->input->post('field_name')));
@@ -1034,7 +1042,11 @@ class Proform_mcp extends Prolib_mcp {
         {
             // go back to field listing
             $this->EE->session->set_flashdata('message', lang('msg_field_created'));
-            $this->EE->functions->redirect(ACTION_BASE.AMP.'method=list_fields');
+            // Allow a plugin to customize the redirect
+            if($this->EE->pl_plugins->call($this->EE->input->post('type'), 'new_field_process_done', array($field, FALSE, TRUE)))
+            {
+                $this->EE->functions->redirect(ACTION_BASE.AMP.'method=list_fields');
+            }
         } else {
             // add the field to that form and go to it's layout view
             $form = $this->EE->formslib->forms->get($auto_add_form_id);
@@ -1043,8 +1055,13 @@ class Proform_mcp extends Prolib_mcp {
                 $form->assign_field($field);
 
                 $this->EE->session->set_flashdata('message', lang('msg_field_created_added'));
-                $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.
-                                                AMP.'form_id='.$auto_add_form_id.AMP.'active_tabs=tab-content-layout');
+                
+                // Allow a plugin to customize the redirect
+                if($this->EE->pl_plugins->call($this->EE->input->post('type'), 'edit_field_process_done', array($field, $auto_add_form_id, TRUE)))
+                {
+                    $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.
+                                                    AMP.'form_id='.$auto_add_form_id.AMP.'active_tabs=tab-content-layout');
+                }
             } else {
                 show_error(lang('invalid_form_id_or_field_id') . '[11]');
             }
@@ -1143,14 +1160,10 @@ class Proform_mcp extends Prolib_mcp {
         $this->EE->load->library('table');
         $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/edit_field.js"></script>');
 
+        $vars = $this->EE->pl_plugins->call($field->type, 'edit_field_data', array($vars));
         $result = $this->EE->load->view('generic_edit', $vars, TRUE);
-        // if($this->EE->input->get('embed'))
-        // {
-        //     echo $result;
-        //     exit;
-        // } else  {
+        $result = $this->EE->pl_plugins->call($field->type, 'edit_field_view', array($result));
             return $result;
-        // }
     }
 
     private function _filter_array($array, $original)
@@ -1171,6 +1184,8 @@ class Proform_mcp extends Prolib_mcp {
     function process_edit_field()
     {
  
+        $this->EE->pl_plugins->call($this->EE->input->post('type'), 'edit_field_process');
+
         // run form validation
         $this->_run_validation('edit_field');
 
@@ -1208,13 +1223,17 @@ class Proform_mcp extends Prolib_mcp {
         $field->settings = $settings;
         $field->save();
 
-        // go back to form listing
-        if($form_id)
+        // Allow a plugin to customize the redirect
+        if($this->EE->pl_plugins->call($this->EE->input->post('type'), 'edit_field_process_done', array($field, $form_id, TRUE)))
         {
-            $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.
-                                                AMP.'form_id='.$form_id.AMP.'active_tabs=tab-content-layout');
-        } else {
-            $this->EE->functions->redirect(ACTION_BASE.AMP.'method=list_fields');
+            // go back to form listing
+            if($form_id)
+            {
+                $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.
+                                                    AMP.'form_id='.$form_id.AMP.'active_tabs=tab-content-layout');
+            } else {
+                $this->EE->functions->redirect(ACTION_BASE.AMP.'method=list_fields');
+            }
         }
         return TRUE;
     }

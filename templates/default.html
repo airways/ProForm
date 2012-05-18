@@ -100,7 +100,11 @@
                             {/pf_field_setting_list}
                         {/if}
                     {if:else}
-                        <input type="{pf_field_control}" id="{pf_field_name}" name="{pf_field_name}" value="{pf_field_value}" class="{pf_field_is_required}" />
+                        {if pf_field_plugin}
+                            {pf_field_plugin}
+                        {if:else}
+                            <input type="{pf_field_control}" id="{pf_field_name}" name="{pf_field_name}" value="{pf_field_value}" class="{pf_field_is_required}" />
+                        {/if}
                     {/if}
 
                     {if pf_field_error}<div id="text-E" class="errMsg"><span>{pf_field_error}</span></div>{/if}
