@@ -527,10 +527,27 @@ class PL_Form extends PL_RowInitialized {
                     $this->__EE->load->dbforge();
                     $forge = &$this->__EE->dbforge;
 
+                    $typedef = FALSE;
+                    $plugin = FALSE;
+
                     if(array_key_exists($field->type, PL_Field::$types['mysql']))
                     {
                         $typedef = PL_Field::$types['mysql'][$field->type];
-
+                    } else {
+                        $plugin = $field->get_plugin();
+                        if($plugin)
+                        {
+                            if(method_exists($plugin, 'get_field_typedef'))
+                            {
+                                $typedef = $plugin->get_field_typedef($field, 'mysql');
+                            } else {
+                                $typedef = array('type' => 'TEXT');
+                            }
+                        }
+                    }
+                    
+                    if($typedef)
+                    {
                         $fields = array(
                             $field->field_name       => array('type' => $typedef['type'])
                         );
@@ -583,6 +600,10 @@ class PL_Form extends PL_RowInitialized {
                         // add new column to the form's table
                         if($do_forge)
                         {
+                            if($plugin && method_exists($plugin, 'add_db_columns'))
+                            {
+                                $typedef = $plugin->add_db_columns($this, $field, $fields, 'mysql');
+                            }
                             $forge->add_column($this->table_name(), $fields);
                         }
                     } else {
@@ -601,6 +622,10 @@ class PL_Form extends PL_RowInitialized {
 
                         if($do_forge)
                         {
+                            if($plugin && method_exists($plugin, 'modify_db_columns'))
+                            {
+                                $typedef = $plugin->modify_db_columns($this, $field, $fields, $assignment_row, 'mysql');
+                            }
                             $forge->modify_column($this->table_name(), $fields);
                         }
 

@@ -30,23 +30,43 @@
  *
  **/ ?>
 
+
 <div class="list_entries">
-    <div class="tabs-wrapper">
-        <div class="new_field">
-            
-            <?php
+
+
+                <?php
             $base = BASE.'&C=addons_modules&M=show_module_cp&module=proform';
             $export_entries_label = lang('export_entries');
+            $html_export_label = lang('html_export');
+            $html_report_label = lang('html_report');
+            $txt_report_label = lang('txt_report');
+//            <span class="button"><a href="{$base}&method=export_entries&form_id={$form_id}">{$export_entries_label}</a></span>
+
             echo $pl_plugins->list_entries_commands($form_id, <<<END
-    <span class="button"><a href="{$base}&method=export_entries&form_id={$form_id}">{$export_entries_label}</a></span>
+
+    <div class="dropdown-wrap">
+        <span class="button content-btn"><a title="" class="submit" href="#">Entries Export / Reports</a></span>
+        <div class="dropdown">
+            <ul>
+                <li><a href="{$base}&method=export_entries&form_id={$form_id}&format=csv">{$export_entries_label}</a></li>
+                <li><a href="{$base}&method=export_entries&form_id={$form_id}&format=html_export">{$html_export_label}</a></li>
+                <li><a href="{$base}&method=export_entries&form_id={$form_id}&format=html_report">{$html_report_label}</a></li>
+                <li><a href="{$base}&method=export_entries&form_id={$form_id}&format=txt_report">{$txt_report_label}</a></li>
+            </ul>
+        </div>
+    </div>
+
+
 END
 ); ?>
-            
+
+
+
             <span class="action-list">
                 <a href="<?php echo $edit_form_url; ?>">Edit Form Settings</a>
             </span>
-        </div>
-    </div>
+            
+    <div class="table_wrapper">
 
 
 <?php if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>'; ?>
@@ -58,67 +78,72 @@ END
 
 <?php
     $this->table->set_template($cp_table_template);
-    $this->table->set_heading($headings);
+
+    // put the headings into the order specified by field_order
+    $ordered_headings = array();
+    foreach($field_order as $i => $field)
+    {
+        $ordered_headings[] = $headings[$field];
+    }
+
+    $this->table->set_heading($ordered_headings);
 
     if (count($entries) > 0):
         foreach($entries as $entry)
         {
-            $row = array('<a href="'.$view_entry_url.'&entry_id='.$entry->form_entry_id.'">'.htmlspecialchars($entry->form_entry_id).'</a>');
-
-            //$row[] = '<a href="'.$field->edit_link.'">'.entry->id.'</a>';
-            foreach($entry as $field => $value)
-            {
-//                $value = $entry->$field;
-
-                if(array_search($field, $hidden_columns) === FALSE)
-                {
-                    if(isset($field_types[$field]))
-                    {
-                        switch($field_types[$field])
-                        {
-                            case 'file':
-                                $row[] = '<span class="'.$field_types[$field].$short.'">'.
-                                    '<a href="'.$field_upload_prefs[$field]['url'].$value.'">'.$value.'</a></span>';
-                                break;
-                            case 'control':
-                                $row[] = '<span class="'.$field_types[$field].$short.'">'.$value.'</span>';
-                                break;
-                            default:
-                                if(strlen($value) > 300)
-                                {
-                                    $value = substr($value, 0, 300).'...';
-                                }
+            $row = array();
+            $short = '';
             
-                                $value = strip_tags($value);
-                                if(strlen($value) > 150)
-                                {
-                                    $value = substr($value, 0, 150).'...';
-                                }
-                                
-                                if(strlen($value) < 20)
-                                {
-                                    $short = ' short';
-                                } else {
-                                    $short = '';
-                                }
+            // foreach($entry as $field => $value)
+            foreach($field_order as $field)
+            {
+
+                $value = &$entry->$field;
+
+                if(!isset($field_types[$field]))
+                {
+                    $type = 'text';
+                } else {
+                    $type = $field_types[$field];
+                }
+                switch($type)
+                {
+                    case 'file':
+                        $row[] = '<span class="'.$type.$short.'">'.
+                            '<a href="'.$field_upload_prefs[$field]['url'].$value.'">'.$value.'</a></span>';
+                        break;
+                    case 'control':
+                        $row[] = '<span class="'.$type.$short.'">'.$value.'</span>';
+                        break;
+                    default:
+                        $plugin_view = $this->pl_plugins->call($type, 'render_entries_list_cp', array($value));
+                        if($plugin_view != $value)
+                        {
+                            $row[] = '<span class="'.$type.'">'.$plugin_view.'</span>';
+                        } else {
+                            if(strlen($value) > 300)
+                            {
+                                $value = substr($value, 0, 300).'...';
+                            }
+    
+                            $value = strip_tags($value);
+                            if(strlen($value) > 150)
+                            {
+                                $value = substr($value, 0, 150).'...';
+                            }
                         
-                                $row[] = '<span class="'.$field_types[$field].$short.'">'.htmlspecialchars($value).'</span>';
+                            if(strlen($value) < 20)
+                            {
+                                $short = ' short';
+                            } else {
+                                $short = '';
+                            }
+                        
+                            $row[] = '<span class="'.$type.$short.'">'.htmlspecialchars($value).'</span>';
                         }
-                    }
                 }
             }
 
-            $action_list = '<div class="action-list">';
-            $action_list .= $pl_plugins->list_entries_action_list_view(
-                    $form_id,
-                    $entry,
-                    '<a href="'.$view_entry_url.'&entry_id='.$entry->form_entry_id.'">View</a> '.
-                    '<a href="'.$delete_entry_url.'&entry_id='.$entry->form_entry_id.'" class="pl_confirm" rel="Are you sure you want to delete this entry?">Delete</a>');
-                     
-            $action_list .= '</div>';
-            
-            $row[] = $action_list;
-            
                      
             $this->table->add_row($row);
         }
@@ -142,6 +167,7 @@ END
         <?php echo $pagination; ?>
         <span class="pagination" id="filter_pagination"></span>
     </div>
+</div>
 
 
 </div>

@@ -179,7 +179,16 @@
 </tr>
 <tr><td colspan="3">
     <p><b>Description</b></p>
-    <p>This hook is called just before inserting the data for the form submission into the database table for this field. This can be used to push the final data array to an external source, generating some sort of custom notification, as well as changing the data to actually be stored in the DB.<p></td>
+    <p>This hook is called just before inserting the data for the form submission into the database table for the form. This can be used to push the final data array to an external source, generating some sort of custom notification, as well as changing the data to actually be stored in the DB.<p></td>
+</tr>
+<!-------------------->
+<tr><td><b>proform_insert_start_session</b></td>
+    <td>$module, $form_obj, $form_session</td>
+    <td>$form_session</td>
+</tr>
+<tr><td colspan="3">
+    <p><b>Description</b></p>
+    <p>Similarly to proform_insert_start, this hook is called just before inserting the data for the form submission into the database table for the  form. The entire form_session can be inspected and modified if needed.<p></td>
 </tr>
 <!-------------------->
 <tr><td><b>proform_insert_end</b></td>
@@ -202,7 +211,7 @@
 </tr>
 </table>
     <div id="footer">
-            <p>ProForm version 1.11</p>
+            <p>ProForm version 1.12</p>
     </div>
     </div>
 </div>

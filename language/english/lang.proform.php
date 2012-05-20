@@ -73,7 +73,10 @@ $lang = array(
     'assign_field' => 'Assign Field',
     'list_templates' => 'Templates',
     'new_template' => 'Create New Template',
-    'export_entries' => 'Export Entries',
+    'export_entries' => 'Export - CSV',
+    'html_export' => 'Export - HTML',
+    'html_report' => 'HTML Report',
+    'txt_report' => 'Text Report',
     'save_form' => 'Save Form',
 
     'form_title' => 'General Form',

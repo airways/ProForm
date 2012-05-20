@@ -54,7 +54,8 @@ class Proform_mcp extends Prolib_mcp {
     function Proform_mcp()
     {
         prolib($this, 'proform');
-
+        $this->EE->pl_plugins->init();
+        
         $this->EE->cp->set_right_nav(array(
                 'home' => TAB_ACTION,
                 'list_fields' => TAB_ACTION.'method=list_fields',
@@ -86,6 +87,17 @@ class Proform_mcp extends Prolib_mcp {
         if(isset($this->config_overrides['field_type_options']))
         {
             $this->field_type_options = $this->config_overrides['field_type_options'];
+        }
+        
+        // list available plugin field types to add to the form
+        $field_plugins = $this->EE->pl_plugins->get_plugins('field');
+        if(count($field_plugins))
+        {
+            $this->field_type_options['Plugins'] = array();
+            foreach($field_plugins as $plugin)
+            {
+                $this->field_type_options['Plugins'][$plugin->meta['key']] = $plugin->meta['name'] . ' ' . $plugin->meta['version'];
+            }
         }
 
         if(isset($this->config_overrides['member_field_options']))
@@ -570,6 +582,16 @@ class Proform_mcp extends Prolib_mcp {
 
         $vars['item_options'] = PL_Field::$item_options;
 
+
+        // list available plugin field types to add to the form
+        $vars['plugin_options'] = array();
+        $field_count = 0;
+        foreach($this->EE->pl_plugins->get_plugins('field') as $plugin)
+        {
+            $vars['plugin_options'][] = $plugin->meta;
+        }
+
+
         ////////////////////////////////////////
         // Generate table of fields
         $vars['fields'] = array();
@@ -601,6 +623,8 @@ class Proform_mcp extends Prolib_mcp {
                                         'value'     => $field->field_id,
                                         'class'     =>'toggle');
 
+                $row_array['plugin'] = $field->get_plugin();
+                
                 $vars['fields'][] = $row_array;
             }
         }
@@ -853,9 +877,11 @@ class Proform_mcp extends Prolib_mcp {
                 }
             }
 
-
             $this->EE->load->library('table');
             $this->_get_flashdata($vars);
+            
+            $vars = $this->EE->pl_plugins->call($this->EE->input->post('type'), 'field_remove', array($field, $vars));
+            
             return $this->EE->load->view('remove_field', $vars, TRUE);
         }
         else
@@ -874,6 +900,8 @@ class Proform_mcp extends Prolib_mcp {
 
         $form = $this->EE->formslib->forms->get($form_id);
         $field = $this->EE->formslib->fields->get($field_id);
+
+        $this->EE->pl_plugins->call($this->EE->input->post('type'), 'field_remove_process', array($form, $field));
 
         if(is_numeric($form_id) && is_numeric($field_id) && $form && $field)
         {
@@ -969,13 +997,15 @@ class Proform_mcp extends Prolib_mcp {
         // blank form object
         $vars['editing'] = FALSE;
 
-
-        return $this->edit_field(FALSE, $vars);
+        $vars = $this->EE->pl_plugins->call($vars['field_type'], 'new_field_data', array($vars));
+        return $this->EE->pl_plugins->call($vars['field_type'], 'new_field_view', array($this->edit_field(FALSE, $vars)));
     }
 
     function process_new_field()
     {
         $this->EE->load->library('formslib');
+
+        $this->EE->pl_plugins->call($this->EE->input->post('type'), 'new_field_process');
 
         // see if the field already exists
         $field_name = strtolower(trim($this->EE->input->post('field_name')));
@@ -1012,7 +1042,11 @@ class Proform_mcp extends Prolib_mcp {
         {
             // go back to field listing
             $this->EE->session->set_flashdata('message', lang('msg_field_created'));
-            $this->EE->functions->redirect(ACTION_BASE.AMP.'method=list_fields');
+            // Allow a plugin to customize the redirect
+            if($this->EE->pl_plugins->call($this->EE->input->post('type'), 'new_field_process_done', array($field, FALSE, TRUE)))
+            {
+                $this->EE->functions->redirect(ACTION_BASE.AMP.'method=list_fields');
+            }
         } else {
             // add the field to that form and go to it's layout view
             $form = $this->EE->formslib->forms->get($auto_add_form_id);
@@ -1021,8 +1055,13 @@ class Proform_mcp extends Prolib_mcp {
                 $form->assign_field($field);
 
                 $this->EE->session->set_flashdata('message', lang('msg_field_created_added'));
-                $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.
-                                                AMP.'form_id='.$auto_add_form_id.AMP.'active_tabs=tab-content-layout');
+                
+                // Allow a plugin to customize the redirect
+                if($this->EE->pl_plugins->call($this->EE->input->post('type'), 'edit_field_process_done', array($field, $auto_add_form_id, TRUE)))
+                {
+                    $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.
+                                                    AMP.'form_id='.$auto_add_form_id.AMP.'active_tabs=tab-content-layout');
+                }
             } else {
                 show_error(lang('invalid_form_id_or_field_id') . '[11]');
             }
@@ -1121,14 +1160,10 @@ class Proform_mcp extends Prolib_mcp {
         $this->EE->load->library('table');
         $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/edit_field.js"></script>');
 
+        $vars = $this->EE->pl_plugins->call($field->type, 'edit_field_data', array($vars));
         $result = $this->EE->load->view('generic_edit', $vars, TRUE);
-        // if($this->EE->input->get('embed'))
-        // {
-        //     echo $result;
-        //     exit;
-        // } else  {
+        $result = $this->EE->pl_plugins->call($field->type, 'edit_field_view', array($result));
             return $result;
-        // }
     }
 
     private function _filter_array($array, $original)
@@ -1149,6 +1184,8 @@ class Proform_mcp extends Prolib_mcp {
     function process_edit_field()
     {
  
+        $this->EE->pl_plugins->call($this->EE->input->post('type'), 'edit_field_process');
+
         // run form validation
         $this->_run_validation('edit_field');
 
@@ -1186,13 +1223,17 @@ class Proform_mcp extends Prolib_mcp {
         $field->settings = $settings;
         $field->save();
 
-        // go back to form listing
-        if($form_id)
+        // Allow a plugin to customize the redirect
+        if($this->EE->pl_plugins->call($this->EE->input->post('type'), 'edit_field_process_done', array($field, $form_id, TRUE)))
         {
-            $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.
-                                                AMP.'form_id='.$form_id.AMP.'active_tabs=tab-content-layout');
-        } else {
-            $this->EE->functions->redirect(ACTION_BASE.AMP.'method=list_fields');
+            // go back to form listing
+            if($form_id)
+            {
+                $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.
+                                                    AMP.'form_id='.$form_id.AMP.'active_tabs=tab-content-layout');
+            } else {
+                $this->EE->functions->redirect(ACTION_BASE.AMP.'method=list_fields');
+            }
         }
         return TRUE;
     }
@@ -1508,6 +1549,7 @@ class Proform_mcp extends Prolib_mcp {
 
         // Get form object
         $form = &$this->EE->formslib->forms->get($form_id);
+        $fields = $form->fields();
 
         // Set up UI
         $this->sub_page(lang('tab_list_entries').' in <em>'.$form->form_name.'</em>');
@@ -1530,9 +1572,37 @@ class Proform_mcp extends Prolib_mcp {
             }
         } else {
             $data = $entries;
-
         }
+        
         $vars['entries'] = $data;
+        
+        // $sorted_data = array();
+        // foreach($data as $unsorted)
+        // {
+        //     $sorted = new stdClass();
+        //     foreach($unsorted as $k => $v)
+        //     {
+        //         foreach($form->fields() as $field)
+        //         {
+        //             $field_name = $field->field_name;
+        //             if(isset($unsorted->$field_name))
+        //             {
+        //                 $sorted->$field_name = $unsorted->$field_name;
+        //             } else {
+        //                 // $sorted->$field_name = 0;
+        //             }
+        //         }
+        //         foreach($unsorted as $field_name => $field_value)
+        //         {
+        //             if(!isset($sorted->$field_name))
+        //             {
+        //                 $sorted->$field_name = $field_value;
+        //             }
+        //         }
+        //     }
+        //     $sorted_data[] = $sorted;
+        // }
+        // $vars['entries'] = $sorted_data;
 
         ////////////////////////////////////////
         // Pagination
@@ -1545,9 +1615,9 @@ class Proform_mcp extends Prolib_mcp {
         // Table Headings
         $vars['hidden_columns'] = array("ip_address", "user_agent", "dst_enabled");
 
-        $headings = array('ID', 'Last Updated');
-        $fields = $form->fields();
-
+        $headings = array('form_entry_id' => 'ID', 'updated' => 'Last Updated');
+        $field_order = array('form_entry_id', 'updated');
+        
         $vars['fields'] = array('updated');
         $vars['field_types'] = array('updated' => 'datetime');
         foreach($fields as $field)
@@ -1565,15 +1635,42 @@ class Proform_mcp extends Prolib_mcp {
                 if(lang('heading_' . $field->field_name) == 'heading_' . $field->field_name)
                 {
                     $field = $this->EE->formslib->fields->get($field->field_name);
-                    $headings[] = $field->field_label;
+                    $headings[$field->field_name] = $field->field_label;
                 } else {
-                    $headings[] = lang('heading_' . $field->field_name);
+                    $headings[$field->field_name] = lang('heading_' . $field->field_name);
+                }
+            }
+            
+            $field_order[] = $field->field_name;
+            
+            if($plugin = $field->get_plugin())
+            {
+                if(method_exists($plugin, 'list_data'))
+                {
+                    $plugin->list_data($form_obj, $field, $vars);
                 }
             }
         }
-        $headings[] = lang('heading_commands');
+        $headings['_commands'] = lang('heading_commands');
+        $field_order[] = '_commands';
         $vars['headings'] = $headings;
+        $vars['field_order'] = $field_order;
 
+        $vars['field_types']['_commands'] = 'control';
+        foreach($vars['entries'] as $entry)
+        {
+            $action_list = '<div class="action-list">';
+            $action_list .= $this->EE->pl_plugins->list_entries_action_list_view(
+                    $form_id,
+                    $entry,
+                    '<a href="'.$vars['view_entry_url'].'&entry_id='.$entry->form_entry_id.'">View</a> '.
+                    '<a href="'.$vars['delete_entry_url'].'&entry_id='.$entry->form_entry_id.'" class="pl_confirm" rel="Are you sure you want to delete this entry?">Delete</a>');
+
+            $action_list .= '</div>';
+            
+            //'<a href="'.$view_entry_url.'&entry_id='.$entry->form_entry_id.'">'.htmlspecialchars($entry->form_entry_id).'</a>'
+            $entry->_commands = $action_list;
+        }
         
         $vars = $this->prolib->pl_plugins->list_entries_data($vars);
         $vars['pl_plugins'] = &$this->prolib->pl_plugins;
@@ -1627,15 +1724,15 @@ class Proform_mcp extends Prolib_mcp {
                             '<a href="'.$upload_pref['url'].$entry->$field_name.'">'.$entry->$field_name.'</a></span>';
                         $types[$field->field_name] = 'static';
                         break;
-                    case 'string':
-                        if($field->length > 255)
-                        {
-                            $types[$field->field_name] = 'textarea';
-                        }
-                        break;
-                    case 'text':
-                        $types[$field->field_name] = 'textarea';
-                        break;
+                    // case 'string':
+                    //     if($field->length > 255)
+                    //     {
+                    //         $types[$field->field_name] = 'textarea';
+                    //     }
+                    //     break;
+                    // case 'text':
+                    //     $types[$field->field_name] = 'textarea';
+                    //     break;
                     default:
                         $types[$field->field_name] = 'read_only';
                         break;
@@ -1659,6 +1756,18 @@ class Proform_mcp extends Prolib_mcp {
             $form = $this->EE->pl_forms->create_cp_form($entry, $types);
             //var_dump($form);die;
             $vars['form'] = $form;
+
+            foreach($form_obj->fields() as $field)
+            {
+                if($plugin = $field->get_plugin())
+                {
+                    if(method_exists($plugin, 'view_data'))
+                    {
+                        $plugin->view_data($form_obj, $field, $vars, $entry);
+                    }
+                }
+            }
+
 
             $this->EE->load->library('table');
             return $this->EE->load->view('generic_edit', $vars, TRUE);
@@ -1720,13 +1829,32 @@ class Proform_mcp extends Prolib_mcp {
 
         // Get params
         $form_id = $this->EE->input->get('form_id');
+        $format = $this->EE->input->get('format');
 
         // Get form object
         $form = $this->EE->formslib->forms->get($form_id);
 
-        $file_name = $form->form_name . '_' . date("j-n-Y_G-i-s") . '.csv';
-        $stdout = fopen("php://output", "w");
-        header('Content-Type: text/csv');
+        switch($format)
+        {
+            case 'csv':
+                $file_name = $form->form_name . '_' . date("j-n-Y_G-i-s") . '.csv';
+                $stdout = fopen("php://output", "w");
+                header('Content-Type: text/csv');
+                break;
+            case 'html_export':
+                $file_name = $form->form_name . '_' . date("j-n-Y_G-i-s") . '_export.html';
+                $stdout = fopen("php://output", "w");
+                break;
+            case 'html_report':
+                $file_name = $form->form_name . '_' . date("j-n-Y_G-i-s") . '_report.html';
+                $stdout = fopen("php://output", "w");
+                break;
+            case 'txt_report':
+                $file_name = $form->form_name . '_' . date("j-n-Y_G-i-s") . '_report.txt';
+                $stdout = fopen("php://output", "w");
+                header('Content-Type: text/plain');
+                break;
+        }
         header('Content-Disposition: attachment; filename='.$file_name);
         header('Pragma: no-cache');
         header('Expires: 0');
@@ -1734,11 +1862,80 @@ class Proform_mcp extends Prolib_mcp {
         // get all entries for form, prepare CSV and send download file
         $entries = $form->entries();
 
-        fputcsv($stdout, array_keys((array)($entries[0])));
-
-        foreach($entries as $row)
+        switch($format)
         {
-            fputcsv($stdout, array_values((array)$row));
+            case 'csv':
+                fputcsv($stdout, array_keys((array)($entries[0])));
+                foreach($entries as $row)
+                {
+                    fputcsv($stdout, array_values((array)$row));
+                }
+                break;
+            case 'html_export':
+                echo '<table width="100%" border="1" cellspacing="0" cellpadding="5"><tr>';
+                foreach(array_keys((array)($entries[0])) as $key)
+                {
+                    echo '<th>'.htmlentities($key).'</th>';
+                }
+                foreach($entries as $row)
+                {
+                    echo '<tr>';
+                    foreach(array_values((array)$row) as $cell)
+                    {
+                        if(substr($key, 0, 2) == "__" || is_object($cell) || is_array($cell)) continue;
+                        echo '<td>'.htmlentities($cell).'</td>';
+                    }
+                    echo '</tr>';
+                }
+                echo '</table>';
+                break;
+            case 'html_report':
+                echo '<table width="100%" border="1" cellspacing="0" cellpadding="5">';
+                foreach($form as $key => $cell)
+                {
+                    if(substr($key, 0, 2) == "__" || is_object($cell) || is_array($cell)) continue;
+                
+                    $n = 40 - strlen($key);
+                    if($n < 0) $n = 0;
+
+                    echo '<tr><td><b>'.$key.'</b></td><td>'.htmlentities($cell).'</td>';
+                }
+                echo '</table><br/><br/>';
+            
+                foreach($entries as $row)
+                {
+                    echo '<table width="100%" border="1" cellspacing="0" cellpadding="5">';
+                    foreach($row as $key => $cell)
+                    {
+                        if(substr($key, 0, 2) == "__" || is_object($cell) || is_array($cell)) continue;
+                        echo '<tr><td><b>'.$key.'</b></td><td>'.htmlentities($cell).'</td>';
+                    }
+                    echo '</table><br/><br/>';
+                }
+                break;
+            case 'txt_report':
+                foreach($form as $key => $cell)
+                {
+                    if(substr($key, 0, 2) == "__" || is_object($cell) || is_array($cell)) continue;
+                    
+                    $n = 40 - strlen($key);
+                    if($n < 0) $n = 0;
+                    echo $key.str_repeat(' ', $n).': '.$cell."\n";
+                }
+                echo "\n================================================================================\n\n";
+                
+                foreach($entries as $row)
+                {
+                    foreach($row as $key => $cell)
+                    {
+                        if(substr($key, 0, 2) == "__" || is_object($cell) || is_array($cell)) continue;
+                        $n = 30 - strlen($key);
+                        if($n < 0) $n = 0;
+                        echo $key.str_repeat(' ', $n).': '.$cell."\n";
+                    }
+                    echo "\n--------------------------------------------------------------------------------\n\n";
+                }
+                break;
         }
 
         die;

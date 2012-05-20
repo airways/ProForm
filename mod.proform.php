@@ -90,7 +90,7 @@ class Proform {
     // Tags
     ////////////////////////////////////////////////////////////////////////////////
 
-    public function head()
+    public function head($prefix='default')
     {
         $result = '';
         // The prefix should only ever be sent once. This can be done in the header as a tag:
@@ -98,7 +98,7 @@ class Proform {
         // {exp:proform:simple}.
         if(!isset($this->cache['prefix_included']) || !$this->cache['prefix_included'])
         {
-            $result = file_get_contents(PATH_THIRD.'proform/templates/prefix.html');
+            $result = file_get_contents(PATH_THIRD.'proform/templates/'.$prefix.'.html');
             $this->cache['prefix_included'] = TRUE;
         }
         return $result;
@@ -108,35 +108,54 @@ class Proform {
     {
         // This just disables the head script completely - use this only when you've created
         // custom styling and javascript for the simple template.
-        $this->cache['prefix_included'] = TRUE;
+        $this->cache['prefix_disabled'] = TRUE;
         return '';
     }
     
     public function simple()
     {
         $template = pf_strip_id(strip_tags($this->EE->TMPL->fetch_param('template', 'default')));
+        $prefix   = pf_strip_id(strip_tags($this->EE->TMPL->fetch_param('prefix', 'prefix')));
         
         $form_name = strip_tags($this->EE->TMPL->fetch_param('form_name', $this->EE->TMPL->fetch_param('form', FALSE)));
-        
+
         if(!$form_name)
         {
             show_error('Invalid form_name provided to {exp:proform:simple}: "'.htmlentities($form_name).'"');
         }
         
         // Get our template components
-        $prefix = $this->head();
+        if((!isset($this->cache['prefix_disabled']) || !$this->cache['prefix_disabled']) && $this->EE->TMPL->fetch_param('disable_head') != 'yes' )
+        {
+            $prefix = $this->head($prefix);
+        } else {
+            $prefix = '';
+        }
+        
         $template = file_get_contents(PATH_THIRD.'proform/templates/'.$template.'.html');
         
         // Swap out the "embed" parameter for form_name in the template
-        $template = str_replace(LD.'embed:form_name'.RD, $form_name, $template);
+        // $template = str_replace(LD.'embed:form_name'.RD, $form_name, $template);
+        
+        // Replace parameters in the template with those from the simple tag. Simulate embed:* parameters
+        // for each param as well.
+        $params = '';
+        foreach($this->EE->TMPL->tagparams as $param => $value)
+        {
+            $params .= $param.'="'.$value.'" ';
+            $template = str_replace(LD.'embed:'.$param.RD, $value, $template);
+        }
+        $template = str_replace('[%params%]', $params, $template);
         
         // We need to remove any EE comments since they will not be handled correctly if they are left in place
         // (the template parser has already removed normal comments before the simple() tag we're processing was
         // called).
         //$output = preg_replace('/\{\!--.*?--\}/s', '', $prefix.$template);
+        
+        // Tack on the prefix JS/CSS etc
         $output = $prefix.$template;
-        //echo htmlentities($output);exit;
-        // Return the template code so the parser can handle it as if the developer had inserted it directly
+        
+        // Return the final template code so the parser can handle it as if the developer had inserted it directly
         // into the template
         return $output;
         
@@ -189,6 +208,7 @@ class Proform {
         $step               = (int)$this->EE->TMPL->fetch_param('step', 1);
         $variable_prefix    = pf_strip_id($this->EE->TMPL->fetch_param('variable_prefix', ''));
         $hidden_fields_mode = strtolower($this->EE->TMPL->fetch_param('hidden_fields_mode', 'split'));
+        $last_step_summary  = $this->EE->TMPL->fetch_param('last_step_summary') == 'yes';
         
         if(count($error_delimiters) != 2)
         {
@@ -280,6 +300,7 @@ class Proform {
                 'secure'            => $secure,
                 'error_messages'    => $error_messages,
                 'step'              => $step,
+                'last_step_summary' => $last_step_summary,
             );
         } else {
             // echo '<b>Existing session:</b>';
@@ -377,11 +398,12 @@ class Proform {
                 {
                     if($form_session)
                     {
-                        if(array_key_exists($field->field_name, $form_session->values)) {
-                            $field_values[$field->field_name] = $form_session->values[$field->field_name];
-                        } else {
-                            $field_values[$field->field_name] = '';
-                        }
+                        // Moving out of this loop so we get everything from the session - just going to use $form_session->values directly
+                        // if(array_key_exists($field->field_name, $form_session->values)) {
+                        //     $field_values[$field->field_name] = $form_session->values[$field->field_name];
+                        // } else {
+                        //     $field_values[$field->field_name] = '';
+                        // }
 
                         if($field->type == 'mailinglist' || $field->type == 'checkbox')
                         {
@@ -428,8 +450,10 @@ class Proform {
                     $field_errors['captcha_array'] = $form_session->errors['captcha'];
                     $field_errors['captcha'] = $form_session->errors['captcha'];
                 }
-
-                $varsets[] = array('value', $field_values);
+                
+                // This array is used here and elsewhere to pass values into functions, need to clean this up
+                $field_values = $form_session->values;
+                $varsets[] = array('value', $form_session->values);
                 $varsets[] = array('checked', $field_checked_flags);
                 $varsets[] = array('error', $field_errors);
 
@@ -461,6 +485,7 @@ class Proform {
                 $variables['steps'] = $form_obj->get_steps($form_session->config['step']);
                 $variables['step_count'] = count($variables['steps']) > 1;
                 $variables['multistep'] = count($variables['steps']) > 1;
+                $variables['current_step'] = $form_session->config['step'];
                 //var_dump($variables['steps']);
 
                 // Setup template pair variables
@@ -521,7 +546,7 @@ class Proform {
 
                 if ($this->EE->extensions->active_hook('proform_form_preparse') === TRUE)
                 {
-                    list($$tagdata, $form_obj, $variables, $this->var_pairs) = $this->EE->extensions->call('proform_form_preparse', $this, $tagdata, $form_obj, $variables, $this->var_pairs);
+                    list($tagdata, $form_obj, $variables, $this->var_pairs) = $this->EE->extensions->call('proform_form_preparse', $this, $tagdata, $form_obj, $variables, $this->var_pairs);
                 }
 
                 // Parse variables
@@ -1321,6 +1346,15 @@ class Proform {
                         $form_session->values[$field->field_name] = date('Y-m-d H:i:s', $date);
                     }
                     break;
+                default:
+                    if($plugin = $field->get_plugin())
+                    {
+                        if(method_exists($plugin, 'process_data'))
+                        {
+                            $field_array = $plugin->process_data($form_obj, $field, $form_session);
+                        }
+                    }
+                
             }
         }
     }
@@ -1653,49 +1687,85 @@ class Proform {
         {
             if ($this->EE->extensions->active_hook('proform_insert_start') === TRUE)
             {
-                $form_session->values = $this->EE->extensions->call('proform_insert_start', $this);
+                $form_session->values = $this->EE->extensions->call('proform_insert_start', $this, $form_obj, $form_session->values);
             }
 
-            if($form_obj->encryption_on == 'y')
+            if ($this->EE->extensions->active_hook('proform_insert_start_session') === TRUE)
             {
-                $this->EE->load->library('encrypt');
-                $save_data = $this->EE->formslib->encrypt_values($form_session->values);
-
-                /*
-                echo "<b>Encrypted data:</b>";
-                $this->prolib->debug($save_data);
-                // */
-
-                // TODO: check for constraint overflows in encrypted values?
-                // TODO: how do we handle encrypted numbers?
-            } else {
-                $save_data = $form_session->values;
-
-                /*
-                echo "<b>Non-encrypted data:</b>";
-                $this->prolib->debug($save_data);
-                // */
+                $form_session = $this->EE->extensions->call('proform_insert_start_session', $this, $form_obj, $form_session);
             }
 
-            // collapse multiselect options and other array values to a single string
-            foreach($save_data as $k => $v)
+            if(count($form_session->values) > 0)
             {
-                if(is_array($v))
+                // Let field plugins do their thing first
+                foreach($form_obj->fields() as $field)
                 {
-                    $save_data[$k] = implode("|", $v);
+                    if($plugin= $field->get_plugin())
+                    {
+                        if(method_exists($plugin, 'process_insert'))
+                        {
+                            $plugin->process_insert($form_obj, $field, $form_session);
+                        }
+                    }
                 }
+                
+                if($form_obj->encryption_on == 'y')
+                {
+                    $this->EE->load->library('encrypt');
+                    $save_data = $this->EE->formslib->encrypt_values($form_session->values);
+    
+                    /*
+                    echo "<b>Encrypted data:</b>";
+                    $this->prolib->debug($save_data);
+                    // */
+    
+                    // TODO: check for constraint overflows in encrypted values?
+                    // TODO: how do we handle encrypted numbers?
+                } else {
+                    $save_data = $form_session->values;
+    
+                    /*
+                    echo "<b>Non-encrypted data:</b>";
+                    $this->prolib->debug($save_data);
+                    // */
+                }
+    
+                // collapse multiselect options and other array values to a single string
+                foreach($save_data as $k => $v)
+                {
+                    if(is_array($v))
+                    {
+                        $save_data[$k] = implode("|", $v);
+                    }
+                }
+    
+                if(isset($save_data[''])) unset($save_data['']);
+    
+                if(!$result = $this->EE->db->insert($form_obj->table_name(), $save_data))
+                {
+                    show_error("{exp:proform:form} could not insert into form: ".$form_obj->form_name);
+                }
+    
+                $form_entry_id = $this->EE->db->insert_id();
+                $form_session->values['form:entry_id'] = $form_entry_id;
+                $form_session->values['form:name'] = $form_obj->form_name;
+                
+                // Let field plugins cleanup as needed
+                foreach($form_obj->fields() as $field)
+                {
+                    if($plugin= $field->get_plugin())
+                    {
+                        if(method_exists($plugin, 'process_insert_end'))
+                        {
+                            $plugin->process_insert_end($form_obj, $field, $form_session, $form_entry_id);
+                        }
+                    }
+                }
+            } else {
+                $form_session->values['form:entry_id'] = 0;
+                $form_session->values['form:name'] = $form_obj->form_name;
             }
-
-            if(isset($save_data[''])) unset($save_data['']);
-
-            if(!$result = $this->EE->db->insert($form_obj->table_name(), $save_data))
-            {
-                show_error("{exp:proform:form} could not insert into form: ".$form_obj->form_name);
-            }
-
-            $form_session->values['form:entry_id'] = $this->EE->db->insert_id();
-            $form_session->values['form:name'] = $form_obj->form_name;
-
+            
             if ($this->EE->extensions->active_hook('proform_insert_end') === TRUE)
             {
                 $this->EE->extensions->call('proform_insert_end', $this, $form_session);
@@ -1830,7 +1900,10 @@ class Proform {
             // skip hidden fields when we don't want them, skip everything else when we do
 
             // Only return fields for the current step, if we are on a particular step
-            if($form_session AND $field->step_no != $form_session->config['step']) continue;
+            if(
+                $form_session && $field->step_no != $form_session->config['step']
+                && !($form_session->config['last_step_summary'] && $form_session->config['step'] == $form_obj->get_step_count())
+            ) continue;
 
             if($hidden !== -1)
             {
@@ -1888,6 +1961,7 @@ class Proform {
                     'field_length'              => $field->length,
                     'field_heading'             => $field->separator_type != PL_Form::SEPARATOR_HTML ? $field->heading : '',
                     'field_html_block'          => $field->separator_type == PL_Form::SEPARATOR_HTML ? $field->heading : '',
+                    'field_is_step'             => $field->separator_type == PL_Form::SEPARATOR_STEP ? 'step' : '',
                     'field_is_required'         => $is_required ? 'required' : '',
                     'field_validation'          => $validation,
                     'field_validation_count'    => $validation_count,
@@ -1977,6 +2051,20 @@ class Proform {
             {
                 $dir = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
                 $field_array['field_value'] = $dir['url'].$field_array['field_value'];
+            }
+            
+            if($plugin = $field->get_plugin())
+            {
+                // Field plugins should set this key to some default representation so that they will work in the
+                // default and sample templates. If this is not set, the default template will use a single input
+                // element for the field.
+                $field_array['field_plugin'] = '';
+                if(method_exists($plugin, 'field_tag_array'))
+                {
+                    $field_array = $plugin->field_tag_array($form_obj, $form_session, $field_array);
+                }
+            } else {
+                $field_array['field_plugin'] = FALSE;
             }
 
             if($create_field_rows)
