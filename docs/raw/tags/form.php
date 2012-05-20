@@ -56,6 +56,30 @@
 
 <p>See the full <a href="#parameters">list of parameters</a> for more information.</p>
 
+<p>The simple tag also supports the following parameters:</p>
+
+<ul>
+    <li><a href="#param_template">template="default"</a></li>
+</ul>
+
+<h3><a name="param_template">template="default"</a></h3>
+
+<p>The <b>template</b> parameter allows you specify which internal template you would like ProForm to render for the tag.</p>
+
+<p>These internal templates behave much like embed templates, but are stored directly under ProForm's package directory at this location:</p>
+<p><b>system/expressionengine/third_party/proform/templates</b></p>
+
+<p>If you need to use a custom template, it's recommended that you either use a true embed template or make a copy of the <b>default.html</b> internal template and customize it.</p>
+
+<div class="tip">
+    <h6>Example Usage</h6>
+    <p>Assuming you've created a custom template file named <b>system/expressionengine/third_party/proform/templates/custom_template.html</b>:</p>
+    <pre class="brush: xml">
+        &#123;exp:proform:simple form="contact_us" template="custom_template"&#125;
+    </pre>
+</div>
+
+
 <h2><a name="simple_variables">Simple Variables</a></h2>
 
 <p>The <kbd>Simple Form Tag</kbd> supports the same  <a href="#variables">Single Variables</a> and <a href="#variable_pairs">Variables Pairs</a> supported by the full tag.</p>

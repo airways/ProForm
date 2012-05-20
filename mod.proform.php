@@ -90,7 +90,7 @@ class Proform {
     // Tags
     ////////////////////////////////////////////////////////////////////////////////
 
-    public function head()
+    public function head($prefix='default')
     {
         $result = '';
         // The prefix should only ever be sent once. This can be done in the header as a tag:
@@ -98,7 +98,7 @@ class Proform {
         // {exp:proform:simple}.
         if(!isset($this->cache['prefix_included']) || !$this->cache['prefix_included'])
         {
-            $result = file_get_contents(PATH_THIRD.'proform/templates/prefix.html');
+            $result = file_get_contents(PATH_THIRD.'proform/templates/'.$prefix.'.html');
             $this->cache['prefix_included'] = TRUE;
         }
         return $result;
@@ -115,9 +115,10 @@ class Proform {
     public function simple()
     {
         $template = pf_strip_id(strip_tags($this->EE->TMPL->fetch_param('template', 'default')));
+        $prefix   = pf_strip_id(strip_tags($this->EE->TMPL->fetch_param('prefix', 'prefix')));
         
         $form_name = strip_tags($this->EE->TMPL->fetch_param('form_name', $this->EE->TMPL->fetch_param('form', FALSE)));
-        
+
         if(!$form_name)
         {
             show_error('Invalid form_name provided to {exp:proform:simple}: "'.htmlentities($form_name).'"');
@@ -126,7 +127,7 @@ class Proform {
         // Get our template components
         if((!isset($this->cache['prefix_disabled']) || !$this->cache['prefix_disabled']) && $this->EE->TMPL->fetch_param('disable_head') != 'yes' )
         {
-            $prefix = $this->head();
+            $prefix = $this->head($prefix);
         } else {
             $prefix = '';
         }
