@@ -850,3 +850,11 @@ span.file a {
     height: 16px;
     display: inline-block;
 }
+
+
+.table_wrapper {
+    padding-top: 15px;
+    height: 28px;
+    min-width: 900px;
+	border-top: 1px solid #d1d7df;
+}

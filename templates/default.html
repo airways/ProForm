@@ -58,7 +58,7 @@
                             <textarea name="{pf_field_name}" id="{pf_field_name}" class="{pf_field_is_required}">{pf_field_value}</textarea>
                             <script type="text/javascript">bkLib.onDomLoaded(function() { new nicEditor(pf_nic_config).panelInstance('{pf_field_name}'); });</script>
                         {if:else}
-                            <textarea name="{pf_field_name}" id="{pf_field_name}" class="{pf_field_is_required}">{pf_field_value}</textarea>
+                            <textarea name="{pf_field_name}" id="{pf_field_name}" class="custom_class_here {pf_field_is_required}">{pf_field_value}</textarea>
                         {/if}
                     {if:elseif pf_field_type == "date"}
                         <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="date {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />

@@ -241,7 +241,7 @@ $alt = FALSE;
                                     }
                                     
                                  ?>">
-                                    <img src="<?php echo get_instance()->config->slash_item('theme_folder_url'); ?>third_party/proform/images/icons/<?php echo isset($option['icon']) ? $option['icon'] : 'plugin.png'; ?>"> <?php echo $option['name']; ?></a>
+                                    <img src="<?php echo get_instance()->config->slash_item('theme_folder_url'); ?>third_party/proform/images/icons/<?php echo isset($option['icon']) ? $option['icon'] : 'plugin.png'; ?>"> <?php echo $option['name'] . ' ' . $option['version']; ?></a>
                             </li>
                             <?php endforeach;
                         endif;

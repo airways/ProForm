@@ -397,11 +397,12 @@ class Proform {
                 {
                     if($form_session)
                     {
-                        if(array_key_exists($field->field_name, $form_session->values)) {
-                            $field_values[$field->field_name] = $form_session->values[$field->field_name];
-                        } else {
-                            $field_values[$field->field_name] = '';
-                        }
+                        // Moving out of this loop so we get everything from the session - just going to use $form_session->values directly
+                        // if(array_key_exists($field->field_name, $form_session->values)) {
+                        //     $field_values[$field->field_name] = $form_session->values[$field->field_name];
+                        // } else {
+                        //     $field_values[$field->field_name] = '';
+                        // }
 
                         if($field->type == 'mailinglist' || $field->type == 'checkbox')
                         {
@@ -448,8 +449,10 @@ class Proform {
                     $field_errors['captcha_array'] = $form_session->errors['captcha'];
                     $field_errors['captcha'] = $form_session->errors['captcha'];
                 }
-
-                $varsets[] = array('value', $field_values);
+                
+                // This array is used here and elsewhere to pass values into functions, need to clean this up
+                $field_values = $form_session->values;
+                $varsets[] = array('value', $form_session->values);
                 $varsets[] = array('checked', $field_checked_flags);
                 $varsets[] = array('error', $field_errors);
 
@@ -481,6 +484,7 @@ class Proform {
                 $variables['steps'] = $form_obj->get_steps($form_session->config['step']);
                 $variables['step_count'] = count($variables['steps']) > 1;
                 $variables['multistep'] = count($variables['steps']) > 1;
+                $variables['current_step'] = $form_session->config['step'];
                 //var_dump($variables['steps']);
 
                 // Setup template pair variables
@@ -1341,6 +1345,15 @@ class Proform {
                         $form_session->values[$field->field_name] = date('Y-m-d H:i:s', $date);
                     }
                     break;
+                default:
+                    if($plugin = $field->get_plugin())
+                    {
+                        if(method_exists($plugin, 'process_data'))
+                        {
+                            $field_array = $plugin->process_data($form_obj, $field, $form_session);
+                        }
+                    }
+                
             }
         }
     }
@@ -1683,6 +1696,18 @@ class Proform {
 
             if(count($form_session->values) > 0)
             {
+                // Let field plugins do their thing first
+                foreach($form_obj->fields() as $field)
+                {
+                    if($plugin= $field->get_plugin())
+                    {
+                        if(method_exists($plugin, 'process_insert'))
+                        {
+                            $plugin->process_insert($form_obj, $field, $form_session);
+                        }
+                    }
+                }
+                
                 if($form_obj->encryption_on == 'y')
                 {
                     $this->EE->load->library('encrypt');
@@ -1720,8 +1745,21 @@ class Proform {
                     show_error("{exp:proform:form} could not insert into form: ".$form_obj->form_name);
                 }
     
-                $form_session->values['form:entry_id'] = $this->EE->db->insert_id();
+                $form_entry_id = $this->EE->db->insert_id();
+                $form_session->values['form:entry_id'] = $form_entry_id;
                 $form_session->values['form:name'] = $form_obj->form_name;
+                
+                // Let field plugins cleanup as needed
+                foreach($form_obj->fields() as $field)
+                {
+                    if($plugin= $field->get_plugin())
+                    {
+                        if(method_exists($plugin, 'process_insert_end'))
+                        {
+                            $plugin->process_insert_end($form_obj, $field, $form_session, $form_entry_id);
+                        }
+                    }
+                }
             } else {
                 $form_session->values['form:entry_id'] = 0;
                 $form_session->values['form:name'] = $form_obj->form_name;
@@ -2022,7 +2060,7 @@ class Proform {
                 $field_array['field_plugin'] = '';
                 if(method_exists($plugin, 'field_tag_array'))
                 {
-                    $field_array = $plugin->field_tag_array($form_obj, $field_array);
+                    $field_array = $plugin->field_tag_array($form_obj, $form_session, $field_array);
                 }
             } else {
                 $field_array['field_plugin'] = FALSE;
