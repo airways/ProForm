@@ -1720,7 +1720,7 @@ class Proform_mcp extends Prolib_mcp {
                 {
                     case 'file':
                         $upload_pref = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
-                        $entry->$field_name = '<span class="file">'.
+                        $entry->$field_name = '<span class="value_file">'.
                             '<a href="'.$upload_pref['url'].$entry->$field_name.'">'.$entry->$field_name.'</a></span>';
                         $types[$field->field_name] = 'static';
                         break;

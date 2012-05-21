@@ -844,8 +844,8 @@ span.short {
 }
 
 
-span.file a {
-    background: url(../images/page_attach.png) no-repeat;
+span.value_file a {
+    background: url(../images/icons/page_attach.png) no-repeat;
     padding-left: 20px;
     height: 16px;
     display: inline-block;
