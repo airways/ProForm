@@ -94,7 +94,6 @@ END
             $row = array();
             $short = '';
             
-            // foreach($entry as $field => $value)
             foreach($field_order as $field)
             {
 
@@ -109,17 +108,17 @@ END
                 switch($type)
                 {
                     case 'file':
-                        $row[] = '<span class="'.$type.$short.'">'.
+                        $row[] = '<span class="value_'.$type.$short.'">'.
                             '<a href="'.$field_upload_prefs[$field]['url'].$value.'">'.$value.'</a></span>';
                         break;
                     case 'control':
-                        $row[] = '<span class="'.$type.$short.'">'.$value.'</span>';
+                        $row[] = '<span class="value_'.$type.$short.'">'.$value.'</span>';
                         break;
                     default:
                         $plugin_view = $this->pl_plugins->call($type, 'render_entries_list_cp', array($value));
                         if($plugin_view != $value)
                         {
-                            $row[] = '<span class="'.$type.'">'.$plugin_view.'</span>';
+                            $row[] = '<span class="value_'.$type.'">'.$plugin_view.'</span>';
                         } else {
                             if(strlen($value) > 300)
                             {
@@ -139,7 +138,7 @@ END
                                 $short = '';
                             }
                         
-                            $row[] = '<span class="'.$type.$short.'">'.htmlspecialchars($value).'</span>';
+                            $row[] = '<span class="value_'.$type.$short.'">'.htmlspecialchars($value).'</span>';
                         }
                 }
             }
