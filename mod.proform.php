@@ -90,7 +90,7 @@ class Proform {
     // Tags
     ////////////////////////////////////////////////////////////////////////////////
 
-    public function head($prefix='default')
+    public function head($prefix='prefix')
     {
         $result = '';
         // The prefix should only ever be sent once. This can be done in the header as a tag:
@@ -453,6 +453,13 @@ class Proform {
                 
                 // This array is used here and elsewhere to pass values into functions, need to clean this up
                 $field_values = $form_session->values;
+                
+                foreach($form_obj->fields() as $field)
+                {
+                    if(!isset($field_values[$field->field_name])) $field_values[$field->field_name] = '';
+                }
+                
+                
                 $varsets[] = array('value', $form_session->values);
                 $varsets[] = array('checked', $field_checked_flags);
                 $varsets[] = array('error', $field_errors);
