@@ -1,6 +1,6 @@
 
 {exp:proform:form form_class="proform {embed:form_name}_proform" [%params%] variable_prefix="pf_"}
-    {if no_results}
+    {if pf_no_results}
         Invalid form name specified!
     {/if}
     
@@ -28,89 +28,92 @@
         {pf_fieldrows}
         <ul class="pf_row">
             {pf_fields}
-                <li id="{pf_field_html_id}" class="pf_column {pf_field_html_class}">
-                {if pf_field_html_block}
-                    {pf_field_html_block}
-                {if:elseif pf_field_heading}
-                    <h3>{pf_field_heading}</h3>
-                {if:else}
-                    {if pf_field_type != "checkbox"}
-                        <label for="{pf_field_name}">{pf_field_label} {if pf_field_is_required}<span class="required">*</span>{/if}</label>
-                        <div class="pf_field {if pf_vertical}pf_vertical{/if}">
-                    {/if}
-                    {if pf_field_type == "string"}
-                        {if pf_field_validation:valid_email}
-                            <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="validate-email {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
-                        {if:else}
-                            {if pf_field_length <= 255}
-                                <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="{pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
+                {if pf_field_type != "invisible"}
+                    <li id="{pf_field_html_id}" class="pf_column {pf_field_html_class}">
+                    {if pf_field_html_block}
+                        {pf_field_html_block}
+                    {if:elseif pf_field_heading}
+                        <h3>{pf_field_heading}</h3>
+                    {if:else}
+                        {if pf_field_type != "checkbox"}
+                            <label for="{pf_field_name}">{pf_field_label} {if pf_field_is_required}<span class="required">*</span>{/if}</label>
+                            <div class="pf_field {if pf_vertical}pf_vertical{/if}">
+                        {/if}
+                        {if pf_field_type == "string"}
+                            {if pf_field_validation:valid_email}
+                                <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="validate-email {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
                             {if:else}
-                                {if pf_wysiwyg}
-                                    <textarea name="{pf_field_name}" id="{pf_field_name}" class="{pf_field_is_required}">{pf_field_value}</textarea>
-                                    <script type="text/javascript">bkLib.onDomLoaded(function() { new nicEditor(pf_nic_config).panelInstance('{pf_field_name}'); });</script>
+                                {if pf_field_length <= 255}
+                                    <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="{pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
                                 {if:else}
-                                    <textarea name="{pf_field_name}" id="{pf_field_name}" class="{pf_field_is_required}">{pf_field_value}</textarea>
+                                    {if pf_wysiwyg}
+                                        <textarea name="{pf_field_name}" id="{pf_field_name}" class="{pf_field_is_required}">{pf_field_value}</textarea>
+                                        <script type="text/javascript">bkLib.onDomLoaded(function() { new nicEditor(pf_nic_config).panelInstance('{pf_field_name}'); });</script>
+                                    {if:else}
+                                        <textarea name="{pf_field_name}" id="{pf_field_name}" class="{pf_field_is_required}">{pf_field_value}</textarea>
+                                    {/if}
                                 {/if}
                             {/if}
-                        {/if}
-                    {if:elseif pf_field_type == "text"}
-                        {if pf_wysiwyg}
-                            <textarea name="{pf_field_name}" id="{pf_field_name}" class="{pf_field_is_required}">{pf_field_value}</textarea>
-                            <script type="text/javascript">bkLib.onDomLoaded(function() { new nicEditor(pf_nic_config).panelInstance('{pf_field_name}'); });</script>
-                        {if:else}
-                            <textarea name="{pf_field_name}" id="{pf_field_name}" class="custom_class_here {pf_field_is_required}">{pf_field_value}</textarea>
-                        {/if}
-                    {if:elseif pf_field_type == "date"}
-                        <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="date {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
-                    {if:elseif pf_field_type == "datetime"}
-                        <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="datetime {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
-                    {if:elseif pf_field_type == "time"}
-                        <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="time {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
-                    {if:elseif pf_field_type == "integer"}
-                        <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="validate-integer {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
-                    {if:elseif pf_field_type == "float"}
-                        <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="validate-float {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
-                    {if:elseif pf_field_type == "file"}
-                        <div class="pf_files">
-                            <input name="{pf_field_name}" id="{pf_field_name}" type="file" class="{pf_field_is_required}" />
-                        </div>
-                    {if:elseif pf_field_type == "checkbox"}
-                        <div class="pf_field">
-                            <div class="pf_option">
-                                <input type="checkbox" name="{pf_field_name}" id="{pf_field_name}" value="y" {if pf_field_checked}checked="checked"{/if} class="{pf_field_is_required}" /><label for="{pf_field_name}">{pf_field_label}</label>
+                        {if:elseif pf_field_type == "text"}
+                            {if pf_wysiwyg}
+                                <textarea name="{pf_field_name}" id="{pf_field_name}" class="{pf_field_is_required}">{pf_field_value}</textarea>
+                                <script type="text/javascript">bkLib.onDomLoaded(function() { new nicEditor(pf_nic_config).panelInstance('{pf_field_name}'); });</script>
+                            {if:else}
+                                <textarea name="{pf_field_name}" id="{pf_field_name}" class="custom_class_here {pf_field_is_required}">{pf_field_value}</textarea>
+                            {/if}
+                        {if:elseif pf_field_type == "date"}
+                            <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="date {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
+                        {if:elseif pf_field_type == "datetime"}
+                            <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="datetime {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
+                        {if:elseif pf_field_type == "time"}
+                            <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="time {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
+                        {if:elseif pf_field_type == "integer"}
+                            <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="validate-integer {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
+                        {if:elseif pf_field_type == "float"}
+                            <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="validate-float {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
+                        {if:elseif pf_field_type == "file"}
+                            <div class="pf_files">
+                                <input name="{pf_field_name}" id="{pf_field_name}" type="file" class="{pf_field_is_required}" />
                             </div>
-                        </div>
-                    {if:elseif pf_field_type == "list"}
-                        <select name="{pf_field_name}" id="{pf_field_name}" {if pf_multiple}multiple="multiple"{/if} class="{pf_field_is_required}">
-                        {pf_field_setting_list}
-                            <option value="{pf_key}" {pf_selected}>{pf_row}</option>
-                        {/pf_field_setting_list}
-                        </select>
-                        {if pf_field_style == "checkboxes"}
+                        {if:elseif pf_field_type == "checkbox"}
+                            <div class="pf_field">
+                                <div class="pf_option">
+                                    <input type="checkbox" name="{pf_field_name}" id="{pf_field_name}" value="y" {if pf_field_checked}checked="checked"{/if} class="{pf_field_is_required}" /><label for="{pf_field_name}">{pf_field_label}</label>
+                                </div>
+                            </div>
+                        {if:elseif pf_field_type == "list"}
+                            <select name="{pf_field_name}" id="{pf_field_name}" {if pf_multiple}multiple="multiple"{/if} class="{pf_field_is_required}">
                             {pf_field_setting_list}
-                            <div class="pf_option {if pf_vertical}pf_vertical{/if}">
-                                <input type="checkbox" name="{pf_field_name}" id="{pf_field_name}_{pf_key}" value="{pf_key}" {if pf_selected}checked="checked"{/if} class="{pf_field_is_required}" /><label for="{pf_field_name}_{pf_key}">{pf_label}</label>
-                            </div>
+                                <option value="{pf_key}" {pf_selected}>{pf_row}</option>
                             {/pf_field_setting_list}
-                        {if:elseif pf_field_style == "radios"}
-                            {pf_field_setting_list}
-                            <div class="pf_option">
-                                <input type="radio" name="{pf_field_name}" id="{pf_field_name}_{pf_key}" value="{pf_key}" {if pf_selected}checked="checked"{/if} class="{pf_field_is_required}" /><label for="{pf_field_name}_{pf_key}">{pf_label}</label>
-                            </div>
-                            {/pf_field_setting_list}
-                        {/if}
-                    {if:else}
-                        {if pf_field_plugin}
-                            {pf_field_plugin}
+                            </select>
+                            {if pf_field_style == "checkboxes"}
+                                {pf_field_setting_list}
+                                <div class="pf_option {if pf_vertical}pf_vertical{/if}">
+                                    <input type="checkbox" name="{pf_field_name}" id="{pf_field_name}_{pf_key}" value="{pf_key}" {if pf_selected}checked="checked"{/if} class="{pf_field_is_required}" /><label for="{pf_field_name}_{pf_key}">{pf_label}</label>
+                                </div>
+                                {/pf_field_setting_list}
+                            {if:elseif pf_field_style == "radios"}
+                                {pf_field_setting_list}
+                                <div class="pf_option">
+                                    <input type="radio" name="{pf_field_name}" id="{pf_field_name}_{pf_key}" value="{pf_key}" {if pf_selected}checked="checked"{/if} class="{pf_field_is_required}" /><label for="{pf_field_name}_{pf_key}">{pf_label}</label>
+                                </div>
+                                {/pf_field_setting_list}
+                            {/if}
                         {if:else}
-                            <input type="{pf_field_control}" id="{pf_field_name}" name="{pf_field_name}" value="{pf_field_value}" class="{pf_field_is_required}" />
+                            {if pf_field_plugin}
+                                {pf_field_plugin}
+                            {if:else}
+                                <input type="{pf_field_control}" id="{pf_field_name}" name="{pf_field_name}" value="{pf_field_value}" class="{pf_field_is_required}" />
+                            {/if}
                         {/if}
-                    {/if}
 
-                    {if pf_field_error}<div id="text-E" class="errMsg"><span>{pf_field_error}</span></div>{/if}
+                        {if pf_field_error}<div id="text-E" class="errMsg"><span>{pf_field_error}</span></div>{/if}
                 
-                    {if pf_field_type != "checkbox"}
-                        </div>
+                        {if pf_field_type != "checkbox"}
+                            </div>
+                        {/if}
+                    </li>
                     {/if}
                 {/if}
             {/pf_fields}

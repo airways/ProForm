@@ -1883,7 +1883,7 @@ class Proform_mcp extends Prolib_mcp {
                     foreach(array_values((array)$row) as $cell)
                     {
                         if(substr($key, 0, 2) == "__" || is_object($cell) || is_array($cell)) continue;
-                        echo '<td>'.htmlentities($cell).'</td>';
+                        echo '<td>'.nl2br(htmlentities($cell)).'</td>';
                     }
                     echo '</tr>';
                 }
@@ -1898,7 +1898,7 @@ class Proform_mcp extends Prolib_mcp {
                     $n = 40 - strlen($key);
                     if($n < 0) $n = 0;
 
-                    echo '<tr><td><b>'.$key.'</b></td><td>'.htmlentities($cell).'</td>';
+                    echo '<tr><td><b>'.$key.'</b></td><td>'.nl2br(htmlentities($cell)).'</td>';
                 }
                 echo '</table><br/><br/>';
             
