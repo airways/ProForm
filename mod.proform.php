@@ -1043,6 +1043,23 @@ class Proform {
         return $this->return_data;
     }
 
+    public function download_file()
+    {
+        $this->EE->load->helper('download');
+        $upload_pref_id = $this->EE->TMPL->fetch_param('upload_pref_id');
+        $filename = $this->EE->TMPL->fetch_param('filename');
+        if($upload_pref_id && $filename)
+        {
+            $dir = $this->EE->pl_uploads->get_upload_pref($upload_pref_id);
+            $file = $dir['server_path'].$filename;
+            $data = file_get_contents($file);
+            if($data)
+            {
+                force_download($filename, $data);
+                exit;
+            }
+        }
+    }
 
     private function _add_rowdata(&$form_obj, &$row, &$row_vars)
     {
@@ -1060,6 +1077,8 @@ class Proform {
                 if($field->type == 'file' && $row_vars['value:'.$field->field_name] != '')
                 {
                     $dir = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
+                    $row_vars['filename:'.$field->field_name] = $row_vars['value:'.$field->field_name];
+                    $row_vars['upload_pref_id:'.$field->field_name] = $field->upload_pref_id;
                     $row_vars['value:'.$field->field_name] = $dir['url'].$row_vars['value:'.$field->field_name];
                 }
             }
