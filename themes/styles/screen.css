@@ -7,6 +7,10 @@ ProForm
 General Overrides
 ------------------------------------------------------------------------ */
 
+#mainContent .pageContents {
+    overflow: visible;
+}
+
 .pageContents a:link, 
 .pageContents a:visited  {
 	color: #555557;

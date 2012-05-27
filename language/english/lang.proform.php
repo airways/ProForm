@@ -290,7 +290,7 @@ $lang = array(
     'msg_html_block_edited' => 'HTML Block successfully edited',
     
     
-    'debug_stop' => '<hr/>Processing stopped to review debug output - remove the debug="yes" parameter from your tag if you do not wish to see this message any more.',
+    'debug_stop' => '<hr/>Processing stopped to review debug output - remove the debug="yes" parameter from your tag if you do not wish to see this message anymore.',
     
     // End
     '' => ''

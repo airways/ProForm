@@ -59,7 +59,7 @@ class Formslib
     {
         prolib($this, 'proform');
 
-        $this->prolib->pl_plugins->init();
+        $this->prolib->pl_drivers->init();
         
         // If there are already any encrypted forms, then we will default the option to allow encryption
         // to on. This option was not available in previous versions, where encryption was always
