@@ -111,6 +111,11 @@ class PL_Form extends PL_RowInitialized {
         {
             $this->form_type = 'form';
         }
+        
+        if(!$this->settings)
+        {
+            $this->settings = array();
+        }
 
         $this->__original_name = $this->form_name;
     }
