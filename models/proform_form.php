@@ -111,6 +111,11 @@ class PL_Form extends PL_RowInitialized {
         {
             $this->form_type = 'form';
         }
+        
+        if(!$this->settings)
+        {
+            $this->settings = array();
+        }
 
         $this->__original_name = $this->form_name;
     }
@@ -528,18 +533,18 @@ class PL_Form extends PL_RowInitialized {
                     $forge = &$this->__EE->dbforge;
 
                     $typedef = FALSE;
-                    $plugin = FALSE;
+                    $driver = FALSE;
 
                     if(array_key_exists($field->type, PL_Field::$types['mysql']))
                     {
                         $typedef = PL_Field::$types['mysql'][$field->type];
                     } else {
-                        $plugin = $field->get_plugin();
-                        if($plugin)
+                        $driver = $field->get_driver();
+                        if($driver)
                         {
-                            if(method_exists($plugin, 'get_field_typedef'))
+                            if(method_exists($driver, 'get_field_typedef'))
                             {
-                                $typedef = $plugin->get_field_typedef($field, 'mysql');
+                                $typedef = $driver->get_field_typedef($field, 'mysql');
                             } else {
                                 $typedef = array('type' => 'TEXT');
                             }
@@ -600,9 +605,9 @@ class PL_Form extends PL_RowInitialized {
                         // add new column to the form's table
                         if($do_forge)
                         {
-                            if($plugin && method_exists($plugin, 'add_db_columns'))
+                            if($driver && method_exists($driver, 'add_db_columns'))
                             {
-                                $typedef = $plugin->add_db_columns($this, $field, $fields, 'mysql');
+                                $typedef = $driver->add_db_columns($this, $field, $fields, 'mysql');
                             }
                             $forge->add_column($this->table_name(), $fields);
                         }
@@ -622,9 +627,9 @@ class PL_Form extends PL_RowInitialized {
 
                         if($do_forge)
                         {
-                            if($plugin && method_exists($plugin, 'modify_db_columns'))
+                            if($driver && method_exists($driver, 'modify_db_columns'))
                             {
-                                $typedef = $plugin->modify_db_columns($this, $field, $fields, $assignment_row, 'mysql');
+                                $typedef = $driver->modify_db_columns($this, $field, $fields, $assignment_row, 'mysql');
                             }
                             $forge->modify_column($this->table_name(), $fields);
                         }

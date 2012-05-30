@@ -147,11 +147,11 @@ class PL_Field extends PL_RowInitialized
     function get_field_icon()
     {
         $result = 'textfield.png';
-        if($plugin = $this->get_plugin())
+        if($driver = $this->get_driver())
         {
-            if(isset($plugin->meta['icon']))
+            if(isset($driver->meta['icon']))
             {
-                $result = $plugin->meta['icon'];
+                $result = $driver->meta['icon'];
             } else {
                 $result = 'plugin.png';
             }
@@ -255,9 +255,9 @@ class PL_Field extends PL_RowInitialized
         return array_filter_values(explode('|', $this->validation), array('none', ''));
     }
     
-    function get_plugin()
+    function get_driver()
     {
-        $this->__EE->pl_plugins->init();
-        return $this->__EE->pl_plugins->get_plugin($this->type);
+        $this->__EE->pl_drivers->init();
+        return $this->__EE->pl_drivers->get_driver($this->type);
     }
 }

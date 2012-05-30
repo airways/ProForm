@@ -1043,6 +1043,23 @@ class Proform {
         return $this->return_data;
     }
 
+    public function download_file()
+    {
+        $this->EE->load->helper('download');
+        $upload_pref_id = $this->EE->TMPL->fetch_param('upload_pref_id');
+        $filename = $this->EE->TMPL->fetch_param('filename');
+        if($upload_pref_id && $filename)
+        {
+            $dir = $this->EE->pl_uploads->get_upload_pref($upload_pref_id);
+            $file = $dir['server_path'].$filename;
+            $data = file_get_contents($file);
+            if($data)
+            {
+                force_download($filename, $data);
+                exit;
+            }
+        }
+    }
 
     private function _add_rowdata(&$form_obj, &$row, &$row_vars)
     {
@@ -1060,6 +1077,8 @@ class Proform {
                 if($field->type == 'file' && $row_vars['value:'.$field->field_name] != '')
                 {
                     $dir = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
+                    $row_vars['filename:'.$field->field_name] = $row_vars['value:'.$field->field_name];
+                    $row_vars['upload_pref_id:'.$field->field_name] = $field->upload_pref_id;
                     $row_vars['value:'.$field->field_name] = $dir['url'].$row_vars['value:'.$field->field_name];
                 }
             }
@@ -1354,11 +1373,11 @@ class Proform {
                     }
                     break;
                 default:
-                    if($plugin = $field->get_plugin())
+                    if($driver = $field->get_driver())
                     {
-                        if(method_exists($plugin, 'process_data'))
+                        if(method_exists($driver, 'process_data'))
                         {
-                            $field_array = $plugin->process_data($form_obj, $field, $form_session);
+                            $field_array = $driver->process_data($form_obj, $field, $form_session);
                         }
                     }
                 
@@ -1704,14 +1723,14 @@ class Proform {
 
             if(count($form_session->values) > 0)
             {
-                // Let field plugins do their thing first
+                // Let field drivers do their thing first
                 foreach($form_obj->fields() as $field)
                 {
-                    if($plugin= $field->get_plugin())
+                    if($driver = $field->get_driver())
                     {
-                        if(method_exists($plugin, 'process_insert'))
+                        if(method_exists($driver, 'process_insert'))
                         {
-                            $plugin->process_insert($form_obj, $field, $form_session);
+                            $driver->process_insert($form_obj, $field, $form_session);
                         }
                     }
                 }
@@ -1757,14 +1776,14 @@ class Proform {
                 $form_session->values['form:entry_id'] = $form_entry_id;
                 $form_session->values['form:name'] = $form_obj->form_name;
                 
-                // Let field plugins cleanup as needed
+                // Let field drivers cleanup as needed
                 foreach($form_obj->fields() as $field)
                 {
-                    if($plugin= $field->get_plugin())
+                    if($driver = $field->get_driver())
                     {
-                        if(method_exists($plugin, 'process_insert_end'))
+                        if(method_exists($driver, 'process_insert_end'))
                         {
-                            $plugin->process_insert_end($form_obj, $field, $form_session, $form_entry_id);
+                            $driver->process_insert_end($form_obj, $field, $form_session, $form_entry_id);
                         }
                     }
                 }
@@ -2060,18 +2079,18 @@ class Proform {
                 $field_array['field_value'] = $dir['url'].$field_array['field_value'];
             }
             
-            if($plugin = $field->get_plugin())
+            if($driver = $field->get_driver())
             {
-                // Field plugins should set this key to some default representation so that they will work in the
+                // Field drivers should set this key to some default representation so that they will work in the
                 // default and sample templates. If this is not set, the default template will use a single input
                 // element for the field.
-                $field_array['field_plugin'] = '';
-                if(method_exists($plugin, 'field_tag_array'))
+                $field_array['field_driver'] = '';
+                if(method_exists($driver, 'field_tag_array'))
                 {
-                    $field_array = $plugin->field_tag_array($form_obj, $form_session, $field_array);
+                    $field_array = $driver->field_tag_array($form_obj, $form_session, $field_array, $field_values);
                 }
             } else {
-                $field_array['field_plugin'] = FALSE;
+                $field_array['field_driver'] = FALSE;
             }
 
             if($create_field_rows)

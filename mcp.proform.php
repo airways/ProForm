@@ -54,7 +54,7 @@ class Proform_mcp extends Prolib_mcp {
     function Proform_mcp()
     {
         prolib($this, 'proform');
-        $this->EE->pl_plugins->init();
+        $this->EE->pl_drivers->init();
         
         $this->EE->cp->set_right_nav(array(
                 'home' => TAB_ACTION,
@@ -89,14 +89,14 @@ class Proform_mcp extends Prolib_mcp {
             $this->field_type_options = $this->config_overrides['field_type_options'];
         }
         
-        // list available plugin field types to add to the form
-        $field_plugins = $this->EE->pl_plugins->get_plugins('field');
-        if(count($field_plugins))
+        // list available drivers field types to add to the form
+        $field_drivers = $this->EE->pl_drivers->get_drivers('field');
+        if(count($field_drivers))
         {
-            $this->field_type_options['Plugins'] = array();
-            foreach($field_plugins as $plugin)
+            $this->field_type_options['Drivers'] = array();
+            foreach($field_drivers as $driver)
             {
-                $this->field_type_options['Plugins'][$plugin->meta['key']] = $plugin->meta['name'] . ' ' . $plugin->meta['version'];
+                $this->field_type_options['Drivers'][$driver->meta['key']] = $driver->meta['name'] . ' ' . $driver->meta['version'];
             }
         }
 
@@ -286,7 +286,7 @@ class Proform_mcp extends Prolib_mcp {
         $this->EE->load->library('formslib');
         $this->EE->load->library('proform_notifications');
         $prefs = $this->EE->formslib->prefs->get_preferences();
-        $prefs = $this->EE->pl_plugins->get_preferences($prefs);
+        $prefs = $this->EE->pl_drivers->get_preferences($prefs);
         
         foreach($prefs as $pref => $value)
         {
@@ -323,9 +323,9 @@ class Proform_mcp extends Prolib_mcp {
         $this->EE->load->library('formslib');
         // returns an array of preferences as name => value pairs
         $prefs = $this->EE->formslib->prefs->get_preferences();
-        $prefs = $this->EE->pl_plugins->get_preferences($prefs);
+        $prefs = $this->EE->pl_drivers->get_preferences($prefs);
         
-        $this->EE->pl_plugins->set_preferences();
+        $this->EE->pl_drivers->set_preferences();
         
         foreach($prefs as $pref => $existing_value)
         {
@@ -583,12 +583,12 @@ class Proform_mcp extends Prolib_mcp {
         $vars['item_options'] = PL_Field::$item_options;
 
 
-        // list available plugin field types to add to the form
-        $vars['plugin_options'] = array();
+        // list available driver field types to add to the form
+        $vars['driver_options'] = array();
         $field_count = 0;
-        foreach($this->EE->pl_plugins->get_plugins('field') as $plugin)
+        foreach($this->EE->pl_drivers->get_drivers('field') as $driver)
         {
-            $vars['plugin_options'][] = $plugin->meta;
+            $vars['driver_options'][] = $driver->meta;
         }
 
 
@@ -623,7 +623,7 @@ class Proform_mcp extends Prolib_mcp {
                                         'value'     => $field->field_id,
                                         'class'     =>'toggle');
 
-                $row_array['plugin'] = $field->get_plugin();
+                $row_array['driver'] = $field->get_driver();
                 
                 $vars['fields'][] = $row_array;
             }
@@ -880,7 +880,7 @@ class Proform_mcp extends Prolib_mcp {
             $this->EE->load->library('table');
             $this->_get_flashdata($vars);
             
-            $vars = $this->EE->pl_plugins->call($this->EE->input->post('type'), 'field_remove', array($field, $vars));
+            $vars = $this->EE->pl_drivers->call($this->EE->input->post('type'), 'field_remove', array($field, $vars));
             
             return $this->EE->load->view('remove_field', $vars, TRUE);
         }
@@ -901,7 +901,7 @@ class Proform_mcp extends Prolib_mcp {
         $form = $this->EE->formslib->forms->get($form_id);
         $field = $this->EE->formslib->fields->get($field_id);
 
-        $this->EE->pl_plugins->call($this->EE->input->post('type'), 'field_remove_process', array($form, $field));
+        $this->EE->pl_drivers->call($this->EE->input->post('type'), 'field_remove_process', array($form, $field));
 
         if(is_numeric($form_id) && is_numeric($field_id) && $form && $field)
         {
@@ -997,15 +997,15 @@ class Proform_mcp extends Prolib_mcp {
         // blank form object
         $vars['editing'] = FALSE;
 
-        $vars = $this->EE->pl_plugins->call($vars['field_type'], 'new_field_data', array($vars));
-        return $this->EE->pl_plugins->call($vars['field_type'], 'new_field_view', array($this->edit_field(FALSE, $vars)));
+        $vars = $this->EE->pl_drivers->call($vars['field_type'], 'new_field_data', array($vars));
+        return $this->EE->pl_drivers->call($vars['field_type'], 'new_field_view', array($this->edit_field(FALSE, $vars)));
     }
 
     function process_new_field()
     {
         $this->EE->load->library('formslib');
 
-        $this->EE->pl_plugins->call($this->EE->input->post('type'), 'new_field_process');
+        $this->EE->pl_drivers->call($this->EE->input->post('type'), 'new_field_process');
 
         // see if the field already exists
         $field_name = strtolower(trim($this->EE->input->post('field_name')));
@@ -1042,8 +1042,8 @@ class Proform_mcp extends Prolib_mcp {
         {
             // go back to field listing
             $this->EE->session->set_flashdata('message', lang('msg_field_created'));
-            // Allow a plugin to customize the redirect
-            if($this->EE->pl_plugins->call($this->EE->input->post('type'), 'new_field_process_done', array($field, FALSE, TRUE)))
+            // Allow a driver to customize the redirect
+            if($this->EE->pl_drivers->call($this->EE->input->post('type'), 'new_field_process_done', array($field, FALSE, TRUE)))
             {
                 $this->EE->functions->redirect(ACTION_BASE.AMP.'method=list_fields');
             }
@@ -1056,8 +1056,8 @@ class Proform_mcp extends Prolib_mcp {
 
                 $this->EE->session->set_flashdata('message', lang('msg_field_created_added'));
                 
-                // Allow a plugin to customize the redirect
-                if($this->EE->pl_plugins->call($this->EE->input->post('type'), 'edit_field_process_done', array($field, $auto_add_form_id, TRUE)))
+                // Allow a driver to customize the redirect
+                if($this->EE->pl_drivers->call($this->EE->input->post('type'), 'edit_field_process_done', array($field, $auto_add_form_id, TRUE)))
                 {
                     $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.
                                                     AMP.'form_id='.$auto_add_form_id.AMP.'active_tabs=tab-content-layout');
@@ -1160,9 +1160,9 @@ class Proform_mcp extends Prolib_mcp {
         $this->EE->load->library('table');
         $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/edit_field.js"></script>');
 
-        $vars = $this->EE->pl_plugins->call($field->type, 'edit_field_data', array($vars));
+        $vars = $this->EE->pl_drivers->call($field->type, 'edit_field_data', array($vars));
         $result = $this->EE->load->view('generic_edit', $vars, TRUE);
-        $result = $this->EE->pl_plugins->call($field->type, 'edit_field_view', array($result));
+        $result = $this->EE->pl_drivers->call($field->type, 'edit_field_view', array($result));
             return $result;
     }
 
@@ -1184,7 +1184,7 @@ class Proform_mcp extends Prolib_mcp {
     function process_edit_field()
     {
  
-        $this->EE->pl_plugins->call($this->EE->input->post('type'), 'edit_field_process');
+        $this->EE->pl_drivers->call($this->EE->input->post('type'), 'edit_field_process');
 
         // run form validation
         $this->_run_validation('edit_field');
@@ -1223,8 +1223,8 @@ class Proform_mcp extends Prolib_mcp {
         $field->settings = $settings;
         $field->save();
 
-        // Allow a plugin to customize the redirect
-        if($this->EE->pl_plugins->call($this->EE->input->post('type'), 'edit_field_process_done', array($field, $form_id, TRUE)))
+        // Allow a driver to customize the redirect
+        if($this->EE->pl_drivers->call($this->EE->input->post('type'), 'edit_field_process_done', array($field, $form_id, TRUE)))
         {
             // go back to form listing
             if($form_id)
@@ -1555,11 +1555,12 @@ class Proform_mcp extends Prolib_mcp {
         $this->sub_page(lang('tab_list_entries').' in <em>'.$form->form_name.'</em>');
         $vars['form_id'] = $form_id;
         $vars['view_entry_url'] = ACTION_BASE.'method=view_form_entry'.AMP.'form_id='.$form_id;
+        $vars['edit_entry_url'] = ACTION_BASE.'method=edit_form_entry'.AMP.'form_id='.$form_id;
         $vars['delete_entry_url'] = ACTION_BASE.'method=delete_form_entry'.AMP.'form_id='.$form_id;
         $vars['edit_form_url']     = ACTION_BASE.'method=edit_form'.AMP.'form_id='.$form->form_id;
 
         // Get page of data
-        $search = $this->prolib->pl_plugins->list_entries_search($form_id, array());
+        $search = $this->prolib->pl_drivers->list_entries_search($form_id, array());
         //var_dump($form->__internal_fields);exit;
         $entries = $form->entries($search, $rownum, $this->perpage, 'updated', 'DESC');
         if(!is_array($entries)) $entries = array();
@@ -1643,11 +1644,11 @@ class Proform_mcp extends Prolib_mcp {
             
             $field_order[] = $field->field_name;
             
-            if($plugin = $field->get_plugin())
+            if($driver = $field->get_driver())
             {
-                if(method_exists($plugin, 'list_data'))
+                if(method_exists($driver, 'list_data'))
                 {
-                    $plugin->list_data($form_obj, $field, $vars);
+                    $driver->list_data($form_obj, $field, $vars);
                 }
             }
         }
@@ -1660,9 +1661,10 @@ class Proform_mcp extends Prolib_mcp {
         foreach($vars['entries'] as $entry)
         {
             $action_list = '<div class="action-list">';
-            $action_list .= $this->EE->pl_plugins->list_entries_action_list_view(
+            $action_list .= $this->EE->pl_drivers->list_entries_action_list_view(
                     $form_id,
                     $entry,
+                    '<a href="'.$vars['edit_entry_url'].'&entry_id='.$entry->form_entry_id.'">Edit</a> '.
                     '<a href="'.$vars['view_entry_url'].'&entry_id='.$entry->form_entry_id.'">View</a> '.
                     '<a href="'.$vars['delete_entry_url'].'&entry_id='.$entry->form_entry_id.'" class="pl_confirm" rel="Are you sure you want to delete this entry?">Delete</a>');
 
@@ -1672,10 +1674,10 @@ class Proform_mcp extends Prolib_mcp {
             $entry->_commands = $action_list;
         }
         
-        $vars = $this->prolib->pl_plugins->list_entries_data($vars);
-        $vars['pl_plugins'] = &$this->prolib->pl_plugins;
+        $vars = $this->prolib->pl_drivers->list_entries_data($vars);
+        $vars['pl_drivers'] = &$this->prolib->pl_drivers;
         $output = $this->EE->load->view('list_entries', $vars, TRUE);
-        return $this->prolib->pl_plugins->list_entries_view($output);
+        return $this->prolib->pl_drivers->list_entries_view($output);
     }
     
 
@@ -1740,7 +1742,7 @@ class Proform_mcp extends Prolib_mcp {
                 
             }
             
-            // Hide any special db fields added by plugins
+            // Hide any special db fields added by drivers
             foreach($form_obj->db_fields() as $field_name)
             {
                 if(!isset($types[$field_name]))
@@ -1759,11 +1761,11 @@ class Proform_mcp extends Prolib_mcp {
 
             foreach($form_obj->fields() as $field)
             {
-                if($plugin = $field->get_plugin())
+                if($driver = $field->get_driver())
                 {
-                    if(method_exists($plugin, 'view_data'))
+                    if(method_exists($driver, 'view_data'))
                     {
-                        $plugin->view_data($form_obj, $field, $vars, $entry);
+                        $driver->view_data($form_obj, $field, $vars, $entry);
                     }
                 }
             }
@@ -1771,6 +1773,137 @@ class Proform_mcp extends Prolib_mcp {
 
             $this->EE->load->library('table');
             return $this->EE->load->view('generic_edit', $vars, TRUE);
+        }
+    }
+
+    function edit_form_entry()
+    {
+        if($this->EE->input->post('form_entry_id') !== FALSE)
+        {
+            if($this->process_edit_form_entry()) return;
+        }
+
+        $this->EE->load->library('formslib');
+
+        $form_id = (int)$this->EE->input->get('form_id');
+        $form_entry_id = (int)$this->EE->input->get('entry_id');
+
+        $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_form_entry'.AMP.'form_id='.$form_id.AMP.'form_entry_id='.$form_entry_id;
+
+        $form_obj = $this->EE->formslib->forms->get($form_id);
+        if($form_obj)
+        {
+            $this->sub_page(lang('tab_edit_form_entry').' in <em>'.$form_obj->form_name.'</em>');
+
+            $entry = $form_obj->get_entry($form_entry_id);
+
+            $vars['editing'] = TRUE;
+            $vars['hidden'] = array('form_id' => $form_id, 'form_entry_id' => $form_entry_id);
+            $vars['hidden_fields'] = array('dst_enabled');
+
+            unset($form_obj->settings);
+
+            $types = array(
+                'form_entry_id' => 'read_only',
+                'updated' => 'read_only',
+                'ip_address' => 'read_only',
+                'user_agent' => 'read_only'
+            );
+
+            $field_names = array();
+            foreach($form_obj->fields() as $field)
+            {
+                $field_names['field_'.$field->field_name] = $field->field_label;
+                $field_name = $field->field_name;
+                switch($field->type)
+                {
+                    case 'file':
+                        $upload_pref = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
+                        $entry->$field_name = '<span class="value_file">'.
+                            '<a href="'.$upload_pref['url'].$entry->$field_name.'">'.$entry->$field_name.'</a></span>';
+                        $types[$field->field_name] = 'static';
+                        break;
+                    case 'string':
+                        if($field->length > 255)
+                        {
+                            $types[$field->field_name] = 'textarea';
+                        } else {
+                            $types[$field->field_name] = 'text';
+                        }
+                        break;
+                    case 'text':
+                        $types[$field->field_name] = 'textarea';
+                        break;
+                    default:
+                        $types[$field->field_name] = 'text';
+                        break;
+                }
+
+            }
+
+            // Hide any special db fields added by drivers
+            foreach($form_obj->db_fields() as $field_name)
+            {
+                if(!isset($types[$field_name]))
+                {
+                    $vars['hidden_fields'][] = $field_name;
+                }
+            }
+
+            $vars['field_names'] = $field_names;
+
+            $form = $this->EE->pl_forms->create_cp_form($entry, $types);
+            $vars['form'] = $form;
+
+            foreach($form_obj->fields() as $field)
+            {
+                if($driver = $field->get_driver())
+                {
+                    if(method_exists($driver, 'edit_data'))
+                    {
+                        $driver->edit_data($form_obj, $field, $vars, $entry);
+                    }
+                }
+            }
+
+
+            $this->EE->load->library('table');
+            return $this->EE->load->view('generic_edit', $vars, TRUE);
+        }
+    }
+
+    function process_edit_form_entry()
+    {
+        $this->EE->load->library('formslib');
+
+        $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_form_entry';
+
+        $form_id = (int)$this->EE->input->get('form_id');
+        $form_entry_id = (int)$this->EE->input->get('form_entry_id');
+
+        $form_obj = $this->EE->formslib->forms->get($form_id);
+        if($form_obj)
+        {
+            $this->sub_page(lang('tab_edit_form_entry').' in <em>'.$form_obj->form_name.'</em>');
+
+            $entry = $form_obj->get_entry($form_entry_id);
+            $data = array();
+            
+            foreach($entry as $field => $current_value)
+            {                                                                                                  
+                $new_value = $this->EE->input->post($field);
+                if($new_value !== FALSE && $new_value != $current_value)
+                {
+                    $data[$field] = $new_value;
+                }
+            }
+            
+            if(count($data) > 0)
+            {
+                $form_obj->update_entry($form_entry_id, $data);
+            }
+            
+            $this->EE->functions->redirect(ACTION_BASE.AMP.'method=list_entries'.AMP.'form_id='.$form_id);
         }
     }
 

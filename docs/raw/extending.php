@@ -65,16 +65,6 @@
     <p>You can use this to dynamically hide particular forms or otherwise change the forms in the listing.</p></td>
 </tr> 
 <!-------------------->
-<tr><td><b>proform_forms_start</b></td>
-    <td>$module, $forms</td>
-    <td>$forms</td>
-</tr>
-<tr><td colspan="3">
-    <p><b>Description</b></p>
-    <p>This hook is after getting the list of forms to be passed back by &#123;exp:proform:forms&#125;.<p>
-    <p>You can use this to dynamically hide particular forms or otherwise change the forms in the listing.</p></td>
-</tr> 
-<!-------------------->
 <tr><td><b>proform_forms_row</b></td>
     <td>$module, $form_obj, $row_vars</td>
     <td>$row_vars</td>

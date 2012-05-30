@@ -42,7 +42,7 @@
             $txt_report_label = lang('txt_report');
 //            <span class="button"><a href="{$base}&method=export_entries&form_id={$form_id}">{$export_entries_label}</a></span>
 
-            echo $pl_plugins->list_entries_commands($form_id, <<<END
+            echo $pl_drivers->list_entries_commands($form_id, <<<END
 
     <div class="dropdown-wrap">
         <span class="button content-btn"><a title="" class="submit" href="#">Entries Export / Reports</a></span>
@@ -73,7 +73,7 @@ END
 <?php if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>'; ?>
 
 <div class="filters">
-    <?php echo $pl_plugins->list_entries_filters_view(); ?>
+    <?php echo $pl_drivers->list_entries_filters_view(); ?>
 </div>
 
 <?php
@@ -115,7 +115,7 @@ END
                         $row[] = '<span class="value_'.$type.$short.'">'.$value.'</span>';
                         break;
                     default:
-                        $plugin_view = $this->pl_plugins->call($type, 'render_entries_list_cp', array($value));
+                        $plugin_view = $this->pl_drivers->call($type, 'render_entries_list_cp', array($value));
                         if($plugin_view != $value)
                         {
                             $row[] = '<span class="value_'.$type.'">'.$plugin_view.'</span>';

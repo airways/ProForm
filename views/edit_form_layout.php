@@ -147,8 +147,8 @@ $alt = FALSE;
                     <?php
                         break;
                     default:
-                        if($field['plugin']):
-                            echo $field['plugin']->render_field_cp($form, $field);
+                        if($field['driver']):
+                            echo $field['driver']->render_field_cp($form, $field);
                         else: ?>
                             <label for="" class=""><?php echo $display_label; ?></label>
                             <input type="text" class="placeHolder" disabled="disabled" />
@@ -222,13 +222,13 @@ $alt = FALSE;
                         </li>
                         <?php endforeach; ?>
 
-                        <li class="first-section">Field Plugins</li>
+                        <li class="first-section">Field Drivers</li>
                         <?php
-                        if(!count($plugin_options)): ?>
-                            <li>You don't have any plugins that provide fields installed yet. You can get more on <a href="http://devot-ee.com/developers/isaac-raway">Devot:ee</a>.</li>
+                        if(!count($driver_options)): ?>
+                            <li>You don't have any Field Drivers installed yet.</li>
                         <?php
                         else:
-                            foreach($plugin_options as $option): ?>
+                            foreach($driver_options as $option): ?>
                             <li><a class="field_type"
                                 href="<?php
                                     echo $new_item_url.AMP.'field_type='.$option['key'];
