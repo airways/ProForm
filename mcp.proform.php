@@ -1660,7 +1660,7 @@ class Proform_mcp extends Prolib_mcp {
         $vars['field_types']['_commands'] = 'control';
         foreach($vars['entries'] as $entry)
         {
-            $action_list = '<div class="action-list">';
+            $action_list = '<span class="action-list">';
             $action_list .= $this->EE->pl_drivers->list_entries_action_list_view(
                     $form_id,
                     $entry,
@@ -1668,7 +1668,7 @@ class Proform_mcp extends Prolib_mcp {
                     '<a href="'.$vars['view_entry_url'].'&entry_id='.$entry->form_entry_id.'">View</a> '.
                     '<a href="'.$vars['delete_entry_url'].'&entry_id='.$entry->form_entry_id.'" class="pl_confirm" rel="Are you sure you want to delete this entry?">Delete</a>');
 
-            $action_list .= '</div>';
+            $action_list .= '</span>';
             
             //'<a href="'.$view_entry_url.'&entry_id='.$entry->form_entry_id.'">'.htmlspecialchars($entry->form_entry_id).'</a>'
             $entry->_commands = $action_list;
