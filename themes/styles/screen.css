@@ -8,7 +8,7 @@ General Overrides
 ------------------------------------------------------------------------ */
 
 #mainContent .pageContents {
-    overflow: visible;
+clear:left;
 }
 
 .pageContents a:link, 
@@ -258,7 +258,7 @@ Form Layout
 #mainContent .section-header h3 {
 	color: #fff;
 	font-size: 14px;
-	float: left;
+    float: left;
 	font-weight: normal;
 	margin-bottom: 0;
 }
