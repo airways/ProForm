@@ -180,7 +180,7 @@ class Proform_install
             'field_name'    => array('type' => 'varchar', 'constraint' => '32'),
             'is_required'   => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'),
             'form_field_settings'      => array('type' => 'blob'),
-            'heading'       => array('type' => 'varchar', 'constraint' => 255, 'default' => ''),
+            'heading'       => array('type' => 'text', 'default' => ''),
             'separator_type'=> array('type' => 'varchar', 'constraint' => 4, 'default' => ''),
         );
         $this->EE->dbforge->add_field($fields);
@@ -373,6 +373,13 @@ class Proform_install
             if(!$this->EE->db->field_exists('site_id', 'proform_preferences')) $forge->add_column('proform_preferences', $fields);
         }
 
+        if($current < 1.16)
+        {
+            $fields = array(
+                'heading'   => array('name' => 'heading', 'type' => 'text', 'default' => ''),
+            );
+            $forge->modify_column('proform_form_fields', $fields);
+        }
         return TRUE;
     } // function update
 
