@@ -133,7 +133,8 @@ class Proform_mcp extends Prolib_mcp {
 
         $this->field_type_settings = array(
             'list' => array(
-                array('type' => 'dropdown', 'name' => 'multiselect', 'label' => 'Allow multiple selections', 'options' => array('' => 'No', 'y' => 'Yes')),
+                array('type' => 'dropdown', 'name' => 'style', 'label' => 'Style', 'options' => array('' => 'Select Box', 'check' => 'Checkboxes', 'radio' => 'Radio Buttons')),
+                array('type' => 'dropdown', 'name' => 'multiselect', 'label' => 'Allow multiple selections?', 'options' => array('' => 'No', 'y' => 'Yes')),
                 array('type' => 'textarea', 'name' => 'list', 'label' => 'Options')
             ),
             'member_data' => array(
@@ -1212,6 +1213,7 @@ class Proform_mcp extends Prolib_mcp {
         // doing this based on if there is a value, not if the type is set - in case someone picks the
         // wrong type we don't want to lose their settings.
         if($this->EE->input->post('type_list')) {
+            $settings['type_style'] = $this->EE->input->post('type_style');
             $settings['type_list'] = $this->EE->input->post('type_list');
             $settings['type_multiselect'] = $this->EE->input->post('type_multiselect');
         }
