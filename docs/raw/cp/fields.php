@@ -153,8 +153,17 @@
             <td>&lt;select&gt;</td>
             <td>A select box allowing the visitor to choose between options. When selected, an additional option is available:<br />
                 <br />
+                <b>Style</b> - The style of list you would like to use. This controls how the processing is done, so it should match the way you are rendering the field. This will work best with the Simple Form Tag or template code based on the Example Template.<br/>
+                <ul>
+                    <li>Select Box - Standard select HTML element, optionally with Multiselect support.</li>
+                    <li>Check Boxes - A set of checkbox controls, one for each option. Inherently supports multiple selections.</li>
+                    <li>Radio Buttons - A set of radio button controls, one for each option. Supports a single selection.</li>
+                </ul>
+                <br/>
+                <b>Multiselect</b> - Enables multiple selections (only shown when the style is Select Box).<br/>
+                <br />
                 <b>Options</b> - A list of options available to the user. Uses either of the following formats for options, with one option on each line (these styles may be mixed within a single field if desired):
-                <pre>
+                <pre class="brush: xml">
 value : label&#10;value</pre>
             </td>
             <td>TEXT</td>

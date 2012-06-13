@@ -591,7 +591,7 @@ class Proform {
         {
             show_error("{exp:proform:form} form not found: $form_name");
         }
-    } // function form()
+    } // form()
 
     /*
      * Provide form post results on a success page (usually the thank you page)
@@ -1497,7 +1497,7 @@ class Proform {
                 } // $field->type == 'file'
             }
         } // save_entries_on == 'y'
-    } // function _process_uploads
+    } // _process_uploads
 
     private function _process_captcha(&$form_obj, &$form_session)
     {
@@ -1522,7 +1522,7 @@ class Proform {
                     WHERE (word='".$this->EE->db->escape_str($_POST['captcha'])."'
                     AND ip_address = '".$this->EE->input->ip_address()."')
                     OR date < UNIX_TIMESTAMP()-7200");
-    } // function _process_captch
+    } // _process_captch
 
     private function _process_validation(&$form_obj, &$form_session)
     {
@@ -1548,10 +1548,20 @@ class Proform {
             {
                 // Check that the value submitted is one of the available options
                 $options = $field->get_list_options();
-                if(!isset($field->settings['type_multiselect']) || !$field->settings['type_multiselect'])
+
+                $type_multiselect = isset($field->settings['type_multiselect']) ? $field->settings['type_multiselect'] : FALSE;
+                $type_style = isset($field->settings['type_style']) ? $field->settings['type_style'] : '';
+
+                if(($type_style == '' && !$type_multiselect) || $type_style == 'radio')
                 {
                     $multi = FALSE;
                     $option_valid = FALSE;
+                    
+                    if(is_array($form_session->values[$field->field_name]))
+                    {
+                        $form_session->values[$field->field_name] = $form_session->values[$field->field_name][0];
+                    }
+
                     if(isset($form_session->values[$field->field_name]))
                     {
                         foreach($options as $option)
@@ -1574,14 +1584,15 @@ class Proform {
                     {
                         $form_session->values[$field->field_name] = array($form_session->values[$field->field_name]);
                     }
-
+#echo 'values:';
+#var_dump($form_session->values);exit;
                     $valid = TRUE;
                     foreach($form_session->values[$field->field_name] as $selected_option)
                     {
                         $option_valid = FALSE;
                         foreach($options as $option)
                         {
-                            if($option['key'] == $form_session->values[$field->field_name])
+                            if($option['key'] == $selected_option)
                             {
                                 $option_valid = TRUE;
                             }
@@ -1697,13 +1708,13 @@ class Proform {
             //var_dump($form_session->errors);die;
         }
         //exit('end of validation');
-    } // function _process_validation
+    } // _process_validation
 
     private function _process_duplicates(&$form_obj, &$form_session)
     {
         // TODO: check for duplicates
         // TODO: make sure encryption is taken into account for duplicates checks
-    } // function _process_duplicates
+    } // _process_duplicates
 
     private function _process_insert(&$form_obj, &$form_session)
     {
@@ -1808,7 +1819,7 @@ class Proform {
 
 
 
-    } // function _process_insert
+    } // _process_insert
 
     private function _process_mailinglist(&$form_obj, &$form_session)
     {
@@ -1901,7 +1912,7 @@ class Proform {
                 } // if($this->EE->input->get_post($field->field_name) && $email && $list_id)
             } // if($field->type == 'mailinglist')
         } // foreach($form_obj->fields() as $field)
-    } // function _process_mailinglist
+    } // _process_mailinglist
 
     ////////////////////////////////////////////////////////////////////////////////
     // Helpers
@@ -2117,7 +2128,7 @@ class Proform {
 
 //        if($create_field_rows){var_dump($result);die;}
         return $result;
-    } // function create_fields_array
+    } // create_fields_array
 
     private function _get_placeholder($type, $default = '')
     {
@@ -2149,7 +2160,7 @@ class Proform {
 
             $this->EE->TMPL->tagdata = preg_replace("/".LD."paginate".RD.".+?".LD.'\/'."paginate".RD."/s", "", $this->EE->TMPL->tagdata);
         }
-    } // function fetch_pagination_data
+    } // fetch_pagination_data
 
     function _debug($msg, $object=FALSE)
     {

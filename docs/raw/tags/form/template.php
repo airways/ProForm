@@ -96,23 +96,24 @@
                             &lt;/div&gt;
                         &lt;/div&gt;
                     &#123;if:elseif pf_field_type == "list"&#125;
-                        &lt;select name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;" &#123;if pf_multiple&#125;multiple="multiple"&#123;/if&#125; class="&#123;pf_field_is_required&#125;"&gt;
-                        &#123;pf_field_setting_list&#125;
-                            &lt;option value="&#123;pf_key&#125;" &#123;pf_selected&#125;&gt;&#123;pf_row&#125;&lt;/option&gt;
-                        &#123;/pf_field_setting_list&#125;
-                        &lt;/select&gt;
-                        &#123;if pf_field_style == "checkboxes"&#125;
+                        &#123;if pf_field_setting_style == "check"&#125;
                             &#123;pf_field_setting_list&#125;
-                            &lt;div class="pf_option &#123;if pf_vertical&#125;pf_vertical&#123;/if&#125;"&gt;
-                                &lt;input type="checkbox" name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;_&#123;pf_key&#125;" value="&#123;pf_key&#125;" &#123;if pf_selected&#125;checked="checked"&#123;/if&#125; class="&#123;pf_field_is_required&#125;" /&gt;&lt;label for="&#123;pf_field_name&#125;_&#123;pf_key&#125;"&gt;&#123;pf_label&#125;&lt;/label&gt;
-                            &lt;/div&gt;
+                            <div class="pf_option &#123;if pf_vertical&#125;pf_vertical&#123;/if&#125;">
+                                <input type="checkbox" name="&#123;pf_field_name&#125;[]" id="&#123;pf_field_name&#125;_&#123;pf_key&#125;" value="&#123;pf_key&#125;" &#123;if pf_selected&#125;checked="checked"&#123;/if&#125; class="&#123;pf_field_is_required&#125;" /><label for="&#123;pf_field_name&#125;_&#123;pf_key&#125;">&#123;pf_label&#125;</label>
+                            </div>
                             &#123;/pf_field_setting_list&#125;
-                        &#123;if:elseif pf_field_style == "radios"&#125;
+                        &#123;if:elseif pf_field_setting_style == "radio"&#125;
                             &#123;pf_field_setting_list&#125;
-                            &lt;div class="pf_option"&gt;
-                                &lt;input type="radio" name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;_&#123;pf_key&#125;" value="&#123;pf_key&#125;" &#123;if pf_selected&#125;checked="checked"&#123;/if&#125; class="&#123;pf_field_is_required&#125;" /&gt;&lt;label for="&#123;pf_field_name&#125;_&#123;pf_key&#125;"&gt;&#123;pf_label&#125;&lt;/label&gt;
-                            &lt;/div&gt;
+                            <div class="pf_option">
+                                <input type="radio" name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;_&#123;pf_key&#125;" value="&#123;pf_key&#125;" &#123;if pf_selected&#125;checked="checked"&#123;/if&#125; class="&#123;pf_field_is_required&#125;" /><label for="&#123;pf_field_name&#125;_&#123;pf_key&#125;">&#123;pf_label&#125;</label>
+                            </div>
                             &#123;/pf_field_setting_list&#125;
+                        &#123;if:else&#125;
+                            <select name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;" &#123;if pf_multiple&#125;multiple="multiple"&#123;/if&#125; class="&#123;pf_field_is_required&#125;">
+                            &#123;pf_field_setting_list&#125;
+                                <option value="&#123;pf_key&#125;" &#123;pf_selected&#125;>&#123;pf_row&#125;</option>
+                            &#123;/pf_field_setting_list&#125;
+                            </select>
                         &#123;/if&#125;
                     &#123;if:else&#125;
                         &lt;input type="&#123;pf_field_control&#125;" id="&#123;pf_field_name&#125;" name="&#123;pf_field_name&#125;" value="&#123;pf_field_value&#125;" class="&#123;pf_field_is_required&#125;" /&gt;
