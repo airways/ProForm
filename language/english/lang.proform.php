@@ -113,7 +113,8 @@ $lang = array(
     'tab_new_html_block' => 'New HTML Block',
     'tab_edit_html_block' => 'Edit HTML Block',
     'tab_delete_html_block' => 'Delete HTML Block',
-    'tab_view_form_entry' => 'View Entry',
+    'tab_view_form_entry' => 'View Form Entry',
+    'tab_edit_form_entry' => 'Edit Form Entry',
     
     // Fields
     'field_form_name' => 'Form Short Name',

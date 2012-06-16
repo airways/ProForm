@@ -82,23 +82,44 @@
                                 </div>
                             </div>
                         {if:elseif pf_field_type == "list"}
-                            {if pf_field_setting_style == "check"}
+                            {if pf_field_setting_style == "check" || pf_field_setting_style == "radio"}
                                 {pf_field_setting_list}
-                                <div class="pf_option {if pf_vertical}pf_vertical{/if}">
-                                    <input type="checkbox" name="{pf_field_name}[]" id="{pf_field_name}_{pf_key}" value="{pf_key}" {if pf_selected}checked="checked"{/if} class="{pf_field_is_required}" /><label for="{pf_field_name}_{pf_key}">{pf_label}</label>
-                                </div>
+                                    {if pf_is_divider}
+                                        {if pf_divider_number > 0}
+                                            </fieldset>
+                                        {/if}
+                                        <fieldset>
+                                            <legend>{pf_label}</legend>
+                                    {if:else}
+                                        <div class="pf_option {if pf_vertical}pf_vertical{/if}">
+                                            {if pf_field_setting_style == "check"}
+                                                <input type="checkbox" name="{pf_field_name}[]" id="{pf_field_name}_{pf_key}" value="{pf_key}" {if pf_selected}checked="checked"{/if} class="{pf_field_is_required}" />
+                                            {/if}
+                                            {if pf_field_setting_style == "radio"}
+                                                <input type="radio" name="{pf_field_name}" id="{pf_field_name}_{pf_key}" value="{pf_key}" {if pf_selected}checked="checked"{/if} class="{pf_field_is_required}" />
+                                            {/if}
+                                            <label for="{pf_field_name}_{pf_key}">{pf_label}</label>
+                                        </div>
+                                    {/if}
                                 {/pf_field_setting_list}
-                            {if:elseif pf_field_setting_style == "radio"}
-                                {pf_field_setting_list}
-                                <div class="pf_option">
-                                    <input type="radio" name="{pf_field_name}" id="{pf_field_name}_{pf_key}" value="{pf_key}" {if pf_selected}checked="checked"{/if} class="{pf_field_is_required}" /><label for="{pf_field_name}_{pf_key}">{pf_label}</label>
-                                </div>
-                                {/pf_field_setting_list}
+                                {if pf_divider_count > 0}
+                                    </fieldset>
+                                {/if}
                             {if:else}
                                 <select name="{pf_field_name}" id="{pf_field_name}" {if pf_multiple}multiple="multiple"{/if} class="{pf_field_is_required}">
-                                {pf_field_setting_list}
-                                    <option value="{pf_key}" {pf_selected}>{pf_row}</option>
-                                {/pf_field_setting_list}
+                                    {pf_field_setting_list}
+                                        {if pf_is_divider}
+                                            {if pf_divider_number > 0}
+                                                </optgroup>
+                                            {/if}
+                                            <optgroup label="{pf_label}">
+                                        {if:else}
+                                            <option value="{pf_key}" {pf_selected}>{pf_row}</option>
+                                        {/if}
+                                    {/pf_field_setting_list}
+                                    {if pf_divider_count > 0}
+                                        </optgroup>
+                                    {/if}
                                 </select>
                             {/if}
                         {if:else}

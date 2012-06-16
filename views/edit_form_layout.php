@@ -147,16 +147,19 @@ $alt = FALSE;
 
                             case 'check':
                             case 'radio': ?>
-                                <div style="margin-left: 20px;">
+                                <div class="option-list">
                                 <?php
                                 if(isset($field['settings']['type_list'])):
                                     foreach(explode("\n", $field['settings']['type_list']) as $option):
                                     $option = explode(':', $option);
                                     if(count($option) == 1) $option[1] = $option[0];
-                                    ?>
+                                    if(strlen($option[0]) > 0 && $option[0][0] == '-'): ?>
+                                        <legend><?php echo $option[1]; ?></legend>
+                                    <?php else: ?>
                                         <input type="<?php echo $type == 'radio' ? 'radio' : 'checkbox'; ?>" disabled="disabled" style="disable: inline; width; 30px;" />
-                                        <b style="display: inline;" class="field-label"><?php echo $option[1]; ?></b><br/>
+                                        <span style="display: inline;" class="field-label"><?php echo $option[1]; ?></span><br/>
                                     <?php
+                                    endif;
                                     endforeach;
                                 endif;
                                 ?>

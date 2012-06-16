@@ -175,6 +175,9 @@ class PL_Field extends PL_RowInitialized
 
         $result = array();
 
+        $count = 0;
+        $divider_count = 0;
+
         if(array_key_exists('type_list', $this->settings))
         {
             $list = explode("\n", $this->settings['type_list']);
@@ -199,15 +202,30 @@ class PL_Field extends PL_RowInitialized
                     unset($selected_items[$k]);
                 }
 
+                if(strlen($key) > 0 && $key[0] == '-')
+                {
+                    $divider_count++;
+                    $is_divider = TRUE;
+                } else {
+                    $is_divider = FALSE;
+                }
+
+                $count++;
                 $result[] = array(
-                    'key' => $key,
-                    'row' => $option,
-                    'option' => $option,
-                    'label' => $option,
-                    'selected' => $selected,
+                    'key'               => $key,
+                    'row'               => $option,
+                    'option'            => $option,
+                    'label'             => $option,
+                    'selected'          => $selected,
+                    'number'            => $count,
+                    'divider_number'    => $divider_count,
+                    'is_divider'        => $is_divider,
                 );
             }
         }
+        
+        $this->divider_count = $divider_count;
+        
         return $result;
     } // function get_list_options
 

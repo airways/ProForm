@@ -39,6 +39,7 @@ if(!file_exists(PATH_THIRD.'prolib/prolib.php'))
 
 require_once PATH_THIRD.'prolib/prolib.php';
 require_once PATH_THIRD.'proform/libraries/formslib.php';
+require_once PATH_THIRD.'proform/libraries/proform_view.php';
 require_once PATH_THIRD.'proform/config.php';
 
 if(!defined('ACTION_BASE'))
@@ -53,7 +54,13 @@ class Proform_mcp extends Prolib_mcp {
 
     function Proform_mcp()
     {
+        
         prolib($this, 'proform');
+
+        // Override the view class so we can inject HTML into our titles and
+        // not have it show up in the <title> tag
+        $this->EE->view = new PF_View($this->EE->view);
+
         $this->EE->pl_drivers->init();
         
         $this->EE->cp->set_right_nav(array(

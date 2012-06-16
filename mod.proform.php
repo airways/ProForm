@@ -1929,7 +1929,8 @@ class Proform {
 
         $result = array();
         $last_field_row = -1;
-
+        $count = 0;
+        
         foreach($form_obj->fields() as $field)
         {
             // skip secured fields such as member_id, member_name, etc.
@@ -2020,6 +2021,7 @@ class Proform {
                 $field_value_wrap = FALSE;
             }
 
+            $count++;
             $field_array = array(
                     //'field_callback'    => function($form_session->values, $key=FALSE) { return time(); },
                     'field_id'                  => $field->field_id,
@@ -2042,7 +2044,8 @@ class Proform {
                     'field_values'              => $field_value_wrap,
                     'field_checked'             => (array_key_exists($field->field_name, $field_checked_flags)
                                                                   && $field_checked_flags[$field->field_name]) ? 'checked="checked"' : '',
-                    'field_control'             => $field->get_control()
+                    'field_control'             => $field->get_control(),
+                    'field_number'              => $count,
                 );
 
             // Create a fieldset for field_validation: to contain rows that are applied to each field, makes conditionals
@@ -2086,6 +2089,7 @@ class Proform {
                     {
 //  var_dump($field_values[$field->field_name]);exit;
                         $v = $field->get_list_options($field_values[$field->field_name]);
+                        $field_array['field_divider_count'] = $field->divider_count;
                         foreach($v as $list_option)
                         {
                             if($list_option['selected'])

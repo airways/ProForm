@@ -674,6 +674,20 @@ Messages / Form Errors
     width: 270px;
 }
 
+.form-layout legend {
+    margin: 10px 0 10px 0;
+    font-weight: bold;
+}
+
+
+.form-layout .option-list {
+    margin-left: 20px;
+}
+.form-layout .option-list label {
+    font-weight: normal;
+}
+
+
 .toolbox li {
     overflow: hidden;
     margin-bottom: 4px;
