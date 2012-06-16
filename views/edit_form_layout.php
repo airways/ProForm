@@ -105,10 +105,10 @@ $alt = FALSE;
                     switch($field['type']):
                         case 'string': case 'text':
                         if($field['length'] > 255 || $field['type'] == 'text'): ?>
-                            <label for="" class=""><?php echo $display_label; ?></label>
-                            <textarea name="" id="" class="placeHolder" cols="30" rows="10" disabled="disabled"></textarea>
+                            <label class="field-label"><?php echo $display_label; ?></label>
+                            <textarea class="placeHolder" cols="30" rows="10" disabled="disabled"></textarea>
                         <?php else: ?>
-                            <label><?php echo $display_label; ?></label>
+                            <label class="field-label"><?php echo $display_label; ?></label>
                             <input type="text" class="placeHolder" disabled="disabled" />
                     <?php
                         endif;
@@ -116,30 +116,54 @@ $alt = FALSE;
                         break;
                     case 'checkbox': ?>
                         <input type="checkbox" class="placeHolder" disabled="disabled" />
-                        <label for="" class="label-checkbox"><?php echo $display_label; ?></label>
+                        <label class="field-label label-checkbox"><?php echo $display_label; ?></label>
                     <?php
                         break;
                     case 'radio': ?>
                         <input type="radio" class="placeHolder" disabled="disabled" />
-                        <label for="" class="label-checkbox"><?php echo $display_label; ?></label>
+                        <label class="field-label label-checkbox"><?php echo $display_label; ?></label>
                     <?php
                         break;
                     case 'list': ?>
-                        <label for="" class="label-checkbox"><?php echo $display_label; ?></label>
-                        <select name="" id="" class="placeHolder" disabled="disabled" />
-                            <?php
-                            if(isset($field['settings']['type_list'])):
-                                foreach(explode("\n", $field['settings']['type_list']) as $option):
-                                $option = explode(':', $option);
-                                if(count($option) == 1) $option[1] = $option[0];
+                        <label class="field-label label-checkbox"><?php echo $display_label; ?></label>
+                        <?php
+                        $type = isset($field['settings']['type_style']) ? $field['settings']['type_style'] : '';
+                        switch($type):
+                            case '': ?>
+                                <select name="" id="" class="placeHolder" disabled="disabled" />
+                                    <?php
+                                    if(isset($field['settings']['type_list'])):
+                                        foreach(explode("\n", $field['settings']['type_list']) as $option):
+                                        $option = explode(':', $option);
+                                        if(count($option) == 1) $option[1] = $option[0];
+                                        ?>
+                                    <option value="<?php echo $option[0]; ?>"><?php echo $option[1]; ?></option>
+                                    <?php
+                                        endforeach;
+                                    endif;
+                                    ?>
+                                </select>
+                            <?php break;
+
+                            case 'check':
+                            case 'radio': ?>
+                                <div style="margin-left: 20px;">
+                                <?php
+                                if(isset($field['settings']['type_list'])):
+                                    foreach(explode("\n", $field['settings']['type_list']) as $option):
+                                    $option = explode(':', $option);
+                                    if(count($option) == 1) $option[1] = $option[0];
+                                    ?>
+                                        <input type="<?php echo $type == 'radio' ? 'radio' : 'checkbox'; ?>" disabled="disabled" style="disable: inline; width; 30px;" />
+                                        <b style="display: inline;" class="field-label"><?php echo $option[1]; ?></b><br/>
+                                    <?php
+                                    endforeach;
+                                endif;
                                 ?>
-                            <option value="<?php echo $option[0]; ?>"><?php echo $option[1]; ?></option>
-                            <?php
-                                endforeach;
-                            endif;
-                            ?>
-                        </select>
-                    <?php
+                                </div>
+                                <?php
+                                break;
+                            endswitch;
                         break;
                     case 'file': ?>
                         <label for="" class=""><?php echo $display_label; ?></label>

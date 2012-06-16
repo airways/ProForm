@@ -320,6 +320,7 @@ class Proform_notifications
 // var_dump($data);
 // echo htmlentities($message);
 // exit;
+            $this->_debug($message);
             $result = TRUE;
             foreach($notification_list as $to_email)
             {

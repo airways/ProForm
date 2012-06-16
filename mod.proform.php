@@ -1987,6 +1987,39 @@ class Proform {
                 }
             }
 
+            $field_value = array_key_exists($field->field_name, $field_values) ? $field_values[$field->field_name] : $field->get_form_field_setting('preset_value');
+
+            if($field->type == 'list')
+            {
+                if(is_array($field_value))
+                {
+                    $field_value_selections = array();
+                    foreach($field_value as $kk => $vv)
+                    {
+                        $field_value_selections[$kk] = $vv;
+                    }
+                } else {
+                    $field_value_selections = explode('|', $field_value);
+                }
+                
+                // Turn the list of selected options into a wrappable array to be parsed
+                $field_value_array = array();
+                $options = $field->get_list_options($field_values[$field->field_name]);
+                foreach($field_value_selections as $key)
+                {
+                    foreach($options as $option)
+                    {
+                        if($option['key'] == $key)
+                        {
+                            $field_value_array[$key] = $option['label'];
+                        }
+                    }
+                }
+                $field_value_wrap = $this->EE->pl_parser->wrap_array($field_value_array, 'key', 'label');
+            } else {
+                $field_value_wrap = FALSE;
+            }
+
             $field_array = array(
                     //'field_callback'    => function($form_session->values, $key=FALSE) { return time(); },
                     'field_id'                  => $field->field_id,
@@ -2005,9 +2038,8 @@ class Proform {
                     'field_error'               => array_key_exists($field->field_name, $field_errors)
                                                         ? $field_errors[$field->field_name]
                                                             : '',
-                    'field_value'               => array_key_exists($field->field_name, $field_values)
-                                                        ? $field_values[$field->field_name]
-                                                            : $field->get_form_field_setting('preset_value'),
+                    'field_value'               => $field_value,
+                    'field_values'              => $field_value_wrap,
                     'field_checked'             => (array_key_exists($field->field_name, $field_checked_flags)
                                                                   && $field_checked_flags[$field->field_name]) ? 'checked="checked"' : '',
                     'field_control'             => $field->get_control()
