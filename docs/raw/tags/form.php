@@ -409,6 +409,7 @@
     <li><a href="#var_form_type">&#123;form_type&#125;</a></li>
     <!-- <li><a href="#var_formpref">&#123;formpref:*&#125;</a></li> -->
     <li><a href="#var_fields_count">&#123;fields_count&#125;</a></li>
+    <li><a href="#var_label">&#123;label:*&#125;</a></li>
     <li><a href="#var_on_first_step">&#123;on_first_step&#125;</a></li>
     <li><a href="#var_on_last_step">&#123;on_last_step&#125;</a></li>
     <li><a href="#var_step_count">&#123;step_count&#125;</a></li>
@@ -514,6 +515,26 @@
 
 <p>Provides the total number of fields assigned to the form.</p>
 
+<h3><a name="var_label">{label:*}</a></h3>
+
+<p>Provides the label set for a particular field on the form. These variables are most useful for cases where you are not using the full &#123;fields&#125; loop and wish to just render the information for a small set of fields. See also the {value:*} variables.</p>
+
+<p>Replace the * in the variable name with the name of a field to get it's label.</p>
+
+<p>The &#123;field_value&#125; variable inside of a &#123;fields&#125; variable pair provides the same value for fields, and is easier to use when generating generic form markup.</p>
+
+<div class="tip">
+    <h6>Example Usage</h6>
+    <p>Assuming there is one field defined on the form, named <strong>phone_number</strong>.</p>
+    <pre class="brush: xml">
+        &#123;exp:proform:form form="contact_us" variable_prefix="pf_"&#125;
+            &lt;p&gt;The label for the phone_number field is: &#123;label:phone_number&#125;&lt;/p&gt;
+        &#123;/exp:proform:form&#125;
+
+    </pre>
+</div>
+
+
 <h3><a name="var_on_first_step">{on_first_step}</a></h3>
 
 <p>Provides a boolean value indicating if the form is currently on it's <strong>first</strong> step.</p>
@@ -532,7 +553,7 @@
 
 <h3><a name="var_value">{value:*}</a></h3>
 
-<p>Provides the value entered for a field on the form. These variables are set when the form contains an error and needs to be redisplayed, <strong>or</strong> when a form step is reloaded (a step can be visited multiple times by the user).</p>
+<p>Provides the value entered for a field on the form. These variables are set when the form contains an error and needs to be redisplayed, <strong>or</strong> when a form step is reloaded (a step can be visited multiple times by the user). These variables are most useful for cases where you are not using the full &#123;fields&#125; loop and wish to just render the information for a small set of fields. See also the {field:*} variables.</p>
 
 <p>Replace the * in the variable name with the name of a field.</p>
 

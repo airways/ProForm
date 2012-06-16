@@ -454,13 +454,18 @@ class Proform {
                 // This array is used here and elsewhere to pass values into functions, need to clean this up
                 $field_values = $form_session->values;
                 
+                $field_labels = array();
                 foreach($form_obj->fields() as $field)
                 {
                     if(!isset($field_values[$field->field_name])) $field_values[$field->field_name] = '';
+                    if($field->field_name != '')
+                    {
+                        $field_labels[$field->field_name] = $field->field_label;
+                    }
                 }
-                
-                
+
                 $varsets[] = array('value', $form_session->values);
+                $varsets[] = array('label', $field_labels);
                 $varsets[] = array('checked', $field_checked_flags);
                 $varsets[] = array('error', $field_errors);
 
