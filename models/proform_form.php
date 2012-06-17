@@ -40,6 +40,12 @@ class PL_Form extends PL_RowInitialized {
     const SEPARATOR_STEP     = 'STEP';
     const SEPARATOR_HTML     = 'HTML';
 
+    public $__advanced_settings_options = array(
+        'thank_you_message'     => 'Thank You Message',
+        'extra1_label'          => 'Label for Extra 1',
+        'extra2_label'          => 'Label for Extra 2',
+    );
+
     public static $default_form_field_settings = array(
         'label'             => '',
         'preset_value'      => '',

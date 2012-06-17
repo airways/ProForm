@@ -336,11 +336,11 @@ $alt = FALSE;
                     <input type="text" id="field-html-class" />
                 </li>
                 <li>
-                    <label for="">Extra 1</label>
+                    <label for=""><?php echo isset($settings['extra1_label']) ? $settings['extra1_label'] : 'Extra 1'; ?></label>
                     <input type="text" id="field-extra1" />
                 </li>
                 <li>
-                    <label for="">Extra 2</label>
+                    <label for=""><?php echo isset($settings['extra2_label']) ? $settings['extra2_label'] : 'Extra 2'; ?></label>
                     <input type="text" id="field-extra2" />
                 </li>
                 <li>

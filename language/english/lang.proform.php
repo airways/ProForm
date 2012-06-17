@@ -51,6 +51,7 @@ $lang = array(
     'heading_field_forced' => 'Forced Value (cannot be set in form submit)',
     'heading_commands' => 'Actions',
     'heading_actions' => 'Actions',
+    'heading_setting' => 'Setting',
 
     // Table results
     'no_forms' => 'No forms created yet',

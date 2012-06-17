@@ -487,6 +487,9 @@ class Proform_mcp extends Prolib_mcp {
         $template_options = array(0 => 'None') + $template_options;
 
         //unset($form_obj->form_id);
+        $vars['settings'] = (isset($form_obj) AND $form_obj) ? $form_obj->settings : array();
+        $vars['advanced_settings_options'] = $form_obj->__advanced_settings_options;
+
         unset($form_obj->settings);
 
         // $channel_options = $this->EE->formslib->get_channel_options($this->EE->formslib->prefs->ini('safecracker_field_group_id'),
@@ -698,6 +701,14 @@ class Proform_mcp extends Prolib_mcp {
         if(!$form_id || $form_id <= 0) show_error(lang('missing_form_id'));
 
         $form = $this->EE->formslib->forms->get($form_id);
+        
+        // If no advanced settings were sent to us, we need to remove any that
+        // might have been saved before (perhaps they have all been removed from
+        // the list, which would stop any array from being sent to us at all).
+        if(!$this->EE->input->post('settings'))
+        {
+            $_POST['settings'] = array();
+        }
 
         // process layout and field customization for the form
         $field_order = $this->EE->input->post('field_order');
@@ -2384,7 +2395,7 @@ class Proform_mcp extends Prolib_mcp {
 
         // $out .= '<h4>Add another rule</h4><br/>'.$dropdown.' '.form_button('addgridrow_'.$key, 'Add', 'id="addgridrow_'.$key.'" class="add_grid_row"');
         $out .= '<h4>Add another rule</h4>'.$dropdown;
-        $out .= '<a href="#" name="addgridrow_'. $key .' id="addgridrow_'.$key.' class="add_grid_row">Add</a>';
+        $out .= '<a href="#" name="addgridrow_'. $key .'" id="addgridrow_'.$key.'" class="add_grid_row">Add</a>';
 
         $out .= '<input type="hidden" name="'.$key.'" value="'.$value.'" />';
 
