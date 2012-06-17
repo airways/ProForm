@@ -65,7 +65,7 @@ $lang = array(
 
     // Buttons
     'home' => 'Home',
-    'global_form_preferences' => 'Module Settings',
+    'module_settings' => 'Module Settings',
     'new_form' => 'Create New Contact Form',
     'new_saef' => 'Create New SAEF Form',
     'new_share' => 'Create New Share Form',
@@ -89,7 +89,7 @@ $lang = array(
 
     // "Tab" / subpages in CP
     'proform_title' => 'ProForm: ',
-    'tab_global_form_preferences' => 'Module Settings',
+    'tab_module_settings' => 'Module Settings',
     'tab_forms' => 'Forms',
     'tab_new_form' => 'New Form',
     'tab_edit_form' => 'Edit Form',

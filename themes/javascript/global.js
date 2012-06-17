@@ -25,10 +25,152 @@ var proform_mod = {
         }, function() {
             $(this).parents('.dropdown-wrap').find('.dropdown').hide();
         });
-   },
+        
+        proform_mod.bind_advanced_settings();
+        proform_mod.bind_tabs();
+    },
+    bind_advanced_settings: function() {
+        $('#add_advanced').unbind('click').click(function() {
+            var $table = $('#advanced_settings table tbody');
+            var even = $('#advanced_settings table tr').length % 2;
+            var key = $('#advanced_settings_options').val();
+            if(key != '')
+            {
+                var label = $('#advanced_settings_options option[value='+key+']').text();
+                $('#advanced_settings_options').children('option[value='+key+']').remove();
+                var input = '<input type="text" name="settings['+key+']" />';
+                $('#advanced_settings table tr:last').after('<tr class="' + (even ? 'even' : 'odd') + '">'+
+                    '<td><span data-key="' + key + '" data-label="' + label + '">' + label + '</span></td>'+
+                    '<td>' + input + '</td>'+
+                    '<td><a href="#" class="remove_grid_row remove_advanced">X</a></td>'+
+                    '</tr>');
+            }
+            proform_mod.bind_advanced_settings();
+            return false;
+        });
+
+        $('.remove_advanced').unbind('click').click(function() {
+            var $tr = $(this).parents('tr');
+            var key = $tr.find('td:first span').attr('data-key');
+            var label = $tr.find('td:first span').attr('data-label');
+            $tr.remove();
+            $('#advanced_settings_options option:last').after('<option value="'+key+'">'+label+'</option>');
+            proform_mod.sort_select($('#advanced_settings_options'));
+            return false;
+        });
+    },
+    bind_tabs: function() {
+        $('.tabs li a').unbind('click').click(function() {
+            var $tabSet = $(this).parents('.tabs');
+            var tabSet = $tabSet.attr('data-tabset');
+            var currentTab = $(this).attr('href');
+            proform_mod.activate_tab(tabSet, currentTab);
+            return false;
+        });
+
+        var active_tabs = $('input[name=active_tabs]').val();
+        
+        var tab = 1;
+        if(active_tabs.indexOf('tab-content-settings') !== -1) tab = 1;
+        if(active_tabs.indexOf('tab-content-advanced') !== -1) tab = 2;
+        if(active_tabs.indexOf('tab-content-layout') !== -1) tab = 3;
+        switch(tab)
+        {
+            case 1:
+                proform_mod.activate_tab('main', 'tab-content-settings', true);
+                break;
+            case 2:
+                proform_mod.activate_tab('main', 'tab-content-advanced', true);
+                break;
+            case 3:
+                proform_mod.activate_tab('main', 'tab-content-layout', true);
+                break;
+        }
+        
+        if(active_tabs.indexOf('tab-content-override') !== -1) {
+            proform_mod.activate_tab('sidebar', 'tab-content-override', true);
+        } else {
+            proform_mod.activate_tab('sidebar', 'tab-content-add-item', true);
+        }
+
+        proform_mod.update_active_tabs();
+    },
+    activate_tab: function(tabSet, currentTab, noUpdateHash)
+    {
+        $('.tabs.'+tabSet+' li  a').parent('li').removeClass('active');
+        var active = '.'+currentTab.replace('tab-', '');
+        $(active).addClass('active');
+        $('.'+tabSet+'.tab-content').hide();
+        $('.'+currentTab).show();
+
+        if(!noUpdateHash) {
+            proform_mod.update_active_tabs();
+        }
+
+        switch(tabSet)
+        {
+            case 'main':
+                if(currentTab == 'tab-content-layout')
+                {
+                    $('.tabs.sidebar').show();
+                } else {
+                    $('.tabs.sidebar').hide();
+                }
+                break;
+        }
+    },
+    update_active_tabs: function()
+    {
+        var active_main = $('.tabs.main ul li.active a').attr('href');
+        var active_sidebar = $('.tabs.sidebar ul li.active a').attr('href');
+        var active_tabs = active_main + ',' + active_sidebar;
+        $('input[name=active_tabs]').val(active_tabs);
+    },
     make_name: function(s) {
         return s.toLowerCase().replace(' ', '_').replace(/[^a-zA-Z0-9]+/g, '_');
+    },
+    sort_select: function($dd) {
+        // Source: http://rickyrosario.com/blog/sorting-dropdown-select-options-using-jquery/
+        
+        if ($dd.length > 0) { // make sure we found the select we were looking for
+    
+            // save the selected value
+            var selectedVal = $dd.val();
+        
+            // get the options and loop through them
+            var $options = $('option', $dd);
+            var arrVals = [];
+            $options.each(function(){
+                // push each option value and text into an array
+                arrVals.push({
+                    val: $(this).val(),
+                    text: $(this).text()
+                });
+            });
+        
+            // sort the array by the value (change val to text to sort by text instead)
+            arrVals.sort(function(a, b){
+                if(a.val>b.val){
+                    return 1;
+                }
+                else if (a.val==b.val){
+                    return 0;
+                }
+                else {
+                    return -1;
+                }
+            });
+        
+            // loop through the sorted array and set the text/values to the options
+            for (var i = 0, l = arrVals.length; i < l; i++) {
+                $($options[i]).val(arrVals[i].val).text(arrVals[i].text);
+            }
+        
+            // set the selected value back
+            $dd.val(selectedVal);
+        }
     }
+
 };
 
 

@@ -1,11 +1,19 @@
 
 {exp:proform:form form_class="proform {embed:form_name}_proform" [%params%] variable_prefix="pf_"}
     {if pf_no_results}
-        Invalid form name specified!
+        {if pf_pref:invalid_form_message}
+            {pf_pref:invalid_form_message}
+        {if:else}
+            Invalid form name specified!
+        {/if}
     {/if}
     
     {if pf_complete}
-        Thank you for your submission!
+        {if pf_pref:thank_you_message}
+            {pf_pref:thank_you_message}
+        {if:else}
+            Thank you for your submission!
+        {/if}
     {if:else}
 
     {pf_hidden_fields}

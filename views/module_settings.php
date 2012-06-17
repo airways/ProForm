@@ -28,50 +28,24 @@
  * source is null and void. Use of this software constitutes your agreement
  * to this clause.
  *
- **/ 
- 
- 
- /*
-<div class="edit_form">
-<?php if(isset($form_name)): ?>
-<h2 class="content-heading">Editing <em><?php echo $form_name; ?></em></h2>
-<?php else: ?>
-<h2 class="content-heading">New Form</h2>
-<?php endif; ?>
-*/ ?>
+ **/ ?>
+
 <?php if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>'; ?>
 <?php if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>'; ?>
 
 <div class="tabs-wrapper">
     <div class="tabs main" id="main-tabs" data-tabset="main">
         <ul>
-            <li class="active content-settings"><a href="tab-content-settings">Form Settings</a></li>
+            <li class="active content-settings"><a href="tab-content-settings">Module Settings</a></li>
             <li class="active content-advanced"><a href="tab-content-advanced">Advanced Settings</a></li>
-    <?php if(isset($form_id) AND $form_id): ?>
-            <li class="content-layout"><a href="tab-content-layout">Form Layout</a></li>
-    <?php endif; ?>
         </ul>
     </div>
-
-    <div class="tabs sidebar" id="sidebar-tabs" data-tabset="sidebar">
-        <ul>
-            <li class="active content-add-item"><a href="tab-content-add-item">Add Item</a></li>
-            <li class="content-override"><a href="tab-content-override">Overrides</a></li>
-        </ul>
-    </div>
-
-    <?php if(isset($view_entries_link)): ?>
-    <span class="action-list">
-        <a href="<?php echo $view_entries_link; ?>">View Form Entries</a>
-    </span>
-    <?php endif; ?>
 </div>
 
 <div class="clear"></div>
 
-
-<?php echo form_open($action_url, array('id' => 'main_form'), isset($hidden) ? $hidden : array()); ?>
-<?php echo form_hidden('active_tab'); ?>
+<?php echo form_open($action_url, array('id' => 'module_settings'), isset($hidden) ? $hidden : array()); ?>
+<?php echo form_hidden('active_tabs'); ?>
 
 <!-- start edit form tab content -->
 <div class="tab-content main tab-content-settings">
@@ -89,29 +63,8 @@
 </div>
 <!-- end advanced settings -->
 
-<?php if(isset($form_id) AND $form_id): ?>
-
-<!-- start tab content -->
-<div class="grid-group tab-content main tab-content-layout">
-
-    <?php include(PATH_THIRD.'proform/views/edit_form_layout.php'); ?>
-
-</div>
-
-<?php endif; ?>
 <br/>
-<?php echo form_submit(array('name' => 'submit', 'value' => lang('save_form'), 'class' => 'submit')); ?>
-<?php echo form_close(); ?>
-<?php
-    // echo '<div id="defaultValueForm" class="defaultValueForm" style="display: none;">';
-    // echo form_open($default_value_action_url, '', $default_value_hidden);
-    // echo form_label('Default Value');
-    // echo form_textarea('default_value', '', 'class="value"');
-    // echo form_checkbox('forced', 'y', $field['preset_forced'] == 'y','id="forced"').
-    //             ' <label for="forced">'.lang('heading_field_forced').'</label>';
-    // echo '<br/><br/>'.form_button('save', 'Save', 'class="submit" id="defaultValueSubmit"');
-    // echo form_close();
-    // echo '</div>';
-?>
+<div class="tableFooter">
+    <?php echo form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit'))?>
 </div>
-
+<?php echo form_close();

@@ -1,6 +1,6 @@
-<mockup version="1.0" skin="sketch" measuredW="1033" measuredH="627" mockupW="1030" mockupH="597">
+<mockup version="1.0" skin="sketch" measuredW="980" measuredH="627" mockupW="977" mockupH="597">
   <controls>
-    <control controlID="0" controlTypeID="com.balsamiq.mockups::DataGrid" x="32" y="110" w="768" h="174" measuredW="597" measuredH="85" zOrder="0" locked="false" isInGroup="-1">
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::DataGrid" x="32" y="110" w="720" h="174" measuredW="597" measuredH="85" zOrder="0" locked="false" isInGroup="-1">
       <controlProperties>
         <text>Setting%2C%20Value%2C%20Actions%0AExtra%201%2C%20Descrption%2C%20Edit%20%7C%20Delete%0AThank%20You%2C%20Thanks%20for%20submitting%20your%20Support%20Request%21%20We%27ll%20get%20back%20to%20you%20ASAP%21%2C%20Edit%20%7C%20Delete</text>
         <verticalScrollbar>false</verticalScrollbar>
@@ -62,11 +62,11 @@
         <src>$ACCOUNT/assets/Annotated%20Wireframe.bmml#Callout%20Right%20Marker</src>
       </controlProperties>
     </control>
-    <control controlID="29" controlTypeID="com.balsamiq.mockups::ButtonBar" x="813" y="64" w="173" h="37" measuredW="173" measuredH="29" zOrder="4" locked="false" isInGroup="-1">
+    <control controlID="29" controlTypeID="com.balsamiq.mockups::ButtonBar" x="760" y="64" w="173" h="37" measuredW="173" measuredH="29" zOrder="4" locked="false" isInGroup="-1">
       <controlProperties>
         <text>Add%20Item%2C%20Overrides</text>
       </controlProperties>
     </control>
-    <control controlID="30" controlTypeID="com.balsamiq.mockups::Canvas" x="813" y="93" w="220" h="191" measuredW="100" measuredH="70" zOrder="5" locked="false" isInGroup="-1"/>
+    <control controlID="30" controlTypeID="com.balsamiq.mockups::Canvas" x="760" y="93" w="220" h="191" measuredW="100" measuredH="70" zOrder="5" locked="false" isInGroup="-1"/>
   </controls>
 </mockup>

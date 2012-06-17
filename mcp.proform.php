@@ -54,7 +54,7 @@ class Proform_mcp extends Prolib_mcp {
 
     function Proform_mcp()
     {
-        
+
         prolib($this, 'proform');
 
         // Override the view class so we can inject HTML into our titles and
@@ -62,11 +62,11 @@ class Proform_mcp extends Prolib_mcp {
         $this->EE->view = new PF_View($this->EE->view);
 
         $this->EE->pl_drivers->init();
-        
+
         $this->EE->cp->set_right_nav(array(
                 'home' => TAB_ACTION,
                 'list_fields' => TAB_ACTION.'method=list_fields',
-                'global_form_preferences' => TAB_ACTION.'method=global_form_preferences'
+                'module_settings' => TAB_ACTION.'method=module_settings'
                 ));
 
         $this->field_type_options = array(
@@ -95,7 +95,7 @@ class Proform_mcp extends Prolib_mcp {
         {
             $this->field_type_options = $this->config_overrides['field_type_options'];
         }
-        
+
         // list available drivers field types to add to the form
         $field_drivers = $this->EE->pl_drivers->get_drivers('field');
         if(count($field_drivers))
@@ -281,17 +281,17 @@ class Proform_mcp extends Prolib_mcp {
         return $result;
     }
 
-    function global_form_preferences()
+    function module_settings()
     {
         if($_SERVER['REQUEST_METHOD'] == 'POST')
         {
-            $this->process_global_form_preferences();
+            $this->process_module_settings();
         }
 
         $vars = array();
-        $this->sub_page('tab_global_form_preferences');
+        $this->sub_page('tab_module_settings');
 
-        $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=global_form_preferences';
+        $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=module_settings';
         $vars['editing'] = FALSE;
         $vars['form'] = array();
 
@@ -299,50 +299,69 @@ class Proform_mcp extends Prolib_mcp {
         $this->EE->load->library('proform_notifications');
         $prefs = $this->EE->formslib->prefs->get_preferences();
         $prefs = $this->EE->pl_drivers->get_preferences($prefs);
+
+        ksort($this->EE->formslib->__advanced_settings_options);
+        $vars['advanced_settings_options'] = $this->EE->formslib->__advanced_settings_options;
+        $vars['settings'] = array();
+
+        // Filter out advanced settings keys so they are not shown in the normal settings form
+        $advanced_keys = array_keys($this->EE->formslib->__advanced_settings_options);
+        $default_keys = array_keys($this->EE->formslib->default_prefs);
         
         foreach($prefs as $pref => $value)
         {
-            $f_name = 'pref_' . $pref;
-
-            switch($f_name)
+            if(!in_array($pref, $default_keys))
             {
-                case 'pref_notification_template_group':
-                    $groups = $this->EE->proform_notifications->get_template_group_names();
-                    $groups = array(0 => 'None') + $groups;
-                    $control = form_dropdown($f_name, $groups, $value);
-                    break;
-                case 'pref_safecracker_integration_on':
-                case 'pref_safecracker_separate_channels_on':
-                    $control = form_checkbox($f_name, 'y', $value == 'y');
-                    break;
-                case 'pref_safecracker_field_group_id':
-                    $groups = $this->EE->formslib->get_field_group_options();
-                    $control = form_dropdown($f_name, $groups, $value);
-                    break;
-                default:
-                    $control = form_input($f_name, $value);
+                $vars['settings'][$pref] = $value;
+            } else {
+                $f_name = 'pref_' . $pref;
+
+                switch($f_name)
+                {
+                    case 'pref_notification_template_group':
+                        $groups = $this->EE->proform_notifications->get_template_group_names();
+                        $groups = array(0 => 'None') + $groups;
+                        $control = form_dropdown($f_name, $groups, $value);
+                        break;
+                    case 'pref_safecracker_integration_on':
+                    case 'pref_safecracker_separate_channels_on':
+                        $control = form_checkbox($f_name, 'y', $value == 'y');
+                        break;
+                    case 'pref_safecracker_field_group_id':
+                        $groups = $this->EE->formslib->get_field_group_options();
+                        $control = form_dropdown($f_name, $groups, $value);
+                        break;
+                    default:
+                        $control = form_input($f_name, $value);
+                }
+                $vars['form'][] = array('lang_field' => $f_name, 'label' => lang($f_name), 'control' => $control);
             }
-            $vars['form'][] = array('lang_field' => $f_name, 'label' => lang($f_name), 'control' => $control);
         }
 
+        ksort($vars['settings']);
+        
         $this->_add_key_warnings($vars);
         $this->EE->load->library('table');
-        if ($this->EE->extensions->active_hook('proform_global_form_preferences') === TRUE)
+        if ($this->EE->extensions->active_hook('proform_module_settings') === TRUE)
         {
-            $vars = $this->EE->extensions->call('proform_global_form_preferences', $this, $vars);
+            $vars = $this->EE->extensions->call('proform_module_settings', $this, $vars);
         }
-        return $this->EE->load->view('generic_edit', $vars, TRUE);
+        $vars['hidden']['active_tabs'] = ($s = $this->EE->input->get_post('active_tabs')) ? $s : 'tab-content-settings';
+        return $this->EE->load->view('module_settings', $vars, TRUE);
     }
 
-    function process_global_form_preferences()
+    function process_module_settings()
     {
         $this->EE->load->library('formslib');
         // returns an array of preferences as name => value pairs
         $prefs = $this->EE->formslib->prefs->get_preferences();
         $prefs = $this->EE->pl_drivers->get_preferences($prefs);
-        
+
         $this->EE->pl_drivers->set_preferences();
-        
+
+        // Look for normal preferences - these always have a default value
+        // and are always sent as their own POST value, not inside of the
+        // settings array.
         foreach($prefs as $pref => $existing_value)
         {
             $f_name = 'pref_' . $pref;
@@ -367,9 +386,45 @@ class Proform_mcp extends Prolib_mcp {
                 }
             }
         }
-        if ($this->EE->extensions->active_hook('proform_process_global_form_preferences') === TRUE)
+        
+        //////////
+        // Try to find advanced settings
+        $advanced_settings = $this->EE->input->post('settings');
+        if(!$advanced_settings) $advanced_settings = array();
+        
+        // Combine all possible sources of preference keys - include the
+        // advanced settings options, advanced settings passed in from POST,
+        // as well as currently saved preferences (which may be old advanced
+        // preferences or otherwise undocumented preferences).
+        $all_preference_keys = array_unique(array_merge(
+            array_keys($this->EE->formslib->__advanced_settings_options),
+            array_keys($advanced_settings),
+            array_keys($prefs)));
+
+        // Loop over our list of keys, looking for advanced preferences to
+        // update or delete
+        foreach($all_preference_keys as $pref)
         {
-            $this->EE->extensions->call('proform_process_global_form_preferences', $this);
+            // Value is set in the settings array, update in the DB
+            if(isset($advanced_settings[$pref]))
+            {
+                $this->EE->formslib->prefs->set($pref, $advanced_settings[$pref]);
+            } else {
+                // No value set in the settings array, but make sure this isn't a normal
+                // preferences passed in it's own POST value. If not, then get rid
+                // of it since the user must have deleted it from the advanced settings
+                // list.
+                if(!$this->EE->input->post('pref_'.$pref))
+                {
+                    $this->EE->formslib->prefs->del($pref);
+                }
+            }
+        }
+        // exit;
+        
+        if ($this->EE->extensions->active_hook('proform_process_module_settings') === TRUE)
+        {
+            $this->EE->extensions->call('proform_process_module_settings', $this);
         }
         return TRUE;
     }
@@ -487,7 +542,13 @@ class Proform_mcp extends Prolib_mcp {
         $template_options = array(0 => 'None') + $template_options;
 
         //unset($form_obj->form_id);
-        $vars['settings'] = (isset($form_obj) AND $form_obj) ? $form_obj->settings : array();
+        if(isset($form_obj) AND $form_obj) {
+            ksort($form_obj->settings);
+            $vars['settings'] = $form_obj->settings;
+        } else {
+            $vars['settings'] = array();
+        }
+        ksort($form_obj->__advanced_settings_options);
         $vars['advanced_settings_options'] = $form_obj->__advanced_settings_options;
 
         unset($form_obj->settings);
@@ -514,8 +575,8 @@ class Proform_mcp extends Prolib_mcp {
                                         ? array('read_only_checkbox', lang('encryption_toggle_disabled'))
                                         : array('checkbox', 'y'),
             'safecracker_channel_id' => array('dropdown', $channel_options),
-            
-            
+
+
             'reply_to_field' => array('dropdown', $form_field_options),
             'submitter_email_field' => array('dropdown', $form_field_options),
             'submitter_reply_to_field' => array('dropdown', $form_field_options),
@@ -535,7 +596,7 @@ class Proform_mcp extends Prolib_mcp {
         $edit_form = $this->EE->pl_forms->create_cp_form($form_obj, $types, $extra);
 
         // usort($edit_form, array($form_obj, 'cmp_fields_sort'));
-        
+
         $vars['form'] = $edit_form;
         $vars['_form_title'] = lang($form_obj->form_type.'_title');
         $vars['_form_description'] = lang($form_obj->form_type.'_desc');
@@ -562,7 +623,7 @@ class Proform_mcp extends Prolib_mcp {
                 );
                 break;
         }
-        
+
         $vars['hidden_fields'][] = 'site_id';
 
         if($this->EE->config->item('proform_allow_encrypted_form_data') != 'y')
@@ -627,7 +688,7 @@ class Proform_mcp extends Prolib_mcp {
         if($form)
         {
             $vars['view_entries_link']     = ACTION_BASE.'method=list_entries'.AMP.'form_id='.$form->form_id;
-            
+
             foreach($form->fields() as $field)
             {
                 $row_array = $field->to_array();;
@@ -652,7 +713,7 @@ class Proform_mcp extends Prolib_mcp {
                                         'class'     =>'toggle');
 
                 $row_array['driver'] = $field->get_driver();
-                
+
                 $vars['fields'][] = $row_array;
             }
         }
@@ -701,7 +762,7 @@ class Proform_mcp extends Prolib_mcp {
         if(!$form_id || $form_id <= 0) show_error(lang('missing_form_id'));
 
         $form = $this->EE->formslib->forms->get($form_id);
-        
+
         // If no advanced settings were sent to us, we need to remove any that
         // might have been saved before (perhaps they have all been removed from
         // the list, which would stop any array from being sent to us at all).
@@ -946,9 +1007,9 @@ class Proform_mcp extends Prolib_mcp {
 
             $this->EE->load->library('table');
             $this->_get_flashdata($vars);
-            
+
             $vars = $this->EE->pl_drivers->call($this->EE->input->post('type'), 'field_remove', array($field, $vars));
-            
+
             return $this->EE->load->view('remove_field', $vars, TRUE);
         }
         else
@@ -1136,7 +1197,7 @@ class Proform_mcp extends Prolib_mcp {
                 $form->assign_field($field);
 
                 $this->EE->session->set_flashdata('message', lang('msg_field_created_added'));
-                
+
                 // Allow a driver to customize the redirect
                 if($this->EE->pl_drivers->call($this->EE->input->post('type'), 'edit_field_process_done', array($field, $auto_add_form_id, TRUE)))
                 {
@@ -1273,7 +1334,7 @@ class Proform_mcp extends Prolib_mcp {
 
     function process_edit_field()
     {
- 
+
         $this->EE->pl_drivers->call($this->EE->input->post('type'), 'edit_field_process');
 
         // run form validation
@@ -1285,10 +1346,10 @@ class Proform_mcp extends Prolib_mcp {
 
 
         if(!$field_id || $field_id <= 0) show_error(lang('invalid_field_id'));
-        
+
         // Check for a valid field name. We need to prevent some built-in reserved field
         // names from being used.
-        if(!trim($field_name) 
+        if(!trim($field_name)
             || $field_name == "form_entry_id" || $field_name == "updated" || $field_name == "ip_address"
             || $field_name == "user_agent" || $field_name == "dst_enabled")
                 show_error(lang('invalid_field_name') . ': ' . htmlentities($field_name));
@@ -1708,9 +1769,9 @@ class Proform_mcp extends Prolib_mcp {
         } else {
             $data = $entries;
         }
-        
+
         $vars['entries'] = $data;
-        
+
         // $sorted_data = array();
         // foreach($data as $unsorted)
         // {
@@ -1752,18 +1813,18 @@ class Proform_mcp extends Prolib_mcp {
 
         $headings = array('form_entry_id' => 'ID', 'updated' => 'Last Updated');
         $field_order = array('form_entry_id', 'updated');
-        
+
         $vars['fields'] = array('updated');
         $vars['field_types'] = array('updated' => 'datetime');
         foreach($fields as $field)
         {
             if($field->heading) continue;
             if($field->get_form_field_setting('show_in_listing', 'n') != 'y') continue;
-            
+
             $vars['fields'][] = $field->field_name;
             $vars['field_types'][$field->field_name] = $field->type;
             $vars['field_upload_prefs'][$field->field_name] = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
-            
+
             if(array_search($field->field_name, $vars['hidden_columns']) === FALSE)
             {
                 // Prepare headings from lang file and from Field configs
@@ -1775,9 +1836,9 @@ class Proform_mcp extends Prolib_mcp {
                     $headings[$field->field_name] = lang('heading_' . $field->field_name);
                 }
             }
-            
+
             $field_order[] = $field->field_name;
-            
+
             if($driver = $field->get_driver())
             {
                 if(method_exists($driver, 'list_data'))
@@ -1803,11 +1864,11 @@ class Proform_mcp extends Prolib_mcp {
                     '<a href="'.$vars['delete_entry_url'].'&entry_id='.$entry->form_entry_id.'" class="pl_confirm" rel="Are you sure you want to delete this entry?">Delete</a>');
 
             $action_list .= '</span>';
-            
+
             //'<a href="'.$view_entry_url.'&entry_id='.$entry->form_entry_id.'">'.htmlspecialchars($entry->form_entry_id).'</a>'
             $entry->_commands = $action_list;
         }
-        
+
         $vars = $this->prolib->pl_drivers->list_entries_data($vars);
         $vars['pl_drivers'] = &$this->prolib->pl_drivers;
         if ($this->EE->extensions->active_hook('proform_list_entries') === TRUE)
@@ -1817,7 +1878,7 @@ class Proform_mcp extends Prolib_mcp {
         $output = $this->EE->load->view('list_entries', $vars, TRUE);
         return $this->prolib->pl_drivers->list_entries_view($output);
     }
-    
+
 
     function view_form_entry()
     {
@@ -1841,7 +1902,7 @@ class Proform_mcp extends Prolib_mcp {
             $vars['editing'] = TRUE;
             $vars['hidden'] = array('form_id' => $form_id, 'form_entry_id' => $form_entry_id);
             $vars['hidden_fields'] = array('dst_enabled');
-            
+
             unset($form_obj->settings);
 
             $types = array(
@@ -1850,7 +1911,7 @@ class Proform_mcp extends Prolib_mcp {
                 'ip_address' => 'read_only',
                 'user_agent' => 'read_only'
             );
-            
+
             $field_names = array();
             foreach($form_obj->fields() as $field)
             {
@@ -1877,9 +1938,9 @@ class Proform_mcp extends Prolib_mcp {
                         $types[$field->field_name] = 'read_only';
                         break;
                 }
-                
+
             }
-            
+
             // Hide any special db fields added by drivers
             foreach($form_obj->db_fields() as $field_name)
             {
@@ -1888,9 +1949,9 @@ class Proform_mcp extends Prolib_mcp {
                     $vars['hidden_fields'][] = $field_name;
                 }
             }
-            
+
             $vars['field_names'] = $field_names;
-            
+
             $vars['generic_edit_embedded'] = TRUE;
             //var_dump($form_obj);
             $form = $this->EE->pl_forms->create_cp_form($entry, $types);
@@ -2036,16 +2097,16 @@ class Proform_mcp extends Prolib_mcp {
 
             $entry = $form_obj->get_entry($form_entry_id);
             $data = array();
-            
+
             foreach($entry as $field => $current_value)
-            {                                                                                                  
+            {
                 $new_value = $this->EE->input->post($field);
                 if($new_value !== FALSE && $new_value != $current_value)
                 {
                     $data[$field] = $new_value;
                 }
             }
-            
+
             if(count($data) > 0)
             {
                 $form_obj->update_entry($form_entry_id, $data);
@@ -2191,14 +2252,14 @@ class Proform_mcp extends Prolib_mcp {
                 foreach($form as $key => $cell)
                 {
                     if(substr($key, 0, 2) == "__" || is_object($cell) || is_array($cell)) continue;
-                
+
                     $n = 40 - strlen($key);
                     if($n < 0) $n = 0;
 
                     echo '<tr><td><b>'.$key.'</b></td><td>'.nl2br(htmlentities($cell)).'</td>';
                 }
                 echo '</table><br/><br/>';
-            
+
                 foreach($entries as $row)
                 {
                     echo '<table width="100%" border="1" cellspacing="0" cellpadding="5">';
@@ -2214,13 +2275,13 @@ class Proform_mcp extends Prolib_mcp {
                 foreach($form as $key => $cell)
                 {
                     if(substr($key, 0, 2) == "__" || is_object($cell) || is_array($cell)) continue;
-                    
+
                     $n = 40 - strlen($key);
                     if($n < 0) $n = 0;
                     echo $key.str_repeat(' ', $n).': '.$cell."\n";
                 }
                 echo "\n================================================================================\n\n";
-                
+
                 foreach($entries as $row)
                 {
                     foreach($row as $key => $cell)
@@ -2441,7 +2502,7 @@ class Proform_mcp extends Prolib_mcp {
         $vars['message'] = $this->EE->session->flashdata('message') ? $this->EE->session->flashdata('message') : false;
         $vars['error'] = $this->EE->session->flashdata('error') ? $this->EE->session->flashdata('error') : false;
     }
-    
+
 }
 
 
