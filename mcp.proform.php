@@ -52,6 +52,27 @@ class Proform_mcp extends Prolib_mcp {
     var $pipe_length = 1;
     var $perpage = 20;
 
+    public static $item_options = array(
+        array('label' => 'Checkbox',                    'type' => 'checkbox',                   'icon' => 'checkbox.png'),
+        array('label' => 'Text',                        'type' => 'string',                     'icon' => 'textfield.png'),
+        array('label' => 'Textarea',                    'type' => 'text',                       'icon' => 'textarea.png',       'length' => '1000',),
+        array('label' => 'Number: Integer',             'type' => 'int',                        'icon' => 'number.png'),
+        array('label' => 'Number: Float',               'type' => 'float',                      'icon' => 'float.png'),
+        array('label' => 'Number: Currency',            'type' => 'currency',                   'icon' => 'currency.png'),
+        array('label' => 'Date',                        'type' => 'date',                       'icon' => 'calendar_view_day.png'),
+        array('label' => 'Time',                        'type' => 'time',                       'icon' => 'time.png'),
+        array('label' => 'Date Time',                   'type' => 'datetime',                   'icon' => 'datetime.png'),
+        array('label' => 'File Upload',                 'type' => 'file',                       'icon' => 'page_attach.png'),
+        array('label' => 'List',                        'type' => 'list',                       'icon' => 'select.png'),
+        // array('label' => 'Quantity Group List',         'type' => 'Quantity Group List',         'icon' => 'email_add.png'),
+        array('label' => 'Hidden',                      'type' => 'hidden',                     'icon' => 'hidden.png'),
+        array('label' => 'Secure Hidden',               'type' => 'secure',                     'icon' => 'secure.png'),
+        array('label' => 'Member Data',                 'type' => 'member_data',                'icon' => 'user_gray.png'),
+        array('label' => 'Mailing List Subscription',   'type' => 'mailinglist',                'icon' => 'email_add.png'),
+        // array('label' => 'Field Group',                 'type' => 'fieldgroup',                 'icon' => 'textfield.png'),
+        array('label' => 'Channel Entry Relationship',   'type' => 'relationship',              'icon' => 'select.png'),
+    );
+
     function Proform_mcp()
     {
 
@@ -69,6 +90,12 @@ class Proform_mcp extends Prolib_mcp {
                 'module_settings' => TAB_ACTION.'method=module_settings'
                 ));
 
+        $this->config_overrides = $this->EE->config->item('proform');
+
+        //////////
+        // Setup available field types and their options
+
+        // TODO: This really needs to be combined with Proform_mcp::$item_options
         $this->field_type_options = array(
             'checkbox'      => 'Checkbox',
             'date'          => 'Date',
@@ -87,14 +114,30 @@ class Proform_mcp extends Prolib_mcp {
             'hidden'        => 'Hidden',
             'secure'        => 'Secure Hidden',
             'member_data'   => 'Member Data',
+            'relationship'  => 'Channel Entry Relationship',
         );
 
-        $this->config_overrides = $this->EE->config->item('proform');
+        $this->field_type_settings = array(
+            'list' => array(
+                array('type' => 'dropdown', 'name' => 'style', 'label' => 'Style', 'options' => array('' => 'Select Box', 'check' => 'Checkboxes', 'radio' => 'Radio Buttons')),
+                array('type' => 'dropdown', 'name' => 'multiselect', 'label' => 'Allow multiple selections?', 'options' => array('' => 'No', 'y' => 'Yes')),
+                array('type' => 'textarea', 'name' => 'list', 'label' => 'Options')
+            ),
+            'member_data' => array(
+                array('type' => 'dropdown', 'name' => 'member_data', 'label' => 'Field',
+                      'options' => $this->prolib->pl_forms->simple_select_options($this->member_field_options()))
+            ),
+            'relationship' => array(
+                array('type' => 'multiselect', 'name' => 'channels[]', 'label' => 'Allowed Channels',
+                      'options' => $this->channel_options()),
+                array('type' => 'multiselect', 'name' => 'categories[]', 'label' => 'Allowed Categories',
+                      'options' => $this->category_options())
+            ),
+        );
 
-        if(isset($this->config_overrides['field_type_options']))
-        {
-            $this->field_type_options = $this->config_overrides['field_type_options'];
-        }
+        $this->field_validation_options = array(
+            'none' => 'None'
+        );
 
         // list available drivers field types to add to the form
         $field_drivers = $this->EE->pl_drivers->get_drivers('field');
@@ -107,52 +150,15 @@ class Proform_mcp extends Prolib_mcp {
             }
         }
 
-        if(isset($this->config_overrides['member_field_options']))
+        // Note: A config override has to supply *all* types that should be available,
+        // including drivers!
+        if(isset($this->config_overrides['field_type_options']))
         {
-            $this->member_field_options = $this->config_overrides['member_field_options'];
-        }
-        else
-        {
-            if(isset($this->config_overrides['member_field_options_simple']) AND $this->config_overrides['member_field_options_simple'] == 'y')
-            {
-                $default = array('member_id', 'group_id', 'username', 'screen_name', 'email', 'language');
-
-                // Get all CUSTOM member fields
-                $fields = $this->EE->db->query("SELECT m_field_id AS field_id,
-                                        m_field_name AS field_name,
-                                        m_field_label AS field_label
-                                        FROM exp_member_fields");
-
-                $custom = array();
-
-                foreach($fields->result_array() as $row)
-                {
-                    $custom[] = $row['field_name'];
-                }
-
-                $this->member_field_options = array_merge($default, $custom);
-            }
-            else
-            {
-                $this->member_field_options = array_keys($this->EE->session->userdata);
-            }
+            $this->field_type_options = $this->config_overrides['field_type_options'];
         }
 
-        $this->field_type_settings = array(
-            'list' => array(
-                array('type' => 'dropdown', 'name' => 'style', 'label' => 'Style', 'options' => array('' => 'Select Box', 'check' => 'Checkboxes', 'radio' => 'Radio Buttons')),
-                array('type' => 'dropdown', 'name' => 'multiselect', 'label' => 'Allow multiple selections?', 'options' => array('' => 'No', 'y' => 'Yes')),
-                array('type' => 'textarea', 'name' => 'list', 'label' => 'Options')
-            ),
-            'member_data' => array(
-                array('type' => 'dropdown', 'name' => 'member_data', 'label' => 'Field',
-                      'options' => $this->prolib->pl_forms->simple_select_options($this->member_field_options))
-            ),
-        );
-
-        $this->field_validation_options = array(
-            'none' => 'None'
-        );
+        //////////
+        // Setup the skin
 
         $this->EE->cp->add_to_head('<link rel="stylesheet" href="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/styles/main.css" type="text/css" media="screen" />');
         $this->EE->cp->add_to_head('<link rel="stylesheet" href="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/styles/jquery.contextMenu.css" type="text/css" media="screen" />');
@@ -307,7 +313,7 @@ class Proform_mcp extends Prolib_mcp {
         // Filter out advanced settings keys so they are not shown in the normal settings form
         $advanced_keys = array_keys($this->EE->formslib->__advanced_settings_options);
         $default_keys = array_keys($this->EE->formslib->default_prefs);
-        
+
         foreach($prefs as $pref => $value)
         {
             if(!in_array($pref, $default_keys))
@@ -339,7 +345,7 @@ class Proform_mcp extends Prolib_mcp {
         }
 
         ksort($vars['settings']);
-        
+
         $this->_add_key_warnings($vars);
         $this->EE->load->library('table');
         if ($this->EE->extensions->active_hook('proform_module_settings') === TRUE)
@@ -386,12 +392,12 @@ class Proform_mcp extends Prolib_mcp {
                 }
             }
         }
-        
+
         //////////
         // Try to find advanced settings
         $advanced_settings = $this->EE->input->post('settings');
         if(!$advanced_settings) $advanced_settings = array();
-        
+
         // Combine all possible sources of preference keys - include the
         // advanced settings options, advanced settings passed in from POST,
         // as well as currently saved preferences (which may be old advanced
@@ -421,7 +427,7 @@ class Proform_mcp extends Prolib_mcp {
             }
         }
         // exit;
-        
+
         if ($this->EE->extensions->active_hook('proform_process_module_settings') === TRUE)
         {
             $this->EE->extensions->call('proform_process_module_settings', $this);
@@ -543,6 +549,7 @@ class Proform_mcp extends Prolib_mcp {
 
         //unset($form_obj->form_id);
         if(isset($form_obj) AND $form_obj) {
+            if(!is_array($form_obj->settings)) $form_obj->settings = array();
             ksort($form_obj->settings);
             $vars['settings'] = $form_obj->settings;
         } else {
@@ -669,7 +676,7 @@ class Proform_mcp extends Prolib_mcp {
             }
         }
 
-        $vars['item_options'] = PL_Field::$item_options;
+        $vars['item_options'] = Proform_mcp::$item_options;
 
 
         // list available driver field types to add to the form
@@ -1165,12 +1172,27 @@ class Proform_mcp extends Prolib_mcp {
         unset($data['form_field_settings']);
 
         // add the field
-        $settings = array();
+        $settings = array(
+            '_type' => $this->EE->input->post('type')
+        );
 
+        /*
         if($this->EE->input->post('type_list'))
             $settings['type_list'] = $this->EE->input->post('type_list');
-        if($this->EE->input->post('type_member_data'))
+        if($this->EE->input->post('type_member_data') && $this->EE->input->post($k))
             $settings['type_member_data'] = $this->EE->input->post('type_member_data');
+        */
+
+        // Copy type specific settings
+        foreach($_POST as $k => $junk)
+        {
+            // The member data field select has no blank default, so skip it if this isn't a member_data field
+            if($k == 'type_member_data' && $this->EE->input->post('type') != 'member_data') continue;
+            if(substr($k, 0, 5) == "type_" && $this->EE->input->post($k))
+            {
+                $settings[$k] = $this->EE->input->post($k);
+            }
+        }
 
         $data['settings'] = $settings;
 
@@ -1358,8 +1380,11 @@ class Proform_mcp extends Prolib_mcp {
         $this->EE->load->library('formslib');
         $field = $this->EE->formslib->fields->get($field_id);
 
-        $settings = array();
+        $settings = array(
+            '_type' => $this->EE->input->post('type')
+        );
 
+        /*
         // doing this based on if there is a value, not if the type is set - in case someone picks the
         // wrong type we don't want to lose their settings.
         if($this->EE->input->post('type_list')) {
@@ -1369,6 +1394,18 @@ class Proform_mcp extends Prolib_mcp {
         }
         if($this->EE->input->post('type_member_data'))
             $settings['type_member_data'] = $this->EE->input->post('type_member_data');
+        */
+
+        // Copy type specific settings
+        foreach($_POST as $k => $junk)
+        {
+            // The member data field select has no blank default, so skip it if this isn't a member_data field
+            if($k == 'type_member_data' && $this->EE->input->post('type') != 'member_data') continue;
+            if(substr($k, 0, 5) == "type_" && $this->EE->input->post($k))
+            {
+                $settings[$k] = $this->EE->input->post($k);
+            }
+        }
 
         // copy post values defined on the field class to it
         $this->prolib->copy_post($field);
@@ -1824,6 +1861,7 @@ class Proform_mcp extends Prolib_mcp {
             $vars['fields'][] = $field->field_name;
             $vars['field_types'][$field->field_name] = $field->type;
             $vars['field_upload_prefs'][$field->field_name] = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
+            $vars['field_options'][$field->field_name] = $field->get_list_options();
 
             if(array_search($field->field_name, $vars['hidden_columns']) === FALSE)
             {
@@ -1934,6 +1972,22 @@ class Proform_mcp extends Prolib_mcp {
                     // case 'text':
                     //     $types[$field->field_name] = 'textarea';
                     //     break;
+                    case 'list':
+                    case 'relationship':
+                        $value = explode('|', $entry->$field_name);
+                        $field_options = $field->get_list_options();
+                        $cell = '<span class="value_'.$field->type.'">';
+                            foreach($field_options as $option)
+                            {
+                                if(in_array($option['key'], $value))
+                                {
+                                    $cell .= $option['label'].' ['.$option['key'].']<br/>';
+                                }
+                            }
+                        $cell .= '</span>';
+                        $entry->$field_name = $cell;
+                        $types[$field->field_name] = 'static';
+                        break;
                     default:
                         $types[$field->field_name] = 'read_only';
                         break;
@@ -2503,10 +2557,86 @@ class Proform_mcp extends Prolib_mcp {
         $vars['error'] = $this->EE->session->flashdata('error') ? $this->EE->session->flashdata('error') : false;
     }
 
+    function member_field_options()
+    {
+        if(!isset($this->member_field_options) || !$this->member_field_options)
+        {
+            if(isset($this->config_overrides['member_field_options']))
+            {
+                $this->member_field_options = $this->config_overrides['member_field_options'];
+            }
+            else
+            {
+                if(isset($this->config_overrides['member_field_options_simple']) AND $this->config_overrides['member_field_options_simple'] == 'y')
+                {
+                    $default = array('member_id', 'group_id', 'username', 'screen_name', 'email', 'language');
+
+                    // Get all CUSTOM member fields
+                    $fields = $this->EE->db->query("SELECT m_field_id AS field_id,
+                                            m_field_name AS field_name,
+                                            m_field_label AS field_label
+                                            FROM exp_member_fields");
+
+                    $custom = array();
+
+                    foreach($fields->result_array() as $row)
+                    {
+                        $custom[] = $row['field_name'];
+                    }
+
+                    $this->member_field_options = array_merge($default, $custom);
+                }
+                else
+                {
+                    $this->member_field_options = array_keys($this->EE->session->userdata);
+                }
+            }
+        }
+
+        return $this->member_field_options;
+    }
+
+    function channel_options()
+    {
+        $result = array(
+            '' => 'All Channels'
+        );
+
+        $this->EE->load->library('api');
+        $this->EE->api->instantiate('channel_structure');
+        $channels = $this->EE->api_channel_structure->get_channels();
+        if ($channels != FALSE AND $channels->num_rows() > 0)
+        {
+            foreach($channels->result() as $channel)
+            {
+                $result[$channel->channel_id] = $channel->channel_title;
+            }
+        }
+        return $result;
+    }
+
+    function category_options()
+    {
+        $result = array(
+            '' => 'All Categories'
+        );
+
+        $categories = $this->EE->db
+            ->where('exp_categories.site_id', $this->prolib->site_id)
+            ->join('exp_category_groups', 'exp_category_groups.group_id = exp_categories.group_id')
+            ->get('exp_categories');
+        if ($categories != FALSE AND $categories->num_rows() > 0)
+        {
+            foreach($categories->result() as $category)
+            {
+                $result[$category->cat_id] = $category->group_name . ': ' . $category->cat_name;
+            }
+        }
+
+        return $result;
+    }
+
 }
-
-
-
 
 
 

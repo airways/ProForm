@@ -150,6 +150,7 @@
     <li><a href="#param_message">message:required="This field is required!", message:*=""</a></li>
     <li><a href="#param_notify">notify="sample@example.com"</a></li>
     <li><a href="#param_step">step="1"</a></li>
+    <li><a href="#param_site">site="default_site"</a></li>
     <li><a href="#param_variable_prefix">variable_prefix="pf_"</a></li>
     <li><a href="#param_thank_you_url">thank_you_url="forms/thank-you"</a></li>
 </ul>
@@ -311,6 +312,10 @@
 
 <p>By default, <dfn>ProForm</dfn> manages the active step using a session and hidden values passed inside the form. This parameter allows you to override this default behavior and specify the step to load based on your own criteria.</p>
 
+
+<h3><a name="param_site">site="default_site"</a></h3>
+
+<p>The <b>site</b> param allows you to override the active site that ProForm looks for forms within. This allows you to make sure of forms from other sites within other sites in your MSM install.</p>
 
 <h3><a name="param_last_step_summary">last_step_summary="yes"</a></h3>
 
@@ -690,7 +695,7 @@
 <p>The following variable pairs are available inside the {fields} pair.</p>
 
 <ul>
-    <li><a href="#pair_field_setting_list">{field_setting_list}</a></li>
+    <li><a href="#pair_field_options">{field_options}</a> (formerly {field_setting_list})</li>
     <li><a href="#pair_field_validation">{field_validation}</a></li>
 </ul>
 
@@ -802,25 +807,33 @@
 
 <h5>{fields} Variable Pairs</h5>
 
-<h6><a name="pair_field_setting_list">{field_setting_list}</a></h6>
-<p><strong>Only valid for 'select' type fields</strong>. The {field_setting_list} loop, which must be used inside of the {fields} pair, provides a list of all of the options available for fields with the type <b>list</b>.</p>
+<h6><a name="pair_field_options">{field_options}</a></h6>
+<p><strong>Only valid for List and Relationship type fields</strong>. The {field_options} loop, which must be used inside of the {fields} pair, provides a list of all of the options available for fields with the type <b>list</b>.</p>
+
+<div class="tip">
+    <h6>Note</h6>
+    This variable was previously named {field_setting_list}.
+</div>
+
+<p>For a Relationship type field, this is a dynamically generated list of the available options based on the configured Channels and Categories.</p>
+
 
 <p>This variable pair has two variables available for each option:</p>
 
 <ul>
   <li><strong>{key}</strong> - the value as stored in the database</li>
-  <li><strong>{row}</strong> - the label of the value shown to the user</li>
+  <li><strong>{label}</strong> - the label of the value shown to the user (formerly {row})</li>
 </ul>
 
 <div class="tip">
     <h6>Example Usage</h6>
     <pre class="brush: xml">
         &#123;fields&#125;
-        &#123;if field_control == 'select'&#125;
+        &#123;if field_type == 'list' || field_type == 'relationship'&#125;
           &lt;select id="{field_name}" name="{field_name}"&gt;
-            &#123;field_setting_list&#125;
-            &lt;option value="{key}"&gt;&#123;row&#125;&lt;/option&gt;
-            &#123;/field_setting_list&#125;
+            &#123;field_options&#125;
+            &lt;option value="{key}"&gt;&#123;label&#125;&lt;/option&gt;
+            &#123;/field_options&#125;
           &lt;/select&gt;
         &#123;/if&#125;
         &#123;/fields&#125;

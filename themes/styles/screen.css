@@ -49,6 +49,14 @@ Create Field
 	height: 140px;
 }
 
+.edit_settings div {
+    margin-bottom: 5px;
+}
+
+.edit_settings div label {
+    display: block;
+}
+
 /* ---------------------------------------------------------------------
 Main Nav buttons
 ------------------------------------------------------------------------ */

@@ -69,28 +69,31 @@ var proform_mod = {
         });
 
         var active_tabs = $('input[name=active_tabs]').val();
-        
         var tab = 1;
-        if(active_tabs.indexOf('tab-content-settings') !== -1) tab = 1;
-        if(active_tabs.indexOf('tab-content-advanced') !== -1) tab = 2;
-        if(active_tabs.indexOf('tab-content-layout') !== -1) tab = 3;
-        switch(tab)
+
+        if(active_tabs)
         {
-            case 1:
-                proform_mod.activate_tab('main', 'tab-content-settings', true);
-                break;
-            case 2:
-                proform_mod.activate_tab('main', 'tab-content-advanced', true);
-                break;
-            case 3:
-                proform_mod.activate_tab('main', 'tab-content-layout', true);
-                break;
-        }
-        
-        if(active_tabs.indexOf('tab-content-override') !== -1) {
-            proform_mod.activate_tab('sidebar', 'tab-content-override', true);
-        } else {
-            proform_mod.activate_tab('sidebar', 'tab-content-add-item', true);
+            if(active_tabs.indexOf('tab-content-settings') !== -1) tab = 1;
+            if(active_tabs.indexOf('tab-content-advanced') !== -1) tab = 2;
+            if(active_tabs.indexOf('tab-content-layout') !== -1) tab = 3;
+            switch(tab)
+            {
+                case 1:
+                    proform_mod.activate_tab('main', 'tab-content-settings', true);
+                    break;
+                case 2:
+                    proform_mod.activate_tab('main', 'tab-content-advanced', true);
+                    break;
+                case 3:
+                    proform_mod.activate_tab('main', 'tab-content-layout', true);
+                    break;
+            }
+
+            if(active_tabs.indexOf('tab-content-override') !== -1) {
+                proform_mod.activate_tab('sidebar', 'tab-content-override', true);
+            } else {
+                proform_mod.activate_tab('sidebar', 'tab-content-add-item', true);
+            }
         }
 
         proform_mod.update_active_tabs();

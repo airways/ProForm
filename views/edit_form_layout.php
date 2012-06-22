@@ -124,7 +124,8 @@ $alt = FALSE;
                         <label class="field-label label-checkbox"><?php echo $display_label; ?></label>
                     <?php
                         break;
-                    case 'list': ?>
+                    case 'list':
+                    case 'relationship': ?>
                         <label class="field-label label-checkbox"><?php echo $display_label; ?></label>
                         <?php
                         $type = isset($field['settings']['type_style']) ? $field['settings']['type_style'] : '';

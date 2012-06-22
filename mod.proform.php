@@ -70,6 +70,9 @@ class Proform {
     {
         prolib($this, 'proform');
 
+        $this->EE->load->library('formslib');
+
+
         $this->EE->db->cache_off();
 
         if (!isset($this->EE->session->cache['proform']))
@@ -116,7 +119,8 @@ class Proform {
     {
         $template = pf_strip_id(strip_tags($this->EE->TMPL->fetch_param('template', 'default')));
         $prefix   = pf_strip_id(strip_tags($this->EE->TMPL->fetch_param('prefix', 'prefix')));
-
+        $this->_set_site();
+        
         $form_name = strip_tags($this->EE->TMPL->fetch_param('form_name', $this->EE->TMPL->fetch_param('form', FALSE)));
 
         if(!$form_name)
@@ -201,6 +205,8 @@ class Proform {
         $variable_prefix    = pf_strip_id($this->EE->TMPL->fetch_param('variable_prefix', ''));
         $hidden_fields_mode = strtolower($this->EE->TMPL->fetch_param('hidden_fields_mode', 'split'));
         $last_step_summary  = $this->EE->TMPL->fetch_param('last_step_summary') == 'yes';
+
+        $this->_set_site();
 
         if(count($error_delimiters) != 2)
         {
@@ -1565,7 +1571,7 @@ class Proform {
         {
             // Only process validation for the current form
             if($field->step_no != $form_session->config['step']) continue;
-            if($field->type == 'list')
+            if($field->type == 'list' || $field->type == 'relationship')
             {
                 // Check that the value submitted is one of the available options
                 $options = $field->get_list_options();
@@ -2011,8 +2017,10 @@ class Proform {
 
             $field_value = array_key_exists($field->field_name, $field_values) ? $field_values[$field->field_name] : $field->get_form_field_setting('preset_value');
 
-            if($field->type == 'list')
+            if($field->type == 'list' || $field->type == 'relationship')
             {
+                $field_options = $field->get_list_options($field_values[$field->field_name]);
+
                 if(is_array($field_value))
                 {
                     $field_value_selections = array();
@@ -2026,10 +2034,9 @@ class Proform {
 
                 // Turn the list of selected options into a wrappable array to be parsed
                 $field_value_array = array();
-                $options = $field->get_list_options($field_values[$field->field_name]);
                 foreach($field_value_selections as $key)
                 {
-                    foreach($options as $option)
+                    foreach($field_options as $option)
                     {
                         if($option['key'] == $key)
                         {
@@ -2037,8 +2044,10 @@ class Proform {
                         }
                     }
                 }
+                $field_options = $this->EE->pl_parser->wrap_array($field_options, 'key', 'label');
                 $field_value_wrap = $this->EE->pl_parser->wrap_array($field_value_array, 'key', 'label');
             } else {
+                $field_options = FALSE;
                 $field_value_wrap = FALSE;
             }
 
@@ -2063,6 +2072,7 @@ class Proform {
                                                             : '',
                     'field_value'               => $field_value,
                     'field_values'              => $field_value_wrap,
+                    'field_options'             => $field_options,
                     'field_checked'             => (array_key_exists($field->field_name, $field_checked_flags)
                                                                   && $field_checked_flags[$field->field_name]) ? 'checked="checked"' : '',
                     'field_control'             => $field->get_control(),
@@ -2106,9 +2116,8 @@ class Proform {
                         $k = substr($k, 5);
                     }
 
-                    if($k == 'list' && isset($field_values[$field->field_name]))
+                    if(($k == 'list' || $k == 'relationship') && isset($field_values[$field->field_name]))
                     {
-//  var_dump($field_values[$field->field_name]);exit;
                         $v = $field->get_list_options($field_values[$field->field_name]);
                         $field_array['field_divider_count'] = $field->divider_count;
                         foreach($v as $list_option)
@@ -2253,5 +2262,23 @@ class Proform {
             exit;
         }
     }
+    
+    function _set_site()
+    {
+        $site = pf_strip_id(strip_tags($this->EE->TMPL->fetch_param('site', $this->EE->TMPL->fetch_param('site_name'))));
+        if($site)
+        {
+            $query = $this->EE->db->where('site_name', $site)->get('exp_sites');
+            $this->prolib->site_id = $query->row()->site_id;
+            foreach($this->EE->formslib as $lib)
+            {
+                if(isset($lib->site_id))
+                {
+                    $lib->site_id = $this->prolib->site_id;
+                }
+            }
+        }
+    }
+    
 }
 

@@ -12,6 +12,7 @@
             <li><a href="#form_settings_basic">Basic Settings</a></li>
             <li><a href="#form_settings_notification_list">Notification List Settings</a></li>
             <li><a href="#form_settings_notification_fields">Notification Field Settings</a></li>
+            <li><a href="#form_settings_advanced">Advanced Settings</a></li>
         </ul>
     </li>
     <li><a href="#layout">Form Layout</a>
@@ -82,7 +83,7 @@
     </tbody>
 </table>
 
-<p>Additionally there are some <a href="{root_url}cp/forms/advanced-settings.html">Advanced Settings</a> available.</p>
+<p>Additionally there are some <a href="{root_url}cp/forms/hidden-settings.html">Hidden Settings</a> available.</p>
 
 <h4><a name="form_settings_notification_list">Notification List Settings</a></h4>
 
@@ -180,6 +181,40 @@
         </tr>
     </tbody>
 </table>
+
+<h4><a name="form_settings_advanced">Advanced Settings</a></h4>
+
+<p>The Advanced Settings tab allows you to configure some additional values and extend the functionality of the form. These settings are dependent on which Form Drivers you have installed, so be sure to check the documentation for any additional Drivers to see if they provide additional Advanced Settings.</p>
+
+<p>Some settings may be specific to the template you are using as well, meaning that they only have an effect if the template actually calls them.</p>
+
+<p>All of these settings are available inside a {exp:proform:form} tag through the <b>{pref:*}</b> variables, as shown in the Variable column of this table. Some additional settings are available globally from the module's own <a href="{root_url}cp/settings.html#form_settings_advanced">Advanced Settings</a> tab.</p>
+
+<table>
+    <tbody>
+        <tr>
+            <th width="20%">Name</th>
+            <th width="20%">Variable</th>
+            <th>Description</th>
+            <th width="20%">Example Value</th>
+        </tr>
+        <tr>
+            <td><strong>Label for Extra 1</strong>, <strong>Label for Extra 2</strong></td>
+            <td><strong>{pref:extra1_label}</strong>, <strong>{pref:extra2_label}</strong></td>
+            <td>Changes the label visible under the Layout tab for the Extra 1 or 2 overrides. This can be useful to change the meaning of the Extra field in order to be more user friendly so the editors do not need to remember what you are using the Extra field for.</td>
+            <td>Wrapper HTML Class</td>
+        </tr>
+        <tr>
+            <td><strong>Thank You Message</strong></td>
+            <td><strong>{pref:thank_you_message}</strong></td>
+            <td>Provides a custom message to be used in the default template and by the {exp:proform:simple} tag when the form has been submitted.</td>
+            <td>Thank you for submitting a Support Request! We will get back to you shortly.</td>
+        </tr>
+
+    </tbody>
+</table>
+
+<p>Additionally there are some <a href="./../cp/forms/hidden-settings.html">Hidden Settings</a> available.</p>
 
 <h2><a name="layout">Form Layout</a></h2>
 <p>Forms have a user-defined layout that is created through the Form Layout tab of the form&#39;s settings.</p>

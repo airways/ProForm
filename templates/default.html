@@ -89,9 +89,9 @@
                                     <input type="checkbox" name="{pf_field_name}" id="{pf_field_name}" value="y" {if pf_field_checked}checked="checked"{/if} class="{pf_field_is_required}" /><label for="{pf_field_name}">{pf_field_label}</label>
                                 </div>
                             </div>
-                        {if:elseif pf_field_type == "list"}
+                        {if:elseif pf_field_type == "list" || pf_field_type == "relationship"}
                             {if pf_field_setting_style == "check" || pf_field_setting_style == "radio"}
-                                {pf_field_setting_list}
+                                {pf_field_options}
                                     {if pf_is_divider}
                                         {if pf_divider_number > 0}
                                             </fieldset>
@@ -109,13 +109,13 @@
                                             <label for="{pf_field_name}_{pf_key}">{pf_label}</label>
                                         </div>
                                     {/if}
-                                {/pf_field_setting_list}
+                                {/pf_field_options}
                                 {if pf_divider_count > 0}
                                     </fieldset>
                                 {/if}
                             {if:else}
                                 <select name="{pf_field_name}" id="{pf_field_name}" {if pf_multiple}multiple="multiple"{/if} class="{pf_field_is_required}">
-                                    {pf_field_setting_list}
+                                    {pf_field_options}
                                         {if pf_is_divider}
                                             {if pf_divider_number > 0}
                                                 </optgroup>
@@ -124,7 +124,7 @@
                                         {if:else}
                                             <option value="{pf_key}" {pf_selected}>{pf_row}</option>
                                         {/if}
-                                    {/pf_field_setting_list}
+                                    {/pf_field_options}
                                     {if pf_divider_count > 0}
                                         </optgroup>
                                     {/if}

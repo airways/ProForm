@@ -1,4 +1,4 @@
-<mockup version="1.0" skin="sketch" measuredW="980" measuredH="627" mockupW="977" mockupH="597">
+<mockup version="1.0" skin="sketch" measuredW="1030" measuredH="627" mockupW="1027" mockupH="627">
   <controls>
     <control controlID="0" controlTypeID="com.balsamiq.mockups::DataGrid" x="32" y="110" w="720" h="174" measuredW="597" measuredH="85" zOrder="0" locked="false" isInGroup="-1">
       <controlProperties>
@@ -68,5 +68,12 @@
       </controlProperties>
     </control>
     <control controlID="30" controlTypeID="com.balsamiq.mockups::Canvas" x="760" y="93" w="220" h="191" measuredW="100" measuredH="70" zOrder="5" locked="false" isInGroup="-1"/>
+    <control controlID="31" controlTypeID="com.balsamiq.mockups::Arrow" x="1020" y="0" w="10" h="55" measuredW="150" measuredH="100" zOrder="12" locked="false" isInGroup="-1">
+      <controlProperties>
+        <direction>top</direction>
+        <leftArrow>false</leftArrow>
+        <rightArrow>false</rightArrow>
+      </controlProperties>
+    </control>
   </controls>
 </mockup>

@@ -77,6 +77,33 @@
     </tbody>
 </table>
 <p><b>*</b> The From Address typically should match your ExpressionEngine email settings in order to avoid having your notifications marked as spam. If not provided, the value will default to that set in ExpressionEngine's global settings - so setting this option isn't recommended. Instead, use the Reply-To settings.</p>
+<h4><a name="form_settings_advanced">Advanced Settings</a></h4>
+<p>The Advanced Settings tab allows you to configure some additional values and extend the functionality of the module. Be sure to check the documentation for any additional Drivers to see if they provide additional Advanced Settings.</p>
+<p>Some settings may be specific to the template you are using as well, meaning that they only have an effect if the template actually calls them.</p>
+<p>All of these settings are available inside a {exp:proform:form} tag through the <b>{pref:*}</b> variables, as shown in the Variable column of this table. Some additional settings are available at the form level through the form's own <a href="./../cp/forms.html#form_settings_advanced">Advanced Settings</a> tab.</p>
+<table>
+    <tbody>
+        <tr>
+            <th width="20%">Name</th>
+            <th width="20%">Variable</th>
+            <th>Description</th>
+            <th width="20%">Example Value</th>
+        </tr>
+        <tr>
+            <td><strong>Invalid Form Message</strong></td>
+            <td><strong>{pref:invalid_form_message}</strong></td>
+            <td>A message to display when the requested form isn't found.</td>
+            <td>The requested form doesn't exist. Please check the Form Directory for a list of available forms.</td>
+        </tr>
+        <tr>
+            <td><strong>Thank You Message (Default)</strong></td>
+            <td><strong>{pref:thank_you_message}</strong></td>
+            <td>Provides a custom message to be used in the default template and by the {exp:proform:simple} tag when the form has been submitted. If a form provides it's own <strong>Thank You Message</strong> through it's Advanced Settings tab, that message will be used instead.</td>
+            <td>Thank you for submitting a form from the Form Directory. Your submission will be processed as soon as possible.</td>
+        </tr>
+    </tbody>
+</table>
+<p>Additionally there are some <a href="./../cp/hidden-settings.html">Hidden Settings</a> available.</p>
     <div id="footer">
             <p>ProForm version 1.16</p>
     </div>
