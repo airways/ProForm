@@ -23,27 +23,8 @@ class PL_Field extends PL_RowInitialized
             'hidden'        => array('type' => 'varchar', 'limit' => 255, 'limit_promote' => 'text'),
             'secure'        => array('type' => 'varchar', 'limit' => 255, 'limit_promote' => 'text'),
             'member_data'   => array('type' => 'varchar', 'limit' => 255, 'limit_promote' => 'text'),
+            'relationship'  => array('type' => 'varchar', 'limit' => 255, 'limit_promote' => 'text'),
         )
-    );
-
-    public static $item_options = array(
-        array('label' => 'Checkbox',                    'type' => 'checkbox',                   'icon' => 'checkbox.png'),
-        array('label' => 'Text',                        'type' => 'string',                     'icon' => 'textfield.png'),
-        array('label' => 'Textarea',                    'type' => 'text',                       'icon' => 'textarea.png',       'length' => '1000',),
-        array('label' => 'Number: Integer',             'type' => 'int',                        'icon' => 'number.png'),
-        array('label' => 'Number: Float',               'type' => 'float',                      'icon' => 'float.png'),
-        array('label' => 'Number: Currency',            'type' => 'currency',                   'icon' => 'currency.png'),
-        array('label' => 'Date',                        'type' => 'date',                       'icon' => 'calendar_view_day.png'),
-        array('label' => 'Time',                        'type' => 'time',                       'icon' => 'time.png'),
-        array('label' => 'Date Time',                   'type' => 'datetime',                   'icon' => 'datetime.png'),
-        array('label' => 'File Upload',                 'type' => 'file',                       'icon' => 'page_attach.png'),
-        array('label' => 'List',                        'type' => 'list',                       'icon' => 'select.png'),
-        // array('label' => 'Quantity Group List',         'type' => 'Quantity Group List',         'icon' => 'email_add.png'),
-        array('label' => 'Hidden',                      'type' => 'hidden',                     'icon' => 'hidden.png'),
-        array('label' => 'Secure Hidden',               'type' => 'secure',                     'icon' => 'secure.png'),
-        array('label' => 'Member Data',                 'type' => 'member_data',                'icon' => 'user_gray.png'),
-        array('label' => 'Mailing List Subscription',   'type' => 'mailinglist',                'icon' => 'email_add.png'),
-        // array('label' => 'Field Group',                 'type' => 'fieldgroup',                 'icon' => 'textfield.png'),
     );
 
     var $field_id = FALSE;
@@ -95,7 +76,7 @@ class PL_Field extends PL_RowInitialized
             $form->assign_field($this);
         }
     }
-    
+
     function pre_delete()
     {
         // Remove the field from any forms it may have been assigned to
@@ -156,7 +137,7 @@ class PL_Field extends PL_RowInitialized
                 $result = 'plugin.png';
             }
         } else {
-            foreach(PL_Field::$item_options as $option)
+            foreach(Proform_mcp::$item_options as $option)
             {
                 if($option['type'] == $this->type)
                 {
@@ -175,7 +156,10 @@ class PL_Field extends PL_RowInitialized
 
         $result = array();
 
-        if(array_key_exists('type_list', $this->settings))
+        $count = 0;
+        $divider_count = 0;
+
+        if($this->type == 'list' && array_key_exists('type_list', $this->settings))
         {
             $list = explode("\n", $this->settings['type_list']);
             $valid = FALSE;
@@ -199,15 +183,71 @@ class PL_Field extends PL_RowInitialized
                     unset($selected_items[$k]);
                 }
 
+                if(strlen($key) > 0 && $key[0] == '-')
+                {
+                    $divider_count++;
+                    $is_divider = TRUE;
+                } else {
+                    $is_divider = FALSE;
+                }
+
+                $count++;
                 $result[] = array(
-                    'key' => $key,
-                    'row' => $option,
-                    'option' => $option,
-                    'label' => $option,
-                    'selected' => $selected,
+                    'key'               => $key,
+                    'row'               => $option,
+                    'option'            => $option,
+                    'label'             => $option,
+                    'selected'          => $selected,
+                    'number'            => $count,
+                    'divider_number'    => $divider_count,
+                    'is_divider'        => $is_divider,
                 );
             }
         }
+
+        if($this->type == 'relationship')
+        {
+            $channels = isset($this->settings['type_channels']) ? $this->settings['type_channels'] : array();
+            $categories = isset($this->settings['type_categories']) ? $this->settings['type_categories'] : array();
+
+            $this->EE->db->from('exp_channel_titles');
+
+            // If we were given a list of channels, only fetch entries from those channels
+            if(count($channels) > 0 && $channels[0] != '')
+            {
+                $this->EE->db->where_in('exp_channel_titles.channel_id', $channels);
+            }
+
+            // If we have a list of categories as well, limit the results to those categories
+            if(count($categories) > 0 && $channels[0] != '')
+            {
+                $this->EE->db->join('exp_category_posts', 'exp_category_posts.entry_id = exp_channel_titles.entry_id', 'inner')
+                             ->where_in('exp_category_posts.cat_id', $categories);
+            }
+
+            // Run the query
+            $query = $this->EE->db->get();
+            
+            foreach($query->result() as $row)
+            {
+                $count++;
+                $selected = ($k = array_search($row->entry_id, $selected_items)) !== FALSE ? ' selected="selected" ' : '';
+                $result[] = array(
+                    'key'               => $row->entry_id,
+                    'row'               => $row->title,
+                    'option'            => $row->title,
+                    'label'             => $row->title,
+                    'selected'          => $selected,
+                    'number'            => $count,
+                    'divider_number'    => $divider_count,
+                    'is_divider'        => FALSE,
+                );
+            }
+
+        }
+
+        $this->divider_count = $divider_count;
+
         return $result;
     } // function get_list_options
 
@@ -237,7 +277,7 @@ class PL_Field extends PL_RowInitialized
         }
         return $result;
     }
-    
+
     function get_property($key, $default = '')
     {
         $result = $default;
@@ -247,14 +287,14 @@ class PL_Field extends PL_RowInitialized
         }
         return $result;
     }
-    
+
     function get_validation()
     {
         // Explode the validation string, and remove any blank values found in it, as well as the 'none'
         // value used to indicate a lack of validation.
         return array_filter_values(explode('|', $this->validation), array('none', ''));
     }
-    
+
     function get_driver()
     {
         $this->__EE->pl_drivers->init();

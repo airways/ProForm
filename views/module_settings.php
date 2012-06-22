@@ -30,4 +30,41 @@
  *
  **/ ?>
 
-<p>GLOBAL FORM PREFS</p>
+<?php if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>'; ?>
+<?php if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>'; ?>
+
+<div class="tabs-wrapper">
+    <div class="tabs main" id="main-tabs" data-tabset="main">
+        <ul>
+            <li class="active content-settings"><a href="tab-content-settings">Module Settings</a></li>
+            <li class="active content-advanced"><a href="tab-content-advanced">Advanced Settings</a></li>
+        </ul>
+    </div>
+</div>
+
+<div class="clear"></div>
+
+<?php echo form_open($action_url, array('id' => 'module_settings'), isset($hidden) ? $hidden : array()); ?>
+<?php echo form_hidden('active_tabs'); ?>
+
+<!-- start edit form tab content -->
+<div class="tab-content main tab-content-settings">
+
+    <?php $generic_edit_embedded = TRUE; include(PATH_THIRD.'proform/views/generic_edit.php'); ?>
+
+</div>
+<!-- end edit form tab content -->
+
+<!-- start advanced settings -->
+<div class="tab-content main tab-content-advanced">
+
+    <?php include(PATH_THIRD.'proform/views/_advanced_settings.php'); ?>
+
+</div>
+<!-- end advanced settings -->
+
+<br/>
+<div class="tableFooter">
+    <?php echo form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit'))?>
+</div>
+<?php echo form_close();

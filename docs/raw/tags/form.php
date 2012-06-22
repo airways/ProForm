@@ -150,6 +150,7 @@
     <li><a href="#param_message">message:required="This field is required!", message:*=""</a></li>
     <li><a href="#param_notify">notify="sample@example.com"</a></li>
     <li><a href="#param_step">step="1"</a></li>
+    <li><a href="#param_site">site="default_site"</a></li>
     <li><a href="#param_variable_prefix">variable_prefix="pf_"</a></li>
     <li><a href="#param_thank_you_url">thank_you_url="forms/thank-you"</a></li>
 </ul>
@@ -312,6 +313,10 @@
 <p>By default, <dfn>ProForm</dfn> manages the active step using a session and hidden values passed inside the form. This parameter allows you to override this default behavior and specify the step to load based on your own criteria.</p>
 
 
+<h3><a name="param_site">site="default_site"</a></h3>
+
+<p>The <b>site</b> param allows you to override the active site that ProForm looks for forms within. This allows you to make sure of forms from other sites within other sites in your MSM install.</p>
+
 <h3><a name="param_last_step_summary">last_step_summary="yes"</a></h3>
 
 <p>The <b>last_step_summary</b> parameter turns on a special mode for the last step of a multistep form, where all fields are returned by the {fields} loop. This can be used to present a summary of the form about to be submitted before the user actually submits it, giving them a chance to go back and change their responses.</p>
@@ -409,6 +414,7 @@
     <li><a href="#var_form_type">&#123;form_type&#125;</a></li>
     <!-- <li><a href="#var_formpref">&#123;formpref:*&#125;</a></li> -->
     <li><a href="#var_fields_count">&#123;fields_count&#125;</a></li>
+    <li><a href="#var_label">&#123;label:*&#125;</a></li>
     <li><a href="#var_on_first_step">&#123;on_first_step&#125;</a></li>
     <li><a href="#var_on_last_step">&#123;on_last_step&#125;</a></li>
     <li><a href="#var_step_count">&#123;step_count&#125;</a></li>
@@ -514,6 +520,26 @@
 
 <p>Provides the total number of fields assigned to the form.</p>
 
+<h3><a name="var_label">{label:*}</a></h3>
+
+<p>Provides the label set for a particular field on the form. These variables are most useful for cases where you are not using the full &#123;fields&#125; loop and wish to just render the information for a small set of fields. See also the {value:*} variables.</p>
+
+<p>Replace the * in the variable name with the name of a field to get it's label.</p>
+
+<p>The &#123;field_value&#125; variable inside of a &#123;fields&#125; variable pair provides the same value for fields, and is easier to use when generating generic form markup.</p>
+
+<div class="tip">
+    <h6>Example Usage</h6>
+    <p>Assuming there is one field defined on the form, named <strong>phone_number</strong>.</p>
+    <pre class="brush: xml">
+        &#123;exp:proform:form form="contact_us" variable_prefix="pf_"&#125;
+            &lt;p&gt;The label for the phone_number field is: &#123;label:phone_number&#125;&lt;/p&gt;
+        &#123;/exp:proform:form&#125;
+
+    </pre>
+</div>
+
+
 <h3><a name="var_on_first_step">{on_first_step}</a></h3>
 
 <p>Provides a boolean value indicating if the form is currently on it's <strong>first</strong> step.</p>
@@ -532,7 +558,7 @@
 
 <h3><a name="var_value">{value:*}</a></h3>
 
-<p>Provides the value entered for a field on the form. These variables are set when the form contains an error and needs to be redisplayed, <strong>or</strong> when a form step is reloaded (a step can be visited multiple times by the user).</p>
+<p>Provides the value entered for a field on the form. These variables are set when the form contains an error and needs to be redisplayed, <strong>or</strong> when a form step is reloaded (a step can be visited multiple times by the user). These variables are most useful for cases where you are not using the full &#123;fields&#125; loop and wish to just render the information for a small set of fields. See also the {field:*} variables.</p>
 
 <p>Replace the * in the variable name with the name of a field.</p>
 
@@ -669,7 +695,7 @@
 <p>The following variable pairs are available inside the {fields} pair.</p>
 
 <ul>
-    <li><a href="#pair_field_setting_list">{field_setting_list}</a></li>
+    <li><a href="#pair_field_options">{field_options}</a> (formerly {field_setting_list})</li>
     <li><a href="#pair_field_validation">{field_validation}</a></li>
 </ul>
 
@@ -781,25 +807,33 @@
 
 <h5>{fields} Variable Pairs</h5>
 
-<h6><a name="pair_field_setting_list">{field_setting_list}</a></h6>
-<p><strong>Only valid for 'select' type fields</strong>. The {field_setting_list} loop, which must be used inside of the {fields} pair, provides a list of all of the options available for fields with the type <b>list</b>.</p>
+<h6><a name="pair_field_options">{field_options}</a></h6>
+<p><strong>Only valid for List and Relationship type fields</strong>. The {field_options} loop, which must be used inside of the {fields} pair, provides a list of all of the options available for fields with the type <b>list</b>.</p>
+
+<div class="tip">
+    <h6>Note</h6>
+    This variable was previously named {field_setting_list}.
+</div>
+
+<p>For a Relationship type field, this is a dynamically generated list of the available options based on the configured Channels and Categories.</p>
+
 
 <p>This variable pair has two variables available for each option:</p>
 
 <ul>
   <li><strong>{key}</strong> - the value as stored in the database</li>
-  <li><strong>{row}</strong> - the label of the value shown to the user</li>
+  <li><strong>{label}</strong> - the label of the value shown to the user (formerly {row})</li>
 </ul>
 
 <div class="tip">
     <h6>Example Usage</h6>
     <pre class="brush: xml">
         &#123;fields&#125;
-        &#123;if field_control == 'select'&#125;
+        &#123;if field_type == 'list' || field_type == 'relationship'&#125;
           &lt;select id="{field_name}" name="{field_name}"&gt;
-            &#123;field_setting_list&#125;
-            &lt;option value="{key}"&gt;&#123;row&#125;&lt;/option&gt;
-            &#123;/field_setting_list&#125;
+            &#123;field_options&#125;
+            &lt;option value="{key}"&gt;&#123;label&#125;&lt;/option&gt;
+            &#123;/field_options&#125;
           &lt;/select&gt;
         &#123;/if&#125;
         &#123;/fields&#125;

@@ -49,6 +49,14 @@ Create Field
 	height: 140px;
 }
 
+.edit_settings div {
+    margin-bottom: 5px;
+}
+
+.edit_settings div label {
+    display: block;
+}
+
 /* ---------------------------------------------------------------------
 Main Nav buttons
 ------------------------------------------------------------------------ */
@@ -102,7 +110,7 @@ Main Nav buttons
 
 .heading {
 	position: relative;
-	height: 33px;
+	height: 40px;
 }
 
 table.mainTable tr td:first-child {
@@ -673,6 +681,20 @@ Messages / Form Errors
 .form-fields p {
     width: 270px;
 }
+
+.form-layout legend {
+    margin: 10px 0 10px 0;
+    font-weight: bold;
+}
+
+
+.form-layout .option-list {
+    margin-left: 20px;
+}
+.form-layout .option-list label {
+    font-weight: normal;
+}
+
 
 .toolbox li {
     overflow: hidden;

@@ -217,7 +217,7 @@ class Proform_notifications
 
         // send email to the submitter
         $this->_debug('submitter_notification '. ($form->submitter_notification_on == 'y' ? 'on' : 'off'));
-        $this->_debug('email_field: ' . $form->submitter_email_field . ' - ' . isset($data[$form->submitter_email_field]) ? $data[$form->submitter_email_field] : ' [null]' ); 
+        $this->_debug('email_field: ' . $form->submitter_email_field . ' - ' . (isset($data[$form->submitter_email_field]) ? $data[$form->submitter_email_field] : ' [null]') ); 
         if($form->submitter_notification_on == 'y' && $form->submitter_email_field
             && isset($data[$form->submitter_email_field]) && $data[$form->submitter_email_field])
         {
@@ -244,7 +244,7 @@ class Proform_notifications
 
         // send share emails ("tell a friend", etc)
         $this->_debug('share_notification '. ($form->share_notification_on == 'y' ? 'on' : 'off'));
-        $this->_debug('email_field: ' . $form->share_email_field . ' - ' . isset($data[$form->share_email_field]) ? $data[$form->share_email_field] : ' [null]' ); 
+        $this->_debug('email_field: ' . $form->share_email_field . ' - ' . (isset($data[$form->share_email_field]) ? $data[$form->share_email_field] : ' [null]') ); 
         if($form->share_notification_on == 'y' && $form->share_email_field
             && isset($data[$form->share_email_field]) && $data[$form->share_email_field])
         {
@@ -320,6 +320,7 @@ class Proform_notifications
 // var_dump($data);
 // echo htmlentities($message);
 // exit;
+            $this->_debug($message);
             $result = TRUE;
             foreach($notification_list as $to_email)
             {

@@ -55,6 +55,11 @@ class Formslib
 
     );
 
+    public $__advanced_settings_options = array(
+        'thank_you_message'         => 'Thank You Message (Default)',
+        'invalid_form_message'      => 'Invalid Form Message',
+    );
+
     function Formslib()
     {
         prolib($this, 'proform');

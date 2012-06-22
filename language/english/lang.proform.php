@@ -51,6 +51,7 @@ $lang = array(
     'heading_field_forced' => 'Forced Value (cannot be set in form submit)',
     'heading_commands' => 'Actions',
     'heading_actions' => 'Actions',
+    'heading_setting' => 'Setting',
 
     // Table results
     'no_forms' => 'No forms created yet',
@@ -64,7 +65,7 @@ $lang = array(
 
     // Buttons
     'home' => 'Home',
-    'global_form_preferences' => 'Module Settings',
+    'module_settings' => 'Module Settings',
     'new_form' => 'Create New Contact Form',
     'new_saef' => 'Create New SAEF Form',
     'new_share' => 'Create New Share Form',
@@ -88,7 +89,7 @@ $lang = array(
 
     // "Tab" / subpages in CP
     'proform_title' => 'ProForm: ',
-    'tab_global_form_preferences' => 'Module Settings',
+    'tab_module_settings' => 'Module Settings',
     'tab_forms' => 'Forms',
     'tab_new_form' => 'New Form',
     'tab_edit_form' => 'Edit Form',
@@ -113,7 +114,8 @@ $lang = array(
     'tab_new_html_block' => 'New HTML Block',
     'tab_edit_html_block' => 'Edit HTML Block',
     'tab_delete_html_block' => 'Delete HTML Block',
-    'tab_view_form_entry' => 'View Entry',
+    'tab_view_form_entry' => 'View Form Entry',
+    'tab_edit_form_entry' => 'Edit Form Entry',
     
     // Fields
     'field_form_name' => 'Form Short Name',

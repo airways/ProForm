@@ -84,9 +84,9 @@ var proform_edit_form_layout = {
             if($active_field && !loading_meta) {
                 if($('#field-label').val().trim() != '')
                 {
-                    $active_field.find('label').text($('#field-label').val());
+                    $active_field.find('label.field-label').text($('#field-label').val());
                 } else {
-                    $active_field.find('label').text($active_field.find('.fieldOriginalLabel').val());
+                    $active_field.find('label.field-label').text($active_field.find('.fieldOriginalLabel').val());
                 } 
             }
         }

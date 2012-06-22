@@ -114,6 +114,20 @@ END
                     case 'control':
                         $row[] = '<span class="value_'.$type.$short.'">'.$value.'</span>';
                         break;
+                    case 'list':
+                    case 'relationship':
+                        $value = explode('|', $value);
+                        $cell = '<span class="value_'.$type.$short.'">';
+                            foreach($field_options[$field] as $option)
+                            {
+                                if(in_array($option['key'], $value))
+                                {
+                                    $cell .= $option['label'].' ['.$option['key'].']<br/>';
+                                }
+                            }
+                        $cell .= '</span>';
+                        $row[] = $cell;
+                        break;
                     default:
                         $plugin_view = $this->pl_drivers->call($type, 'render_entries_list_cp', array($value));
                         if($plugin_view != $value)

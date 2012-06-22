@@ -151,7 +151,7 @@
         <tr>
             <td><b>List</b></td>
             <td>&lt;select&gt;</td>
-            <td>A select box allowing the visitor to choose between options. When selected, an additional option is available:<br />
+            <td>A select box, set of checkboxes, or set of radio buttons allowing the visitor to choose between options. When selected, an additional option is available:<br />
                 <br />
                 <b>Style</b> - The style of list you would like to use. This controls how the processing is done, so it should match the way you are rendering the field. This will work best with the Simple Form Tag or template code based on the Example Template.<br/>
                 <ul>
@@ -166,7 +166,17 @@
                 <pre class="brush: xml">
 value : label&#10;value</pre>
             </td>
-            <td>TEXT</td>
+            <td>VARCHAR or TEXT</td>
+        </tr>
+        <tr>
+            <td><b>Relationship</b></td>
+            <td>&lt;select&gt;</td>
+            <td>A select box allowing the visitor to choose amongst a set of Channel Entries. Additional options:<br /><br/>
+                <b>Channels</b> - Limits the available list of entries to the selected channels.<br/>
+                <br />
+                <b>Categories</b> - Limits the available list of entries to the selected categories.<br/>
+            </td>
+            <td>VARCHAR or TEXT</td>
         </tr>
         <tr>
             <td><b>Mailing List Subscription</b></td>

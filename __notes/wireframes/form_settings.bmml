@@ -1,0 +1,79 @@
+<mockup version="1.0" skin="sketch" measuredW="1030" measuredH="627" mockupW="1027" mockupH="627">
+  <controls>
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::DataGrid" x="32" y="110" w="720" h="174" measuredW="597" measuredH="85" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Setting%2C%20Value%2C%20Actions%0AExtra%201%2C%20Descrption%2C%20Edit%20%7C%20Delete%0AThank%20You%2C%20Thanks%20for%20submitting%20your%20Support%20Request%21%20We%27ll%20get%20back%20to%20you%20ASAP%21%2C%20Edit%20%7C%20Delete</text>
+        <verticalScrollbar>false</verticalScrollbar>
+      </controlProperties>
+    </control>
+    <control controlID="5" controlTypeID="com.balsamiq.mockups::ButtonBar" x="32" y="66" w="508" h="37" measuredW="508" measuredH="29" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <selectedIndex>2</selectedIndex>
+        <text>Form%20Settings%2C%20Notification%20Settings%2C%20Advanced%20Settings%2C%20Form%20Layout</text>
+      </controlProperties>
+    </control>
+    <control controlID="6" controlTypeID="com.balsamiq.mockups::SubTitle" x="38" y="30" w="-1" h="-1" measuredW="394" measuredH="33" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>ProForm%3A%20Edit%20Form%20support_request</text>
+      </controlProperties>
+    </control>
+    <control controlID="7" controlTypeID="com.balsamiq.mockups::Link" x="561" y="74" w="-1" h="-1" measuredW="112" measuredH="21" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>View%20Form%20Entries</text>
+      </controlProperties>
+    </control>
+    <control controlID="10" controlTypeID="com.balsamiq.mockups::ComboBox" x="38" y="296" w="263" h="-1" measuredW="99" measuredH="23" zOrder="6" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Add%20Setting</text>
+      </controlProperties>
+    </control>
+    <control controlID="11" controlTypeID="com.balsamiq.mockups::Button" x="307" y="294" w="-1" h="-1" measuredW="47" measuredH="27" zOrder="7" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Add</text>
+      </controlProperties>
+    </control>
+    <control controlID="24" controlTypeID="com.balsamiq.mockups::Component" x="38" y="351" w="422" h="276" measuredW="422" measuredH="276" zOrder="8" locked="false" isInGroup="-1">
+      <controlProperties>
+        <override controlID="0" x="0" y="33" w="422" h="243">
+          <text>1%2C%20Inline%20editable%20values.%20Probably%20just%20form%20input%20elements.%0A2%2C%20Adding%20a%20value%20just%20adds%20a%20form%20input%20element%20with%20the%20right%20name.%0A%2C%20If%20an%20input%20element%20is%20not%20found%20in%20the%20POST%20it%20is%20not%20processed.%0A%2C%20All%20settings%20are%20saved%20to%20the%20form%27s%20settings%20array.%0A3%2C%20List%20of%20available%20settings.</text>
+        </override>
+        <override controlID="1" x="0" y="0" w="422" h="33"/>
+        <src>$ACCOUNT/assets/Annotated%20Wireframe.bmml#Annotation%20Block</src>
+      </controlProperties>
+    </control>
+    <control controlID="25" controlTypeID="com.balsamiq.mockups::Component" x="561" y="161" w="27" h="27" measuredW="27" measuredH="27" zOrder="9" locked="false" isInGroup="-1">
+      <controlProperties>
+        <override controlID="0" x="0" y="0" w="-1" h="-1">
+          <text>1</text>
+        </override>
+        <src>$ACCOUNT/assets/Annotated%20Wireframe.bmml#Callout%20Left%20Marker</src>
+      </controlProperties>
+    </control>
+    <control controlID="26" controlTypeID="com.balsamiq.mockups::Component" x="362" y="294" w="30" h="27" measuredW="30" measuredH="27" zOrder="10" locked="false" isInGroup="-1">
+      <controlProperties>
+        <override controlID="0">
+          <text>2</text>
+        </override>
+        <src>$ACCOUNT/assets/Annotated%20Wireframe.bmml#Callout%20Left%20Marker</src>
+      </controlProperties>
+    </control>
+    <control controlID="27" controlTypeID="com.balsamiq.mockups::Component" x="3" y="294" w="29" h="27" measuredW="29" measuredH="27" zOrder="11" locked="false" isInGroup="-1">
+      <controlProperties>
+        <src>$ACCOUNT/assets/Annotated%20Wireframe.bmml#Callout%20Right%20Marker</src>
+      </controlProperties>
+    </control>
+    <control controlID="29" controlTypeID="com.balsamiq.mockups::ButtonBar" x="760" y="64" w="173" h="37" measuredW="173" measuredH="29" zOrder="4" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Add%20Item%2C%20Overrides</text>
+      </controlProperties>
+    </control>
+    <control controlID="30" controlTypeID="com.balsamiq.mockups::Canvas" x="760" y="93" w="220" h="191" measuredW="100" measuredH="70" zOrder="5" locked="false" isInGroup="-1"/>
+    <control controlID="31" controlTypeID="com.balsamiq.mockups::Arrow" x="1020" y="0" w="10" h="55" measuredW="150" measuredH="100" zOrder="12" locked="false" isInGroup="-1">
+      <controlProperties>
+        <direction>top</direction>
+        <leftArrow>false</leftArrow>
+        <rightArrow>false</rightArrow>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>

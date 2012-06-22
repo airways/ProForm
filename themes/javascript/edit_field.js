@@ -35,6 +35,7 @@ var proform_edit_field = {
         
         $('.edit_settings').hide();
         $('#type_'+type).show();
+        proform_edit_field.update_type_settings_fields();
     },
 
     update_type_settings_fields: function() {

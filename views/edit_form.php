@@ -46,6 +46,7 @@
     <div class="tabs main" id="main-tabs" data-tabset="main">
         <ul>
             <li class="active content-settings"><a href="tab-content-settings">Form Settings</a></li>
+            <li class="active content-advanced"><a href="tab-content-advanced">Advanced Settings</a></li>
     <?php if(isset($form_id) AND $form_id): ?>
             <li class="content-layout"><a href="tab-content-layout">Form Layout</a></li>
     <?php endif; ?>
@@ -79,6 +80,14 @@
 
 </div>
 <!-- end edit form tab content -->
+
+<!-- start advanced settings -->
+<div class="tab-content main tab-content-advanced">
+
+    <?php include(PATH_THIRD.'proform/views/_advanced_settings.php'); ?>
+
+</div>
+<!-- end advanced settings -->
 
 <?php if(isset($form_id) AND $form_id): ?>
 
