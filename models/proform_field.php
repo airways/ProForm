@@ -167,7 +167,7 @@ class PL_Field extends PL_RowInitialized
             {
                 if(strpos($option, ':') !== FALSE)
                 {
-                    $option = explode(':', $option);
+                    $option = explode(':', $option, 2);
                     $key = trim($option[0]);
                     $option = trim($option[1]);
                 } else {

@@ -2,12 +2,12 @@
 
 $config = array(
     'edit_form' => array(
-        array('field' => 'form_name',           'label' => 'lang:field_form_name',          'rules' => 'trim|required'),
+        array('field' => 'form_name',           'label' => 'lang:field_form_name',          'rules' => 'trim|required|alpha_dash'),
         array('field' => 'form_label',          'label' => 'lang:field_form_label',         'rules' => 'required'),
         array('field' => 'reply_to_address',    'label' => 'lang:field_reply_to_address',   'rules' => 'trim|valid_email'),
     ),
     'edit_field' => array(
-        array('field' => 'field_name',          'label' => 'lang:field_field_name',         'rules' => 'trim|required'),
+        array('field' => 'field_name',          'label' => 'lang:field_field_name',         'rules' => 'trim|required|alpha_dash'),
         array('field' => 'type',                'label' => 'lang:field_type',               'rules' => 'trim|required'),
         array('field' => 'validation',          'label' => 'lang:field_validation',         'rules' => 'trim|required'),
         
