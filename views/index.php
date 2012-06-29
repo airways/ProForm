@@ -99,7 +99,7 @@ if($pagination):
 
     <div class="tableFooter">
 
-        <span class="pagination"><?=$pagination?></span>
+        <span class="pagination"><?php echo $pagination; ?></span>
     </div>
     <?php
 endif;

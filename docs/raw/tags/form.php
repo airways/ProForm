@@ -981,5 +981,7 @@
 
 <p>See the full <a href="{root_url}tags/form/template.html">Sample Template</a> for the <kbd>Form Tag</kbd>.</p>
 
+<p>For an example of using AJAX with ProForm, see the <a href="{root_url}tags/form/ajax-template.html">AJAX Sample Template</a>.</p>
+
 
 {ce:core:include template="global/_footer"}

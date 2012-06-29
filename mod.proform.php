@@ -60,7 +60,6 @@ class Proform {
     var $debug = FALSE;
     var $debug_str = '<b>Debug Output</b><br/>';
 
-
     public function Proform()
     {
         $this->__construct();
@@ -86,6 +85,7 @@ class Proform {
         {
             $_SESSION['pl_form'] = array();
         }
+        
     }
 
 
@@ -121,7 +121,7 @@ class Proform {
         $prefix   = pf_strip_id(strip_tags($this->EE->TMPL->fetch_param('prefix', 'prefix')));
         $this->_set_site();
         
-        $form_name = strip_tags($this->EE->TMPL->fetch_param('form_name', $this->EE->TMPL->fetch_param('form', FALSE)));
+        $form_name = strip_tags($this->EE->TMPL->fetch_param('form_name', $this->EE->TMPL->fetch_param('form', $this->EE->TMPL->fetch_param('name', FALSE))));
 
         if(!$form_name)
         {
@@ -187,7 +187,7 @@ class Proform {
         ////////////////////////////////////////////////////////////////////////////////
 
         // Get required params
-        $form_name = strip_tags($this->EE->TMPL->fetch_param('form_name', $this->EE->TMPL->fetch_param('form', FALSE)));
+        $form_name = strip_tags($this->EE->TMPL->fetch_param('form_name', $this->EE->TMPL->fetch_param('form', $this->EE->TMPL->fetch_param('name', FALSE))));
 
         // Get optional params
         $form_id            = $this->EE->TMPL->fetch_param('form_id', $form_name . '_proform');
@@ -1086,6 +1086,35 @@ class Proform {
                 exit;
             }
         }
+    }
+
+    public function init_shortcodes()
+    {
+        $this->EE->lang->loadfile('proform');
+        $shortcode = &Shortcode_lib::get_instance();
+        $form_options = array();
+        $forms = $this->EE->formslib->forms->get_objects();
+        foreach($forms as $form)
+        {
+            $form_options[$form->form_name] = $form->form_label;
+        }
+        ksort($form_options);
+        
+        return array(
+            'form' => array(
+                'method' => 'simple',
+                'label' => '[form] - ProForm Form',
+                'params' => array(
+                    array('type' => 'dropdown', 'name' => 'form_name', 'label' => 'Form', 'options' => $form_options),
+                )
+            )
+        );
+    }
+
+    public function form_shortcode()
+    {
+        $form_name = $this->EE->TMPL->fetch_param('name', $this->EE->TMPL->fetch_param('form_name', $this->EE->TMPL->fetch_param('form')));
+        return '{exp:proform:simple form_name="'.$form_name.'"}';
     }
 
     private function _add_rowdata(&$form_obj, &$row, &$row_vars)

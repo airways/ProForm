@@ -57,6 +57,7 @@
 <h3>Sample template</h3>
 <ul>
     <li><a href="{root_url}tags/form/template.html">Sample Full Form Template</a></li>
+    <li><a href="{root_url}tags/form/ajax-template.html">AJAX Sample Template</a></li>
     <li><a href="{root_url}notifications.html">Sample Notification Templates</a></li>
 </ul>
 
