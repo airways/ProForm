@@ -112,11 +112,11 @@ class Proform_install
             'reply_to_address'                  => array('type' => 'varchar', 'constraint' => '255',    'default' => ''),
             'reply_to_name'                     => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
             'table_override'                    => array('type' => 'varchar', 'constraint' => '128',    'default' => ''),
-            'settings'                          => array('type' => 'blob',                              'default' => ''),
+            'settings'                          => array('type' => 'blob'),
 
             'admin_notification_on'             => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
             'notification_template'             => array('type' => 'varchar', 'constraint' => '50',     'default' => ''),
-            'notification_list'                 => array('type' => 'text',                              'default' => ''),
+            'notification_list'                 => array('type' => 'text'),
             'subject'                           => array('type' => 'varchar', 'constraint' => '128',    'default' => ''),
             'reply_to_field'                    => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
 
@@ -180,7 +180,7 @@ class Proform_install
             'field_name'    => array('type' => 'varchar', 'constraint' => '32'),
             'is_required'   => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'),
             'form_field_settings'      => array('type' => 'blob'),
-            'heading'       => array('type' => 'text', 'default' => ''),
+            'heading'       => array('type' => 'text'),
             'separator_type'=> array('type' => 'varchar', 'constraint' => 4, 'default' => ''),
         );
         $this->EE->dbforge->add_field($fields);
@@ -205,6 +205,7 @@ class Proform_install
 
     function uninstall()
     {
+
         ////////////////////////////////////////
         // Remove module and all data
         $this->EE->load->dbforge();
@@ -214,26 +215,28 @@ class Proform_install
         // delete all defined forms
         if(!$this->test_uninstall)
         {
-            $forms = $this->EE->formslib->forms->get_all();
-            foreach($forms as $form)
+            // Disable site specific queries on this manager
+            if($this->EE->db->table_exists('proform_forms')) 
             {
-                $this->EE->formslib->forms->delete($form);
+                $forms = $this->EE->formslib->forms->get_all();
+                foreach($forms as $form)
+                {
+                    $this->EE->formslib->forms->delete($form);
+                }
             }
-
+            
             $query = $this->EE->db->select('module_id')->get_where('modules', array('module_name' => 'Proform'));;
             $this->EE->db->where('module_id', $query->row('module_id'))->delete('module_member_groups');
             $this->EE->db->where('module_name', 'Proform')->delete('modules');
             $this->EE->db->where('class', 'Proform')->delete('actions');
-            $this->EE->dbforge->drop_table('proform_forms');
-            $this->EE->dbforge->drop_table('proform_display_entries');
-            $this->EE->dbforge->drop_table('proform_fields');
-            $this->EE->dbforge->drop_table('proform_form_fields');
-            $this->EE->dbforge->drop_table('proform_preferences');
             
-            if($this->EE->db->table_exists('proform_vault'))
-            {
-                $this->EE->dbforge->drop_table('proform_vault');
-            }
+            if($this->EE->db->table_exists('proform_forms')) $this->EE->dbforge->drop_table('proform_forms');
+            if($this->EE->db->table_exists('proform_display_entries')) $this->EE->dbforge->drop_table('proform_display_entries');
+            if($this->EE->db->table_exists('proform_fields')) $this->EE->dbforge->drop_table('proform_fields');
+            if($this->EE->db->table_exists('proform_form_fields')) $this->EE->dbforge->drop_table('proform_form_fields');
+            if($this->EE->db->table_exists('proform_preferences')) $this->EE->dbforge->drop_table('proform_preferences');
+            
+            if($this->EE->db->table_exists('proform_vault')) $this->EE->dbforge->drop_table('proform_vault');
         }
 
         ////////////////////////////////////////
@@ -376,7 +379,7 @@ class Proform_install
         if($current < 1.16)
         {
             $fields = array(
-                'heading'   => array('name' => 'heading', 'type' => 'text', 'default' => ''),
+                'heading'   => array('name' => 'heading', 'type' => 'text'),
             );
             $forge->modify_column('proform_form_fields', $fields);
         }

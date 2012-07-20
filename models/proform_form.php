@@ -748,7 +748,7 @@ class PL_Form extends PL_RowInitialized {
         // associate the field with the form
         $data  = array(
             'form_id'           => $this->form_id,
-            'field_id'          => -1,
+            'field_id'          => 0,
             'field_name'        => '',
             'is_required'       => FALSE,
             'field_order'       => $field_order,
