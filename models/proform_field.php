@@ -174,34 +174,38 @@ class PL_Field extends PL_RowInitialized
                     $option = trim($option);
                     $key = $option;
                 }
-
-                $selected = ($k = array_search($key, $selected_items)) !== FALSE ? ' selected="selected" ' : '';
-                if($selected)
+                
+                if($option != '' || $key != '')
                 {
-                    // If we have duplicate values, we only want to select the first one (useful for "select something"
-                    // messages and dividers).
-                    unset($selected_items[$k]);
-                }
 
-                if(strlen($key) > 0 && $key[0] == '-')
-                {
-                    $divider_count++;
-                    $is_divider = TRUE;
-                } else {
-                    $is_divider = FALSE;
-                }
+                    $selected = ($k = array_search($key, $selected_items)) !== FALSE ? ' selected="selected" ' : '';
+                    if($selected)
+                    {
+                        // If we have duplicate values, we only want to select the first one (useful for "select something"
+                        // messages and dividers).
+                        unset($selected_items[$k]);
+                    }
 
-                $count++;
-                $result[] = array(
-                    'key'               => $key,
-                    'row'               => $option,
-                    'option'            => $option,
-                    'label'             => $option,
-                    'selected'          => $selected,
-                    'number'            => $count,
-                    'divider_number'    => $divider_count,
-                    'is_divider'        => $is_divider,
-                );
+                    if(strlen($key) > 0 && $key[0] == '-')
+                    {
+                        $divider_count++;
+                        $is_divider = TRUE;
+                    } else {
+                        $is_divider = FALSE;
+                    }
+
+                    $count++;
+                    $result[] = array(
+                        'key'               => $key,
+                        'row'               => $option,
+                        'option'            => $option,
+                        'label'             => $option,
+                        'selected'          => $selected,
+                        'number'            => $count,
+                        'divider_number'    => $divider_count,
+                        'is_divider'        => $is_divider,
+                    );
+                }
             }
         }
 
