@@ -346,6 +346,7 @@ $alt = FALSE;
                 </li>
                 <li>
                     <input type="checkbox" id="field-show-in-listing" /> <label for="field-show-in-listing" class="checkbox">Show in Listing?</label>
+                    <p>Should this field be shown as a column in the Form Entries listing?</p>
                 </li>
             </ul>
         </div>

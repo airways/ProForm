@@ -162,7 +162,7 @@ var proform_edit_form_layout = {
             $(this).addClass('active');
             load_meta();
         
-            $('#edit-field-name').text($active_field.find('.fieldLabel'));
+            //$('#edit-field-name').text($active_field.find('.fieldLabel').val());
             $('.field-modifications input').removeAttr('disabled');
         
         });
