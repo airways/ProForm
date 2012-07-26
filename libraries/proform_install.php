@@ -384,11 +384,11 @@ class Proform_install
             $forge->modify_column('proform_form_fields', $fields);
         }
         
-        if($Current < 1.17)
+        if($current < 1.17)
         {
             // Match MySQL
             $fields = array(
-                'field_name'     => array('type' => 'varchar', 'constraint' => '64'),
+                'field_name'     => array('name' => 'field_name', 'type' => 'varchar', 'constraint' => '64'),
             );
             $forge->modify_column('proform_fields', $fields);
             $forge->modify_column('proform_form_fields', $fields);
