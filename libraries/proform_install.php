@@ -155,7 +155,7 @@ class Proform_install
         $fields = array(
             'field_id'       => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE, 'auto_increment' => TRUE),
             'field_label'    => array('type' => 'varchar', 'constraint' => '250'),
-            'field_name'     => array('type' => 'varchar', 'constraint' => '32'),
+            'field_name'     => array('type' => 'varchar', 'constraint' => '64'),
             'type'           => array('type' => 'varchar', 'constraint' => '12'),
             'length'         => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE),
             'validation'     => array('type' => 'varchar', 'constraint' => '250'),
@@ -177,7 +177,7 @@ class Proform_install
             'form_id'       => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE),
             'field_order'   => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE),
             'field_row'     => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE),
-            'field_name'    => array('type' => 'varchar', 'constraint' => '32'),
+            'field_name'    => array('type' => 'varchar', 'constraint' => '64'),
             'is_required'   => array('type' => 'varchar', 'constraint' => '1', 'default' => 'n'),
             'form_field_settings'      => array('type' => 'blob'),
             'heading'       => array('type' => 'text'),
@@ -383,6 +383,17 @@ class Proform_install
             );
             $forge->modify_column('proform_form_fields', $fields);
         }
+        
+        if($Current < 1.17)
+        {
+            // Match MySQL
+            $fields = array(
+                'field_name'     => array('type' => 'varchar', 'constraint' => '64'),
+            );
+            $forge->modify_column('proform_fields', $fields);
+            $forge->modify_column('proform_form_fields', $fields);
+        }
+        
         return TRUE;
     } // function update
 

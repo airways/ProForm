@@ -47,6 +47,7 @@
         <ul>
             <li class="active content-settings"><a href="tab-content-settings">Form Settings</a></li>
             <li class="active content-advanced"><a href="tab-content-advanced">Advanced Settings</a></li>
+            <li class="active content-script"><a href="tab-content-script">Script</a></li>
     <?php if(isset($form_id) AND $form_id): ?>
             <li class="content-layout"><a href="tab-content-layout">Form Layout</a></li>
     <?php endif; ?>
@@ -60,6 +61,13 @@
         </ul>
     </div>
 
+    <div class="tabs sidebar" id="script-sidebar-tabs" data-tabset="script-sidebar">
+        <ul>
+            <li class="active content-script-toolbox"><a href="tab-content-script-toolbox">Events &amp; Actions</a></li>
+            <li class="active content-action-params"><a href="tab-content-action-params">Options</a></li>
+        </ul>
+    </div>
+    
     <?php if(isset($view_entries_link)): ?>
     <span class="action-list">
         <a href="<?php echo $view_entries_link; ?>">View Form Entries</a>

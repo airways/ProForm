@@ -1607,30 +1607,35 @@ class Proform {
 
                 $type_multiselect = isset($field->settings['type_multiselect']) ? $field->settings['type_multiselect'] : FALSE;
                 $type_style = isset($field->settings['type_style']) ? $field->settings['type_style'] : '';
-
+                
+                // Count the number of items selected, only show validation message
+                // if there is more than one item selected.
+                $value_count = 0;
+                
                 if(($type_style == '' && !$type_multiselect) || $type_style == 'radio')
                 {
                     $multi = FALSE;
                     $option_valid = FALSE;
 
-                    if(is_array($form_session->values[$field->field_name]))
-                    {
-                        $form_session->values[$field->field_name] = $form_session->values[$field->field_name][0];
-                    }
-
                     if(isset($form_session->values[$field->field_name]))
                     {
-                        foreach($options as $option)
+                        $value_count++;
+                        
+                        if(is_array($form_session->values[$field->field_name]))
                         {
-                            if($option['key'] == $form_session->values[$field->field_name])
+                            $form_session->values[$field->field_name] = $form_session->values[$field->field_name][0];
+                        }
+
+                        if(isset($form_session->values[$field->field_name]))
+                        {
+                            foreach($options as $option)
                             {
-                                $option_valid = TRUE;
+                                if($option['key'] == $form_session->values[$field->field_name])
+                                {
+                                    $option_valid = TRUE;
+                                }
                             }
                         }
-                    } else
-                    {
-                        echo 'values:';
-                        var_dump($form_session->values);
                     }
 
                     $valid = $option_valid;
@@ -1640,11 +1645,11 @@ class Proform {
                     {
                         $form_session->values[$field->field_name] = array($form_session->values[$field->field_name]);
                     }
-#echo 'values:';
-#var_dump($form_session->values);exit;
+
                     $valid = TRUE;
                     foreach($form_session->values[$field->field_name] as $selected_option)
                     {
+                        $value_count++;
                         $option_valid = FALSE;
                         foreach($options as $option)
                         {
@@ -1658,7 +1663,7 @@ class Proform {
                     }
                 }
 
-                if(!$valid)
+                if($value_count > 0 && !$valid)
                 {
                     $form_session->add_error($field->field_name, ($multi ? 'One of the values for' : 'The value for ').htmlentities($field->field_name).' is not a valid choice.');
                 }

@@ -76,6 +76,7 @@ var proform_mod = {
             if(active_tabs.indexOf('tab-content-settings') !== -1) tab = 1;
             if(active_tabs.indexOf('tab-content-advanced') !== -1) tab = 2;
             if(active_tabs.indexOf('tab-content-layout') !== -1) tab = 3;
+            if(active_tabs.indexOf('tab-content-script') !== -1) tab = 4;
             switch(tab)
             {
                 case 1:
@@ -87,12 +88,32 @@ var proform_mod = {
                 case 3:
                     proform_mod.activate_tab('main', 'tab-content-layout', true);
                     break;
+                case 4:
+                    proform_mod.activate_tab('main', 'tab-content-script', true);
+                    break;
             }
 
-            if(active_tabs.indexOf('tab-content-override') !== -1) {
-                proform_mod.activate_tab('sidebar', 'tab-content-override', true);
-            } else {
-                proform_mod.activate_tab('sidebar', 'tab-content-add-item', true);
+            tab = 1;
+            
+            if(active_tabs.indexOf('tab-content-override') !== -1) tab = 1;
+            if(active_tabs.indexOf('tab-content-add-item') !== -1) tab = 2;
+            if(active_tabs.indexOf('tab-content-script-toolbox') !== -1) tab = 3;
+            if(active_tabs.indexOf('tab-content-action-params') !== -1) tab = 4;
+            
+            switch(tab)
+            {
+                case 1:
+                    proform_mod.activate_tab('sidebar', 'tab-content-override', true);
+                    break;
+                case 2:
+                    proform_mod.activate_tab('sidebar', 'tab-content-add-item', true);
+                    break;
+                case 3:
+                    proform_mod.activate_tab('sidebar', 'tab-content-script-toolbox', true);
+                    break;
+                case 4:
+                    proform_mod.activate_tab('sidebar', 'tab-content-action-params', true);
+                    break;
             }
         }
 
@@ -115,9 +136,16 @@ var proform_mod = {
             case 'main':
                 if(currentTab == 'tab-content-layout')
                 {
-                    $('.tabs.sidebar').show();
+                    $('.tabs#sidebar-tabs').show();
                 } else {
-                    $('.tabs.sidebar').hide();
+                    $('.tabs#sidebar-tabs').hide();
+                }
+                
+                if(currentTab == 'tab-content-script')
+                {
+                    $('.tabs#script-sidebar-tabs').show();
+                } else {
+                    $('.tabs#script-sidebar-tabs').hide();
                 }
                 break;
         }
@@ -125,9 +153,11 @@ var proform_mod = {
     update_active_tabs: function()
     {
         var active_main = $('.tabs.main ul li.active a').attr('href');
-        var active_sidebar = $('.tabs.sidebar ul li.active a').attr('href');
-        var active_tabs = active_main + ',' + active_sidebar;
+        var active_sidebar = $('.tabs#sidebar-tabs ul li.active a').attr('href');
+        var active_sidebar2 = $('.tabs#script-sidebar-tabs ul li.active a').attr('href');
+        var active_tabs = active_main + ',' + active_sidebar + ',' + active_sidebar2;
         $('input[name=active_tabs]').val(active_tabs);
+        console.log(active_tabs);
     },
     make_name: function(s) {
         return s.toLowerCase().replace(' ', '_').replace(/[^a-zA-Z0-9]+/g, '_');

@@ -219,7 +219,7 @@ class PL_Field extends PL_RowInitialized
             }
 
             // If we have a list of categories as well, limit the results to those categories
-            if(count($categories) > 0 && $channels[0] != '')
+            if(count($categories) > 0 && $categories[0] != '')
             {
                 $this->EE->db->join('exp_category_posts', 'exp_category_posts.entry_id = exp_channel_titles.entry_id', 'inner')
                              ->where_in('exp_category_posts.cat_id', $categories);

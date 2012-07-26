@@ -2353,6 +2353,10 @@ class Proform_mcp extends Prolib_base_mcp {
         die;
     }
 
+    //////////////////////////////////////////////////////////////////////
+    // Helpers                                                          //
+    //////////////////////////////////////////////////////////////////////
+
     function data_table_js()
     {
         $this->EE->javascript->output(array(

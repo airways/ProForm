@@ -95,7 +95,7 @@ $alt = FALSE;
                     switch($field['separator_type']):
                         case 'HTML': ?>
                             <div><?php echo nl2br(strip_tags($field['heading'])); ?></div>
-                            <?
+                            <?php
                             break;
                         default: ?>
                             <h3 class="<?php echo $field['separator_type']; ?>"><?php echo $field['heading']; ?></h3>
