@@ -744,7 +744,7 @@ class Proform {
                     if($form_obj->encryption_on == 'y')
                     {
                         $this->EE->load->library('encrypt');
-                        $row = $this->EE->formslib->decrypt_values($row);
+                        $row = $this->EE->pl_encryption->decrypt_values($row);
                     }
 
                     $row_vars = array();
