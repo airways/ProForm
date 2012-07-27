@@ -394,7 +394,7 @@ class PL_Form extends PL_RowInitialized {
         return $result;
     } // function count_entries()
 
-    function entries($search=array(), $start_row = 0, $limit = 0, $orderby = FALSE, $sort = FALSE)
+    function entries($search=array(), $start_row = 0, $limit = 0, $orderby = 'form_entry_id', $sort = 'desc')
     {
         $this->__EE->lang->loadfile('proform');
         switch($this->form_type)
