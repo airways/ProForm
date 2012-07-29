@@ -70,15 +70,17 @@ class Formslib
         // to on. This option was not available in previous versions, where encryption was always
         // available. Since it is often not implemented correctly, we are now turning off the option
         // by default - unless they already have encrypted forms setup in the system.
-        $query = $this->EE->db->select('*')
+        $this->force_allow_encrypted_forms = '';
+        if($this->EE->db->table_exists('proform_forms')) 
+        {
+            $query = $this->EE->db->select('*')
                               ->where('encryption_on', 'y')
                               ->get('proform_forms');
 
-        if($query->num_rows() > 0)
-        {
-            $this->force_allow_encrypted_forms = 'y';
-        } else {
-            $this->force_allow_encrypted_forms = '';
+            if($query->num_rows() > 0)
+            {
+                $this->force_allow_encrypted_forms = 'y';
+            }
         }
 
         // Initialize the preferences manager. This will set default preferences for us according to

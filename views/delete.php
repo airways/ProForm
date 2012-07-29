@@ -35,4 +35,4 @@
 <div class="tableFooter">
     <?php echo form_submit(array('name' => 'submit', 'value' => lang('submit'), 'class' => 'submit')); ?>
 </div>
-<? echo form_close(); ?>
+<?php echo form_close(); ?>

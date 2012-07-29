@@ -47,6 +47,7 @@
         <ul>
             <li class="active content-settings"><a href="tab-content-settings">Form Settings</a></li>
             <li class="active content-advanced"><a href="tab-content-advanced">Advanced Settings</a></li>
+            
     <?php if(isset($form_id) AND $form_id): ?>
             <li class="content-layout"><a href="tab-content-layout">Form Layout</a></li>
     <?php endif; ?>
@@ -59,7 +60,7 @@
             <li class="content-override"><a href="tab-content-override">Overrides</a></li>
         </ul>
     </div>
-
+    
     <?php if(isset($view_entries_link)): ?>
     <span class="action-list">
         <a href="<?php echo $view_entries_link; ?>">View Form Entries</a>

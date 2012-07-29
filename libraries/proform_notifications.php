@@ -311,13 +311,21 @@ class Proform_notifications
             ));
 
             // parse the template for EE tags, conditionals, etc.
-            $this->EE->template->template = &$message;
-            $this->EE->template->parse($message);
+            $oldTMPL = $this->EE->TMPL;
+// var_dump($this->EE->TMPL);
+            $this->EE->TMPL = new EE_Template();
+            $this->EE->TMPL->template = $message;
+            $this->EE->TMPL->template = $this->EE->TMPL->parse_globals($this->EE->TMPL->template);
+            $this->EE->TMPL->parse($message);
 
             // final output to send
-            $message = $this->EE->template->final_template;
+            $this->EE->TMPL->final_template = $this->EE->TMPL->parse_globals($this->EE->TMPL->final_template);
+            $message = $this->EE->TMPL->final_template;
+            
+            $this->EE->TMPL = $oldTMPL;
 // var_dump($this->EE->pl_parser->variable_prefix);
 // var_dump($data);
+// echo "<pre>";
 // echo htmlentities($message);
 // exit;
             $this->_debug($message);

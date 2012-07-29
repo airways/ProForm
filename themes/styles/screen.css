@@ -664,7 +664,8 @@ Messages / Form Errors
     float: left;
 }
 
-#sidebar-tabs {
+#sidebar-tabs,
+#script-sidebar-tabs {
     float: right; 
     width: 300px;
 }

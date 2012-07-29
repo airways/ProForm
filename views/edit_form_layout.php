@@ -95,7 +95,7 @@ $alt = FALSE;
                     switch($field['separator_type']):
                         case 'HTML': ?>
                             <div><?php echo nl2br(strip_tags($field['heading'])); ?></div>
-                            <?
+                            <?php
                             break;
                         default: ?>
                             <h3 class="<?php echo $field['separator_type']; ?>"><?php echo $field['heading']; ?></h3>
@@ -346,6 +346,7 @@ $alt = FALSE;
                 </li>
                 <li>
                     <input type="checkbox" id="field-show-in-listing" /> <label for="field-show-in-listing" class="checkbox">Show in Listing?</label>
+                    <p>Should this field be shown as a column in the Form Entries listing?</p>
                 </li>
             </ul>
         </div>

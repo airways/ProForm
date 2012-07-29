@@ -7,6 +7,7 @@
         <a href="{root_url}tags/form.html">Form Tag</a>
         <ul>
             <li><a href="{root_url}tags/form/template.html">Sample Template</a></li>
+            <li><a href="{root_url}tags/form/ajax-template.html">AJAX Sample Template</a></li>
         </ul>
     </li>
     <li><a href="{root_url}tags/entries.html">Entries Tag</a></li>
