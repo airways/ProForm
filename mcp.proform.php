@@ -47,7 +47,7 @@ if(!defined('ACTION_BASE'))
     define('ACTION_BASE', BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP);
 }
 
-class Proform_mcp extends Prolib_mcp {
+class Proform_mcp extends Prolib_base_mcp {
 
     var $pipe_length = 1;
     var $perpage = 20;
