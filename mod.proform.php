@@ -529,22 +529,8 @@ class Proform {
         ////////////////////////////////////////////////////////////////////////////////
 
         // Turn various arrays of values into variables
-        foreach($varsets as $varset)
-        {
-            //var_dump($varset)."<br/>";
-            foreach($varset[1] as $key => $value)
-            {
-                if(is_array($value))
-                {
-                    $variables[$varset[0] . ':' . $key] = implode('|', $value);
-                }
-                else
-                {
-                    $variables[$varset[0] . ':' . $key] = $value;
-                }
-            }
-        }
-
+        $this->load_varsets($varsets, $variables);
+        
         ////////////////////////////////////////////////////////////////////////////////
         // Final Parsing
         ////////////////////////////////////////////////////////////////////////////////
@@ -665,6 +651,16 @@ class Proform {
                 $variables['fieldrows'] = $this->create_fields_array($form_obj, FALSE, $form_session->errors, $form_session->values, $form_session->checked_flags, TRUE);
                 $variables['fields'] = $this->create_fields_array($form_obj, FALSE, $form_session->errors, $form_session->values, $form_session->checked_flags, FALSE, FALSE);
                 $variables['hidden_fields'] = $this->create_fields_array($form_obj, FALSE, $form_session->errors, $form_session->values, $form_session->checked_flags, FALSE, TRUE);
+
+                $varsets = array();
+                $module_preferences = $this->EE->formslib->prefs->get_preferences();
+                $varsets[] = array('pref', $module_preferences);
+                if(count($form_obj->settings) > 0)
+                {
+                    $varsets[] = array('formpref', $form_obj->settings);
+                }
+                // Turn various arrays of values into variables
+                $this->load_varsets($varsets, $variables);
 
                 //$this->prolib->debug($variables);
 
@@ -1979,6 +1975,25 @@ class Proform {
     // Helpers
     ////////////////////////////////////////////////////////////////////////////////
 
+    private function load_varsets($varsets, $variables)
+    {
+        foreach($varsets as $varset)
+        {
+            //var_dump($varset)."<br/>";
+            foreach($varset[1] as $key => $value)
+            {
+                if(is_array($value))
+                {
+                    $variables[$varset[0] . ':' . $key] = implode('|', $value);
+                }
+                else
+                {
+                    $variables[$varset[0] . ':' . $key] = $value;
+                }
+            }
+        }
+    }
+    
     private function create_fields_array($form_obj, $form_session = FALSE, $field_errors = array(), $field_values = array(),
                                          $field_checked_flags = array(), $create_field_rows = TRUE, $hidden = -1)
     {
