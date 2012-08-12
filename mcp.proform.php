@@ -117,7 +117,13 @@ class Proform_mcp extends Prolib_base_mcp {
             'relationship'  => 'Channel Entry Relationship',
         );
 
+        $upload_prefs = $this->EE->pl_uploads->get_upload_prefs();
+        $upload_prefs[0] = 'None';
+
         $this->field_type_settings = array(
+//             'file' => array(
+//                 array('type' => 'dropdown', 'name' => 'upload_pref_id', 'label' => 'Upload Directory', 'options' => $upload_prefs)
+//             ),
             'list' => array(
                 array('type' => 'dropdown', 'name' => 'style', 'label' => 'Style', 'options' => array('' => 'Select Box', 'check' => 'Checkboxes', 'radio' => 'Radio Buttons')),
                 array('type' => 'dropdown', 'name' => 'multiselect', 'label' => 'Allow multiple selections?', 'options' => array('' => 'No', 'y' => 'Yes')),
@@ -571,13 +577,20 @@ class Proform_mcp extends Prolib_base_mcp {
         $types = array(
             'form_id' => 'read_only',
             'entries_count' => 'read_only',
+            
             'notification_template' => array('dropdown', $template_options),
             'notification_list' => 'textarea',
+            'notification_list_attachments' => array('checkbox', 'y'),
+
             'admin_notification_on' => array('checkbox', 'y'),
             'submitter_notification_on' => array('checkbox', 'y'),
             'submitter_notification_template' => array('dropdown', $template_options),
+            'submitter_notification_attachments' => array('checkbox', 'y'),
+            
             'share_notification_on' => array('checkbox', 'y'),
             'share_notification_template' => array('dropdown', $template_options),
+            'share_notification_attachments' => array('checkbox', 'y'),
+            
             'encryption_on' => (isset($form) AND $form AND $form->count_entries())
                                         ? array('read_only_checkbox', lang('encryption_toggle_disabled'))
                                         : array('checkbox', 'y'),
@@ -596,9 +609,9 @@ class Proform_mcp extends Prolib_base_mcp {
         if($form_obj->form_type == 'form')
             $extra['after']['reply_to_name'] = array(array('lang_field' => 'reply_to_name', 'heading' => lang('notification_list_name'), 'description' => lang('notification_list_desc')));
         if($form_obj->form_type == 'form' OR $form_obj->form_type == 'share')
-            $extra['after']['reply_to_field'] = array(array('lang_field' => 'reply_to_field', 'heading' => lang('field_submitter_notification_name'), 'description' => lang('notification_field_desc')));
+            $extra['after']['notification_list_attachments'] = array(array('lang_field' => 'reply_to_field', 'heading' => lang('field_submitter_notification_name'), 'description' => lang('notification_field_desc')));
         if($form_obj->form_type == 'form' OR $form_obj->form_type == 'share')
-            $extra['after']['submitter_reply_to_field'] = array(array('lang_field' => 'submitter_reply_to_field', 'heading' => lang('field_share_notification_name'), 'description' => lang('notification_field_desc')));
+            $extra['after']['submitter_notification_attachments'] = array(array('lang_field' => 'submitter_reply_to_field', 'heading' => lang('field_share_notification_name'), 'description' => lang('notification_field_desc')));
 
         $edit_form = $this->EE->pl_forms->create_cp_form($form_obj, $types, $extra);
 
@@ -858,6 +871,9 @@ class Proform_mcp extends Prolib_base_mcp {
         if(!$this->EE->input->post('admin_notification_on')) $_POST['admin_notification_on'] = 'n';
         if(!$this->EE->input->post('submitter_notification_on')) $_POST['submitter_notification_on'] = 'n';
         if(!$this->EE->input->post('share_notification_on')) $_POST['share_notification_on'] = 'n';
+        if(!$this->EE->input->post('notification_list_attachments')) $_POST['notification_list_attachments'] = 'n';
+        if(!$this->EE->input->post('submitter_notification_attachments')) $_POST['submitter_notification_attachments'] = 'n';
+        if(!$this->EE->input->post('share_notification_attachments')) $_POST['share_notification_attachments'] = 'n';
 
         // copy post values defined on the form class to it and save it
         $this->prolib->copy_post($form);
