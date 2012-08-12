@@ -129,6 +129,11 @@
                 For instance, often times this option would be set to a field filled out by the visitor such as <strong>my_email_address</strong>. Whatever value is entered by the user would then be set as the Reply-To for the notifications. Assuming that the Notification List is sent to a customer service rep, or other person who would like to easily contact the submitter of the form, they can simply use their email client's <strong>Reply</strong> command to compose a new return message directly to the visitor.</td>
             <td>submitter_email_address</td>
         </tr>
+        <tr>
+            <td><strong>Send Attachments?</strong></td>
+            <td>This option enables sending of attachments to this notification group. All uploaded files from file fields on the form will be sent to this notification group as attachments.</td>
+            <td>n/a</td>
+        </tr>
     </tbody>
 </table>
 <h4>
@@ -178,6 +183,11 @@
             <td>This option can be set to the name of a field, the value of which will be used as the notification's email address in the Reply-To header. This means that any recipient of the notification will automatically be able to reply to the email address entered into this field in the form.<br/><br/>
                 For instance, often times this option would be set to a field filled out by the visitor such as <strong>my_email_address</strong>. Whatever value is entered by the user would then be set as the Reply-To for the notifications. Assuming that the Notification Field is used to specify a particular customer service rep or department to send this notification to, that person can simply use their email client's <strong>Reply</strong> command to compose a new return message directly to the visitor.</td>
             <td>submitter_email_address</td>
+        </tr>
+        <tr>
+            <td><strong>Send Attachments?</strong></td>
+            <td>This option enables sending of attachments to this notification group. All uploaded files from file fields on the form will be sent to this notification group as attachments.</td>
+            <td>n/a</td>
         </tr>
     </tbody>
 </table>
