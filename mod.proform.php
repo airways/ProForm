@@ -237,14 +237,41 @@ class Proform {
         {
             $tagdata = $this->EE->TMPL->tagdata;
 
+            $use_captcha = FALSE;
+            if (preg_match("/({".$variable_prefix."captcha})/", $tagdata))
+            {
+                $captcha = $this->EE->functions->create_captcha();
+                if(!$captcha && $captcha !== '') $captcha = "[CAPTCHA ERROR]";
+                $tagdata = preg_replace("/{".$variable_prefix."captcha}/", $captcha, $tagdata);
+
+                if($captcha !== '')
+                {
+                    $use_captcha = TRUE;
+                }
+            }
+            
+            $static_config = array(
+                'use_captcha' => $use_captcha,
+            );
+
             if($_SERVER['REQUEST_METHOD'] == 'POST' && $this->EE->input->post('__conf'))
             {
                 $form_result = FALSE;
-                $form_session = $this->_process_form($form_obj, $form_session, $form_result);
+                $form_session = $this->_process_form($form_obj, $form_session, $form_result, $static_config);
 
                 if($form_result === TRUE)
                 {
                     return;
+                }
+
+                if($form_obj->get_step_count() > 1 && isset($form_session->config) && $form_session->config['step'] < $form_obj->get_step_count())
+                {
+                    $use_captcha = FALSE;
+                }
+            } else {
+                if($form_obj->get_step_count() > 1)
+                {
+                    $use_captcha = FALSE;
                 }
             }
 
@@ -256,21 +283,6 @@ class Proform {
                     $complete = 'yes';
                 }
             }
-
-            $use_captcha = FALSE;
-            if($form_obj->get_step_count() == 1 OR (isset($form_session->config) AND $form_session->config['step'] == $form_obj->get_step_count()))
-            {
-                if (preg_match("/({".$variable_prefix."captcha})/", $tagdata))
-                {
-                    $captcha = $this->EE->functions->create_captcha();
-                    if(!$captcha && $captcha !== '') $captcha = "[CAPTCHA ERROR]";
-                    $tagdata = preg_replace("/{".$variable_prefix."captcha}/", $captcha, $tagdata);
-
-                    if($captcha !== '')
-                        $use_captcha = TRUE;
-                }
-            }
-
 
             $get_params = array();
             foreach($_GET as $k => $v)
@@ -309,9 +321,6 @@ class Proform {
                     'step'              => $step,
                     'last_step_summary' => $last_step_summary,
                 );
-            } else {
-                // echo '<b>Existing session:</b>';
-                // var_dump($form_session);
             }
 
             // copy everything else the user may have added
@@ -332,14 +341,8 @@ class Proform {
             {
                 if(!is_array($v) && !is_numeric($v))
                     $form_session->config[$k] = $this->EE->TMPL->parse_globals($v);
-                //echo '<hr/>';
-                //var_dump($form_session->config[$k]);
-                //var_dump(array($get_params));
-                //$form_session->config[$k] = $this->EE->TMPL->parse_variables($form_session->config[$k], array($get_params));
             }
-            //var_dump($form_session->config);
 
-            //$form_config_enc = $this->EE->encrypt->encode(serialize($form_config));
             $form_session_enc = $this->EE->formslib->vault->put($form_session);
 
             if ($this->EE->extensions->active_hook('proform_form_start') === TRUE)
@@ -429,14 +432,6 @@ class Proform {
                     }
                 }
 
-                // if($form_session)
-                // {
-                //     echo "field_values";
-                //     var_dump($field_values);
-                //     echo "field_checked_flags";
-                //     var_dump($field_checked_flags);
-                // }
-
                 if(isset($form_session->errors['captcha']))
                 {
                     $field_errors['captcha_array'] = $form_session->errors['captcha'];
@@ -469,7 +464,6 @@ class Proform {
                 $variables['step_count'] = count($variables['steps']) > 1;
                 $variables['multistep'] = count($variables['steps']) > 1;
                 $variables['current_step'] = $form_session->config['step'];
-                //var_dump($variables['steps']);
 
                 // Setup template pair variables
                 if($hidden_fields_mode == 'split')
@@ -485,9 +479,6 @@ class Proform {
                 }
 
                 $variables['hidden_fields'] = $this->create_fields_array($form_obj, $form_session, $field_errors, $field_values, $field_checked_flags, FALSE, TRUE);
-
-                //echo "<pre>";
-                //var_dump($variables);exit;
 
                 /*
                 // this doesn't quite work - we can't tell if the {fields} occurance in the second if is inside a {fieldrows} or outside of it
@@ -1209,7 +1200,7 @@ class Proform {
         }
     }
 
-    private function _process_form(&$form_obj, &$form_session, &$result)
+    private function _process_form(&$form_obj, &$form_session, &$result, $static_config)
     {
         $result = FALSE;
 
@@ -1244,6 +1235,13 @@ class Proform {
 
         $form_session = $form_session_decoded;
 
+        // Static config is setup for us before _process_form is called. We need to copy
+        // some options from it sometimes.
+        if($form_obj->get_step_count() == 1 || (isset($form_session->config) && $form_session->config['step'] == $form_obj->get_step_count()))
+        {
+            $form_session->config['use_captcha'] = $static_config['use_captcha'];
+        }
+            
         // find the form
         $form_name = $form_session->config['form_name'];
         $form_obj = $this->EE->formslib->forms->get($form_name);
@@ -1272,7 +1270,12 @@ class Proform {
             $this->_process_validation($form_obj, $form_session);
 
             // Do final processing before inserting
-            if($this->EE->input->get_post('_pf_finish') != FALSE OR $form_obj->get_step_count() == 1)
+            
+            // This is incremented by process_steps, so we need to save it
+            $current_step = $form_session->config['step'];
+            
+            if($this->EE->input->get_post('_pf_finish') != FALSE 
+                || $form_obj->get_step_count() == 1)
             {
                 if($form_session->config['use_captcha'])
                 {
@@ -1305,7 +1308,8 @@ class Proform {
                 }
             } else {
                 // If no errors and we are on the last step of the form, insert the data.
-                if($this->EE->input->get_post('_pf_finish') != FALSE OR $form_obj->get_step_count() == 1)
+                if($this->EE->input->get_post('_pf_finish') != FALSE 
+                    || $form_obj->get_step_count() == 1)
                 {
                     $form_session->values['ip_address'] = $this->EE->input->ip_address();
                     $form_session->values['user_agent'] = $this->EE->agent->agent_string();
@@ -1553,7 +1557,13 @@ class Proform {
 
     private function _process_captcha(&$form_obj, &$form_session)
     {
-        if ( ! isset($_POST['captcha']) OR $_POST['captcha'] == '')
+        if ($this->EE->extensions->active_hook('proform_process_captcha') === TRUE)
+        {
+            list($handled, $form_obj, $form_session) = $this->EE->extensions->call('proform_process_captcha', $this, $form_obj, $form_session);
+            if($handled) return;
+        }
+        
+        if(!isset($_POST['captcha']) OR $_POST['captcha'] == '')
         {
             $form_session->add_error('captcha', array($this->EE->lang->line('captcha_required')));
             return;
@@ -1564,7 +1574,7 @@ class Proform {
                              AND ip_address = '".$this->EE->input->ip_address()."'
                              AND date > UNIX_TIMESTAMP()-7200");
 
-        if ($query->row('count')  == 0)
+        if($query->row('count') == 0)
         {
             $form_session->add_error('captcha', array($this->EE->lang->line('captcha_incorrect')));
             return;
@@ -1693,7 +1703,6 @@ class Proform {
                         } else {
                             $rule = array($srule, '');
                         }
-    //var_dump($rule);echo "<p/>";
                         // $rule[0] is the rule type
                         // $rule[1] is an optional parameter
 
@@ -1762,7 +1771,6 @@ class Proform {
                     $form_session->add_error($field->field_name, $field_error);
                 }
             }
-            //var_dump($form_session->errors);die;
         }
         //exit('end of validation');
     } // _process_validation
@@ -1975,11 +1983,10 @@ class Proform {
     // Helpers
     ////////////////////////////////////////////////////////////////////////////////
 
-    private function load_varsets($varsets, $variables)
+    private function load_varsets(&$varsets, &$variables)
     {
         foreach($varsets as $varset)
         {
-            //var_dump($varset)."<br/>";
             foreach($varset[1] as $key => $value)
             {
                 if(is_array($value))
@@ -2138,7 +2145,6 @@ class Proform {
             // Copy field settings for each field type into the field array
             if(is_array($field->form_field_settings))
             {
-                // var_dump($field->form_field_settings);
                 foreach($field->form_field_settings as $k => $v)
                 {
                     // Don't override defaults if there is no value provided in the override
@@ -2181,13 +2187,6 @@ class Proform {
                     $field_array['field_setting_'.$k] = $v;
                 }
             }
-
-            // if($field_array['field_type'] == 'list')
-            // {
-            //     var_dump($field_array);
-            //     var_dump($field);
-            //     exit;
-            // }
 
             if(array_key_exists($field->field_name, $field_errors))
             {
@@ -2253,7 +2252,6 @@ class Proform {
             }
         } // foreach($form_obj->fields() as $field)
 
-//        if($create_field_rows){var_dump($result);die;}
         return $result;
     } // create_fields_array
 

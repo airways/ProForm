@@ -363,6 +363,23 @@ class Proform_notifications
                     }
                 }
 
+                // Only normal forms can have files uploaded to them
+                if($form->form_type == 'form')
+                {
+                    // Save uploaded files
+                    foreach($form->fields() as $field)
+                    {
+                        if($field->type == 'file')
+                        {
+                            $upload_pref = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
+                            if ($upload_pref)
+                            {
+                                $this->EE->pl_email->attach($upload_pref['server_path'].$data[$field->field_name]);
+                            }
+                        }
+                    }
+                }
+                
                 $this->EE->pl_email->to($to_email);
                 $this->EE->pl_email->subject($subject);
 
