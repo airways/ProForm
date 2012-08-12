@@ -304,4 +304,9 @@ class PL_Field extends PL_RowInitialized
         $this->__EE->pl_drivers->init();
         return $this->__EE->pl_drivers->get_driver($this->type);
     }
+    
+    function is_required()
+    {
+        return $this->is_required == 'y' || in_array('required', explode('|', $this->validation));
+    }
 }

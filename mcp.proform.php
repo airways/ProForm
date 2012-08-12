@@ -1860,7 +1860,12 @@ class Proform_mcp extends Prolib_base_mcp {
 
             $vars['fields'][] = $field->field_name;
             $vars['field_types'][$field->field_name] = $field->type;
-            $vars['field_upload_prefs'][$field->field_name] = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
+            if($field->upload_pref_id > 0)
+            {
+                $vars['field_upload_prefs'][$field->field_name] = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
+            } else {
+                $vars['field_upload_prefs'][$field->field_name] = null;
+            }
             $vars['field_options'][$field->field_name] = $field->get_list_options();
 
             if(array_search($field->field_name, $vars['hidden_columns']) === FALSE)

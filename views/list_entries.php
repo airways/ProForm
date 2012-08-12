@@ -108,8 +108,16 @@ END
                 switch($type)
                 {
                     case 'file':
-                        $row[] = '<span class="value_'.$type.$short.'">'.
-                            '<a href="'.$field_upload_prefs[$field]['url'].$value.'">'.$value.'</a></span>';
+                        if(!empty($field_upload_prefs[$field]))
+                        {
+                            if($value)
+                            {
+                                $value = '<a href="'.$field_upload_prefs[$field]['url'].$value.'">'.$value.'</a>';
+                            }
+                            $row[] = '<span class="value_'.$type.$short.'">'.$value.'</span>';
+                        } else {
+                            $row[] = '<span class="value_'.$type.$short.'">Invalid file upload directory.</span>';
+                        }
                         break;
                     case 'control':
                         $row[] = '<span class="value_'.$type.$short.'">'.$value.'</span>';

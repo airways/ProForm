@@ -82,6 +82,7 @@
                         {if:elseif pf_field_type == "file"}
                             <div class="pf_files">
                                 <input name="{pf_field_name}" id="{pf_field_name}" type="file" class="{pf_field_is_required}" />
+                                {if pf_field_value}<p>File previously uploaded: <b>{pf_field_filename}</b>. You may upload a new file to replace it.</p>{/if}
                             </div>
                         {if:elseif pf_field_type == "checkbox"}
                             <div class="pf_field">

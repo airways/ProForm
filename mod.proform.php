@@ -1525,7 +1525,7 @@ class Proform {
                     if(!array_key_exists($field->field_name, $form_session->values))
                     {
                         // "upload" the file to it's permanent home
-                        $upload_data = $this->EE->pl_uploads->handle_upload($field->upload_pref_id, $field->field_name, $field->is_required == 'y');
+                        $upload_data = $this->EE->pl_uploads->handle_upload($field->upload_pref_id, $field->field_name, $field->is_required());
 
                         // default to no file saved
                         $form_session->values[$field->field_name] = '';
@@ -2199,10 +2199,22 @@ class Proform {
                 }
             }
 
-            if($field->type == 'file' && $field_array['field_value'] != '')
+            $field_array['field_filename'] = '';
+            $field_array['field_ext'] = '';
+            if($field->type == 'file')
             {
                 $dir = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
-                $field_array['field_value'] = $dir['url'].$field_array['field_value'];
+                if($field->upload_pref_id == 0 || empty($dir)) show_error('The field '.$field->field_name.' has an invalid file upload directory set.');
+                
+                if($field_array['field_value'] != '')
+                {
+                    $field_array['field_value'] = $dir['url'].$field_array['field_value'];
+                }
+                
+                $info = pathinfo($field_array['field_value']);
+                if($info['filename']) $field_array['field_filename'] = $info['filename'].(isset($info['extension']) ? '.'.$info['extension'] : '');
+                if($info['filename']) $field_array['field_basename'] = $info['filename'];
+                if(isset($info['extension'])) $field_array['field_ext'] = $info['extension'];
             }
 
             if($driver = $field->get_driver())
