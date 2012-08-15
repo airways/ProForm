@@ -204,7 +204,7 @@ class Proform_notifications
                 }
 
                 $result &= $this->_send_notifications('admin', $form->notification_template, $form, $data,
-                                                        $form->subject, $notification_list, $reply_to, $form->notification_list_attachments === 'y');
+                                                        $form->subject, $notification_list, $reply_to, FALSE, $form->notification_list_attachments === 'y');
 
                 $this->_debug('Done with admin notifications - new result - ' . ($result ? 'okay' : 'failed'));
             } else {
@@ -233,9 +233,8 @@ class Proform_notifications
             }
 
             $result &= $this->_send_notifications('submitter', $form->submitter_notification_template,
-                $form, $data, $form->submitter_notification_subject
-                                    ? $form->submitter_notification_subject : $form->subject,
-                array($submitter_email), $reply_to, $form->submitter_notification_attachments === 'y');
+                $form, $data, $form->submitter_notification_subject ? $form->submitter_notification_subject : $form->subject,
+                array($submitter_email), $reply_to, FALSE, $form->submitter_notification_attachments === 'y');
 
             $this->_debug('Done with submitter_notification - new result - ' . ($result ? 'okay' : 'failed'));
         } else {
@@ -260,7 +259,7 @@ class Proform_notifications
 
             $result &= $this->_send_notifications('share', $form->share_notification_template,
                 $form, $data, $form->share_notification_subject ? $form->share_notification_subject : $form->subject,
-                array($share_email), $reply_to, $form->share_notification_attachments == 'y');
+                array($share_email), $reply_to, FALSE, $form->share_notification_attachments === 'y');
 
             $this->_debug('Sending share_notification - new result - ' . ($result ? 'okay' : 'failed'));
 
@@ -291,6 +290,8 @@ class Proform_notifications
         $result = FALSE;
         $template = $this->get_template($template_name);
 
+        $this->EE->pl_email->clear(TRUE);
+        
         if($template)
         {
             // parse data from the entry
@@ -366,15 +367,18 @@ class Proform_notifications
                 // Only normal forms can have files uploaded to them
                 if($form->form_type == 'form')
                 {
-                    // Save uploaded files
-                    foreach($form->fields() as $field)
+                    // Attach files
+                    if($send_attachments)
                     {
-                        if($field->type == 'file')
+                        foreach($form->fields() as $field)
                         {
-                            $upload_pref = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
-                            if ($upload_pref)
+                            if($field->type == 'file')
                             {
-                                $this->EE->pl_email->attach($upload_pref['server_path'].$data[$field->field_name]);
+                                $upload_pref = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
+                                if ($upload_pref)
+                                {
+                                    $this->EE->pl_email->attach($upload_pref['server_path'].$data[$field->field_name]);
+                                }
                             }
                         }
                     }

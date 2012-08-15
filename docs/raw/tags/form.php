@@ -688,6 +688,10 @@
     <li><a href="#var_field_extra_2">{field_extra_2}</a></li>
     <li><a href="#var_field_validation">{field_validation:*}</a></li>
     <li><a href="#var_field_value">{field_value}</a></li>
+    <li><a href="#var_field_filename">{field_filename}</a></li>
+    <li><a href="#var_field_basename">{field_basename}</a></li>
+    <li><a href="#var_field_ext">{field_ext}</a></li>
+    
     <li><a href="#var_field_value_label">{field_value_label}</a></li>
 </ul>
 
@@ -801,14 +805,28 @@
 
 <p>The value of the field as it was submitted. Use this to preserve values when errors have occurred in other fields.</p>
 
+<p>For File type fields, this contains the full URL to the uploaded file.</p>
+
+<h6><a name="var_field_filename">{field_filename}</a></h6>
+
+<p><b>Only valid for File type fields.</b> The value of the filename saved in this field. Note that the filename will be slightly modified from what was originally uploaded for safety and to make sure it is unique.</p>
+
+<h6><a name="var_field_basename">{field_basename}</a></h6>
+
+<p><b>Only valid for File type fields.</b> The value of the filename, without any extension.</p>
+
+<h6><a name="var_field_ext">{field_ext}</a></h6>
+
+<p><b>Only valid for File type fields.</b> The extension (if present) for the uploaded file.</p>
+
 <h6><a name="var_field_value_label">{field_value_label}</a></h6>
 
-<p><b>Only valid for list type fields.</b> Provides the label of the selected option. This is useful for notification templates primarily, where you may want to display the label of the selected value rather than the actual value stored in the DB.</p>
+<p><b>Only valid for List type fields.</b> Provides the label of the selected option. This is useful for notification templates primarily, where you may want to display the label of the selected value rather than the actual value stored in the DB.</p>
 
 <h5>{fields} Variable Pairs</h5>
 
 <h6><a name="pair_field_options">{field_options}</a></h6>
-<p><strong>Only valid for List and Relationship type fields</strong>. The {field_options} loop, which must be used inside of the {fields} pair, provides a list of all of the options available for fields with the type <b>list</b>.</p>
+<p><b>Only valid for List and Relationship type fields.</b> The {field_options} loop, which must be used inside of the {fields} pair, provides a list of all of the options available for fields with the type <b>list</b>.</p>
 
 <div class="tip">
     <h6>Note</h6>
