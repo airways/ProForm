@@ -52,7 +52,7 @@
 </ul>
 
 <h2><a name="simple_parameters">Simple Parameters</a></h2>
-<p>The <kbd>Simple Form Tag</kbd> supports all of the same parameters as the <kbd>Full Form Tag</kbd> <strong>except</strong> the variable_prefix and last_step_summary parameters (since they do not make sense for a simple form).</p>
+<p>The <kbd>Simple Form Tag</kbd> supports all of the same parameters as the <kbd>Full Form Tag</kbd> <strong>except</strong> the variable_prefix and last_step_summary parameters since they do not make sense for a simple form.</p>
 
 <p>See the full <a href="#parameters">list of parameters</a> for more information.</p>
 
