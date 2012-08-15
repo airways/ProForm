@@ -242,6 +242,7 @@ $alt = FALSE;
                         <li class="first-section">Field Types</li>
                         <?php foreach($item_options as $option): ?>
                         <li><a class="field_type"
+                            <?php if(isset($option['accesskey'])) echo ' accesskey="'.$option['accesskey'].'" '; ?>
                             href="<?php
                                 echo $new_item_url.AMP.'field_type='.$option['type'];
                                 if(isset($option['length'])) echo AMP.'field_length='.$option['length'];
@@ -258,6 +259,7 @@ $alt = FALSE;
                         else:
                             foreach($driver_options as $option): ?>
                             <li><a class="field_type"
+                                <?php if(isset($option['accesskey'])) echo ' accesskey="'.$option['accesskey'].'" '; ?>
                                 href="<?php
                                     echo $new_item_url.AMP.'field_type='.$option['key'];
                                     if(isset($option['add_params']))
@@ -289,8 +291,10 @@ $alt = FALSE;
                             <li>Click the Reusable checkbox on a field to place it in the library. Only fields that are not on the current form will be shown in the library.</li>
                         <?php
                         else:
-                            foreach($add_item_options as $option): ?>
+                            $count = 0;
+                            foreach($add_item_options as $option): $count++; ?>
                             <li><a class="library"
+                                accesskey="<?php echo $count; ?>"
                                 href="<?php echo $add_item_url.'&field_id='.$option['field_id']; ?>">
                                     <img src="<?php echo get_instance()->config->slash_item('theme_folder_url'); ?>third_party/proform/images/icons/<?php echo $option['icon']; ?>"> <?php echo $option['label']; ?></a>
                                 <a href="<?php echo $edit_field_url.'&field_id='.$option['field_id']; ?>" class="edit"><img src="<?php echo get_instance()->config->slash_item('theme_folder_url'); ?>third_party/proform/images/cog.png">Edit...</a>

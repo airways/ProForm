@@ -54,7 +54,7 @@ class Proform_mcp extends Prolib_base_mcp {
 
     public static $item_options = array(
         array('label' => 'Checkbox',                    'type' => 'checkbox',                   'icon' => 'checkbox.png'),
-        array('label' => 'Text',                        'type' => 'string',                     'icon' => 'textfield.png'),
+        array('label' => 'Text',                        'type' => 'string',                     'icon' => 'textfield.png', 'accesskey' => 'T'),
         array('label' => 'Textarea',                    'type' => 'text',                       'icon' => 'textarea.png',       'length' => '1000',),
         array('label' => 'Number: Integer',             'type' => 'int',                        'icon' => 'number.png'),
         array('label' => 'Number: Float',               'type' => 'float',                      'icon' => 'float.png'),
@@ -121,9 +121,9 @@ class Proform_mcp extends Prolib_base_mcp {
         $upload_prefs[0] = 'None';
 
         $this->field_type_settings = array(
-//             'file' => array(
-//                 array('type' => 'dropdown', 'name' => 'upload_pref_id', 'label' => 'Upload Directory', 'options' => $upload_prefs)
-//             ),
+            'file' => array(
+                array('type' => 'dropdown', 'name' => 'upload_pref_id', 'label' => 'Upload Directory', 'options' => $upload_prefs)
+            ),
             'list' => array(
                 array('type' => 'dropdown', 'name' => 'style', 'label' => 'Style', 'options' => array('' => 'Select Box', 'check' => 'Checkboxes', 'radio' => 'Radio Buttons')),
                 array('type' => 'dropdown', 'name' => 'multiselect', 'label' => 'Allow multiple selections?', 'options' => array('' => 'No', 'y' => 'Yes')),
@@ -1275,7 +1275,12 @@ class Proform_mcp extends Prolib_base_mcp {
 
             //$query = $this->EE->db->get_where('proform_fields', array('field_id' => $field_id));
             $field = $this->EE->formslib->fields->get($field_id);
-
+            
+            if($field->type == 'file')
+            {
+                $field->settings['type_upload_pref_id'] = $field->upload_pref_id;
+            }
+            
             $vars['editing'] = TRUE;
             $vars['hidden'] = array('field_id' => $field_id);
         } else {
@@ -1325,8 +1330,6 @@ class Proform_mcp extends Prolib_base_mcp {
             'type'              => array(
                 'dropdown', $this->field_type_options, $this->field_type_settings),
             'length'            => 'input',
-            'upload_pref_id'    => array(
-                'dropdown', $upload_prefs),
             'mailinglist_id'    => array(
                 'dropdown', $mailinglists),
             'validation'        => array(
@@ -1417,13 +1420,23 @@ class Proform_mcp extends Prolib_base_mcp {
         {
             // The member data field select has no blank default, so skip it if this isn't a member_data field
             if($k == 'type_member_data' && $this->EE->input->post('type') != 'member_data') continue;
-            if(substr($k, 0, 5) == "type_" && $this->EE->input->post($k))
+            if(substr($k, 0, 5) == "type_" && $this->EE->input->post($k) !== FALSE && $this->EE->input->post($k) !== '')
             {
                 $settings[$k] = $this->EE->input->post($k);
             }
         }
 
         // copy post values defined on the field class to it
+        if($field->type == 'file')
+        {
+            if(isset($settings['type_upload_pref_id']))
+            {
+                $_POST['upload_pref_id'] = $settings['type_upload_pref_id'];
+                unset($settings['type_upload_pref_id']);
+            } else {
+                $_POST['upload_pref_id'] = '0';
+            }
+        }
         $this->prolib->copy_post($field);
         $field->settings = $settings;
         $field->save();

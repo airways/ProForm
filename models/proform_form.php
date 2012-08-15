@@ -313,14 +313,18 @@ class PL_Form extends PL_RowInitialized {
     function set_layout($field_order, $field_rows, $form_field_id)
     {
         $i = 0;
+//         var_dump($form_field_id);
         foreach($field_order as $field_id)
         {
             $data = array('field_order' => $i+1, 'field_row' => $field_rows[$i]);
+//             echo $form_field_id[$i].'<br/>';
+//             var_dump($data);
             $where = array('form_id' => $this->form_id, 'form_field_id' => $form_field_id[$i]);
             $this->__EE->db->where($where)->update('exp_proform_form_fields', $data);
 
             $i++;
         }
+//         exit;
     }
 
     function get_field($field_id)
@@ -358,7 +362,10 @@ class PL_Form extends PL_RowInitialized {
 
             foreach($settings_map as $setting => $values)
             {
-                $field->form_field_settings[$setting] = $values[$i];
+                if(isset($values[$i]))
+                {
+                    $field->form_field_settings[$setting] = $values[$i];
+                }
             }
 
             $data = array(
@@ -562,8 +569,16 @@ class PL_Form extends PL_RowInitialized {
                     
                     if($typedef)
                     {
+                        $column_type = $typedef['type'];
+                        
+                        // Avoid errors caused by row lengths being too long in MySQL
+                        if($column_type == 'varchar' && count($this->db_fields()) > 30)
+                        {
+                            $column_type = 'TEXT';
+                        }
+                        
                         $fields = array(
-                            $field->field_name       => array('type' => $typedef['type'])
+                            $field->field_name       => array('type' => $column_type)
                         );
 
                         // if there is a constraint set on the type definition, this always overrides anything

@@ -1985,6 +1985,9 @@ class Proform {
 
     private function load_varsets(&$varsets, &$variables)
     {
+        $prefs = array();
+        $formprefs = array();
+        
         foreach($varsets as $varset)
         {
             foreach($varset[1] as $key => $value)
@@ -1998,6 +2001,24 @@ class Proform {
                     $variables[$varset[0] . ':' . $key] = $value;
                 }
             }
+            
+            if($varset[0] == 'pref')
+            {
+                $prefs[$key] = $value;
+            }
+            
+            if($varset[0] == 'formpref')
+            {
+                $formprefs[$key] = $value;
+            }
+        }
+        foreach($prefs as $key => $value)
+        {
+            $variables[$key] = $value;
+        }
+        foreach($formprefs as $key => $value)
+        {
+            $variables[$key] = $value;
         }
     }
     
