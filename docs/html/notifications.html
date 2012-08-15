@@ -53,14 +53,19 @@
 <h2>Sample Template</h2>
 <p>One of the simplest possible notification templates looks like this:</p>
 <p class="strongbox">Example Template</p>
-<pre class="brush: xml">
-&lt;p&gt;Someone submitted the {form_name} form:&lt;/p&gt;
+<textarea cols="80" rows="40" style="width: 100%; font-family: courier;">
+&lt;p&gt;Someone submitted the &#123;form_name&#125; form:&lt;/p&gt;
 &#123;fields&#125;
-  &lt;b&gt;&#123;field_label&#125;&lt;/b&gt;: &#123;field_value&#125;&lt;br/&gt;
+  &lt;b&gt;&#123;field_label&#125;&lt;/b&gt;: 
+    &#123;if field_filename&#125;
+        &lt;a href="&#123;field_value&#125;"&gt;&#123;field_filename&#125;&lt;/a&gt;
+    &#123;if:else&#125;
+        &#123;field_value&#125;
+    &#123;/if&#125;&lt;br/&gt;
 &#123;/fields&#125;
-</pre>
+</textarea>
     <div id="footer">
-            <p>ProForm version 1.16</p>
+            <p>ProForm version 1.18</p>
     </div>
     </div>
 </div>

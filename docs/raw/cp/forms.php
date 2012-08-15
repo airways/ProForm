@@ -129,6 +129,11 @@
                 For instance, often times this option would be set to a field filled out by the visitor such as <strong>my_email_address</strong>. Whatever value is entered by the user would then be set as the Reply-To for the notifications. Assuming that the Notification List is sent to a customer service rep, or other person who would like to easily contact the submitter of the form, they can simply use their email client's <strong>Reply</strong> command to compose a new return message directly to the visitor.</td>
             <td>submitter_email_address</td>
         </tr>
+        <tr>
+            <td><strong>Send Attachments?</strong></td>
+            <td>This option enables sending of attachments to this notification group. All uploaded files from file fields on the form will be sent to this notification group as attachments.</td>
+            <td>n/a</td>
+        </tr>
     </tbody>
 </table>
 <h4>
@@ -179,6 +184,11 @@
                 For instance, often times this option would be set to a field filled out by the visitor such as <strong>my_email_address</strong>. Whatever value is entered by the user would then be set as the Reply-To for the notifications. Assuming that the Notification Field is used to specify a particular customer service rep or department to send this notification to, that person can simply use their email client's <strong>Reply</strong> command to compose a new return message directly to the visitor.</td>
             <td>submitter_email_address</td>
         </tr>
+        <tr>
+            <td><strong>Send Attachments?</strong></td>
+            <td>This option enables sending of attachments to this notification group. All uploaded files from file fields on the form will be sent to this notification group as attachments.</td>
+            <td>n/a</td>
+        </tr>
     </tbody>
 </table>
 
@@ -188,7 +198,7 @@
 
 <p>Some settings may be specific to the template you are using as well, meaning that they only have an effect if the template actually calls them.</p>
 
-<p>All of these settings are available inside a {exp:proform:form} tag through the <b>{pref:*}</b> variables, as shown in the Variable column of this table. Some additional settings are available globally from the module's own <a href="{root_url}cp/settings.html#form_settings_advanced">Advanced Settings</a> tab.</p>
+<p>All of these settings are available inside a {exp:proform:form} and {exp:proform:results} tags, as shown in the Variable column of this table. Some additional settings are available globally from the module's own <a href="{root_url}cp/settings.html#form_settings_advanced">Advanced Settings</a> tab.</p>
 
 <table>
     <tbody>
@@ -200,13 +210,13 @@
         </tr>
         <tr>
             <td><strong>Label for Extra 1</strong>, <strong>Label for Extra 2</strong></td>
-            <td><strong>{pref:extra1_label}</strong>, <strong>{pref:extra2_label}</strong></td>
+            <td><strong>{extra1_label}</strong>, <strong>{extra2_label}</strong></td>
             <td>Changes the label visible under the Layout tab for the Extra 1 or 2 overrides. This can be useful to change the meaning of the Extra field in order to be more user friendly so the editors do not need to remember what you are using the Extra field for.</td>
             <td>Wrapper HTML Class</td>
         </tr>
         <tr>
             <td><strong>Thank You Message</strong></td>
-            <td><strong>{pref:thank_you_message}</strong></td>
+            <td><strong>{thank_you_message}</strong></td>
             <td>Provides a custom message to be used in the default template and by the {exp:proform:simple} tag when the form has been submitted.</td>
             <td>Thank you for submitting a Support Request! We will get back to you shortly.</td>
         </tr>

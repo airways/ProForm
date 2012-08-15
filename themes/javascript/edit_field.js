@@ -20,7 +20,9 @@ var proform_edit_field = {
 
         $('form').submit(function() {
             proform_mod.dirty = false;
-        });       
+        });
+        
+        $('input[name=field_label]').focus();
     },
 
     update_settings_fields: function() {

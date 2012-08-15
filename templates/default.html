@@ -1,5 +1,5 @@
 
-{exp:proform:form form_class="proform {embed:form_name}_proform" [%params%] variable_prefix="pf_"}
+{exp:proform:form form_class="proform" [%params%] variable_prefix="pf_"}
     {if pf_no_results}
         {if pf_pref:invalid_form_message}
             {pf_pref:invalid_form_message}
@@ -9,8 +9,8 @@
     {/if}
     
     {if pf_complete}
-        {if pf_pref:thank_you_message}
-            {pf_pref:thank_you_message}
+        {if pf_thank_you_message}
+            {pf_thank_you_message}
         {if:else}
             Thank you for your submission!
         {/if}
@@ -41,7 +41,9 @@
                     {if pf_field_html_block}
                         {pf_field_html_block}
                     {if:elseif pf_field_heading}
-                        <h3>{pf_field_heading}</h3>
+                        {if pf_field_is_step == ''}
+                            <h3>{pf_field_heading}</h3>
+                        {/if}
                     {if:else}
                         {if pf_field_type != "checkbox"}
                             <label for="{pf_field_name}">{pf_field_label} {if pf_field_is_required}<span class="required">*</span>{/if}</label>
@@ -82,6 +84,7 @@
                         {if:elseif pf_field_type == "file"}
                             <div class="pf_files">
                                 <input name="{pf_field_name}" id="{pf_field_name}" type="file" class="{pf_field_is_required}" />
+                                {if pf_field_value}<p>File previously uploaded: <b>{pf_field_filename}</b>. You may upload a new file to replace it.</p>{/if}
                             </div>
                         {if:elseif pf_field_type == "checkbox"}
                             <div class="pf_field">

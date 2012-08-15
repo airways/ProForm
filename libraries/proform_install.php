@@ -117,6 +117,7 @@ class Proform_install
             'admin_notification_on'             => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
             'notification_template'             => array('type' => 'varchar', 'constraint' => '50',     'default' => ''),
             'notification_list'                 => array('type' => 'text'),
+            'notification_list_attachments'     => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
             'subject'                           => array('type' => 'varchar', 'constraint' => '128',    'default' => ''),
             'reply_to_field'                    => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
 
@@ -125,12 +126,15 @@ class Proform_install
             'submitter_notification_subject'    => array('type' => 'varchar', 'constraint' => '128',    'default' => ''),
             'submitter_email_field'             => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
             'submitter_reply_to_field'          => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
+            'submitter_notification_attachments'=> array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
 
             'share_notification_on'             => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
             'share_notification_template'       => array('type' => 'varchar', 'constraint' => '50',     'default' => ''),
             'share_notification_subject'        => array('type' => 'varchar', 'constraint' => '128',    'default' => ''),
             'share_email_field'                 => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
             'share_reply_to_field'              => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
+            'share_notification_attachments'=> array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
+
             'site_id'                           => array('type' => 'int', 'constraint' => '4', 'default' => 1),
 
         );
@@ -394,6 +398,15 @@ class Proform_install
             $forge->modify_column('proform_form_fields', $fields);
         }
         
+        if($current < 1.18)
+        {
+            $fields = array(
+                'notification_list_attachments'     => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
+                'submitter_notification_attachments'=> array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
+                'share_notification_attachments'    => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
+            );
+            $forge->add_column('proform_forms', $fields);
+        }
         return TRUE;
     } // function update
 

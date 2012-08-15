@@ -43,7 +43,7 @@
 
 <p>Some settings may be specific to the template you are using as well, meaning that they only have an effect if the template actually calls them.</p>
 
-<p>All of these settings are available inside a {exp:proform:form} tag through the <b>{pref:*}</b> variables, as shown in the Variable column of this table. Some additional settings are available at the form level through the form's own <a href="{root_url}cp/forms.html#form_settings_advanced">Advanced Settings</a> tab.</p>
+<p>All of these settings are available inside a {exp:proform:form} and {exp:proform:results} tags, as shown in the Variable column of this table. Some additional settings are available at the form level through the form's own <a href="{root_url}cp/forms.html#form_settings_advanced">Advanced Settings</a> tab.</p>
 
 <table>
     <tbody>
@@ -55,13 +55,13 @@
         </tr>
         <tr>
             <td><strong>Invalid Form Message</strong></td>
-            <td><strong>{pref:invalid_form_message}</strong></td>
+            <td><strong>{invalid_form_message}</strong></td>
             <td>A message to display when the requested form isn't found.</td>
             <td>The requested form doesn't exist. Please check the Form Directory for a list of available forms.</td>
         </tr>
         <tr>
             <td><strong>Thank You Message (Default)</strong></td>
-            <td><strong>{pref:thank_you_message}</strong></td>
+            <td><strong>{thank_you_message}</strong></td>
             <td>Provides a custom message to be used in the default template and by the {exp:proform:simple} tag when the form has been submitted. If a form provides it's own <strong>Thank You Message</strong> through it's Advanced Settings tab, that message will be used instead.</td>
             <td>Thank you for submitting a form from the Form Directory. Your submission will be processed as soon as possible.</td>
         </tr>

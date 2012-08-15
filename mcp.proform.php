@@ -54,7 +54,7 @@ class Proform_mcp extends Prolib_base_mcp {
 
     public static $item_options = array(
         array('label' => 'Checkbox',                    'type' => 'checkbox',                   'icon' => 'checkbox.png'),
-        array('label' => 'Text',                        'type' => 'string',                     'icon' => 'textfield.png'),
+        array('label' => 'Text',                        'type' => 'string',                     'icon' => 'textfield.png', 'accesskey' => 'T'),
         array('label' => 'Textarea',                    'type' => 'text',                       'icon' => 'textarea.png',       'length' => '1000',),
         array('label' => 'Number: Integer',             'type' => 'int',                        'icon' => 'number.png'),
         array('label' => 'Number: Float',               'type' => 'float',                      'icon' => 'float.png'),
@@ -117,7 +117,13 @@ class Proform_mcp extends Prolib_base_mcp {
             'relationship'  => 'Channel Entry Relationship',
         );
 
+        $upload_prefs = $this->EE->pl_uploads->get_upload_prefs();
+        $upload_prefs[0] = 'None';
+
         $this->field_type_settings = array(
+            'file' => array(
+                array('type' => 'dropdown', 'name' => 'upload_pref_id', 'label' => 'Upload Directory', 'options' => $upload_prefs)
+            ),
             'list' => array(
                 array('type' => 'dropdown', 'name' => 'style', 'label' => 'Style', 'options' => array('' => 'Select Box', 'check' => 'Checkboxes', 'radio' => 'Radio Buttons')),
                 array('type' => 'dropdown', 'name' => 'multiselect', 'label' => 'Allow multiple selections?', 'options' => array('' => 'No', 'y' => 'Yes')),
@@ -571,13 +577,20 @@ class Proform_mcp extends Prolib_base_mcp {
         $types = array(
             'form_id' => 'read_only',
             'entries_count' => 'read_only',
+            
             'notification_template' => array('dropdown', $template_options),
             'notification_list' => 'textarea',
+            'notification_list_attachments' => array('checkbox', 'y'),
+
             'admin_notification_on' => array('checkbox', 'y'),
             'submitter_notification_on' => array('checkbox', 'y'),
             'submitter_notification_template' => array('dropdown', $template_options),
+            'submitter_notification_attachments' => array('checkbox', 'y'),
+            
             'share_notification_on' => array('checkbox', 'y'),
             'share_notification_template' => array('dropdown', $template_options),
+            'share_notification_attachments' => array('checkbox', 'y'),
+            
             'encryption_on' => (isset($form) AND $form AND $form->count_entries())
                                         ? array('read_only_checkbox', lang('encryption_toggle_disabled'))
                                         : array('checkbox', 'y'),
@@ -596,9 +609,9 @@ class Proform_mcp extends Prolib_base_mcp {
         if($form_obj->form_type == 'form')
             $extra['after']['reply_to_name'] = array(array('lang_field' => 'reply_to_name', 'heading' => lang('notification_list_name'), 'description' => lang('notification_list_desc')));
         if($form_obj->form_type == 'form' OR $form_obj->form_type == 'share')
-            $extra['after']['reply_to_field'] = array(array('lang_field' => 'reply_to_field', 'heading' => lang('field_submitter_notification_name'), 'description' => lang('notification_field_desc')));
+            $extra['after']['notification_list_attachments'] = array(array('lang_field' => 'reply_to_field', 'heading' => lang('field_submitter_notification_name'), 'description' => lang('notification_field_desc')));
         if($form_obj->form_type == 'form' OR $form_obj->form_type == 'share')
-            $extra['after']['submitter_reply_to_field'] = array(array('lang_field' => 'submitter_reply_to_field', 'heading' => lang('field_share_notification_name'), 'description' => lang('notification_field_desc')));
+            $extra['after']['submitter_notification_attachments'] = array(array('lang_field' => 'submitter_reply_to_field', 'heading' => lang('field_share_notification_name'), 'description' => lang('notification_field_desc')));
 
         $edit_form = $this->EE->pl_forms->create_cp_form($form_obj, $types, $extra);
 
@@ -858,6 +871,9 @@ class Proform_mcp extends Prolib_base_mcp {
         if(!$this->EE->input->post('admin_notification_on')) $_POST['admin_notification_on'] = 'n';
         if(!$this->EE->input->post('submitter_notification_on')) $_POST['submitter_notification_on'] = 'n';
         if(!$this->EE->input->post('share_notification_on')) $_POST['share_notification_on'] = 'n';
+        if(!$this->EE->input->post('notification_list_attachments')) $_POST['notification_list_attachments'] = 'n';
+        if(!$this->EE->input->post('submitter_notification_attachments')) $_POST['submitter_notification_attachments'] = 'n';
+        if(!$this->EE->input->post('share_notification_attachments')) $_POST['share_notification_attachments'] = 'n';
 
         // copy post values defined on the form class to it and save it
         $this->prolib->copy_post($form);
@@ -1259,7 +1275,12 @@ class Proform_mcp extends Prolib_base_mcp {
 
             //$query = $this->EE->db->get_where('proform_fields', array('field_id' => $field_id));
             $field = $this->EE->formslib->fields->get($field_id);
-
+            
+            if($field->type == 'file')
+            {
+                $field->settings['type_upload_pref_id'] = $field->upload_pref_id;
+            }
+            
             $vars['editing'] = TRUE;
             $vars['hidden'] = array('field_id' => $field_id);
         } else {
@@ -1309,8 +1330,6 @@ class Proform_mcp extends Prolib_base_mcp {
             'type'              => array(
                 'dropdown', $this->field_type_options, $this->field_type_settings),
             'length'            => 'input',
-            'upload_pref_id'    => array(
-                'dropdown', $upload_prefs),
             'mailinglist_id'    => array(
                 'dropdown', $mailinglists),
             'validation'        => array(
@@ -1401,13 +1420,23 @@ class Proform_mcp extends Prolib_base_mcp {
         {
             // The member data field select has no blank default, so skip it if this isn't a member_data field
             if($k == 'type_member_data' && $this->EE->input->post('type') != 'member_data') continue;
-            if(substr($k, 0, 5) == "type_" && $this->EE->input->post($k))
+            if(substr($k, 0, 5) == "type_" && $this->EE->input->post($k) !== FALSE && $this->EE->input->post($k) !== '')
             {
                 $settings[$k] = $this->EE->input->post($k);
             }
         }
 
         // copy post values defined on the field class to it
+        if($field->type == 'file')
+        {
+            if(isset($settings['type_upload_pref_id']))
+            {
+                $_POST['upload_pref_id'] = $settings['type_upload_pref_id'];
+                unset($settings['type_upload_pref_id']);
+            } else {
+                $_POST['upload_pref_id'] = '0';
+            }
+        }
         $this->prolib->copy_post($field);
         $field->settings = $settings;
         $field->save();
@@ -1860,7 +1889,12 @@ class Proform_mcp extends Prolib_base_mcp {
 
             $vars['fields'][] = $field->field_name;
             $vars['field_types'][$field->field_name] = $field->type;
-            $vars['field_upload_prefs'][$field->field_name] = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
+            if($field->upload_pref_id > 0)
+            {
+                $vars['field_upload_prefs'][$field->field_name] = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
+            } else {
+                $vars['field_upload_prefs'][$field->field_name] = null;
+            }
             $vars['field_options'][$field->field_name] = $field->get_list_options();
 
             if(array_search($field->field_name, $vars['hidden_columns']) === FALSE)
