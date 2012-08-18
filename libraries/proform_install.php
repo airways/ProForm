@@ -407,6 +407,7 @@ class Proform_install
             );
             $forge->add_column('proform_forms', $fields);
         }
+
         return TRUE;
     } // function update
 

@@ -881,7 +881,8 @@ span.value_file a {
 
 .table_wrapper {
     padding-top: 15px;
-    height: 28px;
+    min-height: 60px;
     min-width: 900px;
-	border-top: 1px solid #d1d7df;
+    border-top: 1px solid #d1d7df;
+    overflow-x: auto;
 }

@@ -10,6 +10,8 @@ class PL_Form extends PL_RowInitialized {
     var $form_type = 'form';
     var $form_label;
     var $form_name;
+    
+    
     var $encryption_on = 'n';
     var $table_override = '';
     var $safecracker_channel_id = 0;
@@ -44,6 +46,8 @@ class PL_Form extends PL_RowInitialized {
     const SEPARATOR_HTML     = 'HTML';
 
     public $__advanced_settings_options = array(
+        'html_id'               => 'HTML ID',
+        'html_class'            => 'HTML Class',
         'thank_you_message'     => 'Thank You Message',
         'extra1_label'          => 'Label for Extra 1',
         'extra2_label'          => 'Label for Extra 2',
