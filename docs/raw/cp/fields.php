@@ -165,6 +165,15 @@
                 <b>Options</b> - A list of options available to the user. Uses either of the following formats for options, with one option on each line (these styles may be mixed within a single field if desired):
                 <pre class="brush: xml">
 value : label&#10;value</pre>
+                To include groups of options, add a line with a value of "-" with it's label set to the name of the group. For instance, the following option list would create two groups - one named "Billing Requests" and the other named "Sales Requests". All styles of the List field type can render these as groups of select options or as fieldsets for radio buttons, or checkboxes.<br/>
+                <pre class="brush: xml">
+- : Billing Requests
+value1 : label&#10;value1
+value2 : label&#10;value2
+- : Sales Requests
+value3 : label&#10;value3
+value4 : label&#10;value4
+</pre>
             </td>
             <td>VARCHAR or TEXT</td>
         </tr>
