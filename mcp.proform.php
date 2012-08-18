@@ -180,6 +180,30 @@ class Proform_mcp extends Prolib_base_mcp {
         $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/jquery.form.js"></script>');
         $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/jquery.colorbox-min.js"></script>');
 
+        // Grab lang entries we want to sent to the JS
+        $lang_keys = array();
+        $lang_entries = array();
+        $f = new PL_Form(FALSE);
+        
+        foreach(array_keys($f->__advanced_settings_options) as $adv_setting)
+        {
+            $lang_keys[] = 'adv_'.$adv_setting.'_desc';
+        }
+        
+        $this->EE->load->language('proform');
+        
+        foreach($lang_keys as $key)
+        {
+            if(lang($key) != $key)
+            {
+                $lang_entries[$key] = lang($key);
+            }
+        }
+        
+        $js= 'proform_mod.lang = '.json_encode($lang_entries).';';
+        $this->EE->javascript->output($js);
+        
+        $this->EE->javascript->compile();
 
     }
 
@@ -273,6 +297,7 @@ class Proform_mcp extends Prolib_base_mcp {
         ));
         $this->EE->cp->add_js_script(array('plugin' => 'dataTables'));
         //$this->EE->javascript->output($this->ajax_filters('edit_items_ajax_filter', 4));
+        
         $this->EE->javascript->compile();
 
         ////////////////////////////////////////

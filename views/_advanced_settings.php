@@ -15,7 +15,9 @@ foreach($settings as $key => $value)
     }
     // Create a row in the table for the option
     $row = array(
-        '<span data-key="'.$key.'" data-label="'.$label.'">'.$label.'</span>',
+        '<span data-key="'.$key.'" data-label="'.$label.'"><label>'.$label.'</label>'
+            .(lang('adv_'.$key.'_desc') != 'adv_'.$key.'_desc' ? '<br/>'.lang('adv_'.$key.'_desc') : '')
+            .'</span>',
         form_input('settings['.$key.']', $value),
         '<a href="#" class="remove_grid_row remove_advanced">X</a>'
     );

@@ -8,6 +8,7 @@ if(!Array.prototype.remove)
 }
 var proform_mod = {
     dirty: false,
+    lang: {},
     bind_events: function() {
         $(window).bind('beforeunload', function() { 
             if(proform_mod.dirty) return 'You have modified this form. Leaving this page will lose all changes.';
@@ -40,7 +41,7 @@ var proform_mod = {
                 $('#advanced_settings_options').children('option[value='+key+']').remove();
                 var input = '<input type="text" name="settings['+key+']" />';
                 $('#advanced_settings table tr:last').after('<tr class="' + (even ? 'even' : 'odd') + '">'+
-                    '<td><span data-key="' + key + '" data-label="' + label + '">' + label + '</span></td>'+
+                    '<td><span data-key="' + key + '" data-label="' + label + '"><label>' + label + '</label>' + (proform_mod.lang['adv_'+key+'_desc'] ? '<br/>'+proform_mod.lang['adv_'+key+'_desc'] : '') + '</span></td>'+
                     '<td>' + input + '</td>'+
                     '<td><a href="#" class="remove_grid_row remove_advanced">X</a></td>'+
                     '</tr>');

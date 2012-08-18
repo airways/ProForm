@@ -304,7 +304,7 @@ class Proform {
                 $form_session->config = array(
                     'use_captcha'       => $use_captcha,
                     'form_name'         => $form_name,
-                    'form_id'           => (int)$form_id,
+                    'form_id'           => $form_id,
                     'form_class'        => $form_class,
                     'form_url'          => $form_url,
                     'error_url'         => $error_url,
@@ -364,8 +364,8 @@ class Proform {
                 $form_details = array(
                         'action'            => $this->EE->functions->remove_double_slashes($base_url),
                         'name'              => $form_name,
-                        'id'                => $form_id,
-                        'class'             => $form_class,
+                        'id'                => $form_obj->ini('html_id', $form_id),
+                        'class'             => $form_obj->ini('html_class', $form_class),
                         'hidden_fields'     => array('__conf' => $form_session_enc),
                         'secure'            => TRUE,
                         'onsubmit'          => '',

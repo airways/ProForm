@@ -216,7 +216,8 @@
         <tr>
             <td><strong>Form HTML Class</strong></td>
             <td>{html_class}</td>
-            <td>An HTML Class to insert into the generated form tag. If this value is not provided, a class based on the form's Short Name will be used instead.</td>
+            <td>An HTML Class to insert into the generated form tag. If this value is not provided, the class "proform" will be used instead. Just as in HTML you can include multiple classes by separating them with spaces.<br/><br/>s
+            Note: In order to keep ProForm's default styling you should include "proform" as one of the classes in this value. </td>
         </tr>
         <tr>
             <td><strong>Label for Extra 1</strong>, <strong>Label for Extra 2</strong></td>

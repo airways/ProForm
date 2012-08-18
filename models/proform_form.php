@@ -926,4 +926,14 @@ class PL_Form extends PL_RowInitialized {
         $pos_b = $this->field_pos($b['lang_field']);
         return $pos_a - $pos_b;
     }
+    
+    function ini($key, $default='')
+    {
+        if(isset($this->settings[$key]) && $this->settings[$key] != '')
+        {
+            return $this->settings[$key];
+        } else {
+            return $default;
+        }
+    }
 }

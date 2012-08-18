@@ -241,6 +241,11 @@ $lang = array(
     
     'field_reusable' => 'Reusable',
     'field_reusable_desc' => 'Places the field in the Library section of the Toolbox, allowing you to easily reuse it',
+    
+    
+    // Advanced Settings
+    'adv_html_id_desc' => 'Id attribute inserted into the generated form tab',
+    'adv_html_class_desc' => 'Classes inserted into the generated form tab; make sure to include the class "proform" to preserve default formatting',
 
     // Errors
     'invalid_submit' => 'The form has invalid values',
