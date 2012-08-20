@@ -112,9 +112,11 @@
         <tr>
             <td><b>File</b></td>
             <td>&lt;input type="file" ... /&gt;</td>
-            <td>A file upload field. When selected, an additional option is available:<br />
-                <br />
-                <b>Upload Directory</b> - Directory to upload files into.</td>
+            <td>A file upload field.<br /><br />
+            <b>Type Options</b><br/>
+            When this type is selected, an additional option is available:<br />
+            <br />
+            <b>Upload Directory</b> - Directory to upload files into.</td>
             <td>VARHCAR</td>
         </tr>
         <tr>
@@ -150,10 +152,14 @@
         </tr>
         <tr>
             <td><b>List</b></td>
-            <td>&lt;select&gt;</td>
-            <td>A select box, set of checkboxes, or set of radio buttons allowing the visitor to choose between options. When selected, an additional option is available:<br />
+            <td>&lt;select&gt;,<br/>
+            &lt;input type="checkbox" ... /&gt; or <br/>
+            &lt;input type="radio" ... /&gt;</td>
+            <td>A select box, set of checkboxes, or set of radio buttons allowing the visitor to choose between options.<br/><br />
+                <b>Type Options</b><br/>
+                When this type is selected, these additional options are available:<br />
                 <br />
-                <b>Style</b> - The style of list you would like to use. This controls how the processing is done, so it should match the way you are rendering the field. This will work best with the Simple Form Tag or template code based on the Example Template.<br/>
+                <b>Style</b> - The style of list you would like to use.<br/>
                 <ul>
                     <li>Select Box - Standard select HTML element, optionally with Multiselect support.</li>
                     <li>Check Boxes - A set of checkbox controls, one for each option. Inherently supports multiple selections.</li>
@@ -164,15 +170,20 @@
                 <br />
                 <b>Options</b> - A list of options available to the user. Uses either of the following formats for options, with one option on each line (these styles may be mixed within a single field if desired):
                 <pre class="brush: xml">
-value : label&#10;value</pre>
-                To include groups of options, add a line with a value of "-" with it's label set to the name of the group. For instance, the following option list would create two groups - one named "Billing Requests" and the other named "Sales Requests". All styles of the List field type can render these as groups of select options or as fieldsets for radio buttons, or checkboxes.<br/>
+value1 : Label For Option 1
+value2</pre>
+                <b>Option Groups</b><br/>
+                To include groups of options, add a line with a value of "-" with it's label set to the name of the group. All styles of the List field type can render these option groups.<br/>
+                <br/>
+                For instance, the following option list would create two groups - one named "Billing Requests" and the other named "Sales Requests".<br/>
                 <pre class="brush: xml">
 - : Billing Requests
-value1 : label&#10;value1
-value2 : label&#10;value2
+value1 : Label For Option 1
+value2
+value3 : Label For Option 3
 - : Sales Requests
-value3 : label&#10;value3
-value4 : label&#10;value4
+value4 : Label For Option 4
+value5 : Label For Option 5
 </pre>
             </td>
             <td>VARCHAR or TEXT</td>
@@ -190,7 +201,10 @@ value4 : label&#10;value4
         <tr>
             <td><b>Mailing List Subscription</b></td>
             <td>&lt;input type="checkbox" ... /&gt;</td>
-            <td>When this checkbox is selected, the user will be subscribed to the mailing list selected. When this type is selected, an additional option is available:<br />
+            <td>When this checkbox is selected, the user will be subscribed to the mailing list selected. Because this uses ExpressionEngine's built in subscription system, the active user must be logged into a Member account for this to work properly.<br/>
+            <br/>
+            <b>Type Options</b><br/>
+            When this type is selected, an additional option is available:<br />
                 <br />
                 <b>Mailing List</b> - The list to subscribe the user to when this checkbox is set.</td>
             <td>VARHCAR</td>
