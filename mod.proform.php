@@ -288,8 +288,12 @@ class Proform {
             foreach($_GET as $k => $v)
             {
                 $k = $this->EE->security->xss_clean($k);
-                $v = $this->EE->security->xss_clean($v);
-                $get_params[$k] = $v;
+                // Don't include things that look like a path
+                if(strpos($k, '/') === FALSE)
+                {
+                    $v = $this->EE->security->xss_clean($v);
+                    $get_params[$k] = $v;
+                }
             }
             $varsets[] = array('get', $get_params);
 
