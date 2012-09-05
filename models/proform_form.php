@@ -10,7 +10,7 @@ class PL_Form extends PL_RowInitialized {
     var $form_type = 'form';
     var $form_label;
     var $form_name;
-    
+    var $form_driver;
     
     var $encryption_on = 'n';
     var $table_override = '';
@@ -935,5 +935,30 @@ class PL_Form extends PL_RowInitialized {
         } else {
             return $default;
         }
+    }
+    
+    function get_driver()
+    {
+        $this->__EE->pl_drivers->init();
+        return $this->__EE->pl_drivers->get_driver($this->form_driver);
+    }
+    
+    function get_advanced_settings_options()
+    {
+        $result = $this->__advanced_settings_options;
+        if($driver = $this->get_driver())
+        {
+            $result = $driver->form_advanced_settings_options($result);
+        }
+        foreach($result as $k => $v)
+        {
+            if(is_array($v) && isset($v['form']))
+            {
+                #ksort($v['form']);
+                #$result[$k] = $v;
+            }
+        }
+        #ksort($result);
+        return $result;
     }
 }

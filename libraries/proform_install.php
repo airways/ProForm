@@ -107,6 +107,7 @@ class Proform_install
             'form_label'                        => array('type' => 'varchar', 'constraint' => '250'),
             'form_name'                         => array('type' => 'varchar', 'constraint' => '32'),
             'form_type'                         => array('type' => 'varchar', 'constraint' => '10',     'default' => 'form'),
+            'form_driver'                       => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
             'encryption_on'                     => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
             'safecracker_channel_id'            => array('type' => 'int', 'constraint' => '10',         'default' => 0),
             'reply_to_address'                  => array('type' => 'varchar', 'constraint' => '255',    'default' => ''),
@@ -404,6 +405,14 @@ class Proform_install
                 'notification_list_attachments'     => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
                 'submitter_notification_attachments'=> array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
                 'share_notification_attachments'    => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
+            );
+            $forge->add_column('proform_forms', $fields);
+        }
+
+        if($current < 1.19)
+        {
+            $fields = array(
+                'form_driver'                       => array('type' => 'varchar', 'constraint' => '32', 'default' => ''),
             );
             $forge->add_column('proform_forms', $fields);
         }

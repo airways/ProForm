@@ -9,6 +9,7 @@ if(!Array.prototype.remove)
 var proform_mod = {
     dirty: false,
     lang: {},
+    forms: {},
     bind_events: function() {
         $(window).bind('beforeunload', function() { 
             if(proform_mod.dirty) return 'You have modified this form. Leaving this page will lose all changes.';
@@ -40,6 +41,16 @@ var proform_mod = {
                 var label = $('#advanced_settings_options option[value='+key+']').text();
                 $('#advanced_settings_options').children('option[value='+key+']').remove();
                 var input = '<input type="text" name="settings['+key+']" />';
+                if(proform_mod.forms[key])
+                {
+                    form = proform_mod.forms[key];
+                    input = '';
+                    console.log(proform_mod);
+                    for(x in form)
+                    {
+                        input += '<label>' + proform_mod.slang(form[x]['lang_field']) + ' ' + form[x]['control'] + '<br/></label>';
+                    }
+                }
                 $('#advanced_settings table tr:last').after('<tr class="' + (even ? 'even' : 'odd') + '">'+
                     '<td><span data-key="' + key + '" data-label="' + label + '"><label>' + label + '</label>' + (proform_mod.lang['adv_'+key+'_desc'] ? '<br/>'+proform_mod.lang['adv_'+key+'_desc'] : '') + '</span></td>'+
                     '<td>' + input + '</td>'+
@@ -191,6 +202,14 @@ var proform_mod = {
             // set the selected value back
             $dd.val(selectedVal);
         }
+    },
+    slang: function(key) {
+        if(proform_mod.lang[key])
+        {
+            return proform_mod.lang[key];
+        } else {
+            return key;
+        }
     }
 
 };
@@ -202,14 +221,14 @@ $(document).ready(function() {
 });
 
 
-
 var pl_grid = {
     options: {},
     data: {},
+    forms: {},
     help: {},
     bind_events: function(key, id) {
         if(id) {
-            $('.add_grid_row').click(function(e) {
+            $('.add_grid_row').unbind('click').click(function(e) {
                 var val = $('#add'+id).val();
                 /*if(!$('#'+id+' tbody').length) {
                     $('#'+id).append('<tbody></tbody>');
@@ -227,12 +246,20 @@ var pl_grid = {
                 {
                     // <button data-key="' + kbm_form_editey + '" data-opt="' + val + '" type="button" class="remove_grid_row">X</button></td>
                     pl_grid.data[key].push([val]);
+                    
+                    var form = '<input data-key="' + key + '" data-opt="' + val + '" type="text" size="5" class="grid_param" />';
+                    
+                    if(pl_grid.forms[key])
+                    {
+                        form = pl_grid.forms[key];
+                    }
+                    
                     $('#'+id+' tbody').append(
                         '<tr class="grid_row">'
                             +'<td>'+pl_grid.options[key][val].label+'</td>'
                             +(
                                 pl_grid.options[key][val].flags && pl_grid.options[key][val].flags.indexOf('has_param') > -1
-                                    ? '<td><input data-key="' + key + '" data-opt="' + val + '" type="text" size="5" class="grid_param" /><span class="help">'+pl_grid.help[key][val]+'</span></td>'
+                                    ? '<td>'+form+'<span class="help">'+pl_grid.help[key][val]+'</span></td>'
                                     : '<td><span class="help">'+pl_grid.help[key][val]+'</span></td>'
                             )+'<td><a href="#" class="remove_grid_row" data-key="'+ key +'" data-opt="' + val +'">X</a></td>'
                             +'</tr>'

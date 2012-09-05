@@ -200,6 +200,18 @@ class Proform_mcp extends Prolib_base_mcp {
             }
         }
         
+        // Copy custom lang entries from driver classes
+        foreach($this->EE->pl_drivers->get_drivers('form') as $driver)
+        {
+            if(isset($driver->lang))
+            {
+                foreach($driver->lang as $key => $value)
+                {
+                    $lang_entries[$key] = $value;
+                }
+            }
+        }
+        
         $js= 'proform_mod.lang = '.json_encode($lang_entries).';';
         $this->EE->javascript->output($js);
         
@@ -586,8 +598,24 @@ class Proform_mcp extends Prolib_base_mcp {
         } else {
             $vars['settings'] = array();
         }
-        ksort($form_obj->__advanced_settings_options);
-        $vars['advanced_settings_options'] = $form_obj->__advanced_settings_options;
+        
+        $vars['advanced_settings_options'] = $form_obj->get_advanced_settings_options();
+        $vars['advanced_settings_forms'] = array();
+        // Render nested form elements for advanced options (mostly used by drivers to provide a package of settings in one
+        // advanced setting block)
+        foreach($vars['advanced_settings_options'] as $key => $value)
+        {
+            if(is_array($value))
+            {
+                unset($vars['advanced_settings_options'][$key]);
+                
+                if(isset($value['form']))
+                {
+                    $vars['advanced_settings_forms'][$key] = $this->EE->pl_forms->create_cp_form($vars['settings'], $value['form'], array('array_name' => 'settings', 'order' => 'type'));
+                }
+                $vars['advanced_settings_options'][$key] = $value['label'];
+            }       
+        }
 
         unset($form_obj->settings);
 
@@ -599,9 +627,19 @@ class Proform_mcp extends Prolib_base_mcp {
         $form_field_options = $this->prolib->make_options($form_field_options, 'field_name', 'field_label');
         $form_field_options = array('' => 'None') + $form_field_options;
 
+        $form_drivers = $this->EE->pl_drivers->get_drivers('form');
+        $driver_options = array();
+        foreach($form_drivers as $driver)
+        {
+            $driver_options[$driver->meta['key']] = $driver->meta['name'];
+        }
+        $driver_options = array('' => 'None') + $driver_options;
+        
         $types = array(
             'form_id' => 'read_only',
             'entries_count' => 'read_only',
+            
+            'form_driver' => array('dropdown', $driver_options),
             
             'notification_template' => array('dropdown', $template_options),
             'notification_list' => 'textarea',
@@ -631,6 +669,8 @@ class Proform_mcp extends Prolib_base_mcp {
 
         $extra = array('after' => array());
 
+        if($form_obj->form_type == 'form' OR $form_obj->form_type == 'share')
+            $extra['after']['form_driver'] = array(array('lang_field' => 'form_driver', 'heading' => lang('notification_general'), 'description' => lang('notification_general_desc')));
         if($form_obj->form_type == 'form')
             $extra['after']['reply_to_name'] = array(array('lang_field' => 'reply_to_name', 'heading' => lang('notification_list_name'), 'description' => lang('notification_list_desc')));
         if($form_obj->form_type == 'form' OR $form_obj->form_type == 'share')
