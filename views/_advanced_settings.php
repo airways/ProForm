@@ -27,17 +27,42 @@ foreach($settings as $key => $value)
     if(!in_array($key, $sub_settings))
     {
         $form = form_input('settings['.$key.']', $value);
-
+        $help = '';
+        
         if(isset($advanced_settings_options[$key]))
         {
             if(isset($advanced_settings_forms[$key]))
             {
                 $form = '';
+                // Render hidden fields first
+                /*foreach($advanced_settings_forms[$key] as $field)
+                {
+                    if($field['lang_field'] == '')
+                    {
+                        $form .= $field['control'];
+                    }
+                }*/
+                
+                $form .= '<table class="mainTable" border="0" cellspacing="0" cellpadding="0" width="100%">';
                 foreach($advanced_settings_forms[$key] as $field)
                 {
-                    $form .= ($field['lang_field'] != '' ? '<label>'.$PROLIB->pl_drivers->lang($field['lang_field']) : '').' '.$field['control'].($field['lang_field'] != '' ? '<br/></label>' : '');
+                    if($field['lang_field'] == '')
+                    {
+                        $form .= '</table>'.$field['control'].'<table class="mainTable" border="0" cellspacing="0" cellpadding="0"  width="100%">';
+                    } elseif($field['lang_field'] == '!heading') {
+                        $form .= '</table><table class="mainTable" border="0" cellspacing="0" cellpadding="0"  width="100%"><tr><th colspan="2">'.$field['control'].'</td></tr>';
+                    } else {
+                        $form .= '<tr><td width="50%"><label>'.$PROLIB->pl_drivers->lang($field['lang_field']).'</td><td width="50%">'.$field['control'].'<br/></label>';
+                    }
                 }
+                $form .= '</table>';
             }
+            
+            if(isset($advanced_settings_help[$key]))
+            {
+                $help = $advanced_settings_help[$key];
+            }
+            
             $label = $advanced_settings_options[$key];
         } else {
             $label = $key;
@@ -46,7 +71,7 @@ foreach($settings as $key => $value)
         // Create a row in the table for the option
         $row = array(
             '<span data-key="'.$key.'" data-label="'.$label.'"><label>'.$label.'</label>'
-                .(lang('adv_'.$key.'_desc') != 'adv_'.$key.'_desc' ? '<br/>'.lang('adv_'.$key.'_desc') : '')
+                .($help ? '<div class="pl_help">'.$help.'</div>' : '') .(lang('adv_'.$key.'_desc') != 'adv_'.$key.'_desc' ? '<br/>'.lang('adv_'.$key.'_desc') : '')
                 .'</span>',
             $form,
             '<a href="#" class="remove_grid_row remove_advanced">X</a>'

@@ -601,6 +601,7 @@ class Proform_mcp extends Prolib_base_mcp {
         
         $vars['advanced_settings_options'] = $form_obj->get_advanced_settings_options();
         $vars['advanced_settings_forms'] = array();
+        $vars['advanced_settings_help'] = array();
         // Render nested form elements for advanced options (mostly used by drivers to provide a package of settings in one
         // advanced setting block)
         foreach($vars['advanced_settings_options'] as $key => $value)
@@ -613,6 +614,12 @@ class Proform_mcp extends Prolib_base_mcp {
                 {
                     $vars['advanced_settings_forms'][$key] = $this->EE->pl_forms->create_cp_form($vars['settings'], $value['form'], array('array_name' => 'settings', 'order' => 'type'));
                 }
+                
+                if(isset($value['help']))
+                {
+                    $vars['advanced_settings_help'][$key] = $value['help'];
+                }
+                
                 $vars['advanced_settings_options'][$key] = $value['label'];
             }       
         }
@@ -623,9 +630,7 @@ class Proform_mcp extends Prolib_base_mcp {
         //                                                              array(0 => 'None'));
         $channel_options = array();
 
-        $form_field_options = $form_obj->fields();
-        $form_field_options = $this->prolib->make_options($form_field_options, 'field_name', 'field_label');
-        $form_field_options = array('' => 'None') + $form_field_options;
+        $form_field_options = $form_obj->get_form_field_options();
 
         $form_drivers = $this->EE->pl_drivers->get_drivers('form');
         $driver_options = array();

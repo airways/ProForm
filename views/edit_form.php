@@ -44,6 +44,7 @@
 
 <script type="text/javascript">
 <?php echo 'proform_mod.forms = '.json_encode($advanced_settings_forms, JSON_FORCE_OBJECT) . ';'; ?>
+<?php echo 'proform_mod.help = '.json_encode($advanced_settings_help, JSON_FORCE_OBJECT) . ';'; ?>
 </script>
 
 <div class="tabs-wrapper">

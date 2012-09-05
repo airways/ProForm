@@ -948,7 +948,7 @@ class PL_Form extends PL_RowInitialized {
         $result = $this->__advanced_settings_options;
         if($driver = $this->get_driver())
         {
-            $result = $driver->form_advanced_settings_options($result);
+            $result = $driver->form_advanced_settings_options($this, $result);
         }
         foreach($result as $k => $v)
         {
@@ -960,5 +960,16 @@ class PL_Form extends PL_RowInitialized {
         }
         #ksort($result);
         return $result;
+    }
+    
+    function get_form_field_options()
+    {
+        if(!isset($this->__form_field_options))
+        {
+            $result = $this->fields();
+            $result = $this->__prolib->make_options($result, 'field_name', 'field_label');
+            $this->__form_field_options = array('' => 'None') + $result;
+        }
+        return $this->__form_field_options;
     }
 }
