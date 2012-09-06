@@ -218,6 +218,8 @@ $lang = array(
     'field_assigned_forms' => 'Assigned Forms',
     'field_assigned_forms_desc' => 'Forms which currently have this field assigned to them',
 
+    'field_pref_license_key' => 'ProForm License Key',
+    'field_pref_license_key_desc' => 'Enter your Devot:ee or other license key here. ProForm is licensed for use on one production site per license key. Your purchase supports future development of ProForm. Thank you!',
     'field_pref_notification_template_group' => 'Notification Template Group',
     'field_pref_notification_template_group_desc' => 'Template group containing email notification templates',
     'field_pref_from_address' => 'From Address',
