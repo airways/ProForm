@@ -61,6 +61,13 @@
     </div> <!-- end dropdown -->
 </div>
 
+<?php if(!isset($license_key) || !$license_key || strlen($license_key) < 16): ?>
+
+    <div class="warning">
+        <p><strong>Reminder:</strong> You have not yet entered your ProForm License Key. Please do so on the <a href="<?php echo TAB_ACTION.'method=module_settings'; ?>">Module Settings</a> page for ProForm. <em>Please keep in mind that ProForm is licensed for use on one production site per license key.</em> Your purchase helps continue further development of ProForm, <b>thank you</b>!</em></p>
+    </div>
+<?php endif; ?>
+
 <?php if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>'; ?>
 <?php if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>'; ?>
 

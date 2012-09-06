@@ -118,6 +118,8 @@ $lang = array(
     'tab_edit_form_entry' => 'Edit Form Entry',
     
     // Fields
+    'field_form_driver' => 'Form Driver',
+    'field_form_driver_desc' => 'Form Drivers provide additional functionality beyond the base form types',
     'field_form_name' => 'Form Short Name',
     'field_form_name_desc' => 'Single word, no spaces, used in templates',
     'field_form_label' => 'Full Form Name',
@@ -143,6 +145,8 @@ $lang = array(
     'field_template' => 'Template Code',
     'field_template_desc' => 'Replaces form values as template variables, then runs through full template parser',
 
+    'notification_general' => 'General Notification Settings',
+    'notification_general_desc' => 'Settings that apply to all notification groups below.',
     'notification_list_name' => 'Notification List Settings',
     'notification_list_desc' => 'When a new entry is submitted to the form, each of the addresses in the Notification List will be sent a separate email message, generated from the selected template.',
     'field_admin_notification_on' => 'Enable Notification List',
@@ -214,6 +218,8 @@ $lang = array(
     'field_assigned_forms' => 'Assigned Forms',
     'field_assigned_forms_desc' => 'Forms which currently have this field assigned to them',
 
+    'field_pref_license_key' => 'ProForm License Key',
+    'field_pref_license_key_desc' => 'Enter your Devot:ee or other license key here. ProForm is licensed for use on one production site per license key. Your purchase supports future development of ProForm. Thank you!',
     'field_pref_notification_template_group' => 'Notification Template Group',
     'field_pref_notification_template_group_desc' => 'Template group containing email notification templates',
     'field_pref_from_address' => 'From Address',
@@ -241,6 +247,11 @@ $lang = array(
     
     'field_reusable' => 'Reusable',
     'field_reusable_desc' => 'Places the field in the Library section of the Toolbox, allowing you to easily reuse it',
+    
+    
+    // Advanced Settings
+    'adv_html_id_desc' => 'Id attribute inserted into the generated form tab',
+    'adv_html_class_desc' => 'Classes inserted into the generated form tab; make sure to include the class "proform" to preserve default formatting',
 
     // Errors
     'invalid_submit' => 'The form has invalid values',

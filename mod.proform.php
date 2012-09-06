@@ -288,8 +288,12 @@ class Proform {
             foreach($_GET as $k => $v)
             {
                 $k = $this->EE->security->xss_clean($k);
-                $v = $this->EE->security->xss_clean($v);
-                $get_params[$k] = $v;
+                // Don't include things that look like a path
+                if(strpos($k, '/') === FALSE)
+                {
+                    $v = $this->EE->security->xss_clean($v);
+                    $get_params[$k] = $v;
+                }
             }
             $varsets[] = array('get', $get_params);
 
@@ -304,7 +308,7 @@ class Proform {
                 $form_session->config = array(
                     'use_captcha'       => $use_captcha,
                     'form_name'         => $form_name,
-                    'form_id'           => (int)$form_id,
+                    'form_id'           => $form_id,
                     'form_class'        => $form_class,
                     'form_url'          => $form_url,
                     'error_url'         => $error_url,
@@ -364,8 +368,8 @@ class Proform {
                 $form_details = array(
                         'action'            => $this->EE->functions->remove_double_slashes($base_url),
                         'name'              => $form_name,
-                        'id'                => $form_id,
-                        'class'             => $form_class,
+                        'id'                => $form_obj->ini('html_id', $form_id),
+                        'class'             => $form_obj->ini('html_class', $form_class),
                         'hidden_fields'     => array('__conf' => $form_session_enc),
                         'secure'            => TRUE,
                         'onsubmit'          => '',
@@ -436,6 +440,20 @@ class Proform {
                 {
                     $field_errors['captcha_array'] = $form_session->errors['captcha'];
                     $field_errors['captcha'] = $form_session->errors['captcha'];
+                }
+
+                if($form_session and array_key_exists('', $form_session->errors)) {
+                    if(is_array($form_session->errors['']))
+                    {
+                        $variables['form_errors_array'] = $form_session->errors[''];
+                        $variables['form_errors'] = $this->EE->formslib->implode_errors_array($form_session->errors['']);
+                    } else {
+                        $variables['form_errors_array'] = 'form_error';
+                        $variables['form_errors'] = $form_session->errors[''];
+                    }
+                } else {
+                    $variables['form_errors_array'] = '';
+                    $variables['form_errors'] = '';
                 }
 
                 // This array is used here and elsewhere to pass values into functions, need to clean this up
@@ -1747,6 +1765,15 @@ class Proform {
         {
             $validation_rules = $this->EE->extensions->call('proform_validation_rules', $this, $form_obj, $form_session, $validation_rules);
         }
+        
+        if($driver = $form_obj->get_driver())
+        {
+            if(method_exists($driver, 'process_validation'))
+            {
+                $driver->process_validation($form_obj, $form_session, $validation_rules);
+            }
+        }
+
 
         // send the compiled rules on to the validation class
         $this->EE->pl_validation->set_rules($validation_rules);
@@ -1772,6 +1799,15 @@ class Proform {
                 }
             }
         }
+        
+        if($driver = $form_obj->get_driver())
+        {
+            if(method_exists($driver, 'process_validation_end'))
+            {
+                $driver->process_validation_end($form_obj, $form_session);
+            }
+        }
+
         //exit('end of validation');
     } // _process_validation
 
@@ -1808,6 +1844,14 @@ class Proform {
                         {
                             $driver->process_insert($form_obj, $field, $form_session);
                         }
+                    }
+                }
+                
+                if($driver = $form_obj->get_driver())
+                {
+                    if(method_exists($driver, 'process_insert'))
+                    {
+                        $driver->process_insert($form_obj, $form_session);
                     }
                 }
 
@@ -1863,6 +1907,15 @@ class Proform {
                         }
                     }
                 }
+
+                if($driver = $form_obj->get_driver())
+                {
+                    if(method_exists($driver, 'process_insert_end'))
+                    {
+                        $driver->process_insert_end($form_obj, $form_session, $form_entry_id);
+                    }
+                }
+
             } else {
                 $form_session->values['form:entry_id'] = 0;
                 $form_session->values['form:name'] = $form_obj->form_name;

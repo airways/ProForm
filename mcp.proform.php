@@ -180,6 +180,42 @@ class Proform_mcp extends Prolib_base_mcp {
         $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/jquery.form.js"></script>');
         $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/jquery.colorbox-min.js"></script>');
 
+        // Grab lang entries we want to sent to the JS
+        $lang_keys = array();
+        $lang_entries = array();
+        $f = new PL_Form(FALSE);
+        
+        foreach(array_keys($f->__advanced_settings_options) as $adv_setting)
+        {
+            $lang_keys[] = 'adv_'.$adv_setting.'_desc';
+        }
+        
+        $this->EE->load->language('proform');
+        
+        foreach($lang_keys as $key)
+        {
+            if(lang($key) != $key)
+            {
+                $lang_entries[$key] = lang($key);
+            }
+        }
+        
+        // Copy custom lang entries from driver classes
+        foreach($this->EE->pl_drivers->get_drivers('form') as $driver)
+        {
+            if(isset($driver->lang))
+            {
+                foreach($driver->lang as $key => $value)
+                {
+                    $lang_entries[$key] = $value;
+                }
+            }
+        }
+        
+        $js= 'proform_mod.lang = '.json_encode($lang_entries).';';
+        $this->EE->javascript->output($js);
+        
+        $this->EE->javascript->compile();
 
     }
 
@@ -273,6 +309,7 @@ class Proform_mcp extends Prolib_base_mcp {
         ));
         $this->EE->cp->add_js_script(array('plugin' => 'dataTables'));
         //$this->EE->javascript->output($this->ajax_filters('edit_items_ajax_filter', 4));
+        
         $this->EE->javascript->compile();
 
         ////////////////////////////////////////
@@ -282,6 +319,7 @@ class Proform_mcp extends Prolib_base_mcp {
         {
             $vars = $this->EE->extensions->call('proform_index', $this, $vars);
         }
+        $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
         return $this->EE->load->view('index', $vars, TRUE);
     }
 
@@ -359,6 +397,7 @@ class Proform_mcp extends Prolib_base_mcp {
             $vars = $this->EE->extensions->call('proform_module_settings', $this, $vars);
         }
         $vars['hidden']['active_tabs'] = ($s = $this->EE->input->get_post('active_tabs')) ? $s : 'tab-content-settings';
+        $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
         return $this->EE->load->view('module_settings', $vars, TRUE);
     }
 
@@ -561,8 +600,31 @@ class Proform_mcp extends Prolib_base_mcp {
         } else {
             $vars['settings'] = array();
         }
-        ksort($form_obj->__advanced_settings_options);
-        $vars['advanced_settings_options'] = $form_obj->__advanced_settings_options;
+        
+        $vars['advanced_settings_options'] = $form_obj->get_advanced_settings_options();
+        $vars['advanced_settings_forms'] = array();
+        $vars['advanced_settings_help'] = array();
+        // Render nested form elements for advanced options (mostly used by drivers to provide a package of settings in one
+        // advanced setting block)
+        foreach($vars['advanced_settings_options'] as $key => $value)
+        {
+            if(is_array($value))
+            {
+                unset($vars['advanced_settings_options'][$key]);
+                
+                if(isset($value['form']))
+                {
+                    $vars['advanced_settings_forms'][$key] = $this->EE->pl_forms->create_cp_form($vars['settings'], $value['form'], array('array_name' => 'settings', 'order' => 'type'));
+                }
+                
+                if(isset($value['help']))
+                {
+                    $vars['advanced_settings_help'][$key] = $value['help'];
+                }
+                
+                $vars['advanced_settings_options'][$key] = $value['label'];
+            }       
+        }
 
         unset($form_obj->settings);
 
@@ -570,13 +632,21 @@ class Proform_mcp extends Prolib_base_mcp {
         //                                                              array(0 => 'None'));
         $channel_options = array();
 
-        $form_field_options = $form_obj->fields();
-        $form_field_options = $this->prolib->make_options($form_field_options, 'field_name', 'field_label');
-        $form_field_options = array('' => 'None') + $form_field_options;
+        $form_field_options = $form_obj->get_form_field_options();
 
+        $form_drivers = $this->EE->pl_drivers->get_drivers('form');
+        $driver_options = array();
+        foreach($form_drivers as $driver)
+        {
+            $driver_options[$driver->meta['key']] = $driver->meta['name'];
+        }
+        $driver_options = array('' => 'None') + $driver_options;
+        
         $types = array(
             'form_id' => 'read_only',
             'entries_count' => 'read_only',
+            
+            'form_driver' => array('dropdown', $driver_options),
             
             'notification_template' => array('dropdown', $template_options),
             'notification_list' => 'textarea',
@@ -606,6 +676,8 @@ class Proform_mcp extends Prolib_base_mcp {
 
         $extra = array('after' => array());
 
+        if($form_obj->form_type == 'form' OR $form_obj->form_type == 'share')
+            $extra['after']['form_driver'] = array(array('lang_field' => 'form_driver', 'heading' => lang('notification_general'), 'description' => lang('notification_general_desc')));
         if($form_obj->form_type == 'form')
             $extra['after']['reply_to_name'] = array(array('lang_field' => 'reply_to_name', 'heading' => lang('notification_list_name'), 'description' => lang('notification_list_desc')));
         if($form_obj->form_type == 'form' OR $form_obj->form_type == 'share')
@@ -766,7 +838,7 @@ class Proform_mcp extends Prolib_base_mcp {
         {
             $vars = $this->EE->extensions->call('proform_edit_form', $this, $vars);
         }
-
+        $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
         return $this->EE->load->view('edit_form', $vars, TRUE);
     }
 
@@ -946,6 +1018,7 @@ class Proform_mcp extends Prolib_base_mcp {
         {
             $vars = $this->EE->extensions->call('proform_delete_form', $this, $vars);
         }
+        $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
         return $this->EE->load->view('delete', $vars, TRUE);
     }
 
@@ -1033,6 +1106,7 @@ class Proform_mcp extends Prolib_base_mcp {
 
             $vars = $this->EE->pl_drivers->call($this->EE->input->post('type'), 'field_remove', array($field, $vars));
 
+            $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
             return $this->EE->load->view('remove_field', $vars, TRUE);
         }
         else
@@ -1135,6 +1209,7 @@ class Proform_mcp extends Prolib_base_mcp {
         {
             $vars = $this->EE->extensions->call('proform_list_fields', $this, $vars);
         }
+        $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
         return $this->EE->load->view('list_fields', $vars, TRUE);
     }
 
@@ -1353,6 +1428,7 @@ class Proform_mcp extends Prolib_base_mcp {
         {
             $this->EE->extensions->call('proform_edit_field', $this);
         }
+        $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
         $result = $this->EE->load->view('generic_edit', $vars, TRUE);
         $result = $this->EE->pl_drivers->call($field->type, 'edit_field_view', array($result));
         return $result;
@@ -1485,6 +1561,7 @@ class Proform_mcp extends Prolib_base_mcp {
         {
             $vars = $this->EE->extensions->call('proform_delete_field', $this, $vars);
         }
+        $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
         return $this->EE->load->view('delete', $vars, TRUE);
     }
 
@@ -1663,6 +1740,7 @@ class Proform_mcp extends Prolib_base_mcp {
         {
             $vars = $this->EE->extensions->call('proform_edit_separator', $this, $vars);
         }
+        $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
         return $this->EE->load->view('generic_edit', $vars, TRUE);
     }
 
@@ -1760,6 +1838,7 @@ class Proform_mcp extends Prolib_base_mcp {
             {
                 $vars = $this->EE->extensions->call('proform_delete_separator', $this, $vars);
             }
+            $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
             return $this->EE->load->view('delete_separator', $vars, TRUE);
         }
         else
@@ -1947,6 +2026,7 @@ class Proform_mcp extends Prolib_base_mcp {
         {
             $vars = $this->EE->extensions->call('proform_list_entries', $this, $vars);
         }
+        $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
         $output = $this->EE->load->view('list_entries', $vars, TRUE);
         return $this->prolib->pl_drivers->list_entries_view($output);
     }
@@ -2064,6 +2144,7 @@ class Proform_mcp extends Prolib_base_mcp {
                 $vars = $this->EE->extensions->call('proform_view_form_entry', $this, $vars);
             }
 
+            $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
             return $this->EE->load->view('generic_edit', $vars, TRUE);
         }
     }
@@ -2165,6 +2246,7 @@ class Proform_mcp extends Prolib_base_mcp {
                 $vars = $this->EE->extensions->call('proform_edit_form_entry', $this, $vars);
             }
 
+            $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
             return $this->EE->load->view('generic_edit', $vars, TRUE);
         }
     }
@@ -2259,6 +2341,7 @@ class Proform_mcp extends Prolib_base_mcp {
         $this->sub_page('tab_list_entries', $form->form_name);
         $vars['form_id'] = $form_id;
 
+        $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
         return $this->EE->load->view('export_entries', $vars, TRUE);
         */
     }

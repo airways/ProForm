@@ -47,6 +47,7 @@ class Formslib
     var $field_encryption_disabled = array('dst_enabled');
 
     var $default_prefs = array(
+        'license_key' => '',
         'notification_template_group' => 'notifications',
         'from_address' => '',
         'from_name' => '',

@@ -10,6 +10,8 @@ class PL_Form extends PL_RowInitialized {
     var $form_type = 'form';
     var $form_label;
     var $form_name;
+    var $form_driver;
+    
     var $encryption_on = 'n';
     var $table_override = '';
     var $safecracker_channel_id = 0;
@@ -44,6 +46,8 @@ class PL_Form extends PL_RowInitialized {
     const SEPARATOR_HTML     = 'HTML';
 
     public $__advanced_settings_options = array(
+        'html_id'               => 'HTML ID',
+        'html_class'            => 'HTML Class',
         'thank_you_message'     => 'Thank You Message',
         'extra1_label'          => 'Label for Extra 1',
         'extra2_label'          => 'Label for Extra 2',
@@ -921,5 +925,51 @@ class PL_Form extends PL_RowInitialized {
         $pos_a = $this->field_pos($a['lang_field']);
         $pos_b = $this->field_pos($b['lang_field']);
         return $pos_a - $pos_b;
+    }
+    
+    function ini($key, $default='')
+    {
+        if(isset($this->settings[$key]) && $this->settings[$key] != '')
+        {
+            return $this->settings[$key];
+        } else {
+            return $default;
+        }
+    }
+    
+    function get_driver()
+    {
+        $this->__EE->pl_drivers->init();
+        return $this->__EE->pl_drivers->get_driver($this->form_driver);
+    }
+    
+    function get_advanced_settings_options()
+    {
+        $result = $this->__advanced_settings_options;
+        if($driver = $this->get_driver())
+        {
+            $result = $driver->form_advanced_settings_options($this, $result);
+        }
+        foreach($result as $k => $v)
+        {
+            if(is_array($v) && isset($v['form']))
+            {
+                #ksort($v['form']);
+                #$result[$k] = $v;
+            }
+        }
+        #ksort($result);
+        return $result;
+    }
+    
+    function get_form_field_options()
+    {
+        if(!isset($this->__form_field_options))
+        {
+            $result = $this->fields();
+            $result = $this->__prolib->make_options($result, 'field_name', 'field_label');
+            $this->__form_field_options = array('' => 'None') + $result;
+        }
+        return $this->__form_field_options;
     }
 }

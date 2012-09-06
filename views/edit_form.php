@@ -42,6 +42,11 @@
 <?php if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>'; ?>
 <?php if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>'; ?>
 
+<script type="text/javascript">
+<?php echo 'proform_mod.forms = '.json_encode($advanced_settings_forms, JSON_FORCE_OBJECT) . ';'; ?>
+<?php echo 'proform_mod.help = '.json_encode($advanced_settings_help, JSON_FORCE_OBJECT) . ';'; ?>
+</script>
+
 <div class="tabs-wrapper">
     <div class="tabs main" id="main-tabs" data-tabset="main">
         <ul>

@@ -8,6 +8,9 @@ if(!Array.prototype.remove)
 }
 var proform_mod = {
     dirty: false,
+    lang: {},
+    forms: {},
+    help: {},
     bind_events: function() {
         $(window).bind('beforeunload', function() { 
             if(proform_mod.dirty) return 'You have modified this form. Leaving this page will lose all changes.';
@@ -32,15 +35,45 @@ var proform_mod = {
     bind_advanced_settings: function() {
         $('#add_advanced').unbind('click').click(function() {
             var $table = $('#advanced_settings table tbody');
-            var even = $('#advanced_settings table tr').length % 2;
+            var even = !($('#advanced_settings table tr').length % 2);
             var key = $('#advanced_settings_options').val();
             if(key != '')
             {
                 var label = $('#advanced_settings_options option[value='+key+']').text();
                 $('#advanced_settings_options').children('option[value='+key+']').remove();
                 var input = '<input type="text" name="settings['+key+']" />';
+                if(proform_mod.forms[key])
+                {
+                    form = proform_mod.forms[key];
+                    input = '<table class="mainTable" border="0" cellspacing="0" cellpadding="0" width="100%">';
+                    console.log(proform_mod);
+                    var f_even = true;
+                    for(x in form)
+                    {
+                        if(form[x]['lang_field'] == '')
+                        {
+                            input += '</table>'+form[x]['control']+'<table class="mainTable" border="0" cellspacing="0" cellpadding="0" width="100%">';
+                            f_even = true;
+                        } else if(form[x]['lang_field'] == '!heading') {
+                            input += '</table><table class="mainTable" border="0" cellspacing="0" cellpadding="0" width="100%"><tr><th colspan="2">'+form[x]['control']+'</th></tr>';
+                            f_even = true;
+                        } else {
+                            input += '<tr class="'+(f_even ? 'even' : 'odd')+'"><td width="50%"><label>' + proform_mod.slang(form[x]['lang_field']) + '</td><td width="50%">' + form[x]['control'] + '<br/></label></tr>';
+                        }
+                        
+                        f_even = !f_even;
+                    }
+                    input += '</table>';
+                }
+                
+                help = '';
+                if(proform_mod.help[key])
+                {
+                    help = proform_mod.help[key];
+                }
+                
                 $('#advanced_settings table tr:last').after('<tr class="' + (even ? 'even' : 'odd') + '">'+
-                    '<td><span data-key="' + key + '" data-label="' + label + '">' + label + '</span></td>'+
+                    '<td><span data-key="' + key + '" data-label="' + label + '"><label>' + label + '</label>' + help + (proform_mod.lang['adv_'+key+'_desc'] ? '<br/>'+proform_mod.lang['adv_'+key+'_desc'] : '') + '</span></td>'+
                     '<td>' + input + '</td>'+
                     '<td><a href="#" class="remove_grid_row remove_advanced">X</a></td>'+
                     '</tr>');
@@ -190,6 +223,14 @@ var proform_mod = {
             // set the selected value back
             $dd.val(selectedVal);
         }
+    },
+    slang: function(key) {
+        if(proform_mod.lang[key])
+        {
+            return proform_mod.lang[key];
+        } else {
+            return key;
+        }
     }
 
 };
@@ -201,14 +242,14 @@ $(document).ready(function() {
 });
 
 
-
 var pl_grid = {
     options: {},
     data: {},
+    forms: {},
     help: {},
     bind_events: function(key, id) {
         if(id) {
-            $('.add_grid_row').click(function(e) {
+            $('.add_grid_row').unbind('click').click(function(e) {
                 var val = $('#add'+id).val();
                 /*if(!$('#'+id+' tbody').length) {
                     $('#'+id).append('<tbody></tbody>');
@@ -226,12 +267,20 @@ var pl_grid = {
                 {
                     // <button data-key="' + kbm_form_editey + '" data-opt="' + val + '" type="button" class="remove_grid_row">X</button></td>
                     pl_grid.data[key].push([val]);
+                    
+                    var form = '<input data-key="' + key + '" data-opt="' + val + '" type="text" size="5" class="grid_param" />';
+                    
+                    if(pl_grid.forms[key])
+                    {
+                        form = pl_grid.forms[key];
+                    }
+                    
                     $('#'+id+' tbody').append(
                         '<tr class="grid_row">'
                             +'<td>'+pl_grid.options[key][val].label+'</td>'
                             +(
                                 pl_grid.options[key][val].flags && pl_grid.options[key][val].flags.indexOf('has_param') > -1
-                                    ? '<td><input data-key="' + key + '" data-opt="' + val + '" type="text" size="5" class="grid_param" /><span class="help">'+pl_grid.help[key][val]+'</span></td>'
+                                    ? '<td>'+form+'<span class="help">'+pl_grid.help[key][val]+'</span></td>'
                                     : '<td><span class="help">'+pl_grid.help[key][val]+'</span></td>'
                             )+'<td><a href="#" class="remove_grid_row" data-key="'+ key +'" data-opt="' + val +'">X</a></td>'
                             +'</tr>'

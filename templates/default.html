@@ -16,6 +16,8 @@
         {/if}
     {if:else}
 
+    {if pf_form_errors != ''}<span class="error">{pf_form_errors}</span>{/if}
+
     {pf_hidden_fields}
         <input type="hidden" name="{pf_field_name}" value="{pf_field_value}" />
     {/pf_hidden_fields}
