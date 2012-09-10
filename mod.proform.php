@@ -353,6 +353,11 @@ class Proform {
             {
                 $form_obj = $this->EE->extensions->call('proform_form_start', $this, $form_obj);
             }
+            
+            if($driver = $form_obj->get_driver())
+            {
+                $driver->form_start($this, $form_obj);
+            }
 
 
             if($form_obj->fields())
@@ -696,12 +701,16 @@ class Proform {
         $p_page         = $this->EE->TMPL->fetch_param('page');
         $page           = $p_page > 0 ? $p_page : 1;
         $limit          = $this->EE->TMPL->fetch_param('limit');
+        $p_entry_id     = $this->EE->TMPL->fetch_param('form_name');
 
         $orderby        = $this->EE->TMPL->fetch_param('orderby');
         $sort           = strtolower($this->EE->TMPL->fetch_param('sort'));
         if($sort != 'asc' AND $sort != 'desc') $sort = 'asc';
 
         $search = $this->prolib->pl_parser->fetch_param_group('search');
+        
+        if($p_entry_id) $search['form_entry_id'] = $p_entry_id;
+        if(isset($search['form_entry_id'])) $entry_id = $search['form_entry_id'];
 
         // Check required input
         if(!$form_name)

@@ -352,6 +352,7 @@ class Proform_mcp extends Prolib_base_mcp {
 
         ksort($this->EE->formslib->__advanced_settings_options);
         $vars['advanced_settings_options'] = $this->EE->formslib->__advanced_settings_options;
+        $this->render_advanced_options($prefs, $vars['advanced_settings_options'], $vars['advanced_settings_forms'], $vars['advanced_settings_help']);
         $vars['settings'] = array();
 
         // Filter out advanced settings keys so they are not shown in the normal settings form
@@ -604,28 +605,9 @@ class Proform_mcp extends Prolib_base_mcp {
         $vars['advanced_settings_options'] = $form_obj->get_advanced_settings_options();
         $vars['advanced_settings_forms'] = array();
         $vars['advanced_settings_help'] = array();
-        // Render nested form elements for advanced options (mostly used by drivers to provide a package of settings in one
-        // advanced setting block)
-        foreach($vars['advanced_settings_options'] as $key => $value)
-        {
-            if(is_array($value))
-            {
-                unset($vars['advanced_settings_options'][$key]);
-                
-                if(isset($value['form']))
-                {
-                    $vars['advanced_settings_forms'][$key] = $this->EE->pl_forms->create_cp_form($vars['settings'], $value['form'], array('array_name' => 'settings', 'order' => 'type'));
-                }
-                
-                if(isset($value['help']))
-                {
-                    $vars['advanced_settings_help'][$key] = $value['help'];
-                }
-                
-                $vars['advanced_settings_options'][$key] = $value['label'];
-            }       
-        }
-
+        
+        $this->render_advanced_options($vars['settings'], $vars['advanced_settings_options'], $vars['advanced_settings_forms'], $vars['advanced_settings_help']);
+        
         unset($form_obj->settings);
 
         // $channel_options = $this->EE->formslib->get_channel_options($this->EE->formslib->prefs->ini('safecracker_field_group_id'),
@@ -2022,6 +2004,13 @@ class Proform_mcp extends Prolib_base_mcp {
 
         $vars = $this->prolib->pl_drivers->list_entries_data($vars);
         $vars['pl_drivers'] = &$this->prolib->pl_drivers;
+        if($driver = $form->get_driver())
+        {
+            if(method_exists($driver, 'list_data'))
+            {
+                $driver->list_data($form, $vars, $entry);
+            }
+        }
         if ($this->EE->extensions->active_hook('proform_list_entries') === TRUE)
         {
             $vars = $this->EE->extensions->call('proform_list_entries', $this, $vars);
@@ -2134,6 +2123,14 @@ class Proform_mcp extends Prolib_base_mcp {
                     {
                         $driver->view_data($form_obj, $field, $vars, $entry);
                     }
+                }
+            }
+            
+            if($driver = $form_obj->get_driver())
+            {
+                if(method_exists($driver, 'view_data'))
+                {
+                    $driver->view_data($form_obj, $vars, $entry);
                 }
             }
 
@@ -2755,6 +2752,31 @@ class Proform_mcp extends Prolib_base_mcp {
         }
 
         return $result;
+    }
+    
+    function render_advanced_options(&$settings, &$options, &$forms, &$help)
+    {
+        // Render nested form elements for advanced options (mostly used by drivers to provide a package of settings in one
+        // advanced setting block)
+        foreach($options as $key => $value)
+        {
+            if(is_array($value))
+            {
+                unset($options[$key]);
+                
+                if(isset($value['form']))
+                {
+                    $forms[$key] = $this->EE->pl_forms->create_cp_form($settings, $value['form'], array('array_name' => 'settings', 'order' => 'type'));
+                }
+                
+                if(isset($value['help']))
+                {
+                    $help[$key] = $value['help'];
+                }
+                
+                $options[$key] = $value['label'];
+            }       
+        }
     }
 
 }

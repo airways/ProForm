@@ -18,6 +18,12 @@
 
     {if pf_form_errors != ''}<span class="error">{pf_form_errors}</span>{/if}
 
+    {if pf_form_errors != ''}
+        {pf_form_errors_array}
+            {value}
+        {/pf_form_errors_array}
+    {/if}
+    
     {pf_hidden_fields}
         <input type="hidden" name="{pf_field_name}" value="{pf_field_value}" />
     {/pf_hidden_fields}

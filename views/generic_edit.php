@@ -1,5 +1,7 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+global $PROLIB;
+
 /**
  * @package ProForm
  * @author Isaac Raway <isaac.raway@gmail.com>
@@ -120,7 +122,7 @@ endif;
         {
             $label = '<label>' . $field_names[$lang_field] . '</label>';
         } else {
-            $label = '<label>' . lang($lang_field) . '</label>';
+            $label = '<label>' . $PROLIB->pl_drivers->lang($lang_field) . '</label>';
         }
 
         if(array_search('required', $field) !== FALSE) {

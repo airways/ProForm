@@ -1,5 +1,13 @@
 <?php
 
+
+echo '<script type="text/javascript">'."\n";
+echo 'proform_mod.forms = '.json_encode($advanced_settings_forms, JSON_FORCE_OBJECT) . ';'."\n";
+echo 'proform_mod.help = '.json_encode($advanced_settings_help ? $advanced_settings_help : array(), JSON_FORCE_OBJECT) . ';'."\n";
+echo '</script>'."\n";
+
+
+
 global $PROLIB;
 
 echo '<div id="advanced_settings"><p>These settings allow you to control more advanced aspects of ProForm\'s behavior. For details on the available settings, see the ProForm documentation and documentation for any custom Drivers you may have installed.</p>';
