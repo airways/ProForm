@@ -1306,7 +1306,7 @@ class Proform_mcp extends Prolib_base_mcp {
 
         if ($this->EE->extensions->active_hook('proform_process_new_field') === TRUE)
         {
-            $this->EE->extensions->call('proform_process_new_field', $this);
+            $this->EE->extensions->call('proform_process_new_field', $this, $field);
         }
 
         return TRUE;
@@ -1408,7 +1408,7 @@ class Proform_mcp extends Prolib_base_mcp {
         $vars = $this->EE->pl_drivers->call($field->type, 'edit_field_data', array($vars));
         if ($this->EE->extensions->active_hook('proform_edit_field') === TRUE)
         {
-            $this->EE->extensions->call('proform_edit_field', $this);
+            $this->EE->extensions->call('proform_edit_field', $this, $field);
         }
         $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
         $result = $this->EE->load->view('generic_edit', $vars, TRUE);
@@ -1501,7 +1501,7 @@ class Proform_mcp extends Prolib_base_mcp {
 
         if ($this->EE->extensions->active_hook('proform_process_edit_field') === TRUE)
         {
-            $this->EE->extensions->call('proform_process_edit_field', $this);
+            $this->EE->extensions->call('proform_process_edit_field', $this, $field);
         }
 
         // Allow a driver to customize the redirect
