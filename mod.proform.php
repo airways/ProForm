@@ -1139,8 +1139,10 @@ class Proform {
             {
                 if(is_object($row))
                 {
+//                echo 'o ' . $field->field_name.' = '.$row->{$field->field_name};
                     $row_vars['value:'.$field->field_name] = $row->{$field->field_name};
                 } elseif(is_array($row)) {
+//                echo 'a ' . $field->field_name.' = '.$row[$field->field_name];
                     $row_vars['value:'.$field->field_name] = $row[$field->field_name];
                 }
 
@@ -1151,6 +1153,13 @@ class Proform {
                     $row_vars['upload_pref_id:'.$field->field_name] = $field->upload_pref_id;
                     $row_vars['value:'.$field->field_name] = $dir['url'].$row_vars['value:'.$field->field_name];
                 }
+
+                if($field->type == 'mailinglist' || $field->type == 'checkbox')
+                {
+                
+                    $row_vars['checked:'.$field->field_name] = $row_vars['value:'.$field->field_name] ? TRUE : FALSE;
+                }
+
             }
         }
 

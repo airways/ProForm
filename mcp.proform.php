@@ -935,11 +935,11 @@ class Proform_mcp extends Prolib_base_mcp {
 
         // go back to form edit
         $active_tabs = ($s = $this->EE->input->get_post('active_tabs')) ? $s : 'tab-content-settings';
-        $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form->form_id.AMP.'active_tabs='.$active_tabs);
         if ($this->EE->extensions->active_hook('proform_process_edit_form') === TRUE)
         {
             $this->EE->extensions->call('proform_process_edit_form', $this);
         }
+        $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form->form_id.AMP.'active_tabs='.$active_tabs);
         return TRUE;
     }
 
