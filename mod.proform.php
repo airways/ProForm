@@ -135,7 +135,7 @@ class Proform {
         } else {
             $prefix = '';
         }
-
+        
         $template = file_get_contents(PATH_THIRD.'proform/templates/'.$template.'.html');
 
         // Swap out the "embed" parameter for form_name in the template
@@ -2327,6 +2327,7 @@ class Proform {
                 if($field->field_row != $last_field_row)
                 {
                     $result[] = array(
+                        'row' => $field->field_row,
                         'fields' => array());
                     $last_field_row = $field->field_row;
                 }
