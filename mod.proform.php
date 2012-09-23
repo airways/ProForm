@@ -125,7 +125,7 @@ class Proform {
 
         if(!$form_name)
         {
-            show_error('Invalid form_name provided to {exp:proform:simple}: "'.htmlentities($form_name).'"');
+            pl_show_error('Invalid form_name provided to {exp:proform:simple}: "'.htmlentities($form_name).'"');
         }
 
         // Get our template components
@@ -534,7 +534,7 @@ class Proform {
                     $variables['errors'] = array();
                 }
             } else {
-                show_error("Form does not have any assigned fields: $form_name");
+                pl_show_error("Form does not have any assigned fields: $form_name");
             }
         }
 
@@ -575,7 +575,7 @@ class Proform {
                 {
                     $channel_info = $channel_result->row();
                 } else {
-                    show_error('Invalid channel on form "'.htmlentities($form_name).'": '.intval($form_obj->safecracker_channel_id).' (possibly it has been deleted)');
+                    pl_show_error('Invalid channel on form "'.htmlentities($form_name).'": '.intval($form_obj->safecracker_channel_id).' (possibly it has been deleted)');
                 }
 
                 $output = '{exp:channel:entry_form channel="'.$channel_info->channel_name.'" return="site/index" preview="site/entry"}';
@@ -614,6 +614,14 @@ class Proform {
         // Return result
         $this->return_data = $output;
 
+
+        if($this->debug)
+        {
+            echo $this->debug_str;
+            echo 'Form session:<br/>';
+            var_dump($form_session);
+        }
+        
         return $this->return_data;
 
 
@@ -715,7 +723,7 @@ class Proform {
         // Check required input
         if(!$form_name)
         {
-            //show_error("{exp:proform:entries} requires name param.");
+            //pl_show_error("{exp:proform:entries} requires name param.");
             //return $this->EE->output->show_user_error('general', array('exp:proform:form requires form_name param'));
             return '';
         }
@@ -815,7 +823,7 @@ class Proform {
         }
         else
         {
-            show_error("{exp:proform:form} form name not found: $form_name");
+            pl_show_error("{exp:proform:form} form name not found: $form_name");
         }
 
         if ($this->EE->extensions->active_hook('proform_entries_end') === TRUE)
@@ -880,7 +888,7 @@ class Proform {
     //         // Check required input
     //         if(!$form_name)
     //         {
-    //             show_error("{exp:proform:form} requires form_name param.");
+    //             pl_show_error("{exp:proform:form} requires form_name param.");
     //             //return $this->EE->output->show_user_error('general', array('exp:proform:insert requires form_name param'));
     //         }
     //
@@ -935,7 +943,7 @@ class Proform {
     //     }
     //     else
     //     {
-    //         show_error("{exp:proform:form} form name not found: $form_name");
+    //         pl_show_error("{exp:proform:form} form name not found: $form_name");
     //     }
     // }
 
@@ -962,7 +970,7 @@ class Proform {
         // Check required input
         // if(!$form_name)
         // {
-        //     show_error("{exp:proform:form} requires name param.");
+        //     pl_show_error("{exp:proform:form} requires name param.");
         //     //return $this->EE->output->show_user_error('general', array('exp:proform:form requires form_name param'));
         // }
 
@@ -1429,7 +1437,7 @@ class Proform {
                     }
                     exit;
                 } else {
-                    show_error("{exp:proform:form} could not send notifications for form: ".$form_obj->form_name);
+                    pl_show_error("{exp:proform:form} could not send notifications for form: ".$form_obj->form_name);
                 }
             }
         }
@@ -1907,7 +1915,7 @@ class Proform {
 
                 if(!$result = $this->EE->db->insert($form_obj->table_name(), $save_data))
                 {
-                    show_error("{exp:proform:form} could not insert into form: ".$form_obj->form_name);
+                    pl_show_error("{exp:proform:form} could not insert into form: ".$form_obj->form_name);
                 }
 
                 $form_entry_id = $this->EE->db->insert_id();
@@ -2295,7 +2303,7 @@ class Proform {
             if($field->type == 'file')
             {
                 $dir = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
-                if($field->upload_pref_id == 0 || empty($dir)) show_error('The field '.$field->field_name.' has an invalid file upload directory set.');
+                if($field->upload_pref_id == 0 || empty($dir)) pl_show_error('The field '.$field->field_name.' has an invalid file upload directory set.');
                 
                 if($field_array['field_value'] != '')
                 {

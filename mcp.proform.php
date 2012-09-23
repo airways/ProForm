@@ -515,7 +515,7 @@ class Proform_mcp extends Prolib_base_mcp {
         // create new form and table
         $this->EE->load->library('formslib');
         $form_exists = $this->EE->formslib->forms->get($data['form_name'], FALSE);
-        if($form_exists) show_error(lang('form_already_exists'));
+        if($form_exists) pl_show_error(lang('form_already_exists'));
         $form = $this->EE->formslib->forms->create($data);
 
         // go back to form edit page
@@ -551,7 +551,7 @@ class Proform_mcp extends Prolib_base_mcp {
 
             if(!$form_id || !$form)
             {
-                show_error(lang('invalid_form_id').' [9]');
+                pl_show_error(lang('invalid_form_id').' [9]');
                 return FALSE;
             }
 
@@ -833,7 +833,7 @@ class Proform_mcp extends Prolib_base_mcp {
 
         // find form
         $form_id = trim($this->EE->input->get_post('form_id'));
-        if(!$form_id || $form_id <= 0) show_error(lang('missing_form_id'));
+        if(!$form_id || $form_id <= 0) pl_show_error(lang('missing_form_id'));
 
         $form = $this->EE->formslib->forms->get($form_id);
 
@@ -890,7 +890,7 @@ class Proform_mcp extends Prolib_base_mcp {
         //                 $form->assign_field($field);
         //                 $this->EE->session->set_flashdata('message', lang('msg_field_added'));
         //             } else {
-        //                 show_error(lang('invalid_field_id'));
+        //                 pl_show_error(lang('invalid_field_id'));
         //             }
         //         }
         //     } else {
@@ -915,7 +915,7 @@ class Proform_mcp extends Prolib_base_mcp {
             {
                 if(!array_search($search_field_name, $field_names))
                 {
-                    show_error(lang('invalid_field_name').': '.$search_field_name);
+                    pl_show_error(lang('invalid_field_name').': '.$search_field_name);
                 }
             }
         }
@@ -970,7 +970,7 @@ class Proform_mcp extends Prolib_base_mcp {
             $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form->form_id.AMP.'active_tabs=tab-content-layout');
         } else {
             // exit(json_encode(array('status' => 'error')));
-            show_error('Invalid form or field ID specified.');
+            pl_show_error('Invalid form or field ID specified.');
         }
 
 
@@ -1028,7 +1028,7 @@ class Proform_mcp extends Prolib_base_mcp {
         }
         else
         {
-            show_error(lang('invalid_form_id').' [10]');
+            pl_show_error(lang('invalid_form_id').' [10]');
             return FALSE;
         }
     }
@@ -1093,7 +1093,7 @@ class Proform_mcp extends Prolib_base_mcp {
         }
         else
         {
-            show_error(lang('invalid_form_id_or_field_id') . ' [1]');
+            pl_show_error(lang('invalid_form_id_or_field_id') . ' [1]');
             return FALSE;
         }
     }
@@ -1128,7 +1128,7 @@ class Proform_mcp extends Prolib_base_mcp {
         }
         else
         {
-            show_error(lang('invalid_form_id_or_field_id') . ' [2]');
+            pl_show_error(lang('invalid_form_id_or_field_id') . ' [2]');
             return FALSE;
         }
     }
@@ -1232,7 +1232,7 @@ class Proform_mcp extends Prolib_base_mcp {
         // see if the field already exists
         $field_name = strtolower(trim($this->EE->input->post('field_name')));
         $field = $this->EE->formslib->fields->get($field_name, FALSE);
-        if($field) show_error(lang('field_already_exists'));
+        if($field) pl_show_error(lang('field_already_exists'));
 
         // reset invalid length so it is set to the default
         if($this->EE->input->post('field_length') < 1) unset($_POST['field_length']);
@@ -1300,7 +1300,7 @@ class Proform_mcp extends Prolib_base_mcp {
                                                     AMP.'form_id='.$auto_add_form_id.AMP.'active_tabs=tab-content-layout');
                 }
             } else {
-                show_error(lang('invalid_form_id_or_field_id') . '[11]');
+                pl_show_error(lang('invalid_form_id_or_field_id') . '[11]');
             }
         }
 
@@ -1444,14 +1444,14 @@ class Proform_mcp extends Prolib_base_mcp {
         $form_id = (int)$this->EE->input->get('form_id');
 
 
-        if(!$field_id || $field_id <= 0) show_error(lang('invalid_field_id'));
+        if(!$field_id || $field_id <= 0) pl_show_error(lang('invalid_field_id'));
 
         // Check for a valid field name. We need to prevent some built-in reserved field
         // names from being used.
         if(!trim($field_name)
             || $field_name == "form_entry_id" || $field_name == "updated" || $field_name == "ip_address"
             || $field_name == "user_agent" || $field_name == "dst_enabled")
-                show_error(lang('invalid_field_name') . ': ' . htmlentities($field_name));
+                pl_show_error(lang('invalid_field_name') . ': ' . htmlentities($field_name));
 
         // find field
         $this->EE->load->library('formslib');
@@ -1572,7 +1572,7 @@ class Proform_mcp extends Prolib_base_mcp {
         }
         else
         {
-            show_error(lang('invalid_field_id'));
+            pl_show_error(lang('invalid_field_id'));
             return FALSE;
         }
     }
@@ -1825,7 +1825,7 @@ class Proform_mcp extends Prolib_base_mcp {
         }
         else
         {
-            show_error(lang('invalid_form_id_or_field_id') . ' [11]');
+            pl_show_error(lang('invalid_form_id_or_field_id') . ' [11]');
             return FALSE;
         }
     }
@@ -1852,7 +1852,7 @@ class Proform_mcp extends Prolib_base_mcp {
         }
         else
         {
-            show_error(lang('invalid_form_id_or_field_id') . ' [12]');
+            pl_show_error(lang('invalid_form_id_or_field_id') . ' [12]');
             return FALSE;
         }
     }
@@ -2516,7 +2516,7 @@ class Proform_mcp extends Prolib_base_mcp {
     }
 
     function error($msg) {
-        show_error($msg);
+        pl_show_error($msg);
         return FALSE;
     }
 
@@ -2551,7 +2551,7 @@ class Proform_mcp extends Prolib_base_mcp {
         $this->EE->load->library('form_validation', $config);
         if(!$this->EE->form_validation->run($group))
         {
-            show_error('Please correct these errors: '.validation_errors());
+            pl_show_error('Please correct these errors: '.validation_errors());
         }
 
         return TRUE;
