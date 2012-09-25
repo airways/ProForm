@@ -2335,8 +2335,8 @@ class Proform {
                 if($field->field_row != $last_field_row)
                 {
                     $result[] = array(
-                        'row' => $field->field_row,
-                        'fields' => array());
+                        'fields' => array(),
+                        'row_num' => $field->field_row, );
                     $last_field_row = $field->field_row;
                 }
                 $field_array['field_no'] = count($result[count($result)-1]['fields']) + 1;
