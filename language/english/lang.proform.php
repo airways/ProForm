@@ -52,6 +52,10 @@ $lang = array(
     'heading_commands' => 'Actions',
     'heading_actions' => 'Actions',
     'heading_setting' => 'Setting',
+    'heading_driver_type' => 'Driver Type',
+    'heading_driver_name' => 'Name',
+    'heading_driver_version' => 'Version',
+    'heading_driver_key' => 'Key',
 
     // Table results
     'no_forms' => 'No forms created yet',
@@ -66,6 +70,7 @@ $lang = array(
     // Buttons
     'home' => 'Home',
     'module_settings' => 'Module Settings',
+    'list_drivers' => 'Drivers',
     'new_form' => 'Create New Contact Form',
     'new_saef' => 'Create New SAEF Form',
     'new_share' => 'Create New Share Form',
@@ -116,6 +121,7 @@ $lang = array(
     'tab_delete_html_block' => 'Delete HTML Block',
     'tab_view_form_entry' => 'View Form Entry',
     'tab_edit_form_entry' => 'Edit Form Entry',
+    'tab_list_drivers' => 'Drivers',
     
     // Fields
     'field_form_driver' => 'Form Driver',
@@ -271,6 +277,7 @@ $lang = array(
     'field_already_exists' => 'A field with that name already exists',
     'no_unassigned_fields_available' => 'No unassigned fields available',
     'no_entries' => 'No entries to display',
+    'no_drivers' => 'No drivers installed',
     'no_field_group_setting' => 'You have not selected a SafeCracker Field Group in ProForm module settings',
     'form_already_exists' => 'A form with that name already exists in this site.',
 

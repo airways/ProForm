@@ -87,7 +87,8 @@ class Proform_mcp extends Prolib_base_mcp {
         $this->EE->cp->set_right_nav(array(
                 'home' => TAB_ACTION,
                 'list_fields' => TAB_ACTION.'method=list_fields',
-                'module_settings' => TAB_ACTION.'method=module_settings'
+                'list_drivers' => TAB_ACTION.'method=list_drivers',
+                'module_settings' => TAB_ACTION.'method=module_settings',
                 ));
 
         $this->config_overrides = $this->EE->config->item('proform');
@@ -479,6 +480,17 @@ class Proform_mcp extends Prolib_base_mcp {
             $this->EE->extensions->call('proform_process_module_settings', $this);
         }
         return TRUE;
+    }
+    
+    function list_drivers()
+    {
+        $vars = array();
+        $this->sub_page('tab_list_drivers');
+
+        $vars['drivers'] = $this->EE->pl_drivers->get_drivers();
+        
+        $this->EE->load->library('table');
+        return $this->EE->load->view('list_drivers', $vars, TRUE);
     }
 
     function new_form()
