@@ -72,7 +72,7 @@ var proform_mod = {
                     help = proform_mod.help[key];
                 }
                 
-                $('#advanced_settings table tr:last').after('<tr class="' + (even ? 'even' : 'odd') + '">'+
+                $('#advanced_settings > table > tbody > tr:last').after('<tr class="' + (even ? 'even' : 'odd') + '">'+
                     '<td><span data-key="' + key + '" data-label="' + label + '"><label>' + label + '</label>' + help + (proform_mod.lang['adv_'+key+'_desc'] ? '<br/>'+proform_mod.lang['adv_'+key+'_desc'] : '') + '</span></td>'+
                     '<td>' + input + '</td>'+
                     '<td><a href="#" class="remove_grid_row remove_advanced">X</a></td>'+
