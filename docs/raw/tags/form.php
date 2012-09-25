@@ -700,7 +700,7 @@
     <li><a href="#var_field_extra_1">{field_extra_1}</a></li>
     <li><a href="#var_field_extra_2">{field_extra_2}</a></li>
     <li><a href="#var_field_validation">{field_validation:*}</a></li>
-    <li><a href="#var_field_value">{field_value}</a></li>
+    <li><a href="#var_field_value">{field_value}</a> - see also <a href="#pair_field_values">{field_values}</a></li>
     <li><a href="#var_field_filename">{field_filename}</a></li>
     <li><a href="#var_field_basename">{field_basename}</a></li>
     <li><a href="#var_field_ext">{field_ext}</a></li>
@@ -713,6 +713,7 @@
 
 <ul>
     <li><a href="#pair_field_options">{field_options}</a> (formerly {field_setting_list})</li>
+    <li><a href="#pair_field_values">{field_values}</a></li>
     <li><a href="#pair_field_validation">{field_validation}</a></li>
 </ul>
 
@@ -849,11 +850,15 @@
 <p>For a Relationship type field, this is a dynamically generated list of the available options based on the configured Channels and Categories.</p>
 
 
-<p>This variable pair has two variables available for each option:</p>
+<p>This variable pair has these variables available for each option:</p>
 
 <ul>
   <li><strong>{key}</strong> - the value as stored in the database</li>
   <li><strong>{label}</strong> - the label of the value shown to the user (formerly {row})</li>
+  <li><strong>{selected}</strong> - indicates if the value is currently selected</li>
+  <li><strong>{number}</strong> - the numeric position of the option, this value will change if options are re-ordered</li>
+  <li><strong>{is_divider}</strong> - indicates this item is a divider - see <a href="{root_url}cp/fields.html#type_list">Option Groups</a> section of the List field type options</li>
+  <li><strong>{divider_number}</strong> - numeric position of the divider, again this value will change if options are re-ordered</li>
 </ul>
 
 <div class="tip">
@@ -870,6 +875,10 @@
         &#123;/fields&#125;
     </pre>
 </div>
+
+<h6><a name="pair_field_values">{field_values}</a></h6>
+
+<p>List type fields, this contains all selected values. It has the same variables available inside it as <a href="#pair_field_options">{field_options}</a>.</p>
 
 <h6><a name="pair_field_validation">&#123;field_validation&#125;</a></h6>
 

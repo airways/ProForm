@@ -92,25 +92,25 @@
             <th width="100">Database Type</th>
         </tr>
         <tr>
-            <td><b>Checkbox</b></td>
+            <td><b><a name="type_checkbox">Checkbox</a></b></td>
             <td>&lt;input type="checkbox" ... /&gt;</td>
             <td>A simple boolean value stored as a y or n.</td>
             <td>VARCHAR</td>
         </tr>
         <tr>
-            <td><b>Date</b></td>
+            <td><b><a name="type_date">Date</a></b></td>
             <td>&lt;input type="input" ... /&gt;</td>
             <td>A date field containing year, month, and day.</td>
             <td>DATE</td>
         </tr>
         <tr>
-            <td><b>Date and Time</b></td>
+            <td><b><a name="type_datetime">Date and Time</a></b></td>
             <td>&lt;input type="input" ... /&gt;</td>
             <td>A date field containing year, month, day as well as hours, minutes and seconds.</td>
             <td>DATETIME</td>
         </tr>
         <tr>
-            <td><b>File</b></td>
+            <td><b><a name="type_file">File</a></b></td>
             <td>&lt;input type="file" ... /&gt;</td>
             <td>A file upload field.<br /><br />
             <b>Type Options</b><br/>
@@ -120,38 +120,38 @@
             <td>VARHCAR</td>
         </tr>
         <tr>
-            <td><b>Text</b></td>
+            <td><b><a name="type_text">Text</a></b></td>
             <td>&lt;input type="input" ... /&gt; or<br />
                 &lt;textarea&gt;</td>
             <td>A simple text value. The length of the field determines which Database Type is used to store this field. If the length is 255 or less, a VARCHAR field is used, otherwise a TEXT field is used.</td>
             <td>VARCHAR or TEXT</td>
         </tr>
         <tr>
-            <td><b>Textarea</b></td>
+            <td><b><a name="type_textarea">Textarea</a></b></td>
             <td>&lt;textarea&gt;</td>
             <td>A memo field, for longer form values such as messages.</td>
             <td>TEXT</td>
         </tr>
         <tr>
-            <td><b>Number: Integer</b></td>
+            <td><b><a name="type_integer">Number: Integer</a></b></td>
             <td>&lt;input type="input" ... /&gt;</td>
             <td>An integer numeric value.</td>
             <td>INT</td>
         </tr>
         <tr>
-            <td><b>Number: Float</b></td>
+            <td><b><a name="type_float">Number: Float</a></b></td>
             <td>&lt;input type="input" ... /&gt;</td>
             <td>A floating point numeric value.</td>
             <td>FLOAT</td>
         </tr>
         <tr>
-            <td><b>Number: Currency</b></td>
+            <td><b><a name="type_currency">Number: Currency</a></b></td>
             <td>&lt;input type="input" ... /&gt;</td>
             <td>A currency value with a fixed point.</td>
             <td>DECIMAL</td>
         </tr>
         <tr>
-            <td><b>List</b></td>
+            <td><b><a name="type_list">List</a></b></td>
             <td>&lt;select&gt;,<br/>
             &lt;input type="checkbox" ... /&gt; or <br/>
             &lt;input type="radio" ... /&gt;</td>
@@ -189,7 +189,7 @@ value5 : Label For Option 5
             <td>VARCHAR or TEXT</td>
         </tr>
         <tr>
-            <td><b>Relationship</b></td>
+            <td><b><a name="type_relationship">Relationship</a></b></td>
             <td>&lt;select&gt;</td>
             <td>A select box allowing the visitor to choose amongst a set of Channel Entries. Additional options:<br /><br/>
                 <b>Channels</b> - Limits the available list of entries to the selected channels.<br/>
@@ -199,7 +199,7 @@ value5 : Label For Option 5
             <td>VARCHAR or TEXT</td>
         </tr>
         <tr>
-            <td><b>Mailing List Subscription</b></td>
+            <td><b><a name="type_mailinglist">Mailing List Subscription</a></b></td>
             <td>&lt;input type="checkbox" ... /&gt;</td>
             <td>When this checkbox is selected, the user will be subscribed to the mailing list selected. Because this uses ExpressionEngine's built in subscription system, the active user must be logged into a Member account for this to work properly.<br/>
             <br/>
@@ -210,13 +210,13 @@ value5 : Label For Option 5
             <td>VARHCAR</td>
         </tr>
         <tr>
-            <td><b>Hidden</b></td>
+            <td><b><a name="type_hidden">Hidden</a></b></td>
             <td>&lt;input type="hidden" ... /&gt;</td>
             <td>A simple text field rendered as a hidden input field. This can be used to attach additional data to the form. This field type is always set to an internal length limit of 255.</td>
             <td>VARCHAR</td>
         </tr>
         <tr>
-            <td><b>Member Data</b></td>
+            <td><b><a name="type_member">Member Data</a></b></td>
             <td>&lt;input type="hidden" ... /&gt;</td>
             <td>Stores a piece of member information associated with the logged in user along with the form fields. Fields with this type cannot be set through the field POST, but are always set on the backend to the active user&#39;s information. This field type is always set to an internal length limit of 255. When selected, an additional option is available:<br />
                 <br />
