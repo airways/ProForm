@@ -238,9 +238,11 @@ class Proform {
             $tagdata = $this->EE->TMPL->tagdata;
 
             $use_captcha = FALSE;
+            $interactive_captcha = TRUE;
+            
             if (preg_match("/({".$variable_prefix."captcha})/", $tagdata))
             {
-                $captcha = $this->_create_captcha($form_obj);
+                list($captcha, $interactive_captcha) = $this->_create_captcha($form_obj);
                 $tagdata = preg_replace("/{".$variable_prefix."captcha}/", $captcha, $tagdata);
 
                 if($captcha !== '')
@@ -251,6 +253,7 @@ class Proform {
             
             $static_config = array(
                 'use_captcha' => $use_captcha,
+                'interactive_captcha' => $interactive_captcha,
             );
 
             if($_SERVER['REQUEST_METHOD'] == 'POST' && $this->EE->input->post('__conf'))
@@ -305,26 +308,27 @@ class Proform {
             if(!isset($form_session->config) OR count($form_session->config) == 0)
             {
                 $form_session->config = array(
-                    'use_captcha'       => $use_captcha,
-                    'form_name'         => $form_name,
-                    'form_id'           => $form_id,
-                    'form_class'        => $form_class,
-                    'form_url'          => $form_url,
-                    'error_url'         => $error_url,
-                    'thank_you_url'     => $thank_you_url,
-                    'requested'         => time(),
-                    'notify'            => $notify,
-                    'download_url'      => $download_url,
-                    'download_label'    => $download_label,
-                    'referrer_url'      => $this->EE->agent->is_referral() ? $this->EE->agent->referrer() : '',
-                    'debug'             => $this->debug,
-                    'error_delimiters'  => $error_delimiters,
-                    'secure'            => $secure,
-                    'error_messages'    => $error_messages,
-                    'step'              => $step,
-                    'last_step_summary' => $last_step_summary,
-                    '%random%'          => mt_rand().'-'.mt_rand(),
-                    '%uniq%'            => function_exists('openssl_random_pseudo_bytes') ? bin2hex(openssl_random_pseudo_bytes(32)) : uniqid('', true),
+                    'use_captcha'                   => $use_captcha,
+                    'interactive_captcha'           => $interactive_captcha,
+                    'form_name'                     => $form_name,
+                    'form_id'                       => $form_id,
+                    'form_class'                    => $form_class,
+                    'form_url'                      => $form_url,
+                    'error_url'                     => $error_url,
+                    'thank_you_url'                 => $thank_you_url,
+                    'requested'                     => time(),
+                    'notify'                        => $notify,
+                    'download_url'                  => $download_url,
+                    'download_label'                => $download_label,
+                    'referrer_url'                  => $this->EE->agent->is_referral() ? $this->EE->agent->referrer() : '',
+                    'debug'                         => $this->debug,
+                    'error_delimiters'              => $error_delimiters,
+                    'secure'                        => $secure,
+                    'error_messages'                => $error_messages,
+                    'step'                          => $step,
+                    'last_step_summary'             => $last_step_summary,
+                    '%random%'                      => mt_rand().'-'.mt_rand(),
+                    '%uniq%'                        => function_exists('openssl_random_pseudo_bytes') ? bin2hex(openssl_random_pseudo_bytes(32)) : uniqid('', true),
                 );
             }
 
@@ -385,7 +389,9 @@ class Proform {
                 // Setup variables
 
                 $this->prolib->copy_values($form_obj, $variables);
+                
                 $variables['use_captcha'] = $use_captcha;
+                $variables['interactive_captcha'] = $interactive_captcha;
 
                 if(count($form_obj->settings) > 0)
                 {
@@ -1285,6 +1291,7 @@ class Proform {
         if($form_obj->get_step_count() == 1 || (isset($form_session->config) && $form_session->config['step'] == $form_obj->get_step_count()))
         {
             $form_session->config['use_captcha'] = $static_config['use_captcha'];
+            $form_session->config['interactive_captcha'] = $static_config['interactive_captcha'];
         }
             
         // find the form
@@ -1345,7 +1352,7 @@ class Proform {
                 if($this->EE->input->is_ajax_request())
                 {
                     $form_session->status = 'error';
-                    $form_session->new_captcha = $this->_create_captcha($form_obj);
+                    list($form_session->new_captcha, $form_session->interactive_captcha) = $this->_create_captcha($form_obj);
                     $this->EE->output->send_ajax_response((array)$form_session);
                     exit;
                 } else {
@@ -1400,10 +1407,11 @@ class Proform {
     private function _create_captcha(&$form_obj)
     {
         $captcha = '';
+        $interactive_captcha = true;
         
         if($this->EE->extensions->active_hook('proform_create_captcha') === TRUE)
         {
-            $captcha = $this->EE->extensions->call('proform_create_captcha', $form_obj, $this);
+            list($captcha, $interactive_captcha) = $this->EE->extensions->call('proform_create_captcha', $form_obj, $this);
         }
         
         if(!$captcha)
@@ -1416,7 +1424,7 @@ class Proform {
             $captcha = "[CAPTCHA ERROR]";
         }
         
-        return $captcha;
+        return array($captcha, $interactive_captcha);
     }
 
     private function _process_notifications(&$form_obj, &$form_session, &$entry_row)
