@@ -240,8 +240,7 @@ class Proform {
             $use_captcha = FALSE;
             if (preg_match("/({".$variable_prefix."captcha})/", $tagdata))
             {
-                $captcha = $this->EE->functions->create_captcha();
-                if(!$captcha && $captcha !== '') $captcha = "[CAPTCHA ERROR]";
+                $captcha = $this->_create_captcha($form_obj);
                 $tagdata = preg_replace("/{".$variable_prefix."captcha}/", $captcha, $tagdata);
 
                 if($captcha !== '')
@@ -324,6 +323,8 @@ class Proform {
                     'error_messages'    => $error_messages,
                     'step'              => $step,
                     'last_step_summary' => $last_step_summary,
+                    '%random%'          => mt_rand().'-'.mt_rand(),
+                    '%uniq%'            => function_exists('openssl_random_pseudo_bytes') ? bin2hex(openssl_random_pseudo_bytes(32)) : uniqid('', true),
                 );
             }
 
@@ -1344,7 +1345,7 @@ class Proform {
                 if($this->EE->input->is_ajax_request())
                 {
                     $form_session->status = 'error';
-                    $form_session->new_captcha = $this->EE->functions->create_captcha();
+                    $form_session->new_captcha = $this->_create_captcha($form_obj);
                     $this->EE->output->send_ajax_response((array)$form_session);
                     exit;
                 } else {
@@ -1395,7 +1396,28 @@ class Proform {
             }
         }
     }
+    
+    private function _create_captcha(&$form_obj)
+    {
+        $captcha = '';
+        
+        if($this->EE->extensions->active_hook('proform_create_captcha') === TRUE)
+        {
+            $captcha = $this->EE->extensions->call('proform_create_captcha', $form_obj, $this);
+        }
+        
+        if(!$captcha)
+        {
+            $captcha = $this->EE->functions->create_captcha();
+        }
 
+        if(!$captcha && $captcha !== '')
+        {
+            $captcha = "[CAPTCHA ERROR]";
+        }
+        
+        return $captcha;
+    }
 
     private function _process_notifications(&$form_obj, &$form_session, &$entry_row)
     {
@@ -1789,7 +1811,7 @@ class Proform {
 
         if ($this->EE->extensions->active_hook('proform_validation_check_rules') === TRUE)
         {
-            $validation_rules = $this->EE->extensions->call('proform_validation_rules', $this, $form_obj, $form_session, $validation_rules);
+            $validation_rules = $this->EE->extensions->call('proform_validation_check_rules', $this, $form_obj, $form_session, $validation_rules);
         }
         
         if($driver = $form_obj->get_driver())
@@ -1832,6 +1854,11 @@ class Proform {
             {
                 $driver->process_validation_end($form_obj, $form_session);
             }
+        }
+        
+        if ($this->EE->extensions->active_hook('proform_validation_end') === TRUE)
+        {
+            $this->EE->extensions->call('proform_validation_end', $this, $form_obj, $form_session);
         }
 
         //exit('end of validation');
