@@ -164,10 +164,16 @@
         
         <div class="pf_buttons">
             {if pf_use_captcha}
-                <div class="pf_captcha">
-                    Enter this word: {pf_captcha}<br/>
-                    <input type="text" name="captcha" />{if pf_error:captcha}<span class="error">{pf_error:captcha}</span>{/if}
-                </div>
+                {if pf_interactive_captcha}
+                    <div class="pf_captcha">
+                        Enter this word: {pf_captcha}<br/>
+                        <input type="text" name="captcha" />
+                        {if pf_error:captcha}<span class="error">{pf_error:captcha}</span>{/if}
+                    </div>
+                {if:else}
+                    {pf_captcha}
+                    {if pf_error:captcha}<span class="error">{pf_error:captcha}</span>{/if}
+                {/if}
             {/if}
             {if pf_multistep}
                 <input type="submit" name="_pf_goto_previous" value="< Previous" {if pf_on_first_step}disabled="disabled"{/if} />
