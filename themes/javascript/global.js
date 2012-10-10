@@ -46,7 +46,7 @@ var proform_mod = {
                 {
                     form = proform_mod.forms[key];
                     input = '<table class="mainTable" border="0" cellspacing="0" cellpadding="0" width="100%">';
-                    console.log(proform_mod);
+                    //console.log(proform_mod);
                     var f_even = true;
                     for(x in form)
                     {
