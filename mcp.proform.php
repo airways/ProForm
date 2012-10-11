@@ -182,7 +182,7 @@ class Proform_mcp extends Prolib_base_mcp {
         $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/jquery.colorbox-min.js"></script>');
 
         // Grab lang entries we want to sent to the JS
-        $lang_keys = array();
+        $lang_keys = array('no_advanced_settings');
         $lang_entries = array();
         $f = new PL_Form(FALSE);
         
@@ -351,7 +351,8 @@ class Proform_mcp extends Prolib_base_mcp {
         $prefs = $this->EE->formslib->prefs->get_preferences();
         $prefs = $this->EE->pl_drivers->get_preferences($prefs);
 
-        ksort($this->EE->formslib->__advanced_settings_options);
+        //ksort($this->EE->formslib->__advanced_settings_options);
+        asort($this->EE->formslib->__advanced_settings_options);
         $vars['advanced_settings_options'] = $this->EE->formslib->__advanced_settings_options;
         $this->render_advanced_options($prefs, $vars['advanced_settings_options'], $vars['advanced_settings_forms'], $vars['advanced_settings_help']);
         $vars['settings'] = array();
@@ -615,6 +616,7 @@ class Proform_mcp extends Prolib_base_mcp {
         }
         
         $vars['advanced_settings_options'] = $form_obj->get_advanced_settings_options();
+        asort($vars['advanced_settings_options']);
         $vars['advanced_settings_forms'] = array();
         $vars['advanced_settings_help'] = array();
         
