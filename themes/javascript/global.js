@@ -77,6 +77,7 @@ var proform_mod = {
                     '<td>' + input + '</td>'+
                     '<td><a href="#" class="remove_grid_row remove_advanced">X</a></td>'+
                     '</tr>');
+                $('#advanced_settings > table td.placeholder').parent('tr').remove();
             }
             proform_mod.bind_advanced_settings();
             return false;
@@ -89,6 +90,11 @@ var proform_mod = {
             $tr.remove();
             $('#advanced_settings_options option:last').after('<option value="'+key+'">'+label+'</option>');
             proform_mod.sort_select($('#advanced_settings_options'));
+            if($('#advanced_settings > table > tbody > tr').length == 0)
+            {
+                
+                $('#advanced_settings > table').append('<tbody><tr><td class="placeholder" colspan="3">'+proform_mod.slang('no_advanced_settings')+'</td></tr></tbody>');
+            }
             return false;
         });
     },
@@ -204,10 +210,10 @@ var proform_mod = {
         
             // sort the array by the value (change val to text to sort by text instead)
             arrVals.sort(function(a, b){
-                if(a.val>b.val){
+                if(a.text>b.text){
                     return 1;
                 }
-                else if (a.val==b.val){
+                else if (a.text==b.text){
                     return 0;
                 }
                 else {

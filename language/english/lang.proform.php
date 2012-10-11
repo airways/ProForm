@@ -62,6 +62,7 @@ $lang = array(
     'no_fields' => 'This form has no fields assigned',
     'no_fields_defined' => 'There are no fields defined yet',
     'no_templates' => 'There are no templates defined yet',
+    'no_advanced_settings' => 'No advanced settings defined yet',
 
     // Dropdown options
     'edit_selected' => 'Edit Selected',

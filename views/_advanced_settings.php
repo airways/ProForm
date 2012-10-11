@@ -30,6 +30,7 @@ foreach($settings as $key => $value)
     }
 }
 
+$count = 0;
 foreach($settings as $key => $value)
 {
     if(!in_array($key, $sub_settings))
@@ -84,12 +85,23 @@ foreach($settings as $key => $value)
             $form,
             '<a href="#" class="remove_grid_row remove_advanced">X</a>'
         );
+
         $this->table->add_row($row);
+        $count++;
     }
     // Can't add the same option twice
     unset($advanced_settings_options[$key]);
 }
 
+if($count == 0)
+{
+    $row = array(
+        'data' => lang('no_advanced_settings'),
+        'class' => 'placeholder',
+        'colspan' => 3,
+    );
+    $this->table->add_row($row);
+}
 echo $this->table->generate();
 
 echo '<select id="advanced_settings_options"><option value="">- Select a Setting to Add -</option>';
