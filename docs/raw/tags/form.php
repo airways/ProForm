@@ -157,6 +157,7 @@
     <li><a href="#param_last_step_summary">last_step_summary="yes"</a></li>
     <li><a href="#param_message">message:required="This field is required!", message:*=""</a></li>
     <li><a href="#param_notify">notify="sample@example.com"</a></li>
+    <li><a href="#param_set">set:*=""</a></li>
     <li><a href="#param_step">step="1"</a></li>
     <li><a href="#param_site">site="default_site"</a></li>
     <li><a href="#param_variable_prefix">variable_prefix="pf_"</a></li>
@@ -338,6 +339,22 @@
 <div class="tip">
     <h6>But there is a better way!</h6>
     <p>Based on other form systems you may have used in ExpressionEngine, your first tendency may be to hard-code email addresses into your form templates using this parameter, but I strongly advise that you attempt to make use of the Notification List by itself and place all email addresses to send notifications to in the form's <a href="{root_url}cp/forms.html#form_settings_notification_list">Notification List Settings</a> instead.</p>
+</div>
+
+<h3><a name="param_set">set:*=""</a></h3>
+
+<p>The <b>set</b> parameter allows you to specify a value to be saved for any field on the form. This can be used to attach information about a submission, such as custom user fields, order information, or whatever else you wish to save into the form.</p>
+
+<p>The * should be replaced with a valid field name assigned to the form - often this will be the name of a hidden field. For instance, to set the value for a field named "user_address" we would use the parameter <b>set:user_address="100 Test Street"</b>. The set parameter can occur as many times as needed within a form tag, provided each field name used is unique.</p>
+
+<div class="tip">
+    <h6>Example Usage</h6>
+    <p>Suppose we have an order ID from a custom ordering system that we need to save with a form submission. This ID is in the variable {order_id}. To save this into a ProForm entry, we can simply set the value for a field named "external_order_id" with the set parameter like so:</p>
+    <pre class="brush: xml">
+        &#123;exp:proform:form form="order_record" set:external_order_id="{order_id}&#125;
+        ...
+        &#123;/exp:proform:form&#125;
+    </pre>
 </div>
 
 <h3><a name="param_step">step="1"</a></h3>
