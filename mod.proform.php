@@ -187,11 +187,13 @@ class Proform {
         ////////////////////////////////////////////////////////////////////////////////
 
         // Get required params
-        $form_name = strip_tags($this->EE->TMPL->fetch_param('form_name', $this->EE->TMPL->fetch_param('form', $this->EE->TMPL->fetch_param('name', FALSE))));
+        $form_name = str_replace('-', '_', strip_tags($this->EE->TMPL->fetch_param('form_name', $this->EE->TMPL->fetch_param('form', $this->EE->TMPL->fetch_param('name', FALSE)))));
 
         // Get optional params
-        $form_id            = $this->EE->TMPL->fetch_param('form_id', $form_name . '_proform');
-        $form_class         = $this->EE->TMPL->fetch_param('form_class', $form_name . '_proform');
+        $dashes_in_id       = $this->EE->TMPL->fetch_param('dashes_in_id', 'no') == 'yes';
+        $dashes_in_class    = $this->EE->TMPL->fetch_param('dashes_in_class', 'no') == 'yes';
+        $form_id            = $this->EE->TMPL->fetch_param('form_id', str_replace('_', $dashes_in_id ? '-' : '_', $form_name . '_proform'));
+        $form_class         = $this->EE->TMPL->fetch_param('form_class', str_replace('_', $dashes_in_class ? '-' : '_', $form_name . '_proform'));
         $form_url           = $this->EE->TMPL->fetch_param('form_url', $this->EE->functions->remove_double_slashes($_SERVER['REQUEST_URI']));
         $error_url          = $this->EE->TMPL->fetch_param('error_url', $form_url);
         $thank_you_url      = $this->EE->TMPL->fetch_param('thank_you_url',  $form_url);
@@ -388,7 +390,7 @@ class Proform {
                 ////////////////////
                 // Setup variables
 
-                $this->prolib->copy_values($form_obj, $variables);
+                $this->_copy_form_values($form_obj, $variables);
                 
                 $variables['use_captcha'] = $use_captcha;
                 $variables['interactive_captcha'] = $interactive_captcha;
@@ -675,7 +677,7 @@ class Proform {
                 //$this->prolib->debug($form_obj);
 
                 $this->prolib->copy_values($form_session->config, $variables);
-                $this->prolib->copy_values($form_obj, $variables);
+                $this->_copy_form_values($form_obj, $variables);
 
                 $variables['fieldrows'] = $this->create_fields_array($form_obj, FALSE, $form_session->errors, $form_session->values, $form_session->checked_flags, TRUE);
                 $variables['fields'] = $this->create_fields_array($form_obj, FALSE, $form_session->errors, $form_session->values, $form_session->checked_flags, FALSE, FALSE);
@@ -1432,6 +1434,7 @@ class Proform {
         if($this->EE->proform_notifications->has_notifications($form_obj, $form_session))
         {
             $parse_data = array();
+            $this->_copy_form_values($form_obj, $parse_data);
             $this->prolib->copy_values($form_session->config, $parse_data);
             $this->prolib->copy_values($form_session->values, $parse_data);
 
@@ -2473,6 +2476,12 @@ class Proform {
                 }
             }
         }
+    }
+    
+    function _copy_form_values(&$form_obj, &$variables)
+    {
+        $this->prolib->copy_values($form_obj, $variables);
+        $variables['form_name:dashes'] = str_replace('_', '-', $variables['form_name']);
     }
     
 }

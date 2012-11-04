@@ -145,6 +145,8 @@
 <ul>
     <li><a href="#param_custom">Custom Params</a></li>
     <li><a href="#param_debug">debug="yes"</a></li>
+    <li><a href="#param_dashes_in_class">dashes_in_class="yes"</a></li>
+    <li><a href="#param_dashes_in_id">dashes_in_id="yes"</a></li>
     <li><a href="#param_error_delimiters">error_delimiters="&lt;p&gt;|&lt;/p&gt;"</a></li>
     <li><a href="#param_error_url">error_url="forms/contact-us/error"</a></li>
     <li><a href="#param_form">form="contact_us"</a></li>
@@ -171,6 +173,23 @@
 
 <p>The <b>debug</b> parameter turns on debug mode for <dfn>ProForm</dfn>, which will provide some additional information in order to assist in tracing it's behavior.</p>
 
+<h3><a name="param_dashes_in_class">dashes_in_class="yes"</a></h3>
+
+<p>The <b>dashes_in_class</b> parameter causes the automatic form element class generated to use dashes instead of underscores.</p>
+
+<p>For instance, this would change the class generated form a form named "contact_us" from "contact_us_proform" to "contact-us-proform".</p>
+
+<p></p>You can also completely override the class using the <a href="#param_form_class">form_class</a> paramter.</p>
+
+<h3><a name="param_dashes_in_id">dashes_in_id="yes"</a></h3>
+
+<p>The <b>dashes_in_id</b> parameter causes the automatic form element ID generated to use dashes instead of underscores.</p>
+
+<p>For instance, this would change the ID generated form a form named "contact_us" from "contact_us_proform" to "contact-us-proform".</p>
+
+<p></p>You can also completely override the ID using the <a href="#param_form_id">form_id</a> paramter.</p>
+
+
 <h3><a name="param_error_delimiters">error_delimiters="&lt;p&gt;|&lt;/p&gt;"</a></h3>
 
 <p>The <b>error_delimiters</b> parameter allows you to specify custom tags to wrap around each error message generated for a field. This parameter requires two values - which must be separated by a pipe character as shown. The left side of the pipe is used to start the error block, and the right side is used to end it. The default values are:</p>
@@ -194,6 +213,8 @@
 <p>The <b>form</b> parameter is used to specify which form&#39;s information should be loaded. Since ProForm doesn't know which form you want to render, you need to specify using this parameter.</p>
 
 <p>This value can be taken from a URL segment, or from an entry field. The form name can also be hard coded, although in general I recommend creating a more generic template that can be reused for multiple forms.</p>
+
+<p>For technical reasons, form names always use underscores rather than dashes to separate words. However, if you specify the form name using dashes, it will be converted automatically for you. For instance, requesting a form named "contact-us" would load the form named "contact_us" automatically. You can get the name of the current form with dashes instead of underscores using the variable {form_name:dashes} within most tags in ProForm.</p>
 
 <div class="tip">
     <h6>Crash Course</h6>
@@ -424,6 +445,7 @@
     <li><a href="#var_form_id">&#123;form_id&#125;</a></li>
     <li><a href="#var_form_label">&#123;form_label&#125;</a></li>
     <li><a href="#var_form_name">&#123;form_name&#125;</a></li>
+    <li><a href="#var_form_name_dashes">&#123;form_name:dashes&#125;</a></li>
     <li><a href="#var_form_type">&#123;form_type&#125;</a></li>
     <!-- <li><a href="#var_formpref">&#123;formpref:*&#125;</a></li> -->
     <li><a href="#var_fields_count">&#123;fields_count&#125;</a></li>
@@ -520,6 +542,10 @@
 <h3><a name="var_form_name">{form_name}</a></h3>
 
 <p>Provides the internal form name for the form. This should be all lowercase and only contained letters, numbers, and underscores.</p>
+
+<h3><a name="var_form_name_dashes">{form_name:dashes}</a></h3>
+
+<p>Provides the internal form name for the form with all underscores changes to dashes. This can be used in URLs and other places where a version of the form name with dashes is desired. Using dashes in a <a href="#param_form_name">form_name=""</a> parameter will still work correctly as it automatically changes all dashes encountered into underscores before doing the form lookup.</p>
 
 <h3><a name="var_form_type">{form_type}</a></h3>
 

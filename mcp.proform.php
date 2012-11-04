@@ -1234,6 +1234,7 @@ class Proform_mcp extends Prolib_base_mcp {
         {
             $vars = $this->EE->extensions->call('proform_new_field', $this, $vars);
         }
+        
         return $this->EE->pl_drivers->call($vars['field_type'], 'new_field_view', array($this->edit_field(FALSE, $vars)));
     }
 
