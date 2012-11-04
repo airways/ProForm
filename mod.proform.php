@@ -59,7 +59,6 @@ class Proform {
     var $prefix_included = FALSE;
     var $debug = FALSE;
     var $debug_str = '<b>Debug Output</b><br/>';
-    var $set_params = array();
 
     public function Proform()
     {
@@ -113,6 +112,23 @@ class Proform {
         // This just disables the head script completely - use this only when you've created
         // custom styling and javascript for the simple template.
         $this->cache['prefix_disabled'] = TRUE;
+        return '';
+    }
+    
+    public function set()
+    {
+        $form_name = str_replace('-', '_', strip_tags($this->EE->TMPL->fetch_param('form_name', $this->EE->TMPL->fetch_param('form', $this->EE->TMPL->fetch_param('name', FALSE)))));
+        $field_name = strip_tags($this->EE->TMPL->fetch_param('field_name', $this->EE->TMPL->fetch_param('field', FALSE)));
+        $value = $this->EE->TMPL->fetch_param('value');
+        
+        if($this->EE->TMPL->tagdata) $value = $this->EE->TMPL->tagdata;
+        
+        if(!isset($this->cache['set_fields'][$form_name]))
+        {
+            $this->cache['set_fields'][$form_name] = array();
+        }
+        $this->cache['set_fields'][$form_name][$field_name] = $value;
+        
         return '';
     }
 
@@ -208,7 +224,12 @@ class Proform {
         $variable_prefix    = pf_strip_id($this->EE->TMPL->fetch_param('variable_prefix', ''));
         $hidden_fields_mode = strtolower($this->EE->TMPL->fetch_param('hidden_fields_mode', 'split'));
         $last_step_summary  = $this->EE->TMPL->fetch_param('last_step_summary') == 'yes';
-        $this->set_params   = $this->EE->pl_parser->fetch_param_group('set');
+        
+        if(!isset($this->cache['set_fields'][$form_name]))
+        {
+            $this->cache['set_fields'][$form_name] = array();
+        }
+        $this->cache['set_fields'][$form_name]   = $this->cache['set_fields'][$form_name] + $this->EE->pl_parser->fetch_param_group('set');
         
         $this->_set_site();
 
@@ -221,8 +242,7 @@ class Proform {
 
         $form_session = $this->EE->formslib->new_session();
         $form_session->processed = FALSE;
-        $this->_copy_set_params($form_session);
-
+        
         // Get all form data for the requested form
         if($form_name)
         {
@@ -231,6 +251,7 @@ class Proform {
             $form_obj = FALSE;
         }
 
+        $this->_copy_set_fields($form_obj, $form_session);
 
         $this->prolib->pl_parser->parse_no_results_ex(array('variable_prefix' => $variable_prefix));
 
@@ -1255,15 +1276,18 @@ class Proform {
             
         }
         
-        $this->_copy_set_params($form_session);
+        $this->_copy_set_fields($form_obj, $form_session);
     }
     
-    private function _copy_set_params(&$form_session)
+    private function _copy_set_fields(&$form_obj, &$form_session)
     {
-        foreach($this->set_params as $field_name => $value)
+        if(isset($this->cache['set_fields'][$form_obj->form_name]) && is_array($this->cache['set_fields'][$form_obj->form_name]))
         {
-            $form_session->values[$field_name] = $value;
-            $_POST[$field_name]  = $value;
+            foreach($this->cache['set_fields'][$form_obj->form_name] as $field_name => $value)
+            {
+                $form_session->values[$field_name] = $value;
+                $_POST[$field_name]  = $value;
+            }
         }
     }
 
@@ -1762,7 +1786,14 @@ class Proform {
 
                 if($value_count > 0 && !$valid)
                 {
-                    $form_session->add_error($field->field_name, ($multi ? 'One of the values for' : 'The value for ').htmlentities($field->field_name).' is not a valid choice.');
+                    if(isset($form_session->config['error_messages']['list_choice_invalid']))
+                    {
+                        $line = $form_session->config['error_messages']['list_choice_invalid'];
+                    } else {
+                        $line = ($multi ? 'One of the values for' : 'The value for ').' %s is not a valid choice.';
+                    }
+                    $error = sprintf($line, htmlentities($field->field_label));
+                    $form_session->add_error($field->field_name,$error);
                 }
             }
 

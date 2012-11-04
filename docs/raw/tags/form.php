@@ -313,6 +313,8 @@
 
 <p>See the list of <a href="{root_url}cp/fields.html#validation_rules">Validation Rules</a> for a list of what keys to use for each validation rule.</p>
 
+<p>Additionally, a special validation rule which applies only to List type fields and prevents them from accepting values which are not in their options can be set with the parameter <b>message:list_choice_invalid=""</b>.</p>
+
 <div class="tip">
     <h6>Example Usage</h6>
     <pre class="brush: xml">
@@ -352,6 +354,18 @@
     <p>Suppose we have an order ID from a custom ordering system that we need to save with a form submission. This ID is in the variable {order_id}. To save this into a ProForm entry, we can simply set the value for a field named "external_order_id" with the set parameter like so:</p>
     <pre class="brush: xml">
         &#123;exp:proform:form form="order_record" set:external_order_id="{order_id}&#125;
+        ...
+        &#123;/exp:proform:form&#125;
+    </pre>
+</div>
+
+<p>You may also use the {exp:proform:set} tag to do the same thing as the <b>set</b> parameter. This will allow you to store longer strings of text if needed:</p>
+
+<div class="tip">
+    <h6>Example Usage</h6>
+    <pre class="brush: xml">
+        &#123;exp:proform:set form="order_record" field_name="external_order_id"&#125;{order_id}&#123;/exp:proform:set&#125;
+        &#123;exp:proform:form form="order_record"&#125;
         ...
         &#123;/exp:proform:form&#125;
     </pre>
