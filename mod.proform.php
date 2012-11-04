@@ -59,6 +59,7 @@ class Proform {
     var $prefix_included = FALSE;
     var $debug = FALSE;
     var $debug_str = '<b>Debug Output</b><br/>';
+    var $set_params = array();
 
     public function Proform()
     {
@@ -207,7 +208,8 @@ class Proform {
         $variable_prefix    = pf_strip_id($this->EE->TMPL->fetch_param('variable_prefix', ''));
         $hidden_fields_mode = strtolower($this->EE->TMPL->fetch_param('hidden_fields_mode', 'split'));
         $last_step_summary  = $this->EE->TMPL->fetch_param('last_step_summary') == 'yes';
-
+        $this->set_params   = $this->EE->pl_parser->fetch_param_group('set');
+        
         $this->_set_site();
 
         if(count($error_delimiters) != 2)
@@ -219,6 +221,7 @@ class Proform {
 
         $form_session = $this->EE->formslib->new_session();
         $form_session->processed = FALSE;
+        $this->_copy_set_params($form_session);
 
         // Get all form data for the requested form
         if($form_name)
@@ -1207,49 +1210,60 @@ class Proform {
             // Only copy values for fields in the current step
             if($field->step_no != $form_session->config['step']) continue;
 
-            if($field->type != 'file')
+            if($field->type == 'file') continue;
+            
+            if($field->form_field_settings['preset_forced'] == 'y')
             {
-                if($field->form_field_settings['preset_forced'] == 'y')
-                {
-                    $value = $field->form_field_settings['preset_value'];
-                    $_POST[$field->field_name] = $field->form_field_settings['preset_value'];
-                } else {
-                    $value = $this->EE->input->get_post($field->field_name);
+                $value = $field->form_field_settings['preset_value'];
+                $_POST[$field->field_name] = $field->form_field_settings['preset_value'];
+            } else {
+                $value = $this->EE->input->get_post($field->field_name);
 
-                    // force checkboxes to store "y" or "n"
-                    if($field->type == 'checkbox' || $field->type == 'mailinglist')
-                    {
-                        $value = $value ? 'y' : 'n';
-                        #echo "{$field->field_name} value = $value<br/>";
-                    }
-                }
-
-                if(!isset($form_session->values[$field->field_name]))
+                // force checkboxes to store "y" or "n"
+                if($field->type == 'checkbox' || $field->type == 'mailinglist')
                 {
-                    $form_session->values[$field->field_name] = '';
-                }
-
-                if($value !== FALSE)
-                {
-                    $form_session->values[$field->field_name] = $value;
-                } else {
-                    if($field->form_field_settings['preset_value'])
-                    {
-                        $form_session->values[$field->field_name] = $field->form_field_settings['preset_value'];
-                        $_POST[$field->field_name] = $field->form_field_settings['preset_value'];
-                    }
-                }
-
-                if($field->type == 'mailinglist' || $field->type == 'checkbox')
-                {
-                    if(array_key_exists($field->field_name, $form_session->values) && $form_session->values[$field->field_name] == 'y')
-                    {
-                        $form_session->checked_flags[$field->field_name] = TRUE;
-                    } else {
-                        $form_session->checked_flags[$field->field_name] = FALSE;
-                    }
+                    $value = $value ? 'y' : 'n';
+                    #echo "{$field->field_name} value = $value<br/>";
                 }
             }
+
+            if(!isset($form_session->values[$field->field_name]))
+            {
+                $form_session->values[$field->field_name] = '';
+            }
+
+            if($value !== FALSE)
+            {
+                $form_session->values[$field->field_name] = $value;
+            } else {
+                if($field->form_field_settings['preset_value'])
+                {
+                    $form_session->values[$field->field_name] = $field->form_field_settings['preset_value'];
+                    $_POST[$field->field_name] = $field->form_field_settings['preset_value'];
+                }
+            }
+
+            if($field->type == 'mailinglist' || $field->type == 'checkbox')
+            {
+                if(array_key_exists($field->field_name, $form_session->values) && $form_session->values[$field->field_name] == 'y')
+                {
+                    $form_session->checked_flags[$field->field_name] = TRUE;
+                } else {
+                    $form_session->checked_flags[$field->field_name] = FALSE;
+                }
+            }
+            
+        }
+        
+        $this->_copy_set_params($form_session);
+    }
+    
+    private function _copy_set_params(&$form_session)
+    {
+        foreach($this->set_params as $field_name => $value)
+        {
+            $form_session->values[$field_name] = $value;
+            $_POST[$field_name]  = $value;
         }
     }
 
