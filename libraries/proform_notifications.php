@@ -119,7 +119,7 @@ class Proform_notifications
             }
         }
 
-        if(strlen(trim($form->notification_list)) > 0 || (isset($form_session->config['notify']) && count($form_session->config['notify']) > 0))
+        if(strlen(trim($form->notification_list)) > 0 || $form->submitter_notification_on == 'y' || $form->share_notification_on == 'y' || (isset($form_session->config['notify']) && count($form_session->config['notify']) > 0))
         {
             $this->_debug('Notifications exist for '.$form->form_name);
             return TRUE;
@@ -131,6 +131,9 @@ class Proform_notifications
 
     function send_notifications($form, $data, $form_session)
     {
+        $this->_debug('send_notifications start');
+        $this->_debug('data: ' . print_r($data, TRUE));
+        
         $this->EE->extensions->end_script = FALSE;
 
         if(is_object($data)) {
@@ -223,7 +226,7 @@ class Proform_notifications
         {
             $this->_debug('Sending submitter_notification - result so far - ' . ($result ? 'okay' : 'failed'));
 
-            $submitter_email = $data[$form->submitter_email_field];
+            $submitter_email = explode('|', $data[$form->submitter_email_field]);
 
             if(trim($form->submitter_reply_to_field) != '' AND trim($data[$form->submitter_reply_to_field]) != '')
             {
@@ -231,6 +234,8 @@ class Proform_notifications
             } else {
                 $reply_to = FALSE;
             }
+
+            $this->_debug('submitter_notification notification list - ' . print_r($submitter_email, TRUE));
 
             $result &= $this->_send_notifications('submitter', $form->submitter_notification_template,
                 $form, $data, $form->submitter_notification_subject ? $form->submitter_notification_subject : $form->subject,
@@ -248,7 +253,7 @@ class Proform_notifications
             && isset($data[$form->share_email_field]) && $data[$form->share_email_field])
         {
             $this->_debug('Sending share_notification - result so far - ' . ($result ? 'okay' : 'failed'));
-            $share_email = $data[$form->share_email_field];
+            $share_email = explode('|', $data[$form->share_email_field]);
 
             if(trim($form->share_reply_to_field) != '' AND trim($data[$form->share_reply_to_field]) != '')
             {
@@ -257,6 +262,8 @@ class Proform_notifications
                 $reply_to = FALSE;
             }
 
+            $this->_debug('share_notification notification list - ' . print_r($share_email, TRUE));
+            
             $result &= $this->_send_notifications('share', $form->share_notification_template,
                 $form, $data, $form->share_notification_subject ? $form->share_notification_subject : $form->subject,
                 array($share_email), $reply_to, FALSE, $form->share_notification_attachments === 'y');

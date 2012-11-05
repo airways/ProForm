@@ -1474,6 +1474,7 @@ class Proform {
             $parse_data = array();
             $this->_copy_form_values($form_obj, $parse_data);
             $this->prolib->copy_values($form_session->config, $parse_data);
+            var_dump($form_session->values);
             $this->prolib->copy_values($form_session->values, $parse_data);
 
             $fieldrows = $this->create_fields_array($form_obj, FALSE, array(), $form_session->values, array(), TRUE);
@@ -1510,7 +1511,21 @@ class Proform {
                 } else {
                     pl_show_error("{exp:proform:form} could not send notifications for form: ".$form_obj->form_name);
                 }
+            } 
+        } 
+
+        if($form_session->config['debug'])
+        {
+            echo '<b>{exp:proform:form} for form: '.$form_obj->form_name.'</b><p/>';
+            echo $this->EE->proform_notifications->debug;
+            echo '<hr/>';
+            $this->EE->pl_email->print_debugger();
+            echo '<hr/>';
+            foreach($this->EE->pl_email->_debug_msg as $row)
+            {
+                echo $row.'<br/>';
             }
+            exit;
         }
     }
 
