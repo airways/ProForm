@@ -114,6 +114,23 @@ class Proform {
         $this->cache['prefix_disabled'] = TRUE;
         return '';
     }
+    
+    public function set()
+    {
+        $form_name = str_replace('-', '_', strip_tags($this->EE->TMPL->fetch_param('form_name', $this->EE->TMPL->fetch_param('form', $this->EE->TMPL->fetch_param('name', FALSE)))));
+        $field_name = strip_tags($this->EE->TMPL->fetch_param('field_name', $this->EE->TMPL->fetch_param('field', FALSE)));
+        $value = $this->EE->TMPL->fetch_param('value');
+        
+        if($this->EE->TMPL->tagdata) $value = $this->EE->TMPL->tagdata;
+        
+        if(!isset($this->cache['set_fields'][$form_name]))
+        {
+            $this->cache['set_fields'][$form_name] = array();
+        }
+        $this->cache['set_fields'][$form_name][$field_name] = $value;
+        
+        return '';
+    }
 
     public function simple()
     {
@@ -187,11 +204,13 @@ class Proform {
         ////////////////////////////////////////////////////////////////////////////////
 
         // Get required params
-        $form_name = strip_tags($this->EE->TMPL->fetch_param('form_name', $this->EE->TMPL->fetch_param('form', $this->EE->TMPL->fetch_param('name', FALSE))));
+        $form_name = str_replace('-', '_', strip_tags($this->EE->TMPL->fetch_param('form_name', $this->EE->TMPL->fetch_param('form', $this->EE->TMPL->fetch_param('name', FALSE)))));
 
         // Get optional params
-        $form_id            = $this->EE->TMPL->fetch_param('form_id', $form_name . '_proform');
-        $form_class         = $this->EE->TMPL->fetch_param('form_class', $form_name . '_proform');
+        $dashes_in_id       = $this->EE->TMPL->fetch_param('dashes_in_id', 'no') == 'yes';
+        $dashes_in_class    = $this->EE->TMPL->fetch_param('dashes_in_class', 'no') == 'yes';
+        $form_id            = $this->EE->TMPL->fetch_param('form_id', str_replace('_', $dashes_in_id ? '-' : '_', $form_name . '_proform'));
+        $form_class         = $this->EE->TMPL->fetch_param('form_class', str_replace('_', $dashes_in_class ? '-' : '_', $form_name . '_proform'));
         $form_url           = $this->EE->TMPL->fetch_param('form_url', $this->EE->functions->remove_double_slashes($_SERVER['REQUEST_URI']));
         $error_url          = $this->EE->TMPL->fetch_param('error_url', $form_url);
         $thank_you_url      = $this->EE->TMPL->fetch_param('thank_you_url',  $form_url);
@@ -205,7 +224,13 @@ class Proform {
         $variable_prefix    = pf_strip_id($this->EE->TMPL->fetch_param('variable_prefix', ''));
         $hidden_fields_mode = strtolower($this->EE->TMPL->fetch_param('hidden_fields_mode', 'split'));
         $last_step_summary  = $this->EE->TMPL->fetch_param('last_step_summary') == 'yes';
-
+        
+        if(!isset($this->cache['set_fields'][$form_name]))
+        {
+            $this->cache['set_fields'][$form_name] = array();
+        }
+        $this->cache['set_fields'][$form_name]   = $this->cache['set_fields'][$form_name] + $this->EE->pl_parser->fetch_param_group('set');
+        
         $this->_set_site();
 
         if(count($error_delimiters) != 2)
@@ -217,7 +242,7 @@ class Proform {
 
         $form_session = $this->EE->formslib->new_session();
         $form_session->processed = FALSE;
-
+        
         // Get all form data for the requested form
         if($form_name)
         {
@@ -226,6 +251,7 @@ class Proform {
             $form_obj = FALSE;
         }
 
+        $this->_copy_set_fields($form_obj, $form_session);
 
         $this->prolib->pl_parser->parse_no_results_ex(array('variable_prefix' => $variable_prefix));
 
@@ -388,7 +414,7 @@ class Proform {
                 ////////////////////
                 // Setup variables
 
-                $this->prolib->copy_values($form_obj, $variables);
+                $this->_copy_form_values($form_obj, $variables);
                 
                 $variables['use_captcha'] = $use_captcha;
                 $variables['interactive_captcha'] = $interactive_captcha;
@@ -675,7 +701,7 @@ class Proform {
                 //$this->prolib->debug($form_obj);
 
                 $this->prolib->copy_values($form_session->config, $variables);
-                $this->prolib->copy_values($form_obj, $variables);
+                $this->_copy_form_values($form_obj, $variables);
 
                 $variables['fieldrows'] = $this->create_fields_array($form_obj, FALSE, $form_session->errors, $form_session->values, $form_session->checked_flags, TRUE);
                 $variables['fields'] = $this->create_fields_array($form_obj, FALSE, $form_session->errors, $form_session->values, $form_session->checked_flags, FALSE, FALSE);
@@ -1205,48 +1231,62 @@ class Proform {
             // Only copy values for fields in the current step
             if($field->step_no != $form_session->config['step']) continue;
 
-            if($field->type != 'file')
+            if($field->type == 'file') continue;
+            
+            if($field->form_field_settings['preset_forced'] == 'y')
             {
-                if($field->form_field_settings['preset_forced'] == 'y')
+                $value = $field->form_field_settings['preset_value'];
+                $_POST[$field->field_name] = $field->form_field_settings['preset_value'];
+            } else {
+                $value = $this->EE->input->get_post($field->field_name);
+
+                // force checkboxes to store "y" or "n"
+                if($field->type == 'checkbox' || $field->type == 'mailinglist')
                 {
-                    $value = $field->form_field_settings['preset_value'];
+                    $value = $value ? 'y' : 'n';
+                    #echo "{$field->field_name} value = $value<br/>";
+                }
+            }
+
+            if(!isset($form_session->values[$field->field_name]))
+            {
+                $form_session->values[$field->field_name] = '';
+            }
+
+            if($value !== FALSE)
+            {
+                $form_session->values[$field->field_name] = $value;
+            } else {
+                if($field->form_field_settings['preset_value'])
+                {
+                    $form_session->values[$field->field_name] = $field->form_field_settings['preset_value'];
                     $_POST[$field->field_name] = $field->form_field_settings['preset_value'];
+                }
+            }
+
+            if($field->type == 'mailinglist' || $field->type == 'checkbox')
+            {
+                if(array_key_exists($field->field_name, $form_session->values) && $form_session->values[$field->field_name] == 'y')
+                {
+                    $form_session->checked_flags[$field->field_name] = TRUE;
                 } else {
-                    $value = $this->EE->input->get_post($field->field_name);
-
-                    // force checkboxes to store "y" or "n"
-                    if($field->type == 'checkbox' || $field->type == 'mailinglist')
-                    {
-                        $value = $value ? 'y' : 'n';
-                        #echo "{$field->field_name} value = $value<br/>";
-                    }
+                    $form_session->checked_flags[$field->field_name] = FALSE;
                 }
-
-                if(!isset($form_session->values[$field->field_name]))
-                {
-                    $form_session->values[$field->field_name] = '';
-                }
-
-                if($value !== FALSE)
-                {
-                    $form_session->values[$field->field_name] = $value;
-                } else {
-                    if($field->form_field_settings['preset_value'])
-                    {
-                        $form_session->values[$field->field_name] = $field->form_field_settings['preset_value'];
-                        $_POST[$field->field_name] = $field->form_field_settings['preset_value'];
-                    }
-                }
-
-                if($field->type == 'mailinglist' || $field->type == 'checkbox')
-                {
-                    if(array_key_exists($field->field_name, $form_session->values) && $form_session->values[$field->field_name] == 'y')
-                    {
-                        $form_session->checked_flags[$field->field_name] = TRUE;
-                    } else {
-                        $form_session->checked_flags[$field->field_name] = FALSE;
-                    }
-                }
+            }
+            
+        }
+        
+        $this->_copy_set_fields($form_obj, $form_session);
+    }
+    
+    private function _copy_set_fields(&$form_obj, &$form_session)
+    {
+        if(isset($this->cache['set_fields'][$form_obj->form_name]) && is_array($this->cache['set_fields'][$form_obj->form_name]))
+        {
+            foreach($this->cache['set_fields'][$form_obj->form_name] as $field_name => $value)
+            {
+                $form_session->values[$field_name] = $value;
+                $_POST[$field_name]  = $value;
             }
         }
     }
@@ -1432,7 +1472,9 @@ class Proform {
         if($this->EE->proform_notifications->has_notifications($form_obj, $form_session))
         {
             $parse_data = array();
+            $this->_copy_form_values($form_obj, $parse_data);
             $this->prolib->copy_values($form_session->config, $parse_data);
+            var_dump($form_session->values);
             $this->prolib->copy_values($form_session->values, $parse_data);
 
             $fieldrows = $this->create_fields_array($form_obj, FALSE, array(), $form_session->values, array(), TRUE);
@@ -1469,7 +1511,21 @@ class Proform {
                 } else {
                     pl_show_error("{exp:proform:form} could not send notifications for form: ".$form_obj->form_name);
                 }
+            } 
+        } 
+
+        if($form_session->config['debug'])
+        {
+            echo '<b>{exp:proform:form} for form: '.$form_obj->form_name.'</b><p/>';
+            echo $this->EE->proform_notifications->debug;
+            echo '<hr/>';
+            $this->EE->pl_email->print_debugger();
+            echo '<hr/>';
+            foreach($this->EE->pl_email->_debug_msg as $row)
+            {
+                echo $row.'<br/>';
             }
+            exit;
         }
     }
 
@@ -1745,7 +1801,14 @@ class Proform {
 
                 if($value_count > 0 && !$valid)
                 {
-                    $form_session->add_error($field->field_name, ($multi ? 'One of the values for' : 'The value for ').htmlentities($field->field_name).' is not a valid choice.');
+                    if(isset($form_session->config['error_messages']['list_choice_invalid']))
+                    {
+                        $line = $form_session->config['error_messages']['list_choice_invalid'];
+                    } else {
+                        $line = ($multi ? 'One of the values for' : 'The value for ').' %s is not a valid choice.';
+                    }
+                    $error = sprintf($line, htmlentities($field->field_label));
+                    $form_session->add_error($field->field_name,$error);
                 }
             }
 
@@ -2473,6 +2536,12 @@ class Proform {
                 }
             }
         }
+    }
+    
+    function _copy_form_values(&$form_obj, &$variables)
+    {
+        $this->prolib->copy_values($form_obj, $variables);
+        $variables['form_name:dashes'] = str_replace('_', '-', $variables['form_name']);
     }
     
 }

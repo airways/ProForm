@@ -145,6 +145,8 @@
 <ul>
     <li><a href="#param_custom">Custom Params</a></li>
     <li><a href="#param_debug">debug="yes"</a></li>
+    <li><a href="#param_dashes_in_class">dashes_in_class="yes"</a></li>
+    <li><a href="#param_dashes_in_id">dashes_in_id="yes"</a></li>
     <li><a href="#param_error_delimiters">error_delimiters="&lt;p&gt;|&lt;/p&gt;"</a></li>
     <li><a href="#param_error_url">error_url="forms/contact-us/error"</a></li>
     <li><a href="#param_form">form="contact_us"</a></li>
@@ -155,6 +157,7 @@
     <li><a href="#param_last_step_summary">last_step_summary="yes"</a></li>
     <li><a href="#param_message">message:required="This field is required!", message:*=""</a></li>
     <li><a href="#param_notify">notify="sample@example.com"</a></li>
+    <li><a href="#param_set">set:*=""</a></li>
     <li><a href="#param_step">step="1"</a></li>
     <li><a href="#param_site">site="default_site"</a></li>
     <li><a href="#param_variable_prefix">variable_prefix="pf_"</a></li>
@@ -170,6 +173,23 @@
 <h3><a name="param_debug">debug="yes"</a></h3>
 
 <p>The <b>debug</b> parameter turns on debug mode for <dfn>ProForm</dfn>, which will provide some additional information in order to assist in tracing it's behavior.</p>
+
+<h3><a name="param_dashes_in_class">dashes_in_class="yes"</a></h3>
+
+<p>The <b>dashes_in_class</b> parameter causes the automatic form element class generated to use dashes instead of underscores.</p>
+
+<p>For instance, this would change the class generated form a form named "contact_us" from "contact_us_proform" to "contact-us-proform".</p>
+
+<p></p>You can also completely override the class using the <a href="#param_form_class">form_class</a> paramter.</p>
+
+<h3><a name="param_dashes_in_id">dashes_in_id="yes"</a></h3>
+
+<p>The <b>dashes_in_id</b> parameter causes the automatic form element ID generated to use dashes instead of underscores.</p>
+
+<p>For instance, this would change the ID generated form a form named "contact_us" from "contact_us_proform" to "contact-us-proform".</p>
+
+<p></p>You can also completely override the ID using the <a href="#param_form_id">form_id</a> paramter.</p>
+
 
 <h3><a name="param_error_delimiters">error_delimiters="&lt;p&gt;|&lt;/p&gt;"</a></h3>
 
@@ -194,6 +214,8 @@
 <p>The <b>form</b> parameter is used to specify which form&#39;s information should be loaded. Since ProForm doesn't know which form you want to render, you need to specify using this parameter.</p>
 
 <p>This value can be taken from a URL segment, or from an entry field. The form name can also be hard coded, although in general I recommend creating a more generic template that can be reused for multiple forms.</p>
+
+<p>For technical reasons, form names always use underscores rather than dashes to separate words. However, if you specify the form name using dashes, it will be converted automatically for you. For instance, requesting a form named "contact-us" would load the form named "contact_us" automatically. You can get the name of the current form with dashes instead of underscores using the variable {form_name:dashes} within most tags in ProForm.</p>
 
 <div class="tip">
     <h6>Crash Course</h6>
@@ -291,6 +313,8 @@
 
 <p>See the list of <a href="{root_url}cp/fields.html#validation_rules">Validation Rules</a> for a list of what keys to use for each validation rule.</p>
 
+<p>Additionally, a special validation rule which applies only to List type fields and prevents them from accepting values which are not in their options can be set with the parameter <b>message:list_choice_invalid=""</b>.</p>
+
 <div class="tip">
     <h6>Example Usage</h6>
     <pre class="brush: xml">
@@ -317,6 +341,34 @@
 <div class="tip">
     <h6>But there is a better way!</h6>
     <p>Based on other form systems you may have used in ExpressionEngine, your first tendency may be to hard-code email addresses into your form templates using this parameter, but I strongly advise that you attempt to make use of the Notification List by itself and place all email addresses to send notifications to in the form's <a href="{root_url}cp/forms.html#form_settings_notification_list">Notification List Settings</a> instead.</p>
+</div>
+
+<h3><a name="param_set">set:*=""</a></h3>
+
+<p>The <b>set</b> parameter allows you to specify a value to be saved for any field on the form. This can be used to attach information about a submission, such as custom user fields, order information, or whatever else you wish to save into the form.</p>
+
+<p>The * should be replaced with a valid field name assigned to the form - often this will be the name of a hidden field. For instance, to set the value for a field named "user_address" we would use the parameter <b>set:user_address="100 Test Street"</b>. The set parameter can occur as many times as needed within a form tag, provided each field name used is unique.</p>
+
+<div class="tip">
+    <h6>Example Usage</h6>
+    <p>Suppose we have an order ID from a custom ordering system that we need to save with a form submission. This ID is in the variable {order_id}. To save this into a ProForm entry, we can simply set the value for a field named "external_order_id" with the set parameter like so:</p>
+    <pre class="brush: xml">
+        &#123;exp:proform:form form="order_record" set:external_order_id="{order_id}&#125;
+        ...
+        &#123;/exp:proform:form&#125;
+    </pre>
+</div>
+
+<p>You may also use the {exp:proform:set} tag to do the same thing as the <b>set</b> parameter. This will allow you to store longer strings of text if needed:</p>
+
+<div class="tip">
+    <h6>Example Usage</h6>
+    <pre class="brush: xml">
+        &#123;exp:proform:set form="order_record" field_name="external_order_id"&#125;{order_id}&#123;/exp:proform:set&#125;
+        &#123;exp:proform:form form="order_record"&#125;
+        ...
+        &#123;/exp:proform:form&#125;
+    </pre>
 </div>
 
 <h3><a name="param_step">step="1"</a></h3>
@@ -424,6 +476,7 @@
     <li><a href="#var_form_id">&#123;form_id&#125;</a></li>
     <li><a href="#var_form_label">&#123;form_label&#125;</a></li>
     <li><a href="#var_form_name">&#123;form_name&#125;</a></li>
+    <li><a href="#var_form_name_dashes">&#123;form_name:dashes&#125;</a></li>
     <li><a href="#var_form_type">&#123;form_type&#125;</a></li>
     <!-- <li><a href="#var_formpref">&#123;formpref:*&#125;</a></li> -->
     <li><a href="#var_fields_count">&#123;fields_count&#125;</a></li>
@@ -520,6 +573,10 @@
 <h3><a name="var_form_name">{form_name}</a></h3>
 
 <p>Provides the internal form name for the form. This should be all lowercase and only contained letters, numbers, and underscores.</p>
+
+<h3><a name="var_form_name_dashes">{form_name:dashes}</a></h3>
+
+<p>Provides the internal form name for the form with all underscores changes to dashes. This can be used in URLs and other places where a version of the form name with dashes is desired. Using dashes in a <a href="#param_form_name">form_name=""</a> parameter will still work correctly as it automatically changes all dashes encountered into underscores before doing the form lookup.</p>
 
 <h3><a name="var_form_type">{form_type}</a></h3>
 
