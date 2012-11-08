@@ -214,9 +214,13 @@ class Proform_mcp extends Prolib_base_mcp {
         }
         
         $js= 'proform_mod.lang = '.json_encode($lang_entries).';';
+        $js= 'proform_mod.tab_action = "'.str_replace('&amp;', '&', TAB_ACTION).'"; proform_mod.version_check()';
         $this->EE->javascript->output($js);
         
         $this->EE->javascript->compile();
+        
+        $this->EE->load->library('formslib');
+        $this->versions = $this->EE->formslib->vault->get('versions');
 
     }
 
@@ -321,6 +325,7 @@ class Proform_mcp extends Prolib_base_mcp {
             $vars = $this->EE->extensions->call('proform_index', $this, $vars);
         }
         $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
+        $vars['versions'] = $this->versions;
         return $this->EE->load->view('index', $vars, TRUE);
     }
 
@@ -401,6 +406,7 @@ class Proform_mcp extends Prolib_base_mcp {
         }
         $vars['hidden']['active_tabs'] = ($s = $this->EE->input->get_post('active_tabs')) ? $s : 'tab-content-settings';
         $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
+        $vars['versions'] = $this->versions;
         return $this->EE->load->view('module_settings', $vars, TRUE);
     }
 
@@ -481,6 +487,21 @@ class Proform_mcp extends Prolib_base_mcp {
             $this->EE->extensions->call('proform_process_module_settings', $this);
         }
         return TRUE;
+    }
+    
+    function version_check()
+    {
+        $this->EE->load->library('formslib');
+        $versions = $this->EE->formslib->vault->get('versions');
+        if(!is_array($versions))
+        {
+            $versions = $this->EE->formslib->version_check();
+            if(count($versions) > 0)
+            {
+                $this->EE->formslib->vault->put($versions, TRUE, 'versions');
+            }
+        }
+        exit;
     }
     
     function list_drivers()
@@ -835,6 +856,7 @@ class Proform_mcp extends Prolib_base_mcp {
             $vars = $this->EE->extensions->call('proform_edit_form', $this, $vars);
         }
         $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
+        $vars['versions'] = $this->versions;
         return $this->EE->load->view('edit_form', $vars, TRUE);
     }
 
@@ -1015,6 +1037,7 @@ class Proform_mcp extends Prolib_base_mcp {
             $vars = $this->EE->extensions->call('proform_delete_form', $this, $vars);
         }
         $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
+        $vars['versions'] = $this->versions;
         return $this->EE->load->view('delete', $vars, TRUE);
     }
 
@@ -1103,6 +1126,7 @@ class Proform_mcp extends Prolib_base_mcp {
             $vars = $this->EE->pl_drivers->call($this->EE->input->post('type'), 'field_remove', array($field, $vars));
 
             $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
+            $vars['versions'] = $this->versions;
             return $this->EE->load->view('remove_field', $vars, TRUE);
         }
         else
@@ -1206,6 +1230,7 @@ class Proform_mcp extends Prolib_base_mcp {
             $vars = $this->EE->extensions->call('proform_list_fields', $this, $vars);
         }
         $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
+        $vars['versions'] = $this->versions;
         return $this->EE->load->view('list_fields', $vars, TRUE);
     }
 
@@ -1426,6 +1451,7 @@ class Proform_mcp extends Prolib_base_mcp {
             $this->EE->extensions->call('proform_edit_field', $this, $field);
         }
         $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
+        $vars['versions'] = $this->versions;
         $result = $this->EE->load->view('generic_edit', $vars, TRUE);
         $result = $this->EE->pl_drivers->call($field->type, 'edit_field_view', array($result));
         return $result;
@@ -1559,6 +1585,7 @@ class Proform_mcp extends Prolib_base_mcp {
             $vars = $this->EE->extensions->call('proform_delete_field', $this, $vars);
         }
         $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
+        $vars['versions'] = $this->versions;
         return $this->EE->load->view('delete', $vars, TRUE);
     }
 
@@ -1738,6 +1765,7 @@ class Proform_mcp extends Prolib_base_mcp {
             $vars = $this->EE->extensions->call('proform_edit_separator', $this, $vars);
         }
         $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
+        $vars['versions'] = $this->versions;
         return $this->EE->load->view('generic_edit', $vars, TRUE);
     }
 
@@ -1836,6 +1864,7 @@ class Proform_mcp extends Prolib_base_mcp {
                 $vars = $this->EE->extensions->call('proform_delete_separator', $this, $vars);
             }
             $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
+            $vars['versions'] = $this->versions;
             return $this->EE->load->view('delete_separator', $vars, TRUE);
         }
         else
@@ -2031,6 +2060,7 @@ class Proform_mcp extends Prolib_base_mcp {
             $vars = $this->EE->extensions->call('proform_list_entries', $this, $vars);
         }
         $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
+        $vars['versions'] = $this->versions;
         $output = $this->EE->load->view('list_entries', $vars, TRUE);
         return $this->prolib->pl_drivers->list_entries_view($output);
     }
@@ -2157,6 +2187,7 @@ class Proform_mcp extends Prolib_base_mcp {
             }
 
             $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
+            $vars['versions'] = $this->versions;
             return $this->EE->load->view('generic_edit', $vars, TRUE);
         }
     }
@@ -2259,6 +2290,7 @@ class Proform_mcp extends Prolib_base_mcp {
             }
 
             $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
+            $vars['versions'] = $this->versions;
             return $this->EE->load->view('generic_edit', $vars, TRUE);
         }
     }
@@ -2354,6 +2386,7 @@ class Proform_mcp extends Prolib_base_mcp {
         $vars['form_id'] = $form_id;
 
         $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
+        $vars['versions'] = $this->versions;
         return $this->EE->load->view('export_entries', $vars, TRUE);
         */
     }
@@ -2793,6 +2826,8 @@ class Proform_mcp extends Prolib_base_mcp {
             }       
         }
     }
+    
+
 
 }
 

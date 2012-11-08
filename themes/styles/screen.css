@@ -856,6 +856,26 @@ Create Form
 .warning a {
 	font-weight: bold;
 }
+
+.info {
+	background: #e8f6ff;
+	border: 1px solid #b8e2fb;
+	color: #3E4C54;
+	padding: 10px;
+	margin-bottom: 20px;
+	-moz-border-radius: 5px; /* Firefox */
+  	-webkit-border-radius: 5px; /* Safari, Chrome */
+  	border-radius: 5px; /* universal */
+}
+
+.info p {
+	margin-bottom: 0px !important;
+	padding: 5px;
+}
+
+.info a {
+	font-weight: bold;
+}
      
 
 
