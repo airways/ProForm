@@ -30,7 +30,14 @@
  *
  **/ ?>
 
-
+<?php if(is_array($versions) && count($versions) > 0): ?>
+<div class="info">
+    <?php foreach($versions as $version): ?>
+        <div><?php echo $version['info']; ?></div>
+    <?php endforeach; ?>
+</div>
+<?php endif; ?>
+        
 <?php if($is_super_admin AND !$mcrypt_installed AND $allow_encrypted_form_data): ?>
     <div class="warning">
         <p><strong>Warning:</strong> You have enabled the hidden configuration option allow_encrypted_form_data, but your server does not have the <a href="http://php.net/mcrypt">mcrypt PHP extension</a> installed. Your form submissions will be less secure without this PHP extension. It is <strong>strongly</strong> recommended that you install mcrypt. Please contact your hosting provider or search their knowledge base for information on how to accomplish this.</p>

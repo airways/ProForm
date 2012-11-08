@@ -170,6 +170,24 @@ class Formslib
 
         return $result;
     }
+    
+    function version_check()
+    {
+        $result = array();
+        $license = $this->prefs->ini('license_key');
+        $license = preg_replace('/[^\-\*\$A-Za-z0-9]/', '', $license);
+        $versions = explode("\n", file_get_contents('http://metasushi.com/version_check.php?P=PF-01&L='.$license.'&V='.PROFORM_VERSION));
+        foreach($versions as $version)
+        {
+            if(substr(trim($version), 0, 1) == ';') continue;
+            $version = explode("|", $version);
+            if(count($version) > 1)
+            {
+                $result[] = array('version' => $version[0], 'info' => $version[1]);
+            }
+        }
+        return $result;
+    }
 } // class Formslib
 }
 

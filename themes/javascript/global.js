@@ -11,6 +11,7 @@ var proform_mod = {
     lang: {},
     forms: {},
     help: {},
+    tab_action: '',
     bind_events: function() {
         $(window).bind('beforeunload', function() { 
             if(proform_mod.dirty) return 'You have modified this form. Leaving this page will lose all changes.';
@@ -236,6 +237,15 @@ var proform_mod = {
             return proform_mod.lang[key];
         } else {
             return key;
+        }
+    },
+    version_check: function() {
+        if(Math.floor((Math.random()*10)+1) == 5)
+        {
+            // Trigger an asynchronous AJAX request to refresh our cached version number list.
+            // This is done here instead of as part of the normal page load to prevent
+            // forcing the user to wait while we fetch the version list.
+            $.ajax(proform_mod.tab_action + '&method=version_check');
         }
     }
 
