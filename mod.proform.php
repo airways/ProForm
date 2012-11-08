@@ -1430,8 +1430,9 @@ class Proform {
 
                     if($this->EE->input->is_ajax_request())
                     {
-                        $entry_data->status = 'success';
-                        $this->EE->output->send_ajax_response((array)$entry_data);
+                        $entry_data = (array)$entry_data;
+                        $entry_data['status'] = 'success';
+                        $this->EE->output->send_ajax_response($entry_data);
                         exit;
                     } else {
                         $this->EE->functions->redirect($form_session->config['thank_you_url']);
