@@ -1475,7 +1475,7 @@ class Proform {
             $parse_data = array();
             $this->_copy_form_values($form_obj, $parse_data);
             $this->prolib->copy_values($form_session->config, $parse_data);
-            var_dump($form_session->values);
+            
             $this->prolib->copy_values($form_session->values, $parse_data);
 
             $fieldrows = $this->create_fields_array($form_obj, FALSE, array(), $form_session->values, array(), TRUE);
