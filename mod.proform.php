@@ -224,12 +224,18 @@ class Proform {
         $variable_prefix    = pf_strip_id($this->EE->TMPL->fetch_param('variable_prefix', ''));
         $hidden_fields_mode = strtolower($this->EE->TMPL->fetch_param('hidden_fields_mode', 'split'));
         $last_step_summary  = $this->EE->TMPL->fetch_param('last_step_summary') == 'yes';
+        $placeholders       = $this->EE->pl_parser->fetch_param_group('placeholder');
         
         if(!isset($this->cache['set_fields'][$form_name]))
         {
             $this->cache['set_fields'][$form_name] = array();
         }
         $this->cache['set_fields'][$form_name]   = $this->cache['set_fields'][$form_name] + $this->EE->pl_parser->fetch_param_group('set');
+        
+        foreach($placeholders as $type => $placeholder)
+        {
+            $this->default_placeholders[$type] = $placeholder;
+        }
         
         $this->_set_site();
 
