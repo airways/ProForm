@@ -501,7 +501,7 @@ class Proform_mcp extends Prolib_base_mcp {
                 $this->EE->formslib->vault->put($versions, TRUE, 'versions');
             }
         }
-        var_dump($versions);
+        
         exit;
     }
     

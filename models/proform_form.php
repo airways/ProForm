@@ -322,40 +322,41 @@ class PL_Form extends PL_RowInitialized {
             if($calculated_fields)
             {
                 foreach($calculated_fields as $calculated_field)
-            {
-                if(!isset($this->__fields[$calculated_field['name']]))
                 {
-                    $row = array(
-                        'field_id' => '0',
-                        'field_name' => $calculated_field['name'],
-                        'field_label' => $calculated_field['name'],
-                        'type' => 'calculated',
-                        'heading' => '',
-                        'is_required' => false,
-                        'field_row' => 0,
-                        'separator_type' => '',
-                    );
-                    
-                    $this->__fields[$calculated_field['name']] = new PL_Field($row);
-                    
-                    if(isset($calculated_field['settings']))
+                    if(!isset($this->__fields[$calculated_field['name']]))
                     {
-                        if(!is_array($calculated_field['settings']))
+                        $row = array(
+                            'field_id' => '0',
+                            'field_name' => $calculated_field['name'],
+                            'field_label' => $calculated_field['name'],
+                            'type' => 'calculated',
+                            'heading' => '',
+                            'is_required' => false,
+                            'field_row' => 0,
+                            'separator_type' => '',
+                        );
+                    
+                        $this->__fields[$calculated_field['name']] = new PL_Field($row);
+                    
+                        if(isset($calculated_field['settings']))
                         {
-                            $this->__fields[$calculated_field['name']]->settings = unserialize($calculated_field['settings']);
-                        } else {
-                            $this->__fields[$calculated_field['name']]->settings = $calculated_field['settings'];
+                            if(!is_array($calculated_field['settings']))
+                            {
+                                $this->__fields[$calculated_field['name']]->settings = unserialize($calculated_field['settings']);
+                            } else {
+                                $this->__fields[$calculated_field['name']]->settings = $calculated_field['settings'];
+                            }
                         }
-                    }
-                    else
-                        $this->__fields[$calculated_field['name']]->settings = array();
+                        else
+                            $this->__fields[$calculated_field['name']]->settings = array();
 
-                    $this->__fields[$calculated_field['name']]->form_field_settings = array(
-                        'preset_forced' => '',
-                        'preset_value' => '',
-                    );
-                    $this->__fields[$calculated_field['name']]->step_no = $step_no;
-                    $field_count ++;
+                        $this->__fields[$calculated_field['name']]->form_field_settings = array(
+                            'preset_forced' => '',
+                            'preset_value' => '',
+                        );
+                        $this->__fields[$calculated_field['name']]->step_no = $step_no;
+                        $field_count ++;
+                    }
                 }
             }
         }
