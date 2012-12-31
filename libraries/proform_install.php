@@ -2,9 +2,9 @@
 
 /**
  * @package ProForm
- * @author Isaac Raway (MetaSushi, LLC) <isaac.raway@gmail.com>
+ * @author Isaac Raway (MetaSushi, LLC) <airways@mm.st>
  *
- * Copyright (c)2009, 2010, 2011. Isaac Raway and MetaSushi, LLC.
+ * Copyright (c)2009, 2010, 2011, 2012, 2013. Isaac Raway and MetaSushi, LLC.
  * All rights reserved.
  *
  * This source is commercial software. Use of this software requires a

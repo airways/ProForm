@@ -2,9 +2,9 @@
 
 /**
  * @package ProForm
- * @author Isaac Raway (MetaSushi, LLC) <isaac.raway@gmail.com>
+ * @author Isaac Raway (MetaSushi, LLC) <airways@mm.st>
  *
- * Copyright (c)2009, 2010, 2011. Isaac Raway and MetaSushi, LLC.
+ * Copyright (c)2009, 2010, 2011, 2012, 2013. Isaac Raway and MetaSushi, LLC.
  * All rights reserved.
  *
  * This source is commercial software. Use of this software requires a
@@ -501,6 +501,7 @@ class Proform_mcp extends Prolib_base_mcp {
                 $this->EE->formslib->vault->put($versions, TRUE, 'versions');
             }
         }
+        var_dump($versions);
         exit;
     }
     
@@ -965,6 +966,8 @@ class Proform_mcp extends Prolib_base_mcp {
         if(!$this->EE->input->post('submitter_notification_attachments')) $_POST['submitter_notification_attachments'] = 'n';
         if(!$this->EE->input->post('share_notification_attachments')) $_POST['share_notification_attachments'] = 'n';
 
+        $this->EE->pl_drivers->process_edit_form($form);
+        
         // copy post values defined on the form class to it and save it
         $this->prolib->copy_post($form);
         $form->save();
@@ -975,6 +978,7 @@ class Proform_mcp extends Prolib_base_mcp {
         {
             $this->EE->extensions->call('proform_process_edit_form', $this);
         }
+        
         $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form->form_id.AMP.'active_tabs='.$active_tabs);
         return TRUE;
     }
