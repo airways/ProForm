@@ -2021,6 +2021,11 @@ class Proform {
             {
                 $this->EE->extensions->call('proform_insert_end', $this, $form_session);
             }
+            
+            if ($this->EE->extensions->active_hook('proform_insert_end_ex') === TRUE)
+            {
+                $this->EE->extensions->call('proform_insert_end_ex', $this, $form_obj, $form_session);
+            }
         } else {
             $form_session->values['form:entry_id'] = 0;
             $form_session->values['form:name'] = $form_obj->form_name;
