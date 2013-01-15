@@ -533,6 +533,11 @@ class Formslib
             }
         } // foreach($form_obj->fields() as $field)
 
+        if ($this->EE->extensions->active_hook('proform_create_fields') === TRUE) 
+        {
+            $result = $this->EE->extensions->call('proform_create_fields', $this, $result, $create_field_rows); 
+        }
+
         return $result;
     } // create_fields_array
 

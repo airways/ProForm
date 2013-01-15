@@ -81,6 +81,8 @@ class PL_Form extends PL_RowInitialized {
         'thank_you_message'     => 'Thank You Message',
         'extra1_label'          => 'Label for Extra 1',
         'extra2_label'          => 'Label for Extra 2',
+        'submit_label'   => 'Label for Submit Button',
+        'html_postfix'          => 'HTML Postfix',
     );
 
     public static $default_form_field_settings = array(

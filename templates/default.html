@@ -180,12 +180,13 @@
                 <input type="submit" name="_pf_goto_next" value="Next >" {if pf_on_last_step}disabled="disabled"{/if} />
             {/if}
             {if pf_on_last_step}
-                <input type="submit" name="_pf_finish" value="Submit" />
+                <input type="submit" name="_pf_finish" value="{if pf_formpref:submit_label}{pf_formpref:submit_label}{if:else}Submit{/if}" />
             {if:else}
-                <input type="submit" value="Submit" disabled="disabled" />
+                <input type="submit" value="{if pf_formpref:submit_label}{pf_formpref:submit_label}{if:else}Submit{/if}" disabled="disabled" />
             {/if}
         </div>
         {/if}
+        {pf_formpref:html_postfix}
     </div>
 {/exp:proform:form}
 
