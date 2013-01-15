@@ -34,8 +34,6 @@
 define('PF_CALCULATED_NAME', 'Calculated Fields');
 define('PF_CALCULATED_VERSION', '1.00');
 
-if(!function_exists('curl_init')) pl_show_error('ProForm '.PF_CALCULATED_NAME.' requires the PHP5 Curl module.');
-
 class Calculated_fields_driver extends PL_base_driver {
     var $type = array('global_form');
 
@@ -59,6 +57,13 @@ class Calculated_fields_driver extends PL_base_driver {
     {
         $this->EE = &get_instance();
         $this->lang['pf_calculated_fields'] .= ' '.PF_CALCULATED_VERSION;
+        for($i = 1; $i < 100; $i++)
+        {
+            $this->lang['calculated_fields_'.$i.'_name'] = 'Name';
+            $this->lang['calculated_fields_'.$i.'_type'] = 'Type';
+            $this->lang['calculated_fields_'.$i.'_code'] = 'Code';
+        }
+        
     }
     
     // Global module preferences
@@ -78,7 +83,7 @@ class Calculated_fields_driver extends PL_base_driver {
         {
             $this->EE->lang->language[$key] = $value;
         }
-        
+
         return $prefs;
     }
     
@@ -120,7 +125,7 @@ class Calculated_fields_driver extends PL_base_driver {
         }
         
         $options['calculated_fields'] = array(
-            'label' => 'Calculated Field',
+            'label' => PF_CALCULATED_NAME,
             'help' => '',
             'form' => $form
         );

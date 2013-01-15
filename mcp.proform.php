@@ -202,7 +202,7 @@ class Proform_mcp extends Prolib_base_mcp {
         }
         
         // Copy custom lang entries from driver classes
-        foreach($this->EE->pl_drivers->get_drivers('form') as $driver)
+        foreach($this->EE->pl_drivers->get_drivers(array('form','global_form')) as $driver)
         {
             if(isset($driver->lang))
             {
@@ -213,8 +213,9 @@ class Proform_mcp extends Prolib_base_mcp {
             }
         }
         
-        $js= 'proform_mod.lang = '.json_encode($lang_entries).';';
-        $js= 'proform_mod.tab_action = "'.str_replace('&amp;', '&', TAB_ACTION).'"; proform_mod.version_check()';
+        $js = "\n";
+        $js .= 'proform_mod.lang = '.json_encode($lang_entries).";\n";
+        $js .= 'proform_mod.tab_action = "'.str_replace('&amp;', '&', TAB_ACTION).'"; proform_mod.version_check()'.";\n";
         $this->EE->javascript->output($js);
         
         $this->EE->javascript->compile();

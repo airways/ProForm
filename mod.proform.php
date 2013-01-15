@@ -363,6 +363,8 @@ class Proform {
                     '%uniq%'                        => function_exists('openssl_random_pseudo_bytes') ? bin2hex(openssl_random_pseudo_bytes(32)) : uniqid('', true),
                 );
             }
+            
+            $this->_copy_post_to_session($form_obj, $form_session);
 
             // copy everything else the user may have added
             foreach($this->EE->TMPL->tagparams as $key => $value)
