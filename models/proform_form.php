@@ -82,6 +82,7 @@ class PL_Form extends PL_RowInitialized {
         'extra1_label'          => 'Label for Extra 1',
         'extra2_label'          => 'Label for Extra 2',
         'submit_label'   => 'Label for Submit Button',
+        'html_prefix'          => 'HTML Prefix',
         'html_postfix'          => 'HTML Postfix',
     );
 

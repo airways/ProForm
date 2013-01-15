@@ -1,5 +1,7 @@
 
 {exp:proform:form form_class="proform" [%params%] variable_prefix="pf_"}
+    {pf_formpref:html_prefix}
+
     {if pf_no_results}
         {if pf_pref:invalid_form_message}
             {pf_pref:invalid_form_message}
@@ -186,7 +188,8 @@
             {/if}
         </div>
         {/if}
-        {pf_formpref:html_postfix}
     </div>
+
+    {pf_formpref:html_postfix}
 {/exp:proform:form}
 
