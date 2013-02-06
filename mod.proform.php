@@ -695,6 +695,12 @@ class Proform {
             'fields'        => array(),
         );
 
+        if($this->debug)
+        {
+            echo "pl_form:";
+            $this->prolib->debug(isset($_SESSION['pl_form']) ? $_SESSION['pl_form'] : 'null');
+        }
+        
         if(isset($_SESSION['pl_form']['thank_you_form'])
             AND isset($_SESSION['pl_form']['result_session']))
         {
@@ -707,7 +713,10 @@ class Proform {
             if($form_name && $form_session->config['form_name'] == $form_name)
             {
                 $form_obj = $this->EE->formslib->forms->get($form_name);
-                //$this->prolib->debug($form_obj);
+                if($this->debug)
+                {
+                    $this->prolib->debug($form_obj);
+                }
 
                 $this->prolib->copy_values($form_session->config, $variables);
                 $this->EE->formslib->copy_form_values($form_obj, $variables);
@@ -726,7 +735,12 @@ class Proform {
                 // Turn various arrays of values into variables
                 $this->load_varsets($varsets, $variables);
 
-                //$this->prolib->debug($variables);
+                if($this->debug)
+                {
+                    echo "Final Variables:";
+                    $this->prolib->debug($variables);
+                }
+                
 
             }
         } else {
@@ -1627,8 +1641,12 @@ class Proform {
             {
                 if($field->type == 'file')
                 {
-                    // if the field already exists in $form_session->values then we have already uploaded the file
-                    if(!array_key_exists($field->field_name, $form_session->values))
+                    // if the field already exists in $form_session->values then we have already uploaded the file, but
+                    // we should see if there is a blank value (no previously uploaded file, and we're on an error
+                    // return) or there is a new file to replace it.
+                    if(!array_key_exists($field->field_name, $form_session->values) 
+                        || $form_session->values[$field->field_name] == '' 
+                        || (isset($_FILES[$field->field_name]['name']) && $_FILES[$field->field_name]['name'] != '') )
                     {
                         // "upload" the file to it's permanent home
                         $upload_data = $this->EE->pl_uploads->handle_upload($field->upload_pref_id, $field->field_name, $field->is_required());
