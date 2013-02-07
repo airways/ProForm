@@ -1324,6 +1324,12 @@ class Proform_mcp extends Prolib_base_mcp {
         // automatically add the field to a form?
         $auto_add_form_id = $this->EE->input->get_post('auto_add_form_id');
 
+        // Calling the hook.
+        if ($this->EE->extensions->active_hook('proform_process_new_field_start') === TRUE)
+        {
+            $this->EE->extensions->call('proform_process_new_field_start', $this, $field);
+        }
+
         if(!$auto_add_form_id)
         {
             // go back to field listing
@@ -1553,6 +1559,7 @@ class Proform_mcp extends Prolib_base_mcp {
         $field->settings = $settings;
         $field->save();
 
+        // Call the hook.
         if ($this->EE->extensions->active_hook('proform_process_edit_field') === TRUE)
         {
             $this->EE->extensions->call('proform_process_edit_field', $this, $field);
@@ -1611,9 +1618,10 @@ class Proform_mcp extends Prolib_base_mcp {
         {
             $this->EE->load->library('formslib');
 
+            // Call the hook.
             if ($this->EE->extensions->active_hook('proform_process_delete_field') === TRUE)
             {
-                $this->EE->extensions->call('proform_process_delete_field', $this);
+                $this->EE->extensions->call('proform_process_delete_field', $this, $field_id);
                 if($this->EE->extensions->end_script === TRUE) return TRUE;
             }
 

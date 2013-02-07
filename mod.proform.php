@@ -1641,10 +1641,16 @@ class Proform {
             {
                 if($field->type == 'file')
                 {
-                    // if the field already exists in $form_session->values then we have already uploaded the file, but
+                    // Pre-emptive requirement check.
+                    // It's possible to keep this in PL_uploads::handle_upload() but the field label is not passed to the function 
+                    // so it's easier to have it here.
+                    if($field->is_required == 'y' && (!isset($_FILES[$field->field_name]['name']) || !$_FILES[$field->field_name]['name'])) {
+                        $form_session->add_error($field->field_name, array("$field->field_label is required."));
+                    }
+                    // Otherwise, if the field already exists in $form_session->values then we have already uploaded the file, but
                     // we should see if there is a blank value (no previously uploaded file, and we're on an error
                     // return) or there is a new file to replace it.
-                    if(!array_key_exists($field->field_name, $form_session->values) 
+                    elseif(!array_key_exists($field->field_name, $form_session->values) 
                         || $form_session->values[$field->field_name] == '' 
                         || (isset($_FILES[$field->field_name]['name']) && $_FILES[$field->field_name]['name'] != '') )
                     {
@@ -1661,9 +1667,6 @@ class Proform {
                         {
                             // save the filename to the session's values array so we don't clobber it if there are
                             // other errors
-                            $form_session->values[$field->field_name] = $upload_data['file_name'];
-
-                            // save the filename in case we get to actually save the form insert this time
                             $form_session->values[$field->field_name] = $upload_data['file_name'];
                         } elseif(count($this->EE->pl_uploads->errors) > 0) {
                             // if the file wasn't required, there would be no errors in the array
@@ -1798,7 +1801,7 @@ class Proform {
                         $line = ($multi ? 'One of the values for' : 'The value for ').' %s is not a valid choice.';
                     }
                     $error = sprintf($line, htmlentities($field->field_label));
-                    $form_session->add_error($field->field_name,$error);
+                    $form_session->add_error($field->field_name, $error);
                 }
             }
 
