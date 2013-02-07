@@ -1253,6 +1253,10 @@ class Proform_mcp extends Prolib_base_mcp {
         $auto_add_form_id = $this->EE->input->get_post('auto_add_form_id');
 
         $vars['hidden'] = array('auto_add_form_id' => $auto_add_form_id);
+        if(!$auto_add_form_id)
+        {
+            $vars['reusable'] = 'y';
+        }
 
         $this->sub_page('tab_new_field');
 
@@ -1395,6 +1399,10 @@ class Proform_mcp extends Prolib_base_mcp {
             if(isset($vars['field_length']))
             {
                 $field->length = $vars['field_length'];
+            }
+            if(isset($vars['reusable']))
+            {
+                $field->reusable = $vars['reusable'];
             }
         }
 
