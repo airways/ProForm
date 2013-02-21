@@ -140,10 +140,10 @@ class Proform {
         
         $form_name = strip_tags($this->EE->TMPL->fetch_param('form_name', $this->EE->TMPL->fetch_param('form', $this->EE->TMPL->fetch_param('name', FALSE))));
 
-        if(!$form_name)
+        /*if(!$form_name)
         {
             pl_show_error('Invalid form_name provided to {exp:proform:simple}: "'.htmlentities($form_name).'"');
-        }
+        }*/
 
         // Get our template components
         if((!isset($this->cache['prefix_disabled']) || !$this->cache['prefix_disabled']) && $this->EE->TMPL->fetch_param('disable_head') != 'yes' )
@@ -214,6 +214,7 @@ class Proform {
         $form_url           = $this->EE->TMPL->fetch_param('form_url', $this->EE->functions->remove_double_slashes($_SERVER['REQUEST_URI']));
         $error_url          = $this->EE->TMPL->fetch_param('error_url', $form_url);
         $thank_you_url      = $this->EE->TMPL->fetch_param('thank_you_url',  $form_url);
+        $p_404_url          = $this->EE->TMPL->fetch_param('404_url',  '');
         $notify             = explode('|', $this->EE->TMPL->fetch_param('notify', ''));
         $download_url       = $this->EE->TMPL->fetch_param('download_url',  '');
         $download_label     = $this->EE->TMPL->fetch_param('download_label',  '');
@@ -263,7 +264,13 @@ class Proform {
 
         if(!$form_obj)
         {
-            $tagdata = $this->prolib->pl_parser->no_results();
+            if($p_404_url)
+            {
+                $this->EE->functions->redirect($this->EE->TMPL->parse_globals($p_404_url));
+                return;
+            } else {
+                $tagdata = $this->prolib->pl_parser->no_results();
+            }
         }
         else
         {
@@ -1274,6 +1281,7 @@ class Proform {
     
     private function _copy_set_fields(&$form_obj, &$form_session)
     {
+        if(!$form_obj) return;
         if(isset($this->cache['set_fields'][$form_obj->form_name]) && is_array($this->cache['set_fields'][$form_obj->form_name]))
         {
             foreach($this->cache['set_fields'][$form_obj->form_name] as $field_name => $value)
