@@ -90,7 +90,10 @@ class Formslib
         $this->prefs = new PL_prefs("proform_preferences", FALSE, $this->default_prefs, $this->prolib->site_id);
 
         $this->forms = new PL_handle_mgr("proform_forms", "form", "PL_Form");
+        $this->forms->get_all();
+        
         $this->fields = new PL_handle_mgr("proform_fields", "field", "PL_Field");
+        $this->fields->get_all();
 
         $this->forms->site_id = $this->prolib->site_id;
         $this->fields->site_id = $this->prolib->site_id;

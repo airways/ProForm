@@ -160,33 +160,37 @@ class Calculated_fields_driver extends PL_base_driver {
     public function calculated_fields($form_model)
     {
         $added = array();
+        $result = array();
         
-        if(!isset($this->calculated_fields))
+        if($form_model && isset($form_model->settings))
         {
-            foreach($form_model->settings as $key => $value)
+            if(!isset($this->calculated_fields))
             {
-                if(substr($key, 0, 17) == 'calculated_fields')
+                foreach($form_model->settings as $key => $value)
                 {
-                    $arr = explode('_', $key);
-                    if(!isset($arr[2])) continue;
-                
-                    $id = $arr[2];
-                
-                    if(!in_array($id, $added))
+                    if(substr($key, 0, 17) == 'calculated_fields')
                     {
-                        $added[] = $id;
-                        $result[$form_model->settings['calculated_fields_'.$id.'_name']] = array(
-                            'id' => $id,
-                            'name' => $form_model->settings['calculated_fields_'.$id.'_name'],
-                            'type' => $form_model->settings['calculated_fields_'.$id.'_type'],
-                            'code' => $form_model->settings['calculated_fields_'.$id.'_code'],
-                        );
+                        $arr = explode('_', $key);
+                        if(!isset($arr[2])) continue;
+                    
+                        $id = $arr[2];
+                    
+                        if(!in_array($id, $added))
+                        {
+                            $added[] = $id;
+                            $result[$form_model->settings['calculated_fields_'.$id.'_name']] = array(
+                                'id' => $id,
+                                'name' => $form_model->settings['calculated_fields_'.$id.'_name'],
+                                'type' => $form_model->settings['calculated_fields_'.$id.'_type'],
+                                'code' => $form_model->settings['calculated_fields_'.$id.'_code'],
+                            );
+                        }
                     }
                 }
+                $this->calculated_fields = &$result;
+            } else {
+                $result = &$this->calculated_fields;
             }
-            $this->calculated_fields = &$result;
-        } else {
-            $result = &$this->calculated_fields;
         }
         
         return $result;

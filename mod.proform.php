@@ -433,6 +433,10 @@ class Proform {
                 
                 $variables['use_captcha'] = $use_captcha;
                 $variables['interactive_captcha'] = $interactive_captcha;
+                
+                // Set defaults for advanced options so that they don't get rendered as variable names
+                $variables['formpref:html_prefix'] = '';
+                $variables['formpref:html_postfix'] = '';
 
                 if(count($form_obj->settings) > 0)
                 {
@@ -1778,25 +1782,24 @@ class Proform {
                     $valid = $option_valid;
                 } else {
                     $multi = TRUE;
-                    if(!is_array($form_session->values[$field->field_name]))
-                    {
-                        $form_session->values[$field->field_name] = array($form_session->values[$field->field_name]);
-                    }
 
                     $valid = TRUE;
-                    foreach($form_session->values[$field->field_name] as $selected_option)
+                    if($form_session->values[$field->field_name])
                     {
-                        $value_count++;
-                        $option_valid = FALSE;
-                        foreach($options as $option)
+                        foreach($form_session->values[$field->field_name] as $selected_option)
                         {
-                            if($option['key'] == $selected_option)
+                            $value_count++;
+                            $option_valid = FALSE;
+                            foreach($options as $option)
                             {
-                                $option_valid = TRUE;
+                                if($option['key'] == $selected_option)
+                                {
+                                    $option_valid = TRUE;
+                                }
                             }
+                            $valid &= $option_valid;
+                            if(!$valid) break;
                         }
-                        $valid &= $option_valid;
-                        if(!$valid) break;
                     }
                 }
 
