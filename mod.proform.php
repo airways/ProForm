@@ -346,6 +346,9 @@ class Proform {
 
             if(!isset($form_session->config) OR count($form_session->config) == 0)
             {
+                $random = mt_rand().'-'.mt_rand();
+                $uniq = function_exists('openssl_random_pseudo_bytes') ? bin2hex(openssl_random_pseudo_bytes(32)) : uniqid('', true);
+                
                 $form_session->config = array(
                     'use_captcha'                   => $use_captcha,
                     'interactive_captcha'           => $interactive_captcha,
@@ -353,11 +356,11 @@ class Proform {
                     'form_id'                       => $form_id,
                     'form_class'                    => $form_class,
                     'form_url'                      => $form_url,
-                    'error_url'                     => $error_url,
-                    'thank_you_url'                 => $thank_you_url,
+                    'error_url'                     => str_replace(LD.'%uniq%'.RD, $uniq, str_replace(LD.'%random%'.RD, $random, $error_url)),
+                    'thank_you_url'                 => str_replace(LD.'%uniq%'.RD, $uniq,str_replace(LD.'%random%'.RD, $random, $thank_you_url)),
                     'requested'                     => time(),
                     'notify'                        => $notify,
-                    'download_url'                  => $download_url,
+                    'download_url'                  => str_replace(LD.'%uniq%'.RD, $uniq,str_replace(LD.'%random%'.RD, $random, $download_url)),
                     'download_label'                => $download_label,
                     'referrer_url'                  => $this->EE->agent->is_referral() ? $this->EE->agent->referrer() : '',
                     'debug'                         => $this->debug,
@@ -366,8 +369,8 @@ class Proform {
                     'error_messages'                => $error_messages,
                     'step'                          => $step,
                     'last_step_summary'             => $last_step_summary,
-                    '%random%'                      => mt_rand().'-'.mt_rand(),
-                    '%uniq%'                        => function_exists('openssl_random_pseudo_bytes') ? bin2hex(openssl_random_pseudo_bytes(32)) : uniqid('', true),
+                    '%random%'                      => $random,
+                    '%uniq%'                        => $uniq,
                 );
             }
             
