@@ -607,9 +607,11 @@ class Proform_mcp extends Prolib_base_mcp {
                 array('label' => 'HTML Block',                   'type' => 'html',                    'icon' => 'html_add.png',
                       'url' => ACTION_BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_separator'.AMP.'form_id='.$form_id.AMP.'type='.PL_Form::SEPARATOR_HTML),
             );
-
-
-            $form_obj = $form;//$query->row();
+            
+            $form_obj = $form;
+            
+            $form_driver = $form_obj->get_driver();
+            $form_driver->edit_form($form_obj);
         } else {
             $form = FALSE;
             $form_obj = new PL_Form($form);
@@ -627,8 +629,12 @@ class Proform_mcp extends Prolib_base_mcp {
             $vars['add_item_url'] = FALSE;
             $vars['edit_field_url'] = FALSE;
             $vars['special_options'] = array();
+            
+            $form_driver = $form_obj->get_driver();
+            $form_driver->new_form($form_obj);
         }
 
+        
 
         $this->EE->load->library('proform_notifications');
         $this->EE->load->library('formslib');
@@ -864,6 +870,8 @@ class Proform_mcp extends Prolib_base_mcp {
         {
             $vars = $this->EE->extensions->call('proform_edit_form', $this, $vars);
         }
+        $vars = $form_driver->edit_form_vars($form_obj, $vars);
+        
         $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
         $vars['versions'] = $this->versions;
         return $this->EE->load->view('edit_form', $vars, TRUE);
