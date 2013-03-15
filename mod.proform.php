@@ -1,10 +1,10 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
  * @package ProForm
- * @author Isaac Raway <isaac.raway@gmail.com>
+ * @author Isaac Raway (MetaSushi, LLC) <airways@mm.st>
  *
- * Copyright (c)2009, 2010, 2011. Isaac Raway and MetaSushi, LLC.
+ * Copyright (c)2009, 2010, 2011, 2012, 2013. Isaac Raway and MetaSushi, LLC.
  * All rights reserved.
  *
  * This source is commercial software. Use of this software requires a
@@ -45,7 +45,7 @@ require_once PATH_THIRD.'proform/config.php';
 class Proform {
 
     var $return_data    = '';
-    var $var_pairs = array('fieldrows', 'fields', 'hidden_fields', 'errors', 'steps', 'field_validation');
+    var $var_pairs = array();
     var $paginate = FALSE;
     var $paginate_data = '';
     var $default_placeholders = array(
@@ -70,7 +70,7 @@ class Proform {
         prolib($this, 'proform');
 
         $this->EE->load->library('formslib');
-
+        $this->var_pairs = $this->EE->formslib->var_pairs;
 
         $this->EE->db->cache_off();
 
@@ -136,14 +136,14 @@ class Proform {
     {
         $template = pf_strip_id(strip_tags($this->EE->TMPL->fetch_param('template', 'default')));
         $prefix   = pf_strip_id(strip_tags($this->EE->TMPL->fetch_param('prefix', 'prefix')));
-        $this->_set_site();
+        $this->EE->formslib->set_site();
         
         $form_name = strip_tags($this->EE->TMPL->fetch_param('form_name', $this->EE->TMPL->fetch_param('form', $this->EE->TMPL->fetch_param('name', FALSE))));
 
-        if(!$form_name)
+        /*if(!$form_name)
         {
             pl_show_error('Invalid form_name provided to {exp:proform:simple}: "'.htmlentities($form_name).'"');
-        }
+        }*/
 
         // Get our template components
         if((!isset($this->cache['prefix_disabled']) || !$this->cache['prefix_disabled']) && $this->EE->TMPL->fetch_param('disable_head') != 'yes' )
@@ -214,6 +214,7 @@ class Proform {
         $form_url           = $this->EE->TMPL->fetch_param('form_url', $this->EE->functions->remove_double_slashes($_SERVER['REQUEST_URI']));
         $error_url          = $this->EE->TMPL->fetch_param('error_url', $form_url);
         $thank_you_url      = $this->EE->TMPL->fetch_param('thank_you_url',  $form_url);
+        $p_404_url          = $this->EE->TMPL->fetch_param('404_url',  '');
         $notify             = explode('|', $this->EE->TMPL->fetch_param('notify', ''));
         $download_url       = $this->EE->TMPL->fetch_param('download_url',  '');
         $download_label     = $this->EE->TMPL->fetch_param('download_label',  '');
@@ -224,6 +225,7 @@ class Proform {
         $variable_prefix    = pf_strip_id($this->EE->TMPL->fetch_param('variable_prefix', ''));
         $hidden_fields_mode = strtolower($this->EE->TMPL->fetch_param('hidden_fields_mode', 'split'));
         $last_step_summary  = $this->EE->TMPL->fetch_param('last_step_summary') == 'yes';
+        $placeholders       = $this->EE->pl_parser->fetch_param_group('placeholder');
         
         if(!isset($this->cache['set_fields'][$form_name]))
         {
@@ -231,7 +233,12 @@ class Proform {
         }
         $this->cache['set_fields'][$form_name]   = $this->cache['set_fields'][$form_name] + $this->EE->pl_parser->fetch_param_group('set');
         
-        $this->_set_site();
+        foreach($placeholders as $type => $placeholder)
+        {
+            $this->default_placeholders[$type] = $placeholder;
+        }
+        
+        $this->EE->formslib->set_site();
 
         if(count($error_delimiters) != 2)
         {
@@ -257,7 +264,13 @@ class Proform {
 
         if(!$form_obj)
         {
-            $tagdata = $this->prolib->pl_parser->no_results();
+            if($p_404_url)
+            {
+                $this->EE->functions->redirect($this->EE->TMPL->parse_globals($p_404_url));
+                return;
+            } else {
+                $tagdata = $this->prolib->pl_parser->no_results();
+            }
         }
         else
         {
@@ -333,6 +346,9 @@ class Proform {
 
             if(!isset($form_session->config) OR count($form_session->config) == 0)
             {
+                $random = mt_rand().'-'.mt_rand();
+                $uniq = function_exists('openssl_random_pseudo_bytes') ? bin2hex(openssl_random_pseudo_bytes(32)) : uniqid('', true);
+                
                 $form_session->config = array(
                     'use_captcha'                   => $use_captcha,
                     'interactive_captcha'           => $interactive_captcha,
@@ -340,11 +356,11 @@ class Proform {
                     'form_id'                       => $form_id,
                     'form_class'                    => $form_class,
                     'form_url'                      => $form_url,
-                    'error_url'                     => $error_url,
-                    'thank_you_url'                 => $thank_you_url,
+                    'error_url'                     => str_replace(LD.'%uniq%'.RD, $uniq, str_replace(LD.'%random%'.RD, $random, $error_url)),
+                    'thank_you_url'                 => str_replace(LD.'%uniq%'.RD, $uniq,str_replace(LD.'%random%'.RD, $random, $thank_you_url)),
                     'requested'                     => time(),
                     'notify'                        => $notify,
-                    'download_url'                  => $download_url,
+                    'download_url'                  => str_replace(LD.'%uniq%'.RD, $uniq,str_replace(LD.'%random%'.RD, $random, $download_url)),
                     'download_label'                => $download_label,
                     'referrer_url'                  => $this->EE->agent->is_referral() ? $this->EE->agent->referrer() : '',
                     'debug'                         => $this->debug,
@@ -353,10 +369,12 @@ class Proform {
                     'error_messages'                => $error_messages,
                     'step'                          => $step,
                     'last_step_summary'             => $last_step_summary,
-                    '%random%'                      => mt_rand().'-'.mt_rand(),
-                    '%uniq%'                        => function_exists('openssl_random_pseudo_bytes') ? bin2hex(openssl_random_pseudo_bytes(32)) : uniqid('', true),
+                    '%random%'                      => $random,
+                    '%uniq%'                        => $uniq,
                 );
             }
+            
+            $this->_copy_post_to_session($form_obj, $form_session);
 
             // copy everything else the user may have added
             foreach($this->EE->TMPL->tagparams as $key => $value)
@@ -414,10 +432,14 @@ class Proform {
                 ////////////////////
                 // Setup variables
 
-                $this->_copy_form_values($form_obj, $variables);
+                $this->EE->formslib->copy_form_values($form_obj, $variables);
                 
                 $variables['use_captcha'] = $use_captcha;
                 $variables['interactive_captcha'] = $interactive_captcha;
+                
+                // Set defaults for advanced options so that they don't get rendered as variable names
+                $variables['formpref:html_prefix'] = '';
+                $variables['formpref:html_postfix'] = '';
 
                 if(count($form_obj->settings) > 0)
                 {
@@ -525,16 +547,16 @@ class Proform {
                 if($hidden_fields_mode == 'split')
                 {
                     // Do not include any hidden fields in the {fieldrows} and {fields} variables
-                    $variables['fieldrows'] = $this->create_fields_array($form_obj, $form_session, $field_errors, $field_values, $field_checked_flags, TRUE, FALSE);
-                    $variables['fields'] = $this->create_fields_array($form_obj, $form_session, $field_errors, $field_values, $field_checked_flags, FALSE, FALSE);
+                    $variables['fieldrows'] = $this->EE->formslib->create_fields_array($form_obj, $form_session, $field_errors, $field_values, $field_checked_flags, TRUE, FALSE);
+                    $variables['fields'] = $this->EE->formslib->create_fields_array($form_obj, $form_session, $field_errors, $field_values, $field_checked_flags, FALSE, FALSE);
                 } elseif($hidden_fields_mode == 'hybrid') {
                     // Include all hidden fields in {fieldrows} and {fields} - using this is not recommended, the new
                     // default behavior is to only use hidden fields from the {hidden_fields} loop, which is always registered.
-                    $variables['fieldrows'] = $this->create_fields_array($form_obj, $form_session, $field_errors, $field_values, $field_checked_flags, TRUE);
-                    $variables['fields'] = $this->create_fields_array($form_obj, $form_session, $field_errors, $field_values, $field_checked_flags, FALSE);
+                    $variables['fieldrows'] = $this->EE->formslib->create_fields_array($form_obj, $form_session, $field_errors, $field_values, $field_checked_flags, TRUE);
+                    $variables['fields'] = $this->EE->formslib->create_fields_array($form_obj, $form_session, $field_errors, $field_values, $field_checked_flags, FALSE);
                 }
 
-                $variables['hidden_fields'] = $this->create_fields_array($form_obj, $form_session, $field_errors, $field_values, $field_checked_flags, FALSE, TRUE);
+                $variables['hidden_fields'] = $this->EE->formslib->create_fields_array($form_obj, $form_session, $field_errors, $field_values, $field_checked_flags, FALSE, TRUE);
 
                 /*
                 // this doesn't quite work - we can't tell if the {fields} occurance in the second if is inside a {fieldrows} or outside of it
@@ -667,7 +689,8 @@ class Proform {
     public function results()
     {
         $this->EE->load->library('formslib');
-
+        $this->EE->formslib->set_site();
+        
         $this->debug              = $this->EE->TMPL->fetch_param('debug', 'false') == 'yes';
 
         $variables = $this->_get_results();
@@ -686,6 +709,12 @@ class Proform {
             'fields'        => array(),
         );
 
+        if($this->debug)
+        {
+            echo "pl_form:";
+            $this->prolib->debug(isset($_SESSION['pl_form']) ? $_SESSION['pl_form'] : 'null');
+        }
+        
         if(isset($_SESSION['pl_form']['thank_you_form'])
             AND isset($_SESSION['pl_form']['result_session']))
         {
@@ -698,14 +727,17 @@ class Proform {
             if($form_name && $form_session->config['form_name'] == $form_name)
             {
                 $form_obj = $this->EE->formslib->forms->get($form_name);
-                //$this->prolib->debug($form_obj);
+                if($this->debug)
+                {
+                    $this->prolib->debug($form_obj);
+                }
 
                 $this->prolib->copy_values($form_session->config, $variables);
-                $this->_copy_form_values($form_obj, $variables);
+                $this->EE->formslib->copy_form_values($form_obj, $variables);
 
-                $variables['fieldrows'] = $this->create_fields_array($form_obj, FALSE, $form_session->errors, $form_session->values, $form_session->checked_flags, TRUE);
-                $variables['fields'] = $this->create_fields_array($form_obj, FALSE, $form_session->errors, $form_session->values, $form_session->checked_flags, FALSE, FALSE);
-                $variables['hidden_fields'] = $this->create_fields_array($form_obj, FALSE, $form_session->errors, $form_session->values, $form_session->checked_flags, FALSE, TRUE);
+                $variables['fieldrows'] = $this->EE->formslib->create_fields_array($form_obj, FALSE, $form_session->errors, $form_session->values, $form_session->checked_flags, TRUE);
+                $variables['fields'] = $this->EE->formslib->create_fields_array($form_obj, FALSE, $form_session->errors, $form_session->values, $form_session->checked_flags, FALSE, FALSE);
+                $variables['hidden_fields'] = $this->EE->formslib->create_fields_array($form_obj, FALSE, $form_session->errors, $form_session->values, $form_session->checked_flags, FALSE, TRUE);
 
                 $varsets = array();
                 $module_preferences = $this->EE->formslib->prefs->get_preferences();
@@ -717,7 +749,12 @@ class Proform {
                 // Turn various arrays of values into variables
                 $this->load_varsets($varsets, $variables);
 
-                //$this->prolib->debug($variables);
+                if($this->debug)
+                {
+                    echo "Final Variables:";
+                    $this->prolib->debug($variables);
+                }
+                
 
             }
         } else {
@@ -734,7 +771,8 @@ class Proform {
     {
         // List entries posted to a form
         $this->EE->load->library('formslib');
-
+        $this->EE->formslib->set_site();
+        
         // Get params
         $form_name      = $this->EE->TMPL->fetch_param('form_name');
         $paginate       = $this->EE->TMPL->fetch_param('paginate');
@@ -806,8 +844,8 @@ class Proform {
                     $row_vars['total_entries'] = $total_entries;
                     $row_vars['total_pages'] = $total_pages;
                     $row_vars['current_page'] = $page;
-                    $row_vars['fieldrows'] = $this->create_fields_array($form_obj, FALSE, array(), $row, array(), TRUE);
-                    $row_vars['fields'] = $this->create_fields_array($form_obj, FALSE, array(), $row, array(), FALSE);
+                    $row_vars['fieldrows'] = $this->EE->formslib->create_fields_array($form_obj, FALSE, array(), $row, array(), TRUE);
+                    $row_vars['fields'] = $this->EE->formslib->create_fields_array($form_obj, FALSE, array(), $row, array(), FALSE);
 
                     /*foreach($row as $key => $value)
                     {
@@ -843,8 +881,8 @@ class Proform {
                 $row_vars['row:number'] = 1;
                 $row_vars['entries:count'] = 0;
                 $row_vars['entries:no_results'] = TRUE;
-                $row_vars['fieldrows'] = $this->create_fields_array($form_obj, FALSE, array(), array(), array(), TRUE);
-                $row_vars['fields'] = $this->create_fields_array($form_obj, FALSE, array(), array(), array(), FALSE);
+                $row_vars['fieldrows'] = $this->EE->formslib->create_fields_array($form_obj, FALSE, array(), array(), array(), TRUE);
+                $row_vars['fields'] = $this->EE->formslib->create_fields_array($form_obj, FALSE, array(), array(), array(), FALSE);
                 //$row_vars['fields'] = $this->create_fields_array($form_obj);
                 $row_vars['fields:count'] = count($row_vars['fields']);
 
@@ -991,7 +1029,8 @@ class Proform {
     {
         // List available forms
         $this->EE->load->library('formslib');
-
+        $this->EE->formslib->set_site();
+        
         // Get params
         $form_name      = $this->EE->TMPL->fetch_param('form_name');
         $paginate       = $this->EE->TMPL->fetch_param('paginate');
@@ -1172,50 +1211,7 @@ class Proform {
         return '{exp:proform:simple form_name="'.$form_name.'"}';
     }
 
-    private function _add_rowdata(&$form_obj, &$row, &$row_vars)
-    {
-        foreach($form_obj->fields() as $field)
-        {
-            if($field->field_name)
-            {
-                if(is_object($row))
-                {
-//                echo 'o ' . $field->field_name.' = '.$row->{$field->field_name};
-                    $row_vars['value:'.$field->field_name] = $row->{$field->field_name};
-                } elseif(is_array($row)) {
-//                echo 'a ' . $field->field_name.' = '.$row[$field->field_name];
-                    $row_vars['value:'.$field->field_name] = $row[$field->field_name];
-                }
 
-                if($field->type == 'file' && $row_vars['value:'.$field->field_name] != '')
-                {
-                    $dir = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
-                    $row_vars['filename:'.$field->field_name] = $row_vars['value:'.$field->field_name];
-                    $row_vars['upload_pref_id:'.$field->field_name] = $field->upload_pref_id;
-                    $row_vars['value:'.$field->field_name] = $dir['url'].$row_vars['value:'.$field->field_name];
-                }
-
-                if($field->type == 'mailinglist' || $field->type == 'checkbox')
-                {
-                
-                    $row_vars['checked:'.$field->field_name] = $row_vars['value:'.$field->field_name] ? TRUE : FALSE;
-                }
-
-            }
-        }
-
-        // add row data that isn't part of the form
-        foreach($row as $key => $value)
-        {
-            if($key)
-            {
-                if(!array_key_exists('value:'.$key, $row_vars))
-                {
-                    $row_vars['value:' . $key] = $value;
-                }
-            }
-        }
-    }
 
 
 
@@ -1276,11 +1272,23 @@ class Proform {
             
         }
         
+        // Get calculated values
+        foreach($form_obj->fields() as $field)
+        {
+            switch($field->type)
+            {
+                case 'calculated':
+                    $form_session->values[$field->field_name] = $this->EE->pl_drivers->calculated_field_value($form_obj, $field, $form_session);
+                    break;
+            }
+        }
+        
         $this->_copy_set_fields($form_obj, $form_session);
     }
     
     private function _copy_set_fields(&$form_obj, &$form_session)
     {
+        if(!$form_obj) return;
         if(isset($this->cache['set_fields'][$form_obj->form_name]) && is_array($this->cache['set_fields'][$form_obj->form_name]))
         {
             foreach($this->cache['set_fields'][$form_obj->form_name] as $field_name => $value)
@@ -1472,19 +1480,7 @@ class Proform {
     {
         if($this->EE->proform_notifications->has_notifications($form_obj, $form_session))
         {
-            $parse_data = array();
-            $this->_copy_form_values($form_obj, $parse_data);
-            $this->prolib->copy_values($form_session->config, $parse_data);
-            
-            $this->prolib->copy_values($form_session->values, $parse_data);
-
-            $fieldrows = $this->create_fields_array($form_obj, FALSE, array(), $form_session->values, array(), TRUE);
-            $fields = $this->create_fields_array($form_obj, FALSE, array(), $form_session->values, array(), FALSE);
-
-            $parse_data['fieldrows'] = $fieldrows;
-            $parse_data['fields'] = $fields;
-
-            $this->_add_rowdata($form_obj, $entry_row, $parse_data);
+            $parse_data = $this->EE->formslib->prep_parse_data($form_obj, $form_session, $entry_row);
 
             // $this->debug(array(
             //     "form_obj:" => $form_obj,
@@ -1530,6 +1526,8 @@ class Proform {
         }
     }
 
+
+    
     ////////////////////////////////////////////////////////////////////////////////
     // Processing Helpers
     ////////////////////////////////////////////////////////////////////////////////
@@ -1570,6 +1568,8 @@ class Proform {
 
             }
         }
+
+
     }
 
     private function _datetime($value)
@@ -1656,8 +1656,18 @@ class Proform {
             {
                 if($field->type == 'file')
                 {
-                    // if the field already exists in $form_session->values then we have already uploaded the file
-                    if(!array_key_exists($field->field_name, $form_session->values))
+                    // Pre-emptive requirement check.
+                    // It's possible to keep this in PL_uploads::handle_upload() but the field label is not passed to the function 
+                    // so it's easier to have it here.
+                    if($field->is_required == 'y' && (!isset($_FILES[$field->field_name]['name']) || !$_FILES[$field->field_name]['name'])) {
+                        $form_session->add_error($field->field_name, array("$field->field_label is required."));
+                    }
+                    // Otherwise, if the field already exists in $form_session->values then we have already uploaded the file, but
+                    // we should see if there is a blank value (no previously uploaded file, and we're on an error
+                    // return) or there is a new file to replace it.
+                    elseif(!array_key_exists($field->field_name, $form_session->values) 
+                        || $form_session->values[$field->field_name] == '' 
+                        || (isset($_FILES[$field->field_name]['name']) && $_FILES[$field->field_name]['name'] != '') )
                     {
                         // "upload" the file to it's permanent home
                         $upload_data = $this->EE->pl_uploads->handle_upload($field->upload_pref_id, $field->field_name, $field->is_required());
@@ -1672,9 +1682,6 @@ class Proform {
                         {
                             // save the filename to the session's values array so we don't clobber it if there are
                             // other errors
-                            $form_session->values[$field->field_name] = $upload_data['file_name'];
-
-                            // save the filename in case we get to actually save the form insert this time
                             $form_session->values[$field->field_name] = $upload_data['file_name'];
                         } elseif(count($this->EE->pl_uploads->errors) > 0) {
                             // if the file wasn't required, there would be no errors in the array
@@ -1778,25 +1785,24 @@ class Proform {
                     $valid = $option_valid;
                 } else {
                     $multi = TRUE;
-                    if(!is_array($form_session->values[$field->field_name]))
-                    {
-                        $form_session->values[$field->field_name] = array($form_session->values[$field->field_name]);
-                    }
 
                     $valid = TRUE;
-                    foreach($form_session->values[$field->field_name] as $selected_option)
+                    if($form_session->values[$field->field_name])
                     {
-                        $value_count++;
-                        $option_valid = FALSE;
-                        foreach($options as $option)
+                        foreach($form_session->values[$field->field_name] as $selected_option)
                         {
-                            if($option['key'] == $selected_option)
+                            $value_count++;
+                            $option_valid = FALSE;
+                            foreach($options as $option)
                             {
-                                $option_valid = TRUE;
+                                if($option['key'] == $selected_option)
+                                {
+                                    $option_valid = TRUE;
+                                }
                             }
+                            $valid &= $option_valid;
+                            if(!$valid) break;
                         }
-                        $valid &= $option_valid;
-                        if(!$valid) break;
                     }
                 }
 
@@ -1809,7 +1815,7 @@ class Proform {
                         $line = ($multi ? 'One of the values for' : 'The value for ').' %s is not a valid choice.';
                     }
                     $error = sprintf($line, htmlentities($field->field_label));
-                    $form_session->add_error($field->field_name,$error);
+                    $form_session->add_error($field->field_name, $error);
                 }
             }
 
@@ -2000,6 +2006,8 @@ class Proform {
                     $this->prolib->debug($save_data);
                     // */
                 }
+                
+                $save_data = $this->EE->pl_drivers->prep_insert($form_obj, $form_session, $save_data);
 
                 // collapse multiselect options and other array values to a single string
                 foreach($save_data as $k => $v)
@@ -2049,6 +2057,11 @@ class Proform {
             if ($this->EE->extensions->active_hook('proform_insert_end') === TRUE)
             {
                 $this->EE->extensions->call('proform_insert_end', $this, $form_session);
+            }
+            
+            if ($this->EE->extensions->active_hook('proform_insert_end_ex') === TRUE)
+            {
+                $this->EE->extensions->call('proform_insert_end_ex', $this, $form_obj, $form_session);
             }
         } else {
             $form_session->values['form:entry_id'] = 0;
@@ -2200,270 +2213,7 @@ class Proform {
         }
     }
     
-    private function create_fields_array($form_obj, $form_session = FALSE, $field_errors = array(), $field_values = array(),
-                                         $field_checked_flags = array(), $create_field_rows = TRUE, $hidden = -1)
-    {
 
-        if(is_object($field_values))
-        {
-            $field_values = (array)$field_values;
-        }
-
-        $result = array();
-        $last_field_row = -1;
-        $count = 0;
-
-        foreach($form_obj->fields() as $field)
-        {
-            // skip secured fields such as member_id, member_name, etc.
-            if($field->type == 'secure' OR $field->type == 'member_data') continue;
-            // skip hidden fields when we don't want them, skip everything else when we do
-
-            // Only return fields for the current step, if we are on a particular step
-            if(
-                $form_session && $field->step_no != $form_session->config['step']
-                && !($form_session->config['last_step_summary'] && $form_session->config['step'] == $form_obj->get_step_count())
-            ) continue;
-
-            if($hidden !== -1)
-            {
-                if($field->get_control() == 'hidden')
-                {
-                    // it is hidden but we do not want hidden, skip it
-                    if(!$hidden) {
-                        continue;
-                    }
-                } else {
-                    // it is not hidden and we want only hidden, skip it
-                    if($hidden) {
-                        continue;
-                    }
-                }
-            }
-
-            // handle normal posted fields
-            $is_required = $field->is_required == 'y';
-            if(!$is_required)
-            {
-                // look for the always required value in the field's validation rules
-                $field_rules = explode('|', $field->validation);
-                foreach($field_rules as $rule)
-                {
-                    if($rule == 'required')
-                    {
-                        $is_required = TRUE;
-                    }
-                }
-            }
-
-            $validation = $this->EE->pl_parser->wrap_array($field->get_validation(), 'rule_no', 'rule');
-            $validation_count = count($validation->array);
-
-            // Determine placeholder based on validation rules, if possible - if not, use the type place
-            // holder as a fallback.
-            $default_placeholder = $this->_get_placeholder($field->type);
-            foreach($validation->array as $rule)
-            {
-                if($this->_get_placeholder($rule))
-                {
-                    $default_placeholder = $this->_get_placeholder($rule);
-                }
-            }
-
-            $field_value = array_key_exists($field->field_name, $field_values) ? $field_values[$field->field_name] : $field->get_form_field_setting('preset_value');
-
-            if($field->type == 'list' || $field->type == 'relationship')
-            {
-                $field_options = $field->get_list_options($field_values[$field->field_name]);
-
-                if(is_array($field_value))
-                {
-                    $field_value_selections = array();
-                    foreach($field_value as $kk => $vv)
-                    {
-                        $field_value_selections[$kk] = $vv;
-                    }
-                } else {
-                    $field_value_selections = explode('|', $field_value);
-                }
-
-                // Turn the list of selected options into a wrappable array to be parsed
-                $field_value_array = array();
-                foreach($field_value_selections as $key)
-                {
-                    foreach($field_options as $option)
-                    {
-                        if($option['key'] == $key)
-                        {
-                            $field_value_array[$key] = $option['label'];
-                        }
-                    }
-                }
-                $field_options = $this->EE->pl_parser->wrap_array($field_options, 'key', 'label');
-                $field_value_wrap = $this->EE->pl_parser->wrap_array($field_value_array, 'key', 'label');
-            } else {
-                $field_options = FALSE;
-                $field_value_wrap = FALSE;
-            }
-
-            $count++;
-            $field_array = array(
-                    //'field_callback'    => function($form_session->values, $key=FALSE) { return time(); },
-                    'field_id'                  => $field->field_id,
-                    'field_name'                => $field->field_name,
-                    'field_label'               => $field->get_form_field_setting('label', $field->field_label),
-                    'field_placeholder'         => $field->get_form_field_setting('placeholder',
-                                                        $field->get_property('placeholder', $default_placeholder)),
-                    'field_type'                => $field->type,
-                    'field_length'              => $field->length,
-                    'field_heading'             => $field->separator_type != PL_Form::SEPARATOR_HTML ? $field->heading : '',
-                    'field_html_block'          => $field->separator_type == PL_Form::SEPARATOR_HTML ? $field->heading : '',
-                    'field_is_step'             => $field->separator_type == PL_Form::SEPARATOR_STEP ? 'step' : '',
-                    'field_is_required'         => $is_required ? 'required' : '',
-                    'field_validation'          => $validation,
-                    'field_validation_count'    => $validation_count,
-                    'field_error'               => array_key_exists($field->field_name, $field_errors)
-                                                        ? $field_errors[$field->field_name]
-                                                            : '',
-                    'field_value'               => $field_value,
-                    'field_values'              => $field_value_wrap,
-                    'field_options'             => $field_options,
-                    'field_checked'             => (array_key_exists($field->field_name, $field_checked_flags)
-                                                                  && $field_checked_flags[$field->field_name]) ? 'checked="checked"' : '',
-                    'field_control'             => $field->get_control(),
-                    'field_number'              => $count,
-                );
-
-            // Create a fieldset for field_validation: to contain rows that are applied to each field, makes conditionals
-            // a lot easier
-            foreach($validation->array as $rule)
-            {
-                $field_array['field_validation:'.$rule] = '1';
-            }
-
-            // Copy field settings for each field type into the field array
-            if(is_array($field->form_field_settings))
-            {
-                foreach($field->form_field_settings as $k => $v)
-                {
-                    // Don't override defaults if there is no value provided in the override
-                    if(trim($v) != '' OR !isset($field_array['field_'.$k]))
-                    {
-                        $field_array['field_'.$k] = $v;
-
-                        if(substr($k, 0, 5) == 'extra')
-                        {
-                            $field_array['field_'.str_replace('extra', 'extra_', $k)] = $v;
-                        }
-                    }
-                }
-            }
-
-            $field_array['field_value_label'] = '';
-
-            if(is_array($field->settings))
-            {
-                foreach($field->settings as $k => $v)
-                {
-                    if(substr($k, 0, 5) == 'type_')
-                    {
-                        $k = substr($k, 5);
-                    }
-
-                    if(($k == 'list' || $k == 'relationship') && isset($field_values[$field->field_name]))
-                    {
-                        $v = $field->get_list_options($field_values[$field->field_name]);
-                        $field_array['field_divider_count'] = $field->divider_count;
-                        foreach($v as $list_option)
-                        {
-                            if($list_option['selected'])
-                            {
-                                $field_array['field_value_label'] = $list_option['label'];
-                            }
-                        }
-                    }
-
-                    $field_array['field_setting_'.$k] = $v;
-                }
-            }
-
-            if(array_key_exists($field->field_name, $field_errors))
-            {
-                if(is_array($field_errors[$field->field_name]))
-                {
-                    $field_array['field_error'] = $this->EE->formslib->implode_errors_array($field_errors[$field->field_name]);
-                } else {
-                    $field_array['field_error'] = $field_errors[$field->field_name];
-                }
-            }
-
-            $field_array['field_filename'] = '';
-            $field_array['field_ext'] = '';
-            if($field->type == 'file')
-            {
-                $dir = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
-                if($field->upload_pref_id == 0 || empty($dir)) pl_show_error('The field '.$field->field_name.' has an invalid file upload directory set.');
-                
-                if($field_array['field_value'] != '')
-                {
-                    $field_array['field_value'] = $dir['url'].$field_array['field_value'];
-                }
-                
-                $info = pathinfo($field_array['field_value']);
-                if($info['filename']) $field_array['field_filename'] = $info['filename'].(isset($info['extension']) ? '.'.$info['extension'] : '');
-                if($info['filename']) $field_array['field_basename'] = $info['filename'];
-                if(isset($info['extension'])) $field_array['field_ext'] = $info['extension'];
-            }
-
-            if($driver = $field->get_driver())
-            {
-                // Field drivers should set this key to some default representation so that they will work in the
-                // default and sample templates. If this is not set, the default template will use a single input
-                // element for the field.
-                $field_array['field_driver'] = '';
-                if(method_exists($driver, 'field_tag_array'))
-                {
-                    $field_array = $driver->field_tag_array($form_obj, $form_session, $field_array, $field_values);
-                }
-            } else {
-                $field_array['field_driver'] = FALSE;
-            }
-
-            if($create_field_rows)
-            {
-                if($field->field_row != $last_field_row)
-                {
-                    $result[] = array(
-                        'fields' => array(),
-                        'row_num' => $field->field_row, );
-                    $last_field_row = $field->field_row;
-                }
-                $field_array['field_no'] = count($result[count($result)-1]['fields']) + 1;
-                $field_array['field_even'] = $field_array['field_no'] % 2 == 0 ? 'yes' : 'no';
-                $result[count($result)-1]['fields'][] = $field_array;
-                $result[count($result)-1]['fieldrow:count'] = count($result[count($result)-1]['fields']);
-                if(!isset($result[count($result)-1]['fieldrow:hidden_count']))
-                    $result[count($result)-1]['fieldrow:hidden_count'] = 0;
-                if($field_array['field_control'] == 'hidden')
-                    $result[count($result)-1]['fieldrow:hidden_count'] ++;
-            } else {
-                $field_array['field_no'] = count($result) + 1;
-                $result[] = $field_array;
-            }
-        } // foreach($form_obj->fields() as $field)
-
-        return $result;
-    } // create_fields_array
-
-    private function _get_placeholder($type, $default = '')
-    {
-        $result = $default;
-        if(isset($this->default_placeholders[$type]))
-        {
-            $result = $this->default_placeholders[$type];
-        }
-        return $result;
-    }
 
     /**
       *  Fetch pagination data
@@ -2522,28 +2272,7 @@ class Proform {
         }
     }
     
-    function _set_site()
-    {
-        $site = pf_strip_id(strip_tags($this->EE->TMPL->fetch_param('site', $this->EE->TMPL->fetch_param('site_name'))));
-        if($site)
-        {
-            $query = $this->EE->db->where('site_name', $site)->get('exp_sites');
-            $this->prolib->site_id = $query->row()->site_id;
-            foreach($this->EE->formslib as $lib)
-            {
-                if(isset($lib->site_id))
-                {
-                    $lib->site_id = $this->prolib->site_id;
-                }
-            }
-        }
-    }
-    
-    function _copy_form_values(&$form_obj, &$variables)
-    {
-        $this->prolib->copy_values($form_obj, $variables);
-        $variables['form_name:dashes'] = str_replace('_', '-', $variables['form_name']);
-    }
+
     
 }
 

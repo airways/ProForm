@@ -2,9 +2,9 @@
 
 /**
  * @package ProForm
- * @author Isaac Raway (MetaSushi, LLC) <isaac.raway@gmail.com>
+ * @author Isaac Raway (MetaSushi, LLC) <airways@mm.st>
  *
- * Copyright (c)2009, 2010, 2011. Isaac Raway and MetaSushi, LLC.
+ * Copyright (c)2009, 2010, 2011, 2012, 2013. Isaac Raway and MetaSushi, LLC.
  * All rights reserved.
  *
  * This source is commercial software. Use of this software requires a
@@ -202,7 +202,7 @@ class Proform_mcp extends Prolib_base_mcp {
         }
         
         // Copy custom lang entries from driver classes
-        foreach($this->EE->pl_drivers->get_drivers('form') as $driver)
+        foreach($this->EE->pl_drivers->get_drivers(array('form','global_form')) as $driver)
         {
             if(isset($driver->lang))
             {
@@ -213,8 +213,9 @@ class Proform_mcp extends Prolib_base_mcp {
             }
         }
         
-        $js= 'proform_mod.lang = '.json_encode($lang_entries).';';
-        $js= 'proform_mod.tab_action = "'.str_replace('&amp;', '&', TAB_ACTION).'"; proform_mod.version_check()';
+        $js = "\n";
+        $js .= 'proform_mod.lang = '.json_encode($lang_entries).";\n";
+        $js .= 'proform_mod.tab_action = "'.str_replace('&amp;', '&', TAB_ACTION).'"; proform_mod.version_check()'.";\n";
         $this->EE->javascript->output($js);
         
         $this->EE->javascript->compile();
@@ -501,6 +502,7 @@ class Proform_mcp extends Prolib_base_mcp {
                 $this->EE->formslib->vault->put($versions, TRUE, 'versions');
             }
         }
+        
         exit;
     }
     
@@ -612,6 +614,13 @@ class Proform_mcp extends Prolib_base_mcp {
             $form = FALSE;
             $form_obj = new PL_Form($form);
             $form_obj->form_type = $vars['new_type'];
+            if(isset($vars['defaults']))
+            {
+                foreach($vars['defaults'] as $key => $value)
+                {
+                    $form_obj->$key = $value;
+                }
+            }
             $vars['hidden']['form_type'] = $vars['new_type'];
             $vars['editing'] = FALSE;
             $vars['new_item_url'] = FALSE;
@@ -965,6 +974,8 @@ class Proform_mcp extends Prolib_base_mcp {
         if(!$this->EE->input->post('submitter_notification_attachments')) $_POST['submitter_notification_attachments'] = 'n';
         if(!$this->EE->input->post('share_notification_attachments')) $_POST['share_notification_attachments'] = 'n';
 
+        $this->EE->pl_drivers->process_edit_form($form);
+        
         // copy post values defined on the form class to it and save it
         $this->prolib->copy_post($form);
         $form->save();
@@ -975,6 +986,7 @@ class Proform_mcp extends Prolib_base_mcp {
         {
             $this->EE->extensions->call('proform_process_edit_form', $this);
         }
+        
         $this->EE->functions->redirect(ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form->form_id.AMP.'active_tabs='.$active_tabs);
         return TRUE;
     }
@@ -1248,6 +1260,10 @@ class Proform_mcp extends Prolib_base_mcp {
         $auto_add_form_id = $this->EE->input->get_post('auto_add_form_id');
 
         $vars['hidden'] = array('auto_add_form_id' => $auto_add_form_id);
+        if(!$auto_add_form_id)
+        {
+            $vars['reusable'] = 'y';
+        }
 
         $this->sub_page('tab_new_field');
 
@@ -1314,6 +1330,12 @@ class Proform_mcp extends Prolib_base_mcp {
 
         // automatically add the field to a form?
         $auto_add_form_id = $this->EE->input->get_post('auto_add_form_id');
+
+        // Calling the hook.
+        if ($this->EE->extensions->active_hook('proform_process_new_field_start') === TRUE)
+        {
+            $this->EE->extensions->call('proform_process_new_field_start', $this, $field);
+        }
 
         if(!$auto_add_form_id)
         {
@@ -1390,6 +1412,10 @@ class Proform_mcp extends Prolib_base_mcp {
             if(isset($vars['field_length']))
             {
                 $field->length = $vars['field_length'];
+            }
+            if(isset($vars['reusable']))
+            {
+                $field->reusable = $vars['reusable'];
             }
         }
 
@@ -1540,6 +1566,7 @@ class Proform_mcp extends Prolib_base_mcp {
         $field->settings = $settings;
         $field->save();
 
+        // Call the hook.
         if ($this->EE->extensions->active_hook('proform_process_edit_field') === TRUE)
         {
             $this->EE->extensions->call('proform_process_edit_field', $this, $field);
@@ -1598,9 +1625,10 @@ class Proform_mcp extends Prolib_base_mcp {
         {
             $this->EE->load->library('formslib');
 
+            // Call the hook.
             if ($this->EE->extensions->active_hook('proform_process_delete_field') === TRUE)
             {
-                $this->EE->extensions->call('proform_process_delete_field', $this);
+                $this->EE->extensions->call('proform_process_delete_field', $this, $field_id);
                 if($this->EE->extensions->end_script === TRUE) return TRUE;
             }
 

@@ -141,7 +141,16 @@
 </tr>
 <!-------------------->
 <tr><td><b>proform_insert_end</b></td>
-    <td>$module, $form_obj, $data</td>
+    <td>$module, $form_session</td>
+    <td>none</td>
+</tr>
+<tr><td colspan="3">
+    <p><b>Description</b></p>
+    <p>This hook is called just after inserting the data for the form submission into the database. This can be used to push the final data array to an external source, generating some sort of custom notification, or a number of other purposes.<p></td>
+</tr>
+<!-------------------->
+<tr><td><b>proform_insert_end_ex</b></td>
+    <td>$module, $form_obj, $form_session</td>
     <td>none</td>
 </tr>
 <tr><td colspan="3">

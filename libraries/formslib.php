@@ -2,9 +2,9 @@
 
 /**
  * @package ProForm
- * @author Isaac Raway (MetaSushi, LLC) <isaac.raway@gmail.com>
+ * @author Isaac Raway (MetaSushi, LLC) <airways@mm.st>
  *
- * Copyright (c)2009, 2010, 2011. Isaac Raway and MetaSushi, LLC.
+ * Copyright (c)2009, 2010, 2011, 2012, 2013. Isaac Raway and MetaSushi, LLC.
  * All rights reserved.
  *
  * This source is commercial software. Use of this software requires a
@@ -42,7 +42,8 @@ class Formslib
     var $session_mgr;
 
     var $form_types = array('form' => 'Entry Form', 'saef' => 'SAEF Form', 'share' => 'Share Form');
-
+    var $var_pairs = array('fieldrows', 'fields', 'hidden_fields', 'errors', 'steps', 'field_validation');
+    
     // Fields that will not be encrypted or decrypted
     var $field_encryption_disabled = array('dst_enabled');
 
@@ -89,7 +90,10 @@ class Formslib
         $this->prefs = new PL_prefs("proform_preferences", FALSE, $this->default_prefs, $this->prolib->site_id);
 
         $this->forms = new PL_handle_mgr("proform_forms", "form", "PL_Form");
+        //$this->forms->get_all();
+        
         $this->fields = new PL_handle_mgr("proform_fields", "field", "PL_Field");
+        //$this->fields->get_all();
 
         $this->forms->site_id = $this->prolib->site_id;
         $this->fields->site_id = $this->prolib->site_id;
@@ -185,6 +189,367 @@ class Formslib
             {
                 $result[] = array('version' => $version[0], 'info' => $version[1]);
             }
+        }
+        return $result;
+    }
+    
+    
+    public function prep_parse_data(&$form_obj, &$form_session, &$entry_row)
+    {
+        $parse_data = array();
+        $this->copy_form_values($form_obj, $parse_data);
+        $this->prolib->copy_values($form_session->config, $parse_data);
+        $this->prolib->copy_values($form_session->values, $parse_data);
+
+        $fieldrows = $this->create_fields_array($form_obj, FALSE, array(), $form_session->values, array(), TRUE);
+        $fields = $this->create_fields_array($form_obj, FALSE, array(), $form_session->values, array(), FALSE);
+
+        $parse_data['fieldrows'] = $fieldrows;
+        $parse_data['fields'] = $fields;
+
+        $this->add_rowdata($form_obj, $entry_row, $parse_data);
+        return $parse_data;
+    }
+    
+    public function  copy_form_values(&$form_obj, &$variables)
+    {
+        $this->prolib->copy_values($form_obj, $variables);
+        $variables['form_name:dashes'] = str_replace('_', '-', $variables['form_name']);
+    }
+    
+    public function add_rowdata(&$form_obj, &$row, &$row_vars)
+    {
+        foreach($form_obj->fields() as $field)
+        {
+            if($field->field_name)
+            {
+                if(is_object($row))
+                {
+//                echo 'o ' . $field->field_name.' = '.$row->{$field->field_name};
+                    $row_vars['value:'.$field->field_name] = $row->{$field->field_name};
+                } elseif(is_array($row)) {
+//                echo 'a ' . $field->field_name.' = '.$row[$field->field_name];
+                    $row_vars['value:'.$field->field_name] = $row[$field->field_name];
+                }
+
+                if($field->type == 'file' && $row_vars['value:'.$field->field_name] != '')
+                {
+                    $dir = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
+                    $row_vars['filename:'.$field->field_name] = $row_vars['value:'.$field->field_name];
+                    $row_vars['upload_pref_id:'.$field->field_name] = $field->upload_pref_id;
+                    $row_vars['value:'.$field->field_name] = $dir['url'].$row_vars['value:'.$field->field_name];
+                }
+
+                if($field->type == 'mailinglist' || $field->type == 'checkbox')
+                {
+                    if(!isset($row_vars['value:'.$field->field_name]))
+                    {
+                    var_dump($row_vars);
+                    var_dump($row);
+                    exit;
+                    }
+                    $row_vars['checked:'.$field->field_name] = $row_vars['value:'.$field->field_name] ? TRUE : FALSE;
+                }
+
+            }
+        }
+
+        // add row data that isn't part of the form
+        foreach($row as $key => $value)
+        {
+            if($key)
+            {
+                if(!array_key_exists('value:'.$key, $row_vars))
+                {
+                    $row_vars['value:' . $key] = $value;
+                }
+            }
+        }
+    }
+
+    function set_site()
+    {
+        $site = pf_strip_id(strip_tags($this->EE->TMPL->fetch_param('site', $this->EE->TMPL->fetch_param('site_name'))));
+        if($site)
+        {
+            $query = $this->EE->db->where('site_name', $site)->get('exp_sites');
+            $this->prolib->site_id = $query->row()->site_id;
+            foreach($this->EE->formslib as $lib)
+            {
+                if(isset($lib->site_id))
+                {
+                    $lib->site_id = $this->prolib->site_id;
+                }
+            }
+        }
+    }
+    
+    public function create_fields_array($form_obj, $form_session = FALSE, $field_errors = array(), $field_values = array(),
+                                         $field_checked_flags = array(), $create_field_rows = TRUE, $hidden = -1)
+    {
+
+        if(is_object($field_values))
+        {
+            $field_values = (array)$field_values;
+        }
+
+        $result = array();
+        $last_field_row = -1;
+        $count = 0;
+
+        foreach($form_obj->fields() as $field)
+        {
+            // skip secured fields such as member_id, member_name, etc.
+            if($field->type == 'secure' OR $field->type == 'member_data') continue;
+            // skip hidden fields when we don't want them, skip everything else when we do
+
+            // Only return fields for the current step, if we are on a particular step
+            if(
+                $form_session && $field->step_no != $form_session->config['step']
+                && !($form_session->config['last_step_summary'] && $form_session->config['step'] == $form_obj->get_step_count())
+            ) continue;
+
+            if($hidden !== -1)
+            {
+                if($field->get_control() == 'hidden')
+                {
+                    // it is hidden but we do not want hidden, skip it
+                    if(!$hidden) {
+                        continue;
+                    }
+                } else {
+                    // it is not hidden and we want only hidden, skip it
+                    if($hidden) {
+                        continue;
+                    }
+                }
+            }
+
+            // handle normal posted fields
+            $is_required = $field->is_required == 'y';
+            if(!$is_required)
+            {
+                // look for the always required value in the field's validation rules
+                $field_rules = explode('|', $field->validation);
+                foreach($field_rules as $rule)
+                {
+                    if($rule == 'required')
+                    {
+                        $is_required = TRUE;
+                    }
+                }
+            }
+
+            $validation = $this->EE->pl_parser->wrap_array($field->get_validation(), 'rule_no', 'rule');
+            $validation_count = count($validation->array);
+
+            // Determine placeholder based on validation rules, if possible - if not, use the type place
+            // holder as a fallback.
+            $default_placeholder = $this->_get_placeholder($field->type);
+            foreach($validation->array as $rule)
+            {
+                if($this->_get_placeholder($rule))
+                {
+                    $default_placeholder = $this->_get_placeholder($rule);
+                }
+            }
+
+            $field_value = array_key_exists($field->field_name, $field_values) ? $field_values[$field->field_name] : $field->get_form_field_setting('preset_value');
+
+            if($field->type == 'list' || $field->type == 'relationship')
+            {
+                $field_options = $field->get_list_options($field_values[$field->field_name]);
+
+                if(is_array($field_value))
+                {
+                    $field_value_selections = array();
+                    foreach($field_value as $kk => $vv)
+                    {
+                        $field_value_selections[$kk] = $vv;
+                    }
+                } else {
+                    $field_value_selections = explode('|', $field_value);
+                }
+
+                // Turn the list of selected options into a wrappable array to be parsed
+                $field_value_array = array();
+                foreach($field_value_selections as $key)
+                {
+                    foreach($field_options as $option)
+                    {
+                        if($option['key'] == $key)
+                        {
+                            $field_value_array[$key] = $option['label'];
+                        }
+                    }
+                }
+                $field_options = $this->EE->pl_parser->wrap_array($field_options, 'key', 'label');
+                $field_value_wrap = $this->EE->pl_parser->wrap_array($field_value_array, 'key', 'label');
+            } else {
+                $field_options = FALSE;
+                $field_value_wrap = FALSE;
+            }
+
+            $count++;
+            $field_array = array(
+                    //'field_callback'    => function($form_session->values, $key=FALSE) { return time(); },
+                    'field_id'                  => $field->field_id,
+                    'field_name'                => $field->field_name,
+                    'field_label'               => $field->get_form_field_setting('label', $field->field_label),
+                    'field_placeholder'         => $field->get_form_field_setting('placeholder',
+                                                        $field->get_property('placeholder', $default_placeholder)),
+                    'field_type'                => $field->type,
+                    'field_length'              => $field->length,
+                    'field_heading'             => $field->separator_type != PL_Form::SEPARATOR_HTML ? $field->heading : '',
+                    'field_html_block'          => $field->separator_type == PL_Form::SEPARATOR_HTML ? $field->heading : '',
+                    'field_is_step'             => $field->separator_type == PL_Form::SEPARATOR_STEP ? 'step' : '',
+                    'field_is_required'         => $is_required ? 'required' : '',
+                    'field_validation'          => $validation,
+                    'field_validation_count'    => $validation_count,
+                    'field_error'               => array_key_exists($field->field_name, $field_errors)
+                                                        ? $field_errors[$field->field_name]
+                                                            : '',
+                    'field_value'               => $field_value,
+                    'field_values'              => $field_value_wrap,
+                    'field_options'             => $field_options,
+                    'field_checked'             => (array_key_exists($field->field_name, $field_checked_flags)
+                                                                  && $field_checked_flags[$field->field_name]) ? 'checked="checked"' : '',
+                    'field_control'             => $field->get_control(),
+                    'field_number'              => $count,
+                );
+
+            // Create a fieldset for field_validation: to contain rows that are applied to each field, makes conditionals
+            // a lot easier
+            foreach($validation->array as $rule)
+            {
+                $field_array['field_validation:'.$rule] = '1';
+            }
+
+            // Copy field settings for each field type into the field array
+            if(is_array($field->form_field_settings))
+            {
+                foreach($field->form_field_settings as $k => $v)
+                {
+                    // Don't override defaults if there is no value provided in the override
+                    if(trim($v) != '' OR !isset($field_array['field_'.$k]))
+                    {
+                        $field_array['field_'.$k] = $v;
+
+                        if(substr($k, 0, 5) == 'extra')
+                        {
+                            $field_array['field_'.str_replace('extra', 'extra_', $k)] = $v;
+                        }
+                    }
+                }
+            }
+
+            $field_array['field_value_label'] = '';
+
+            if(is_array($field->settings))
+            {
+                foreach($field->settings as $k => $v)
+                {
+                    if(substr($k, 0, 5) == 'type_')
+                    {
+                        $k = substr($k, 5);
+                    }
+
+                    if(($k == 'list' || $k == 'relationship') && isset($field_values[$field->field_name]))
+                    {
+                        $v = $field->get_list_options($field_values[$field->field_name]);
+                        $field_array['field_divider_count'] = $field->divider_count;
+                        foreach($v as $list_option)
+                        {
+                            if($list_option['selected'])
+                            {
+                                $field_array['field_value_label'] = $list_option['label'];
+                            }
+                        }
+                    }
+
+                    $field_array['field_setting_'.$k] = $v;
+                }
+            }
+
+            if(array_key_exists($field->field_name, $field_errors))
+            {
+                if(is_array($field_errors[$field->field_name]))
+                {
+                    $field_array['field_error'] = $this->EE->formslib->implode_errors_array($field_errors[$field->field_name]);
+                } else {
+                    $field_array['field_error'] = $field_errors[$field->field_name];
+                }
+            }
+
+            $field_array['field_filename'] = '';
+            $field_array['field_ext'] = '';
+            if($field->type == 'file')
+            {
+                $dir = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
+                if($field->upload_pref_id == 0 || empty($dir)) pl_show_error('The field '.$field->field_name.' has an invalid file upload directory set.');
+                
+                if($field_array['field_value'] != '')
+                {
+                    $field_array['field_value'] = $dir['url'].$field_array['field_value'];
+                }
+                
+                $info = pathinfo($field_array['field_value']);
+                if($info['filename']) $field_array['field_filename'] = $info['filename'].(isset($info['extension']) ? '.'.$info['extension'] : '');
+                if($info['filename']) $field_array['field_basename'] = $info['filename'];
+                if(isset($info['extension'])) $field_array['field_ext'] = $info['extension'];
+            }
+
+            if($driver = $field->get_driver())
+            {
+                // Field drivers should set this key to some default representation so that they will work in the
+                // default and sample templates. If this is not set, the default template will use a single input
+                // element for the field.
+                $field_array['field_driver'] = '';
+                if(method_exists($driver, 'field_tag_array'))
+                {
+                    $field_array = $driver->field_tag_array($form_obj, $form_session, $field_array, $field_values);
+                }
+            } else {
+                $field_array['field_driver'] = FALSE;
+            }
+
+            if($create_field_rows)
+            {
+                if($field->field_row != $last_field_row)
+                {
+                    $result[] = array(
+                        'fields' => array(),
+                        'row_num' => $field->field_row, );
+                    $last_field_row = $field->field_row;
+                }
+                $field_array['field_no'] = count($result[count($result)-1]['fields']) + 1;
+                $field_array['field_even'] = $field_array['field_no'] % 2 == 0 ? 'yes' : 'no';
+                $result[count($result)-1]['fields'][] = $field_array;
+                $result[count($result)-1]['fieldrow:count'] = count($result[count($result)-1]['fields']);
+                if(!isset($result[count($result)-1]['fieldrow:hidden_count']))
+                    $result[count($result)-1]['fieldrow:hidden_count'] = 0;
+                if($field_array['field_control'] == 'hidden')
+                    $result[count($result)-1]['fieldrow:hidden_count'] ++;
+            } else {
+                $field_array['field_no'] = count($result) + 1;
+                $result[] = $field_array;
+            }
+        } // foreach($form_obj->fields() as $field)
+
+        if ($this->EE->extensions->active_hook('proform_create_fields') === TRUE) 
+        {
+            $result = $this->EE->extensions->call('proform_create_fields', $this, $result, $create_field_rows); 
+        }
+
+        return $result;
+    } // create_fields_array
+
+    private function _get_placeholder($type, $default = '')
+    {
+        $result = $default;
+        if(isset($this->default_placeholders[$type]))
+        {
+            $result = $this->default_placeholders[$type];
         }
         return $result;
     }

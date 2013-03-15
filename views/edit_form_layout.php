@@ -2,7 +2,6 @@
 
 function print_hidden($field)
 {
-    // var_dump($field);
     echo '<input type="hidden" class="removeLink" value="'              . $field['remove_link']                                 . '">'.
          '<input type="hidden" name="required_'                         . $field['field_name']                                  . '" value="'.$field['is_required'].'" class="fieldRequired" />'.
          '<input type="hidden" name="form_field_id[]" value="'          . $field['form_field_id']                               . '" class="formFieldId" />'.
@@ -47,7 +46,8 @@ $alt = FALSE;
             <?php
             // echo '<ul class="fieldRow targetRow"></ul>';
             foreach($fields as $field):
-                if($field['type'] == 'hidden' OR $field['type'] == 'member_data') continue;
+                
+                if($field['type'] == 'hidden' OR $field['type'] == 'member_data' OR $field['type'] == 'calculated') continue;
 
                 if($last_field_row != $field['field_row'])
                 {

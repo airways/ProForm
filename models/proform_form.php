@@ -1,5 +1,35 @@
 <?php
 
+/**
+ * @package ProForm
+ * @author Isaac Raway <isaac.raway@gmail.com>
+ *
+ * Copyright (c)2009, 2010, 2011, 2012, 2013. Isaac Raway and MetaSushi, LLC.
+ * All rights reserved.
+ *
+ * This source is commercial software. Use of this software requires a
+ * site license for each domain it is used on. Use of this software or any
+ * of its source code without express written permission in the form of
+ * a purchased commercial or other license is prohibited.
+ *
+ * THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY
+ * KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
+ * PARTICULAR PURPOSE.
+ *
+ * As part of the license agreement for this software, all modifications
+ * to this source must be submitted to the original author for review and
+ * possible inclusion in future releases. No compensation will be provided
+ * for patches, although where possible we will attribute each contribution
+ * in file revision notes. Submitting such modifications constitutes
+ * assignment of copyright to the original author (Isaac Raway and
+ * MetaSushi, LLC) for such modifications. If you do not wish to assign
+ * copyright to the original author, your license to  use and modify this
+ * source is null and void. Use of this software constitutes your agreement
+ * to this clause.
+ *
+ **/
+ 
 class PL_Form extends PL_RowInitialized {
 
     var $__fields = FALSE;
@@ -51,6 +81,9 @@ class PL_Form extends PL_RowInitialized {
         'thank_you_message'     => 'Thank You Message',
         'extra1_label'          => 'Label for Extra 1',
         'extra2_label'          => 'Label for Extra 2',
+        'submit_label'   => 'Label for Submit Button',
+        'html_prefix'          => 'HTML Prefix',
+        'html_postfix'          => 'HTML Postfix',
     );
 
     public static $default_form_field_settings = array(
@@ -286,9 +319,59 @@ class PL_Form extends PL_RowInitialized {
                     }
                 }
             }
+            
+            $calculated_fields = &$this->calculated_fields();
+
+            if($calculated_fields)
+            {
+                foreach($calculated_fields as $calculated_field)
+                {
+                    if(!isset($this->__fields[$calculated_field['name']]))
+                    {
+                        $row = array(
+                            'field_id' => '0',
+                            'field_name' => $calculated_field['name'],
+                            'field_label' => $calculated_field['name'],
+                            'type' => 'calculated',
+                            'heading' => '',
+                            'is_required' => false,
+                            'field_row' => 0,
+                            'separator_type' => '',
+                        );
+                    
+                        $this->__fields[$calculated_field['name']] = new PL_Field($row);
+                    
+                        if(isset($calculated_field['settings']))
+                        {
+                            if(!is_array($calculated_field['settings']))
+                            {
+                                $this->__fields[$calculated_field['name']]->settings = unserialize($calculated_field['settings']);
+                            } else {
+                                $this->__fields[$calculated_field['name']]->settings = $calculated_field['settings'];
+                            }
+                        }
+                        else
+                            $this->__fields[$calculated_field['name']]->settings = array();
+
+                        $this->__fields[$calculated_field['name']]->form_field_settings = array(
+                            'preset_forced' => '',
+                            'preset_value' => '',
+                        );
+                        $this->__fields[$calculated_field['name']]->step_no = $step_no;
+                        $field_count ++;
+                    }
+                }
+            }
         }
 
         return $this->__fields;
+    }
+    
+    function calculated_fields()
+    {
+        $result = $this->EE->pl_drivers->calculated_fields($this);
+        if(!$result) $result = array();
+        return $result;
     }
 
     function db_fields()
@@ -946,10 +1029,14 @@ class PL_Form extends PL_RowInitialized {
     function get_advanced_settings_options()
     {
         $result = $this->__advanced_settings_options;
+        
+        $result = $this->__EE->pl_drivers->form_advanced_settings_options($this, $result);
+        
         if($driver = $this->get_driver())
         {
             $result = $driver->form_advanced_settings_options($this, $result);
         }
+        
         foreach($result as $k => $v)
         {
             if(is_array($v) && isset($v['form']))
