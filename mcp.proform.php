@@ -614,6 +614,13 @@ class Proform_mcp extends Prolib_base_mcp {
             $form = FALSE;
             $form_obj = new PL_Form($form);
             $form_obj->form_type = $vars['new_type'];
+            if(isset($vars['defaults']))
+            {
+                foreach($vars['defaults'] as $key => $value)
+                {
+                    $form_obj->$key = $value;
+                }
+            }
             $vars['hidden']['form_type'] = $vars['new_type'];
             $vars['editing'] = FALSE;
             $vars['new_item_url'] = FALSE;
