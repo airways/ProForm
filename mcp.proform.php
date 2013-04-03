@@ -611,7 +611,7 @@ class Proform_mcp extends Prolib_base_mcp {
             $form_obj = $form;
             
             $form_driver = $form_obj->get_driver();
-            $form_driver->edit_form($form_obj);
+            if($form_driver) $form_driver->edit_form($form_obj);
         } else {
             $form = FALSE;
             $form_obj = new PL_Form($form);
@@ -631,7 +631,7 @@ class Proform_mcp extends Prolib_base_mcp {
             $vars['special_options'] = array();
             
             $form_driver = $form_obj->get_driver();
-            $form_driver->new_form($form_obj);
+            if($form_driver) $form_driver->new_form($form_obj);
         }
 
         
@@ -870,7 +870,7 @@ class Proform_mcp extends Prolib_base_mcp {
         {
             $vars = $this->EE->extensions->call('proform_edit_form', $this, $vars);
         }
-        $vars = $form_driver->edit_form_vars($form_obj, $vars);
+        if($form_driver) $vars = $form_driver->edit_form_vars($form_obj, $vars);
         
         $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
         $vars['versions'] = $this->versions;
