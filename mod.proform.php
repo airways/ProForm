@@ -780,7 +780,7 @@ class Proform {
         $p_page         = $this->EE->TMPL->fetch_param('page');
         $page           = $p_page > 0 ? $p_page : 1;
         $limit          = $this->EE->TMPL->fetch_param('limit');
-        $p_entry_id     = $this->EE->TMPL->fetch_param('form_name');
+        $p_entry_id     = $this->EE->TMPL->fetch_param('entry_id');
 
         $orderby        = $this->EE->TMPL->fetch_param('orderby');
         $sort           = strtolower($this->EE->TMPL->fetch_param('sort'));
@@ -853,7 +853,7 @@ class Proform {
                     }*/
 
                     // add form field data
-                    $this->_add_rowdata($form_obj, $row, $row_vars);
+                    $this->EE->formslib->add_rowdata($form_obj, $row, $row_vars);
 
                     // add additional variables needed in the iteration
                     $row_vars['row:number'] = $row_i;

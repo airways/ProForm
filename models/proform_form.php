@@ -499,17 +499,17 @@ class PL_Form extends PL_RowInitialized {
             case 'form':
                 $this->__EE->db->select('*');
 
-                if(is_array($search) AND count($search) > 0)
+                if(is_array($search) && count($search) > 0)
                 {
                     $search = $this->_translate_search($search);
                     $this->__EE->db->where($search);
                 }
 
-                if($start_row >= 0 AND $limit > 0) {
+                if($start_row >= 0 && $limit > 0) {
                     $this->__EE->db->limit($limit, $start_row); // yes it is reversed compared to MySQL
                 }
 
-                if($orderby AND $sort)
+                if($orderby && $sort)
                 {
                     $this->__EE->db->order_by($orderby, $sort);
                 }
@@ -524,6 +524,7 @@ class PL_Form extends PL_RowInitialized {
                         $this->__entries[] = $row;
                     }
                 }
+                
                 return $this->__entries;
                 break;
             case 'saef':
