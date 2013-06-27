@@ -622,6 +622,16 @@ class Proform {
             if($form_obj->form_type == 'form' || $form_obj->form_type == 'share')
             {
                 $output = $this->EE->functions->form_declaration($form_details);
+                
+                if(method_exists($driver, 'form_declaration'))
+                {
+                    $output = $driver->form_declaration($form_obj, $form_details, $output);
+                }
+                
+                if ($this->EE->extensions->active_hook('form_declaration') === TRUE)
+                {
+                    $output = $this->EE->extensions->call('form_declaration', $form_obj, $form_details, $output);
+                }
             } else {
                 $this->EE->load->library('api');
                 $this->EE->api->instantiate('channel_structure');
