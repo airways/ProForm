@@ -1946,6 +1946,8 @@ class Proform {
             }
         }
         
+        $this->EE->pl_drivers->process_validation_end($form_obj, $form_session);
+        
         if ($this->EE->extensions->active_hook('proform_validation_end') === TRUE)
         {
             $this->EE->extensions->call('proform_validation_end', $this, $form_obj, $form_session);

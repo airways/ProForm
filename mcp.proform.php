@@ -646,7 +646,7 @@ class Proform_mcp extends Prolib_base_mcp {
         if(isset($form_obj) AND $form_obj) {
             if(!is_array($form_obj->settings)) $form_obj->settings = array();
             ksort($form_obj->settings);
-            $vars['settings'] = $form_obj->settings;
+            $vars['settings'] = $this->EE->pl_drivers->form_default_settings($form_obj->settings);
         } else {
             $vars['settings'] = array();
         }
