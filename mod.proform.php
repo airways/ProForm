@@ -628,6 +628,8 @@ class Proform {
                     $output = $driver->form_declaration($form_obj, $form_details, $output);
                 }
                 
+                $output = $this->EE->pl_drivers->form_declaration($form_obj, $form_details, $output);
+                
                 if ($this->EE->extensions->active_hook('form_declaration') === TRUE)
                 {
                     $output = $this->EE->extensions->call('form_declaration', $form_obj, $form_details, $output);

@@ -54,6 +54,8 @@ class Spamguard_driver extends PL_base_driver {
     );
 
     var $module_settings = array('calculated_fields_enabled');
+    
+    static $encryption_key = '#$f4sd';
 
     public function __construct()
     {
@@ -97,7 +99,23 @@ class Spamguard_driver extends PL_base_driver {
         if($form_model->ini('spamguard_honeypot_enabled', 'on'))
         {
             $field_name = $form_model->ini('spamguard_honeypot_name', PF_SPAMGUARD_DEFAULT_HONEYPOT);
+            if($field_name)
+            {
+                $output .= form_input($field_name, '');
+            }
+        }
+        
+        if($form_model->ini('spamguard_js_enabled', 'on'))
+        {
+            $ops = array('*', '/', '-', '+', '%');
+            $js_config = array(
+                'param1' => rand(1,1000),
+                'param2' => rand(1,1000),
+                'method' => $ops[rand(0,4)],
+            );
             
+            $output .= form_hidden('js_encode', $this->encrypt(base64_encode(serialize($js_config)), md5(self::$encryption_key)));
+            $output .= '<script>document.getElementByid("js_result").value = ('.$js_config['param1'].$js_config['method'].$js_config['param2'].');</script>';
         }
     }
     
@@ -119,7 +137,17 @@ class Spamguard_driver extends PL_base_driver {
             
             if($this->EE->input->get_post($field_name))
             {
-                return $this->throw_error($form_model, $form_session);
+                $js_config = $this->input->get_post('js_encode');
+                if($js_config) $js_config = $this->decrypt($js_config, this::$encryption_key);
+                if($js_config) $js_config = unserialize(base64_decode($js_config, md5(self::$encryption_key)));
+                if($js_config && is_array($js_config))
+                {
+                    $result = eval('('.$js_config['param1'].$js_config['method'].$js_config['param2'].')');
+                    if($this->input->get_post('js_result') != $result)
+                    {
+                        $this->throw_error($form_model, $form_session);
+                    }
+                }
             }
         }
                 
@@ -142,6 +170,24 @@ class Spamguard_driver extends PL_base_driver {
                 $form_session->add_error('', $form_session->lang('spamguard_validation_error'));
                 break;
         }
+    }
+    
+    private function encrypt($str, $key)
+    {
+        $block = mcrypt_get_block_size('des', 'ecb');
+        $pad = $block - (strlen($str) % $block);
+        $str .= str_repeat(chr($pad), $pad);
+        
+        return mcrypt_encrypt(MCRYPT_DES, $key, $str, MCRYPT_MODE_ECB);
+    }
+    
+    function decrypt($str, $key)
+    {   
+        $str = mcrypt_decrypt(MCRYPT_DES, $key, $str, MCRYPT_MODE_ECB);
+        
+        $block = mcrypt_get_block_size('des', 'ecb');
+        $pad = ord($str[($len = strlen($str)) - 1]);
+        return substr($str, 0, strlen($str) - $pad);
     }
     
 }
