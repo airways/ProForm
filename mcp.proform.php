@@ -922,8 +922,8 @@ class Proform_mcp extends Prolib_base_mcp {
                 'show_in_listing'        => $this->EE->input->post('field_show_in_listing'),
                 'placeholder'   => $this->EE->input->post('field_placeholder'),
             );
-            // var_dump($this->EE->input->post('field_show_in_listing'));exit;
-            $form->set_all_form_field_settings($this->EE->input->post('field_order'), $settings_map);
+            
+            $form->set_all_form_field_settings($this->EE->input->post('form_field_id'), $settings_map);
         }
 
         // process adding a field
