@@ -67,7 +67,7 @@ class PL_Field extends PL_RowInitialized
     var $upload_pref_id = FALSE;
     var $mailinglist_id = FALSE;
     var $settings = array();
-    var $reusable = 'n';
+    var $reusable = 'y';
 
     function __construct($row=array(), &$mgr=NULL)
     {

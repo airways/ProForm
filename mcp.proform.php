@@ -646,7 +646,7 @@ class Proform_mcp extends Prolib_base_mcp {
         if(isset($form_obj) AND $form_obj) {
             if(!is_array($form_obj->settings)) $form_obj->settings = array();
             ksort($form_obj->settings);
-            $vars['settings'] = $form_obj->settings;
+            $vars['settings'] = $this->EE->pl_drivers->form_default_settings($form_obj->settings);
         } else {
             $vars['settings'] = array();
         }
@@ -922,8 +922,8 @@ class Proform_mcp extends Prolib_base_mcp {
                 'show_in_listing'        => $this->EE->input->post('field_show_in_listing'),
                 'placeholder'   => $this->EE->input->post('field_placeholder'),
             );
-            // var_dump($this->EE->input->post('field_show_in_listing'));exit;
-            $form->set_all_form_field_settings($this->EE->input->post('field_order'), $settings_map);
+            
+            $form->set_all_form_field_settings($this->EE->input->post('form_field_id'), $settings_map);
         }
 
         // process adding a field

@@ -38,6 +38,20 @@ class PL_FormSession
     var $current_step = 1;
 
     /**
+     * Try to return a language string as set by the user through the form tag,
+     * otherwise just get it from the normal lang() system.
+     */
+    function lang($key)
+    {
+        if(isset($this->config['error_messages'][$key]))
+        {
+            return $this->config['error_messages'][$key];
+        } else {
+            return lang($key);
+        }
+    }
+    
+    /**
      * Add an error message for a given field
      *
      * @param $field_name - field to add error for

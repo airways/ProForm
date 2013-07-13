@@ -622,6 +622,18 @@ class Proform {
             if($form_obj->form_type == 'form' || $form_obj->form_type == 'share')
             {
                 $output = $this->EE->functions->form_declaration($form_details);
+                
+                if(method_exists($driver, 'form_declaration'))
+                {
+                    $output = $driver->form_declaration($form_obj, $form_details, $output);
+                }
+                
+                $output = $this->EE->pl_drivers->form_declaration($form_obj, $form_details, $output);
+                
+                if ($this->EE->extensions->active_hook('form_declaration') === TRUE)
+                {
+                    $output = $this->EE->extensions->call('form_declaration', $form_obj, $form_details, $output);
+                }
             } else {
                 $this->EE->load->library('api');
                 $this->EE->api->instantiate('channel_structure');
@@ -780,7 +792,7 @@ class Proform {
         $p_page         = $this->EE->TMPL->fetch_param('page');
         $page           = $p_page > 0 ? $p_page : 1;
         $limit          = $this->EE->TMPL->fetch_param('limit');
-        $p_entry_id     = $this->EE->TMPL->fetch_param('form_name');
+        $p_entry_id     = $this->EE->TMPL->fetch_param('entry_id');
 
         $orderby        = $this->EE->TMPL->fetch_param('orderby');
         $sort           = strtolower($this->EE->TMPL->fetch_param('sort'));
@@ -853,7 +865,7 @@ class Proform {
                     }*/
 
                     // add form field data
-                    $this->_add_rowdata($form_obj, $row, $row_vars);
+                    $this->EE->formslib->add_rowdata($form_obj, $row, $row_vars);
 
                     // add additional variables needed in the iteration
                     $row_vars['row:number'] = $row_i;
@@ -1933,6 +1945,8 @@ class Proform {
                 $driver->process_validation_end($form_obj, $form_session);
             }
         }
+        
+        $this->EE->pl_drivers->process_validation_end($form_obj, $form_session);
         
         if ($this->EE->extensions->active_hook('proform_validation_end') === TRUE)
         {

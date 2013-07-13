@@ -344,7 +344,8 @@ Form Layout
 Form Layout > Fields
 ------------------------------------------------------------------------ */
 
-.form-layout li.STEP {
+.form-layout li.STEP,
+.form-layout li.HTML {
     background: #e2edf4;
 }
 

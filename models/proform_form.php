@@ -305,17 +305,21 @@ class PL_Form extends PL_RowInitialized {
                         $this->__fields['sep_'.$row->form_field_id] = new PL_Field($row);
                         $this->__fields['sep_'.$row->form_field_id]->step_no = $step_no;
                         $this->__fields['sep_'.$row->form_field_id]->settings = array();
-                        $this->__fields['sep_'.$row->form_field_id]->form_field_settings = array(
-                            'label' => '',
-                            'preset_value' => '',
-                            'preset_forced' => '',
-                            'html_id' => '',
-                            'html_class' => '',
-                            'extra1' => '',
-                            'extra2' => '',
-                            'placeholder' => '',
-                            'show_in_listing' => 'n',
-                        );
+                        $this->__fields['sep_'.$row->form_field_id]->form_field_settings = @unserialize($row->form_field_settings);
+                        if(!$this->__fields['sep_'.$row->form_field_id]->form_field_settings)
+                        {
+                            $this->__fields['sep_'.$row->form_field_id]->form_field_settings = array(
+                                'label' => '',
+                                'preset_value' => '',
+                                'preset_forced' => '',
+                                'html_id' => '',
+                                'html_class' => '',
+                                'extra1' => '',
+                                'extra2' => '',
+                                'placeholder' => '',
+                                'show_in_listing' => 'n',
+                            );
+                        }
                     }
                 }
             }
@@ -431,37 +435,39 @@ class PL_Form extends PL_RowInitialized {
         return NULL;
     }
 
-    function set_all_form_field_settings($field_order, $settings_map)
+    function set_all_form_field_settings($form_fields_ids, $settings_map)
     {
-        // if needed, load fields for this form
-        if(!$this->__fields)
+        $query = $this->__EE->db->where('form_id', $this->form_id)
+                                ->select('form_field_id, form_field_settings')
+                                ->get('proform_form_fields');
+        
+        $all_settings = array();
+        foreach($query->result() as $row)
         {
-            $this->fields();
+            $all_settings[$row->form_field_id] = @unserialize($row->form_field_settings);
+            if(!$all_settings[$row->form_field_id]) $all_settings[$row->form_field_id] = array();
         }
 
-        // var_dump($field_order, $settings_map);exit;
-
-        // loop over all fields provided and save their settings
-        foreach($field_order as $i => $field_id)
+        foreach($form_fields_ids as $i => $form_field_id)
         {
-            //$field = $this->__fields[$field_id];
-            $field = &$this->get_field($field_id);
-
+            $form_field_settings = $all_settings[$form_field_id];
+            
             foreach($settings_map as $setting => $values)
             {
                 if(isset($values[$i]))
                 {
-                    $field->form_field_settings[$setting] = $values[$i];
+                    $form_field_settings[$setting] = $values[$i];
                 }
             }
-
+            
             $data = array(
-                'form_field_settings' => serialize($field->form_field_settings)
+                'form_field_settings' => serialize($form_field_settings)
             );
 
-            $this->__EE->db->where(array('field_id' => $field_id, 'form_id' => $this->form_id))
+            $this->__EE->db->where(array('form_field_id' => $form_field_id, 'form_id' => $this->form_id))
                            ->update('proform_form_fields', $data);
         }
+        
     } // function set_all_form_field_settings()
 
     function count_entries($search=array())
@@ -499,17 +505,17 @@ class PL_Form extends PL_RowInitialized {
             case 'form':
                 $this->__EE->db->select('*');
 
-                if(is_array($search) AND count($search) > 0)
+                if(is_array($search) && count($search) > 0)
                 {
                     $search = $this->_translate_search($search);
                     $this->__EE->db->where($search);
                 }
 
-                if($start_row >= 0 AND $limit > 0) {
+                if($start_row >= 0 && $limit > 0) {
                     $this->__EE->db->limit($limit, $start_row); // yes it is reversed compared to MySQL
                 }
 
-                if($orderby AND $sort)
+                if($orderby && $sort)
                 {
                     $this->__EE->db->order_by($orderby, $sort);
                 }
@@ -524,6 +530,7 @@ class PL_Form extends PL_RowInitialized {
                         $this->__entries[] = $row;
                     }
                 }
+                
                 return $this->__entries;
                 break;
             case 'saef':
