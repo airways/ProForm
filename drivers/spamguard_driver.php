@@ -67,13 +67,13 @@ class Spamguard_driver extends PL_base_driver {
     
     var $default_form_settings = array(
         'spamguard' => '',
-        'spamguard_error_mode' => 'on',
+        'spamguard_error_mode' => 'off',
         'spamguard_ban_enabled' => 'off',
-        'spamguard_honeypot_enabled' => 'on',
+        'spamguard_honeypot_enabled' => 'off',
         'spamguard_honeypot_label' => 'Account Numbers',
         'spamguard_honeypot_name' => 'account_numbers',
-        'spamguard_js_enabled' => 'on',
-        'spamguard_hash_enabled' => 'on',
+        'spamguard_js_enabled' => 'off',
+        'spamguard_hash_enabled' => 'off',
         'spamguard_field_permutate_enabled' => 'off',
     );
 
@@ -104,6 +104,7 @@ class Spamguard_driver extends PL_base_driver {
     
     public function form_default_settings($settings)
     {
+        /*
         foreach($this->default_form_settings as $key => $default)
         {
             if(!isset($settings[$key]))
@@ -111,6 +112,7 @@ class Spamguard_driver extends PL_base_driver {
                 $settings[$key] = $default;
             }
         }
+        */
         return $settings;
     }
     
@@ -122,13 +124,13 @@ class Spamguard_driver extends PL_base_driver {
             'form' => array(
                 'spamguard' => array('hidden', ''),
                 'spamguard_error_mode' => array('dropdown', array('exit' => 'Exit Immediately', 'validation_error' => 'Return Validation Error')),
-                'spamguard_ban_enabled' => array('dropdown', array('on' => 'On', '' => 'Off')),
+                //'spamguard_ban_enabled' => array('dropdown', array('on' => 'On', '' => 'Off')),
                 'spamguard_honeypot_enabled' => array('dropdown', array('on' => 'On', '' => 'Off')),
                 'spamguard_honeypot_label' => array('text', ''),
                 'spamguard_honeypot_name' => array('text', ''),
                 'spamguard_js_enabled' => array('dropdown', array('on' => 'On', '' => 'Off')),
-                'spamguard_hash_enabled' => array('dropdown', array('on' => 'On', '' => 'Off')),
-                'spamguard_field_permutate_enabled' => array('dropdown', array('on' => 'On', '' => 'Off')),
+                //'spamguard_hash_enabled' => array('dropdown', array('on' => 'On', '' => 'Off')),
+                //'spamguard_field_permutate_enabled' => array('dropdown', array('on' => 'On', '' => 'Off')),
             )
         );
         
@@ -137,7 +139,9 @@ class Spamguard_driver extends PL_base_driver {
     
     public function form_declaration($form_model, $form_details, $output)
     {
-        if($form_model->ini('spamguard_honeypot_enabled', 'on'))
+        $guard_count = 0;
+        
+        if($form_model->ini('spamguard_honeypot_enabled', 'off') == 'on')
         {
             $field_name = $form_model->ini('spamguard_honeypot_name', 'foo');
             $field_label = $form_model->ini('spamguard_honeypot_name', 'Foo');
@@ -145,9 +149,10 @@ class Spamguard_driver extends PL_base_driver {
             {
                 $output .= '<div style="display: none;"><label>'.$field_label.' '.form_input($field_name, '').'</label></div>';
             }
+            $guard_count++;
         }
         
-        if($form_model->ini('spamguard_js_enabled', 'on'))
+        if($form_model->ini('spamguard_js_enabled', 'off') == 'on')
         {
             $ops = array('*', '-', '+');
             $js_config = array(
@@ -160,6 +165,7 @@ class Spamguard_driver extends PL_base_driver {
             $output .= form_hidden('js_encode', base64_encode(serialize(array($code, md5($code.self::$encryption_key)))));
             $output .= '<input type="hidden" id="js_result" name="js_result" value="'.rand(1,1000).'" />';
             $output .= '<script>setTimeout(\'document.getElementById("js_result").value = ('.$js_config['param1'].$js_config['method'].$js_config['param2'].');\', 10);</script>';
+            $guard_count++;
         }
         
         return $output;
@@ -167,16 +173,19 @@ class Spamguard_driver extends PL_base_driver {
     
     public function process_validation_end($form_model, $form_session)
     {
-        if($form_model->ini('spamguard_honeypot_enabled', 'on'))
+        $guard_count = 0;
+        
+        if($form_model->ini('spamguard_honeypot_enabled', 'off') == 'on')
         {
             $field_name = $form_model->ini('spamguard_honeypot_name', 'foo');
             if($this->EE->input->get_post($field_name))
             {
                 return $this->throw_error($form_model, $form_session);
             }
+            $guard_count++;
         }
         
-        if($form_model->ini('spamguard_js_enabled', 'on'))
+        if($form_model->ini('spamguard_js_enabled', 'off') == 'on')
         {
             $field_name = $form_model->ini('spamguard_js_enabled', 'on');
             
@@ -201,6 +210,7 @@ class Spamguard_driver extends PL_base_driver {
             } else {
                 $this->throw_error($form_model, $form_session);
             }
+            $guard_count++;
         }
     }
     
