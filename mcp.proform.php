@@ -1313,6 +1313,13 @@ class Proform_mcp extends Prolib_base_mcp {
         $this->_run_validation('edit_field');
 
         $data = array();
+
+        if($this->EE->input->post('type') == 'file')
+        {
+            $_POST['upload_pref_id'] = $this->EE->input->post('type_upload_pref_id');
+        }
+        unset($_POST['type_upload_pref_id']);
+        
         $this->prolib->copy_post($data, "PL_Field");
         unset($data['form_field_settings']);
 
@@ -1327,7 +1334,7 @@ class Proform_mcp extends Prolib_base_mcp {
         if($this->EE->input->post('type_member_data') && $this->EE->input->post($k))
             $settings['type_member_data'] = $this->EE->input->post('type_member_data');
         */
-
+        
         // Copy type specific settings
         foreach($_POST as $k => $junk)
         {
