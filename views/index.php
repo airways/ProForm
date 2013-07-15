@@ -100,19 +100,32 @@
                 );
         }
     else:
+        $no_forms = lang('no_forms');
         $this->table->add_row(array(
-            'data'      => '<div class="no_items_msg">' . lang('no_forms') . '</div>',
+            'data'      => '<div class="no_items_msg"><p>'.lang('no_forms').'</p></div>',
             'colspan'   => 3,
         ));
     endif;
 
     echo $this->table->generate();
-
-if($pagination):
     ?>
 
+<?php if($show_quickstart_on == 'y'): ?>
+    <div class="info">
+        <p><strong>Quick Start:</strong> To get started follow these quick steps:</p>
+        <p>1. Create a new form above with the Create a Form menu above. (User Guide: <a href="http://metasushi.com/documentation/proform/cp/forms.html#create_form" target="_blank">Create Form</a>)</p>
+        <p>2. Click the Edit Layout link for the form, then add fields to it using the Toolbox (User Guide: <a href="http://metasushi.com/documentation/proform/cp/forms.html#layout" target="_blank">Form Layout</a>)</p>
+        <p>3. Insert the simple template tag into a template, using the Form Name value generated for your form (User Guide: <a href="http://metasushi.com/documentation/proform/tags/form.html#simple" target="_blank">Sime Form Tag</a>)<br/><br/>
+            <pre>
+                {exp:proform:simple form="name_of_form"}
+            </pre>
+        </p>
+        <p>That's all there is to it!</p>
+        <p>(You can hide this message on the <a href="<?php echo TAB_ACTION.'method=module_settings'; ?>">Module Settings</a> page.</p>
+    </div>
+<?php endif; ?>
+<?php if($pagination): ?>
     <div class="tableFooter">
-
         <span class="pagination"><?php echo $pagination; ?></span>
     </div>
     <?php

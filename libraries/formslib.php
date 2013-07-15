@@ -49,6 +49,7 @@ class Formslib
 
     var $default_prefs = array(
         'license_key' => '',
+        'show_quickstart_on' => 'y',
         'notification_template_group' => 'notifications',
         'from_address' => '',
         'from_name' => '',

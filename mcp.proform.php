@@ -325,6 +325,7 @@ class Proform_mcp extends Prolib_base_mcp {
         {
             $vars = $this->EE->extensions->call('proform_index', $this, $vars);
         }
+        $vars['show_quickstart_on'] = $this->EE->formslib->prefs->ini('show_quickstart_on', 'y');
         $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
         $vars['versions'] = $this->versions;
         return $this->EE->load->view('index', $vars, TRUE);
@@ -367,6 +368,7 @@ class Proform_mcp extends Prolib_base_mcp {
         $advanced_keys = array_keys($this->EE->formslib->__advanced_settings_options);
         $default_keys = array_keys($this->EE->formslib->default_prefs);
 
+        $yes_no_options = array('y' => 'Yes', 'n' => 'No');
         foreach($prefs as $pref => $value)
         {
             if(!in_array($pref, $default_keys))
@@ -389,6 +391,9 @@ class Proform_mcp extends Prolib_base_mcp {
                     case 'pref_safecracker_field_group_id':
                         $groups = $this->EE->formslib->get_field_group_options();
                         $control = form_dropdown($f_name, $groups, $value);
+                        break;
+                    case 'pref_show_quickstart_on':
+                        $control = form_dropdown($f_name, $yes_no_options, $value);
                         break;
                     default:
                         $control = form_input($f_name, $value);
@@ -438,6 +443,9 @@ class Proform_mcp extends Prolib_base_mcp {
                     {
                         case 'pref_safecracker_integration_on':
                         case 'pref_safecracker_separate_channels_on':
+                            $this->EE->formslib->prefs->set($pref, 'n');
+                                break;
+                       case 'pref_show_quickstart_on':
                             $this->EE->formslib->prefs->set($pref, 'n');
                                 break;
                         default:
