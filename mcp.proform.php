@@ -77,7 +77,7 @@ class Proform_mcp extends Prolib_base_mcp {
     {
 
         prolib($this, 'proform');
-
+        
         // Override the view class so we can inject HTML into our titles and
         // not have it show up in the <title> tag
         $this->EE->view = new PF_View($this->EE->view);
@@ -88,6 +88,7 @@ class Proform_mcp extends Prolib_base_mcp {
                 'home' => TAB_ACTION,
                 'list_fields' => TAB_ACTION.'method=list_fields',
                 'list_drivers' => TAB_ACTION.'method=list_drivers',
+                'maintenance' => TAB_ACTION.'method=maintenance',
                 'module_settings' => TAB_ACTION.'method=module_settings',
                 ));
 
@@ -235,9 +236,9 @@ class Proform_mcp extends Prolib_base_mcp {
         $this->EE->load->library('formslib');
         $this->EE->load->helper('form');
 
-        $this->EE->cp->set_variable('cp_page_title', $this->EE->lang->line('proform_module_name'));
-
         $this->sub_page('tab_forms');
+        
+        $this->EE->view->cp_page_title = $this->EE->lang->line('proform_module_name');
 
         //$vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_form';
         $vars['form_hidden'] = NULL;
@@ -496,6 +497,120 @@ class Proform_mcp extends Prolib_base_mcp {
             $this->EE->extensions->call('proform_process_module_settings', $this);
         }
         return TRUE;
+    }
+    
+    function maintenance()
+    {
+        $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
+        $vars['versions'] = $this->versions;
+        return $this->EE->load->view('maintenance', $vars, TRUE);
+    }
+    
+    function maint_export_forms()
+    {
+        if($this->EE->input->post('form_id') !== FALSE)
+        {
+            list($messages, $refresh) = $this->process_maint_export_forms();
+        } else {
+            $messages = array();
+            $refresh = '';
+        }
+        
+        $vars = array(
+            'action_url' => 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=maint_export_forms',
+            'messages' => $messages,
+            'refresh' => $refresh,
+            'forms' => $this->EE->formslib->forms->get_all()
+        );
+        return $this->EE->load->view('maint_export_forms', $vars, TRUE);
+    }
+    
+    function process_maint_export_forms()
+    {
+        $messages = array();
+        $form_ids = array_keys($this->EE->input->post('form_id'));
+        $selected_forms = array();
+        $all_forms = $this->EE->formslib->forms->get_all();
+        
+        foreach($all_forms as $form)
+        {
+            if(!in_array($form->form_id, $form_ids)) continue;
+            $form->fields();
+            $selected_forms[] = $form;
+        }
+        
+        $raw = array();
+        
+        $query = $this->EE->db->where_in('form_id', $form_ids)->get('exp_proform_forms');
+        $raw['exp_forms'] = $query->result();
+
+        $query = $this->EE->db->get('exp_proform_fields');
+        $raw['exp_fields'] = $query->result();
+
+        $query = $this->EE->db->where_in('form_id', $form_ids)->get('exp_proform_form_fields');
+        $raw['exp_form_fields'] = $query->result();
+
+        $query = $this->EE->db->get('exp_proform_preferences');
+        $raw['exp_preferences'] = $query->result();
+        
+        $output = array(
+            '_prolib' => $this->prolib,
+            '_formslib' => $this->EE->formslib,
+            '_EE' => $this->EE,
+            'preferences' => $this->EE->formslib->prefs->get_preferences(),
+            'forms' => $selected_forms,
+            'raw' => $raw,
+        );
+        
+        $xml = $this->EE->pl_parser->array_to_xml_doc($output, 'nodes', 'node', array('EE', 'CI', '__EE', '__CI', 'lang', 'member_data', 'member_field_options', 'encryption_key', 'smtp_pass', 'password', 'salt', 'jquery_code_for_compile', 'jquery_code_for_load', 'prolib'));
+        
+        $date = date('Y-m-d');
+        $id = rand(1,100000);
+        $file = APPPATH.'cache/proform-export-'.$date.'_'.$id.'.xml';
+        
+        file_put_contents($file, $xml);
+        
+        if(!file_exists($file))
+        {
+            $messages[] = 'Error: Could not export XML dump to cache directory! Please ensure the cache directory is writable. Tried to write to '.$file;
+            $refresh = '';
+        } else {
+            $refresh = ACTION_BASE.AMP.'method=maint_download_export'.AMP.'date='.$date.AMP.'id='.$id;
+            $messages[] = 'Success! XML export has been created. The <a href="'.$refresh.'">download</a> should start in a moment or you can get the file through SFTP here: '.$file;
+            
+        }
+        
+        return array($messages, $refresh);
+    }
+    
+    function maint_download_export()
+    {
+        $date = $this->EE->input->get('date');
+        $date = preg_replace("/[^A-Za-z0-9\-]/", '', $date);
+        $id = (int)$this->EE->input->get('id');
+        
+        $file = APPPATH.'cache/proform-export-'.$date.'_'.$id.'.xml';
+        
+        if(!file_exists($file))
+        {
+            header('Location: '.ACTION_BASE.AMP.'method=maint_export_Forms');
+            exit;
+        }
+        
+        $xml = file_get_contents($file);
+        $length = strlen($xml);
+        
+        header('Content-Disposition: attachment; filename=proform-export-'.$date.'_'.$id.'.xml');
+        header('Content-Type: text/xml');
+        header('Content-Length: '.$length);
+        
+        echo $xml;
+        exit;
+        
+    }
+    
+    function process_import()
+    {
     }
     
     function version_check()
@@ -2610,7 +2725,7 @@ class Proform_mcp extends Prolib_base_mcp {
     function sub_page($page, $added_title = '')
     {
         $this->EE->cp->set_breadcrumb(ACTION_BASE.AMP.'module=proform'.AMP, $this->EE->lang->line('proform_module_name'));
-        $this->EE->cp->set_variable('cp_page_title', lang('proform_title') . ' ' . lang($page) . ($added_title != '' ? ' - ' . $added_title : ''));
+        $this->EE->view->cp_page_title = lang('proform_title') . ' ' . lang($page) . ($added_title != '' ? ' - ' . $added_title : '');
 
     }
 

@@ -69,9 +69,10 @@ $lang = array(
     'delete_selected' => 'Delete Selected',
 
     // Buttons
-    'home' => 'Home',
+    'home' => 'Forms',
     'module_settings' => 'Module Settings',
     'list_drivers' => 'Drivers',
+    'maintenance' => 'Maintenance',
     'new_form' => 'Create New Contact Form',
     'new_saef' => 'Create New SAEF Form',
     'new_share' => 'Create New Share Form',

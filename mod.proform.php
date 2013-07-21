@@ -70,6 +70,8 @@ class Proform {
         prolib($this, 'proform');
 
         $this->EE->load->library('formslib');
+        $this->EE->load->helper('string');
+        
         $this->var_pairs = $this->EE->formslib->var_pairs;
 
         $this->EE->db->cache_off();
@@ -211,7 +213,7 @@ class Proform {
         $dashes_in_class    = $this->EE->TMPL->fetch_param('dashes_in_class', 'no') == 'yes';
         $form_id            = $this->EE->TMPL->fetch_param('form_id', str_replace('_', $dashes_in_id ? '-' : '_', $form_name . '_proform'));
         $form_class         = $this->EE->TMPL->fetch_param('form_class', str_replace('_', $dashes_in_class ? '-' : '_', $form_name . '_proform'));
-        $form_url           = $this->EE->TMPL->fetch_param('form_url', $this->EE->functions->remove_double_slashes($_SERVER['REQUEST_URI']));
+        $form_url           = $this->EE->TMPL->fetch_param('form_url', reduce_double_slashes($_SERVER['REQUEST_URI']));
         $error_url          = $this->EE->TMPL->fetch_param('error_url', $form_url);
         $thank_you_url      = $this->EE->TMPL->fetch_param('thank_you_url',  $form_url);
         $p_404_url          = $this->EE->TMPL->fetch_param('404_url',  '');
@@ -420,7 +422,7 @@ class Proform {
                 $base_url = $form_session->config['form_url'];
 
                 $form_details = array(
-                        'action'            => $this->EE->functions->remove_double_slashes($base_url),
+                        'action'            => reduce_double_slashes($base_url),
                         'name'              => $form_name,
                         'id'                => $form_obj->ini('html_id', $form_id),
                         'class'             => $form_obj->ini('html_class', $form_class),
