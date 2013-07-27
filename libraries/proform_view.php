@@ -33,6 +33,7 @@
 class PF_View extends View {
     public function __construct(View $view)
     {
+        if(!isset($this->EE)) $this->EE = &get_instance();
         $this->set_cp_theme($view->_theme);
     }
     
