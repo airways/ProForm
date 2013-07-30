@@ -1,10 +1,10 @@
-<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
  * @package ProForm
- * @author Isaac Raway (MetaSushi, LLC) <airways@mm.st>
+ * @author Isaac Raway <isaac.raway@gmail.com>
  *
- * Copyright (c)2009, 2010, 2011, 2012, 2013. Isaac Raway and MetaSushi, LLC.
+ * Copyright (c)2009, 2010, 2011. Isaac Raway and MetaSushi, LLC.
  * All rights reserved.
  *
  * This source is commercial software. Use of this software requires a
@@ -28,17 +28,24 @@
  * source is null and void. Use of this software constitutes your agreement
  * to this clause.
  *
- **/
+ **/ ?>
 
-class PF_View extends View {
-    public function __construct(View $view)
-    {
-        if(!isset($this->EE)) $this->EE = &get_instance();
-        $this->set_cp_theme($view->_theme);
-    }
-    
-    public function head_title($title)
-    {
-        return parent::head_title(strip_tags($title));
-    }
-}
+<h2>Maintanance Tasks</h2><br/>
+<div class="warning">
+    <p>You should only use these functions if you have been asked to do so by a MetaSushi, LLC support agent.</p>
+</div>
+
+<h3>Export</h3>
+<p>You can export your form configuration from ProForm to assist with debugging.</p>
+<div>
+    <span class="button content-btn"><a class="submit" href="<?php echo ACTION_BASE.AMP.'method=maint_export_forms'; ?>">Export Forms &amp; Fields</a></span>
+</div>
+
+<?php /*
+
+<p>You can export form data from ProForm to assist with debugging.</p>
+<div>
+    <span class="button content-btn"><a class="submit" href="<?php echo ACTION_BASE.AMP.'method=maint_export_forms'; ?>">Export Form Data</a></span>
+</div>
+
+*/ ?>

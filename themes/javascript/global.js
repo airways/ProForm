@@ -188,7 +188,11 @@ var proform_mod = {
         $('input[name=active_tabs]').val(active_tabs);
     },
     make_name: function(s) {
-        return s.toLowerCase().replace(' ', '_').replace(/[^a-zA-Z0-9]+/g, '_');
+        var r = s.toLowerCase();
+        r = r.replace(' ', '_');
+        r = r.replace(/['".,`!?]+/g, '');
+        r = r.replace(/[^a-zA-Z0-9]+/g, '_');
+        return r;
     },
     sort_select: function($dd) {
         // Source: http://rickyrosario.com/blog/sorting-dropdown-select-options-using-jquery/

@@ -69,9 +69,10 @@ $lang = array(
     'delete_selected' => 'Delete Selected',
 
     // Buttons
-    'home' => 'Home',
+    'home' => 'Forms',
     'module_settings' => 'Module Settings',
     'list_drivers' => 'Drivers',
+    'maintenance' => 'Maintenance',
     'new_form' => 'Create New Contact Form',
     'new_saef' => 'Create New SAEF Form',
     'new_share' => 'Create New Share Form',
@@ -241,7 +242,9 @@ $lang = array(
     'field_pref_safecracker_integration_on_desc' => 'Enable SafeCracker Integration to allow form data to be saved into entries',
     'field_pref_safecracker_field_group_id' => 'SafeCracker: Field Group',
     'field_pref_safecracker_separate_channels_on' => 'SafeCracker: Separate Channel Per Form',
-
+    'field_pref_show_quickstart_on' => 'Show Quick Start',
+    'field_pref_show_quickstart_on_desc' => 'Turns on the Quick Start box displayed under the list of forms on the main page of ProForm',
+    
 
     'field_form_entry_id' => 'Entry ID',
     'field_updated' => 'Updated',
