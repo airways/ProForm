@@ -1900,7 +1900,7 @@ class Proform {
 
                 $validation_rules[] = array(
                     'field' => $field->field_name,
-                    'label' => $field->field_label,
+                    'label' => $field->get_form_field_setting('label', $field->field_label),
                     'rules' => $checked_rules
                 );
             }
