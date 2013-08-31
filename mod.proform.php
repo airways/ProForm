@@ -1924,6 +1924,7 @@ class Proform {
 
 
         // send the compiled rules on to the validation class
+//		echo "<pre>"; var_dump($validation_rules); echo "</pre>";
         $this->EE->pl_validation->set_rules($validation_rules);
 
         // set custom error messages as provided on the form tag
