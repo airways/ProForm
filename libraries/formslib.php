@@ -286,7 +286,7 @@ class Formslib
     }
     
     public function create_fields_array($form_obj, $form_session = FALSE, $field_errors = array(), $field_values = array(),
-                                         $field_checked_flags = array(), $create_field_rows = TRUE, $hidden = -1)
+                                         $field_checked_flags = array(), $create_field_rows = TRUE, $hidden = TRUE)
     {
 
         if(is_object($field_values))
@@ -308,23 +308,21 @@ class Formslib
             if(
                 $form_session && $field->step_no != $form_session->config['step']
                 && !($form_session->config['last_step_summary'] && $form_session->config['step'] == $form_obj->get_step_count())
+                && $field->get_control() != 'hidden'
             ) continue;
 
-            if($hidden !== -1)
-            {
-                if($field->get_control() == 'hidden')
-                {
-                    // it is hidden but we do not want hidden, skip it
-                    if(!$hidden) {
-                        continue;
-                    }
-                } else {
-                    // it is not hidden and we want only hidden, skip it
-                    if($hidden) {
-                        continue;
-                    }
-                }
-            }
+			if($field->get_control() == 'hidden')
+			{
+				// it is hidden but we do not want hidden, skip it
+				if(!$hidden) {
+					continue;
+				}
+			} else {
+				// it is not hidden and we want only hidden, skip it
+				if($hidden) {
+					continue;
+				}
+			}
 
             // handle normal posted fields
             $is_required = $field->is_required == 'y';

@@ -1749,6 +1749,8 @@ class Proform {
             list($form_obj, $form_session) = $this->EE->extensions->call('proform_validation_start', $this, $form_obj, $form_session);
         }
 
+		$step_count = $form_obj->get_step_count();
+        
         // override delimiter values from form configuration
         $this->EE->pl_validation->set_error_delimiters($form_session->config['error_delimiters'][0], $form_session->config['error_delimiters'][1]);
 
@@ -1837,8 +1839,9 @@ class Proform {
                     $form_session->add_error($field->field_name, $error);
                 }
             }
-
-            if($field->type != 'file')
+            else if($field->type != 'file' && $field->type != 'hidden'
+            		|| ($field->type == 'hidden' && $form_session->config['step'] == $step_count 
+            			&& $this->EE->input->get_post('_pf_finish')) )  
             {
                 $checked_rules = '';
 
