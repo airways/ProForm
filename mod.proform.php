@@ -1801,8 +1801,13 @@ class Proform {
                     $multi = TRUE;
 
                     $valid = TRUE;
-                    if($form_session->values[$field->field_name])
+                    if(isset($form_session->values[$field->field_name]))
                     {
+                        if(!is_array($form_session->values[$field->field_name]))
+                        {
+                            $form_session->values[$field->field_name] = array($form_session->values[$field->field_name]);
+                        }
+			            
                         foreach($form_session->values[$field->field_name] as $selected_option)
                         {
                             $value_count++;
