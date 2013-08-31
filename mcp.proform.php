@@ -235,11 +235,11 @@ class Proform_mcp extends Prolib_base_mcp {
         $this->EE->load->library('table');
         $this->EE->load->library('formslib');
         $this->EE->load->helper('form');
-
+        
         $this->sub_page('tab_forms');
         
-        $this->EE->view->cp_page_title = $this->EE->lang->line('proform_module_name');
-
+        $this->set_page_title('proform_module_name');
+        
         //$vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_form';
         $vars['form_hidden'] = NULL;
         $vars['forms'] = array();
@@ -501,6 +501,7 @@ class Proform_mcp extends Prolib_base_mcp {
     
     function maintenance()
     {
+        $this->sub_page('maintenance');
         $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
         $vars['versions'] = $this->versions;
         return $this->EE->load->view('maintenance', $vars, TRUE);
@@ -2725,8 +2726,17 @@ class Proform_mcp extends Prolib_base_mcp {
     function sub_page($page, $added_title = '')
     {
         $this->EE->cp->set_breadcrumb(ACTION_BASE.AMP.'module=proform'.AMP, $this->EE->lang->line('proform_module_name'));
-        $this->EE->view->cp_page_title = lang('proform_title') . ' ' . lang($page) . ($added_title != '' ? ' - ' . $added_title : '');
-
+        $this->set_page_title(lang('proform_title') . ' ' . lang($page) . ($added_title != '' ? ' - ' . $added_title : ''));
+        
+    }
+    
+    function set_page_title($title)
+    {
+        if (version_compare(APP_VER, '2.6', '>=')) {
+            $this->EE->view->cp_page_title = $this->EE->lang->line($title);
+        } else {
+            $this->EE->cp->set_variable('cp_page_title', $this->EE->lang->line($title));
+        }
     }
 
     function error($msg) {
