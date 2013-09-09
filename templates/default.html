@@ -27,6 +27,7 @@
     
     {pf_hidden_fields}
         <input type="hidden" name="{pf_field_name}" value="{pf_field_value}" />
+		{if pf_field_error}<div id="text-E" class="errMsg"><span>{pf_field_error}</span></div>{/if}
     {/pf_hidden_fields}
 
     <input type="hidden" name="_pf_current_step" value="{pf_current_step}" />
