@@ -202,8 +202,8 @@ class Formslib
         $this->prolib->copy_values($form_session->config, $parse_data);
         $this->prolib->copy_values($form_session->values, $parse_data);
 
-        $fieldrows = $this->create_fields_array($form_obj, FALSE, array(), $form_session->values, array(), TRUE);
-        $fields = $this->create_fields_array($form_obj, FALSE, array(), $form_session->values, array(), FALSE);
+        $fieldrows = $this->create_fields_array($form_obj, FALSE, array(), $form_session->values, array(), TRUE, NULL, TRUE);
+        $fields = $this->create_fields_array($form_obj, FALSE, array(), $form_session->values, array(), FALSE, NULL, TRUE);
 
         $parse_data['fieldrows'] = $fieldrows;
         $parse_data['fields'] = $fields;
@@ -286,9 +286,8 @@ class Formslib
     }
     
     public function create_fields_array($form_obj, $form_session = FALSE, $field_errors = array(), $field_values = array(),
-                                         $field_checked_flags = array(), $create_field_rows = TRUE, $hidden = TRUE)
+                                         $field_checked_flags = array(), $create_field_rows = TRUE, $hidden = NULL, $all = FALSE)
     {
-
         if(is_object($field_values))
         {
             $field_values = (array)$field_values;
@@ -309,20 +308,24 @@ class Formslib
                 $form_session && $field->step_no != $form_session->config['step']
                 && !($form_session->config['last_step_summary'] && $form_session->config['step'] == $form_obj->get_step_count())
                 && $field->get_control() != 'hidden'
+                && !$all
             ) continue;
 
-			if($field->get_control() == 'hidden')
-			{
-				// it is hidden but we do not want hidden, skip it
-				if(!$hidden) {
-					continue;
-				}
-			} else {
-				// it is not hidden and we want only hidden, skip it
-				if($hidden) {
-					continue;
-				}
-			}
+            if(!is_null($hidden))
+            {
+                if($field->get_control() == 'hidden')
+                {
+                    // it is hidden but we do not want hidden, skip it
+                    if(!$hidden) {
+                        continue;
+                    }
+                } else {
+                    // it is not hidden and we want only hidden, skip it
+                    if($hidden) {
+                        continue;
+                    }
+                }
+            }
 
             // handle normal posted fields
             $is_required = $field->is_required == 'y';
