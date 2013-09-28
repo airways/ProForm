@@ -507,8 +507,15 @@ class PL_Form extends PL_RowInitialized {
 
                 if(is_array($search) && count($search) > 0)
                 {
-                    $search = $this->_translate_search($search);
-                    $this->__EE->db->where($search);
+                    $keys = array_keys($search);
+                    if(is_numeric($keys[0]))
+                    {
+                        // We have an array of entry IDs instead of an array of field names
+                        $this->__EE->db->where_in('form_entry_id', $search);
+                    } else {
+                        $search = $this->_translate_search($search);
+                        $this->__EE->db->where($search);
+                    }
                 }
 
                 if($start_row >= 0 && $limit > 0) {
