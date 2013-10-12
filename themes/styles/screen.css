@@ -875,6 +875,7 @@ Create Form
 }
 
 .info a {
+	padding-right: 0;
 	font-weight: bold;
 }
      

@@ -300,21 +300,9 @@ class Proform_mcp extends Prolib_base_mcp {
 
         ////////////////////////////////////////
         // Javascript
-        $this->EE->javascript->output(array(
-            '$(".toggle_all").toggle(
-                function(){
-                    $("input.toggle").each(function() {
-                        this.checked = true;
-                    });
-                }, function (){
-                    var checked_status = this.checked;
-                    $("input.toggle").each(function() {
-                        this.checked = false;
-                    });
-                }
-            );'
-        ));
-        $this->EE->cp->add_js_script(array('plugin' => 'dataTables'));
+
+        $this->data_table_js();
+
         //$this->EE->javascript->output($this->ajax_filters('edit_items_ajax_filter', 4));
         
         $this->EE->javascript->compile();
@@ -2070,11 +2058,17 @@ class Proform_mcp extends Prolib_base_mcp {
 
     function list_entries()
     {
+        if($this->EE->input->post('batch_id') !== FALSE)
+        {
+            if($this->process_list_entries()) return;
+        }
+
         $this->EE->load->library('formslib');
         $this->EE->load->library('pagination');
         $this->EE->load->library('table'); // only use in view
 
         $vars = array();
+
 
         // Get params
         $form_id = $this->EE->input->get('form_id');
@@ -2091,6 +2085,8 @@ class Proform_mcp extends Prolib_base_mcp {
         $vars['edit_entry_url'] = ACTION_BASE.'method=edit_form_entry'.AMP.'form_id='.$form_id;
         $vars['delete_entry_url'] = ACTION_BASE.'method=delete_form_entry'.AMP.'form_id='.$form_id;
         $vars['edit_form_url']     = ACTION_BASE.'method=edit_form'.AMP.'form_id='.$form->form_id;
+        $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=list_entries'.AMP.'form_id='.$form_id;
+        $vars['total_entries'] = $form->count_entries();
 
         // Get page of data
         $search = $this->prolib->pl_drivers->list_entries_search($form_id, array());
@@ -2226,13 +2222,70 @@ class Proform_mcp extends Prolib_base_mcp {
         {
             $vars = $this->EE->extensions->call('proform_list_entries', $this, $vars);
         }
+        $vars['batch_commands'] = array(
+                                'delete' => 'Delete Selected',
+ //                               'break'  => '-----',
+ //                               'export_csv'   => 'CSV Export of Selected',
+ //                               'export_html'  => 'HTML Export of Selected',
+ //                               'report_html'  => 'HTML Report of Selected',
+ //                               'repoty_text'  => 'Text Report of Selected',
+                                
+                                );  
         $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
         $vars['versions'] = $this->versions;
+        
+        $this->data_table_js();
+        $this->EE->javascript->compile();
+
         $output = $this->EE->load->view('list_entries', $vars, TRUE);
         return $this->prolib->pl_drivers->list_entries_view($output);
     }
 
+    function process_list_entries()
+    {
+        $this->EE->load->library('formslib');
+        $form_id = (int)$this->EE->input->get('form_id');
+        $form_obj = $this->EE->formslib->forms->get($form_id);
 
+        
+        $batch_command = $this->EE->input->post('batch_command');
+        if($this->EE->input->post('select_all_entries') == 1)
+        {
+            $batch_id = array();
+            
+            foreach($form_obj->entries() as $entry) 
+            {
+                $batch_id[] = $entry->form_entry_id; 
+            }
+            
+        } else {
+            $batch_id = $this->EE->input->post('batch_id');            
+        }
+
+        switch($batch_command)
+        {
+            case 'delete':
+                foreach($batch_id as $id)
+                {
+                    $form_obj->delete_entry($id);
+                }
+                break;
+            case 'export_csv':
+                
+                break;
+            case 'export_html':
+                
+                break;
+            case 'report_html':
+                
+                break;
+            case 'report_text':
+                
+                break;
+            default;
+                break;
+        }
+    }
     function view_form_entry()
     {
         $this->EE->load->library('formslib');
