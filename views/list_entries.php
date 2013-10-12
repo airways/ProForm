@@ -32,9 +32,10 @@
 
 
 <div class="list_entries">
+            
 
-
-                <?php
+    <?php
+            echo form_open($action_url);
             $base = BASE.'&C=addons_modules&M=show_module_cp&module=proform';
             $export_entries_label = lang('export_entries');
             $html_export_label = lang('html_export');
@@ -64,6 +65,11 @@ END
 
             <span class="action-list">
                 <a href="<?php echo $edit_form_url; ?>">Edit Form Settings</a>
+                <span id="pl_select_all_entries_span" class="info" style="display:none;" data-entry-count="<?php echo $total_entries; ?>">Would you like to <a id="pl_select_all_entries_link" href="#">select all <?php echo $total_entries; ?> entries</a>?
+                </span>
+                <span id="pl_all_entries_selected" class="info" style="display:none;">All <?php echo $total_entries; ?> entries selected</span>
+                <?php echo form_hidden('select_all_entries', '0') ?>
+                
             </span>
             
     <div class="table_wrapper">
@@ -86,6 +92,8 @@ END
         $ordered_headings[] = $headings[$field];
     }
 
+    $ordered_headings[0] = form_checkbox('select_all', '', FALSE, 'id="pl_select_all"').'&nbsp'.$ordered_headings[0];
+    
     $this->table->set_heading($ordered_headings);
 
     if (count($entries) > 0):
@@ -160,7 +168,14 @@ END
                                 $short = '';
                             }
                         
-                            $row[] = '<span class="value_'.$type.$short.'">'.htmlspecialchars($value).'</span>';
+                            $column = '<span class="value_'.$type.$short.'">';
+                            if ($field == 'form_entry_id') 
+                            {
+                                $column .= form_checkbox('batch_id[]', $value, FALSE, 'class="batch_id"').'&nbsp';
+                            }
+                            
+                            $column .= htmlspecialchars($value).'</span>';
+                            $row[] = $column;
                         }
                 }
             }
@@ -182,7 +197,11 @@ END
     <div class="tableFooter">
 
         <div class="tableSubmit">
-
+            <?php 
+                echo form_submit('batch_submit', 'Submit', 'class="submit" id="pl_batch_submit"');
+                echo "&nbsp&nbsp";
+                echo form_dropdown('batch_command', $batch_commands); 
+            ?>
         </div>
 
         <?php echo $pagination; ?>
@@ -190,5 +209,5 @@ END
     </div>
 </div>
 
-
+<?php echo form_close(); ?>
 </div>
