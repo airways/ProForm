@@ -2224,11 +2224,11 @@ class Proform_mcp extends Prolib_base_mcp {
         }
         $vars['batch_commands'] = array(
                                 'delete' => 'Delete Selected',
- //                               'break'  => '-----',
- //                               'export_csv'   => 'CSV Export of Selected',
- //                               'export_html'  => 'HTML Export of Selected',
- //                               'report_html'  => 'HTML Report of Selected',
- //                               'repoty_text'  => 'Text Report of Selected',
+                                'break'  => '-----',
+                                'export_csv'   => 'CSV Export of Selected',
+                                'export_html'  => 'HTML Export of Selected',
+                                'report_html'  => 'HTML Report of Selected',
+                                'repoty_text'  => 'Text Report of Selected',
                                 
                                 );  
         $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
@@ -2251,36 +2251,30 @@ class Proform_mcp extends Prolib_base_mcp {
         $batch_command = $this->EE->input->post('batch_command');
         if($this->EE->input->post('select_all_entries') == 1)
         {
-            $batch_id = array();
-            
-            foreach($form_obj->entries() as $entry) 
-            {
-                $batch_id[] = $entry->form_entry_id; 
-            }
-            
+            $batch_entries = $form_obj->entries();
         } else {
-            $batch_id = $this->EE->input->post('batch_id');            
+            $batch_entries = $form_obj->entries($this->EE->input->post('batch_id'));
         }
 
         switch($batch_command)
         {
             case 'delete':
-                foreach($batch_id as $id)
+                foreach($batch_entries as $entry)
                 {
-                    $form_obj->delete_entry($id);
+                    $form_obj->delete_entry($entry->form_entry_id);
                 }
                 break;
             case 'export_csv':
-                
+                $this->_export_entries('csv', $batch_entries);
                 break;
             case 'export_html':
-                
+                $this->_export_entries('html_export', $batch_entries);
                 break;
             case 'report_html':
-                
+                $this->_export_entries('html_report', $batch_entries);
                 break;
             case 'report_text':
-                
+                $this->_export_entries('txt_report', $batch_entries);
                 break;
             default;
                 break;
@@ -2576,48 +2570,14 @@ class Proform_mcp extends Prolib_base_mcp {
         return TRUE;
     }
 
-    function export_entries()
-    {
-        $this->process_export_entries();
 
-        /*
-         * // when we need options for the export:
-         *
-        if($this->EE->input->post('form_id') !== FALSE)
-        {
-            if($this->process_export_entries()) return;
-        }
-
-        $this->EE->load->library('formslib');
-        $this->EE->load->library('pagination');
-        $this->EE->load->library('table'); // only use in view
-
-        $vars = array();
-
-        // Get params
-        $form_id = $this->EE->input->get('form_id');
-        $rownum = (int)$this->EE->input->get_post('rownum');
-
-        // Get form object
-        $form = $this->EE->formslib->forms->get($form_id);
-
-        // Set up UI
-        $this->sub_page('tab_list_entries', $form->form_name);
-        $vars['form_id'] = $form_id;
-
-        $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
-        $vars['versions'] = $this->versions;
-        return $this->EE->load->view('export_entries', $vars, TRUE);
-        */
-    }
-
-    function process_export_entries()
+    private function _export_entries($format, array $entries)
     {
         $this->EE->load->library('formslib');
 
         // Get params
         $form_id = $this->EE->input->get('form_id');
-        $format = $this->EE->input->get('format');
+        //$format = $this->EE->input->get('format');
 
         // Get form object
         $form = $this->EE->formslib->forms->get($form_id);
@@ -2654,7 +2614,7 @@ class Proform_mcp extends Prolib_base_mcp {
         header('Expires: 0');
 
         // get all entries for form, prepare CSV and send download file
-        $entries = $form->entries();
+        //$entries = $form->entries();
 
         switch($format)
         {
