@@ -2060,7 +2060,7 @@ class Proform_mcp extends Prolib_base_mcp {
     {
         if($this->EE->input->post('batch_id') !== FALSE)
         {
-            if($this->process_list_entries()) return;
+            $this->process_list_entries();
         }
 
         $this->EE->load->library('formslib');
@@ -2087,7 +2087,10 @@ class Proform_mcp extends Prolib_base_mcp {
         $vars['edit_form_url']     = ACTION_BASE.'method=edit_form'.AMP.'form_id='.$form->form_id;
         $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=list_entries'.AMP.'form_id='.$form_id;
         $vars['total_entries'] = $form->count_entries();
-
+        $vars['select_all'] = $this->EE->input->post('select_all');
+        $vars['batch_id'] = $this->EE->input->post('batch_id');
+        $vars['select_all_entries'] = $this->EE->input->post('select_all_entries');
+        
         // Get page of data
         $search = $this->prolib->pl_drivers->list_entries_search($form_id, array());
         //var_dump($form->__internal_fields);exit;
@@ -2223,14 +2226,16 @@ class Proform_mcp extends Prolib_base_mcp {
             $vars = $this->EE->extensions->call('proform_list_entries', $this, $vars);
         }
         $vars['batch_commands'] = array(
-                                'delete' => 'Delete Selected',
-                                'break'  => '-----',
-                                'export_csv'   => 'CSV Export of Selected',
-                                'export_html'  => 'HTML Export of Selected',
-                                'report_html'  => 'HTML Report of Selected',
-                                'repoty_text'  => 'Text Report of Selected',
-                                
-                                );  
+                                'Batch Commands' => array(
+                                    'delete' => 'Delete Selected',
+                                ),
+                                    'Export Entries' => array(
+                                    'export_csv'   => 'CSV Export',
+                                    'export_html'  => 'HTML Export',
+                                    'report_html'  => 'HTML Report',
+                                    'repoty_text'  => 'Text Report',
+                                    
+                                ));  
         $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
         $vars['versions'] = $this->versions;
         
@@ -2247,13 +2252,13 @@ class Proform_mcp extends Prolib_base_mcp {
         $form_id = (int)$this->EE->input->get('form_id');
         $form_obj = $this->EE->formslib->forms->get($form_id);
 
-        
         $batch_command = $this->EE->input->post('batch_command');
+        
         if($this->EE->input->post('select_all_entries') == 1)
         {
-            $batch_entries = $form_obj->entries();
+            $batch_id = array();
         } else {
-            $batch_entries = $form_obj->entries($this->EE->input->post('batch_id'));
+            $batch_id = $this->EE->input->post('batch_id');
         }
 
         switch($batch_command)
@@ -2264,19 +2269,19 @@ class Proform_mcp extends Prolib_base_mcp {
                     $form_obj->delete_entry($entry->form_entry_id);
                 }
                 break;
-            case 'export_csv':
-                $this->_export_entries('csv', $batch_entries);
-                break;
-            case 'export_html':
-                $this->_export_entries('html_export', $batch_entries);
-                break;
-            case 'report_html':
-                $this->_export_entries('html_report', $batch_entries);
-                break;
-            case 'report_text':
-                $this->_export_entries('txt_report', $batch_entries);
-                break;
-            default;
+            default:
+                $prefix = substr($batch_command, 0, 6);
+                if($prefix == 'export' || $prefix == 'report')
+                {
+                    $export_data = array(
+                        'form_id' => $form_id,
+                        'batch_command' => $batch_command,
+                        'batch_id' => $batch_id,
+                    );
+                    $hash = $this->EE->formslib->vault->put($export_data);
+                    header(str_replace('&amp;', '&', 'Refresh: 0;url='.ACTION_BASE.'method=do_export_entries'.AMP.'hash='.$hash));
+                }
+            
                 break;
         }
     }
@@ -2571,13 +2576,16 @@ class Proform_mcp extends Prolib_base_mcp {
     }
 
 
-    private function _export_entries($format, array $entries)
+    public function do_export_entries()
     {
         $this->EE->load->library('formslib');
 
-        // Get params
-        $form_id = $this->EE->input->get('form_id');
-        //$format = $this->EE->input->get('format');
+        $hash = $this->EE->input->get('hash');
+        $export_data = $this->EE->formslib->vault->get($hash);
+        
+        $form_id = $export_data['form_id'];
+        $batch_command = $export_data['batch_command'];
+        $batch_id = $export_data['batch_id'];
 
         // Get form object
         $form = $this->EE->formslib->forms->get($form_id);
@@ -2588,22 +2596,24 @@ class Proform_mcp extends Prolib_base_mcp {
             if($this->EE->extensions->end_script === TRUE) return TRUE;
         }
 
-        switch($format)
+        $entries = $form->entries($batch_id);
+
+        switch($batch_command)
         {
-            case 'csv':
+            case 'export_csv':
                 $file_name = $form->form_name . '_' . date("j-n-Y_G-i-s") . '.csv';
                 $stdout = fopen("php://output", "w");
                 header('Content-Type: text/csv');
                 break;
-            case 'html_export':
+            case 'export_html':
                 $file_name = $form->form_name . '_' . date("j-n-Y_G-i-s") . '_export.html';
                 $stdout = fopen("php://output", "w");
                 break;
-            case 'html_report':
+            case 'report_html':
                 $file_name = $form->form_name . '_' . date("j-n-Y_G-i-s") . '_report.html';
                 $stdout = fopen("php://output", "w");
                 break;
-            case 'txt_report':
+            case 'report_text':
                 $file_name = $form->form_name . '_' . date("j-n-Y_G-i-s") . '_report.txt';
                 $stdout = fopen("php://output", "w");
                 header('Content-Type: text/plain');
@@ -2616,16 +2626,16 @@ class Proform_mcp extends Prolib_base_mcp {
         // get all entries for form, prepare CSV and send download file
         //$entries = $form->entries();
 
-        switch($format)
+        switch($batch_command)
         {
-            case 'csv':
+            case 'export_csv':
                 fputcsv($stdout, array_keys((array)($entries[0])));
                 foreach($entries as $row)
                 {
                     fputcsv($stdout, array_values((array)$row));
                 }
                 break;
-            case 'html_export':
+            case 'export_html':
                 echo '<table width="100%" border="1" cellspacing="0" cellpadding="5"><tr>';
                 foreach(array_keys((array)($entries[0])) as $key)
                 {
@@ -2643,7 +2653,7 @@ class Proform_mcp extends Prolib_base_mcp {
                 }
                 echo '</table>';
                 break;
-            case 'html_report':
+            case 'report_html':
                 echo '<table width="100%" border="1" cellspacing="0" cellpadding="5">';
                 foreach($form as $key => $cell)
                 {
@@ -2667,7 +2677,7 @@ class Proform_mcp extends Prolib_base_mcp {
                     echo '</table><br/><br/>';
                 }
                 break;
-            case 'txt_report':
+            case 'report_text':
                 foreach($form as $key => $cell)
                 {
                     if(substr($key, 0, 2) == "__" || is_object($cell) || is_array($cell)) continue;

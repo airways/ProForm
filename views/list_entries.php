@@ -68,7 +68,7 @@ END
                 <span id="pl_select_all_entries_span" class="info" style="display:none;" data-entry-count="<?php echo $total_entries; ?>">Would you like to <a id="pl_select_all_entries_link" href="#">select all <?php echo $total_entries; ?> entries</a>?
                 </span>
                 <span id="pl_all_entries_selected" class="info" style="display:none;">All <?php echo $total_entries; ?> entries selected</span>
-                <?php echo form_hidden('select_all_entries', '0') ?>
+                <?php echo form_hidden('select_all_entries', $select_all_entries) ?>
                 
             </span>
             
@@ -92,7 +92,7 @@ END
         $ordered_headings[] = $headings[$field];
     }
 
-    $ordered_headings[0] = form_checkbox('select_all', '', FALSE, 'id="pl_select_all"').'&nbsp'.$ordered_headings[0];
+    $ordered_headings[0] = form_checkbox('select_all', '1', $select_all, 'id="pl_select_all"').'&nbsp'.$ordered_headings[0];
     
     $this->table->set_heading($ordered_headings);
 
@@ -171,7 +171,7 @@ END
                             $column = '<span class="value_'.$type.$short.'">';
                             if ($field == 'form_entry_id') 
                             {
-                                $column .= form_checkbox('batch_id[]', $value, FALSE, 'class="batch_id"').'&nbsp';
+                                $column .= form_checkbox('batch_id[]', $value, is_array($batch_id) && in_array($value, $batch_id), 'class="batch_id"').'&nbsp';
                             }
                             
                             $column .= htmlspecialchars($value).'</span>';
