@@ -326,7 +326,12 @@ class PL_Field extends PL_RowInitialized
     {
         // Explode the validation string, and remove any blank values found in it, as well as the 'none'
         // value used to indicate a lack of validation.
-        return array_filter_values(explode('|', $this->validation), array('none', ''));
+        $field_rules = array_filter_values(explode('|', $this->validation), array('none', ''));
+        if($this->is_required == 'y')
+        {
+            $field_rules[] = 'required';
+        }
+        return $field_rules;
     }
 
     function get_driver()
