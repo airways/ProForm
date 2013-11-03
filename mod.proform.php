@@ -142,6 +142,8 @@ class Proform {
         
         $form_name = strip_tags($this->EE->TMPL->fetch_param('form_name', $this->EE->TMPL->fetch_param('form', $this->EE->TMPL->fetch_param('name', FALSE))));
 
+        if(!$form_name) return '';
+
         /*if(!$form_name)
         {
             pl_show_error('Invalid form_name provided to {exp:proform:simple}: "'.htmlentities($form_name).'"');
@@ -1779,15 +1781,17 @@ class Proform {
 
                     if(isset($form_session->values[$field->field_name]))
                     {
-                        $value_count++;
                         
                         if(is_array($form_session->values[$field->field_name]))
                         {
                             $form_session->values[$field->field_name] = $form_session->values[$field->field_name][0];
                         }
-
-                        if(isset($form_session->values[$field->field_name]))
+                        
+                        // For radio buttons, if we get a blank value, we treat this as if we got nothing
+                        if($type_style != 'radio' || $form_session->values[$field->field_name] != '')
                         {
+                            $value_count++;
+                            
                             foreach($options as $option)
                             {
                                 if($option['key'] == $form_session->values[$field->field_name])
@@ -1810,19 +1814,28 @@ class Proform {
                             $form_session->values[$field->field_name] = array($form_session->values[$field->field_name]);
                         }
 			            
-                        foreach($form_session->values[$field->field_name] as $selected_option)
-                        {
-                            $value_count++;
-                            $option_valid = FALSE;
-                            foreach($options as $option)
+			            // For check boxes, if we get a single blank value, we treat this as if we got nothing
+                        if($type_style != 'check' || (
+                            $type_style == 'check' && (
+                                count($form_session->values[$field->field_name]) > 1 
+                                    || $form_session->values[$field->field_name][0] != ''
+                                )
+                            )
+                        ) {
+                            foreach($form_session->values[$field->field_name] as $selected_option)
                             {
-                                if($option['key'] == $selected_option)
+                                $value_count++;
+                                $option_valid = FALSE;
+                                foreach($options as $option)
                                 {
-                                    $option_valid = TRUE;
+                                    if($option['key'] == $selected_option)
+                                    {
+                                        $option_valid = TRUE;
+                                    }
                                 }
+                                $valid &= $option_valid;
+                                if(!$valid) break;
                             }
-                            $valid &= $option_valid;
-                            if(!$valid) break;
                         }
                     }
                 }
@@ -1846,13 +1859,7 @@ class Proform {
                 $checked_rules = '';
 
                 // validate rules
-                $field_rules = explode('|', $field->validation);
-
-                // temporarily add a 'required' rule if the field is required
-                if($field->is_required == 'y')
-                {
-                    $field_rules[] = 'required';
-                }
+                $field_rules = $field->get_validation();
 
                 foreach($field_rules as $srule)
                 {

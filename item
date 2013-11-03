@@ -1,0 +1,31 @@
+mod.proform.php:1323:        if($this->EE->config->item('proform_disable_xid', 'n') == 'n'
+mod.proform.php:1325:              $this->EE->config->item('proform_disable_xid_ajax', 'n') == 'n'))
+mod.proform.php:2120:                if ($this->EE->config->item('mailinglist_enabled') == 'n')
+libraries/proform_notifications.php:75:            $this->default_from_address = $this->EE->config->item('webmaster_email');
+libraries/proform_notifications.php:76:            $this->default_from_name = $this->EE->config->item('webmaster_name');
+libraries/proform_notifications.php:452:        $this->EE->db->where('site_id', $this->EE->config->item('site_id'));
+libraries/proform_notifications.php:488:                    $template_file = $this->EE->config->slash_item('tmpl_file_basepath')
+libraries/proform_notifications.php:489:                                    . $this->EE->config->slash_item('site_short_name')
+mcp.proform.php:95:        $this->config_overrides = $this->EE->config->item('proform');
+mcp.proform.php:171:        $this->EE->cp->add_to_head('<link rel="stylesheet" href="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/styles/main.css" type="text/css" media="screen" />');
+mcp.proform.php:172:        $this->EE->cp->add_to_head('<link rel="stylesheet" href="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/styles/jquery.contextMenu.css" type="text/css" media="screen" />');
+mcp.proform.php:173:        $this->EE->cp->add_to_head('<link rel="stylesheet" href="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/styles/screen.css" type="text/css" media="screen" />');
+mcp.proform.php:174:        $this->EE->cp->add_to_head('<link rel="stylesheet" href="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/styles/colorbox.css" type="text/css" media="screen" />');
+mcp.proform.php:176:        $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/prolib/javascript/prolib.js"></script>');
+mcp.proform.php:178:        $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/jquery.tablednd_0_5.js"></script>');
+mcp.proform.php:179:        $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/global.js"></script>');
+mcp.proform.php:181:        $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/jquery.contextMenu.js"></script>');
+mcp.proform.php:182:        $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/jquery.form.js"></script>');
+mcp.proform.php:183:        $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/jquery.colorbox-min.js"></script>');
+mcp.proform.php:877:        if($this->EE->config->item('proform_allow_encrypted_form_data') != 'y')
+mcp.proform.php:882:        if($this->EE->config->item('proform_allow_table_override') != 'y' || $form_obj->form_type != 'form')
+mcp.proform.php:991:        $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/edit_form.js"></script>');
+mcp.proform.php:992:        $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/edit_form_layout.js"></script>');
+mcp.proform.php:1611:        $this->EE->cp->add_to_head('<script type="text/javascript" src="' . $this->EE->config->item('theme_folder_url') . 'third_party/proform/javascript/edit_field.js"></script>');
+mcp.proform.php:2751:        $vars['encryption_key_set'] = (strlen($this->EE->config->item('encryption_key')) >= 32);
+mcp.proform.php:2752:        $vars['allow_encrypted_form_data'] = $this->EE->config->item('proform_allow_encrypted_form_data') == 'y' || $this->EE->formslib->force_allow_encrypted_forms;
+views/edit_form_layout.php:250:                                <img src="<?php echo get_instance()->config->slash_item('theme_folder_url'); ?>third_party/proform/images/icons/<?php echo $option['icon']; ?>"> <?php echo $option['label']; ?></a>
+views/edit_form_layout.php:274:                                    <img src="<?php echo get_instance()->config->slash_item('theme_folder_url'); ?>third_party/proform/images/icons/<?php echo isset($option['icon']) ? $option['icon'] : 'plugin.png'; ?>"> <?php echo $option['name'] . ' ' . $option['version']; ?></a>
+views/edit_form_layout.php:284:                                <img src="<?php echo get_instance()->config->slash_item('theme_folder_url'); ?>third_party/proform/images/icons/<?php echo $option['icon']; ?>"> <?php echo $option['label']; ?></a>
+views/edit_form_layout.php:299:                                    <img src="<?php echo get_instance()->config->slash_item('theme_folder_url'); ?>third_party/proform/images/icons/<?php echo $option['icon']; ?>"> <?php echo $option['label']; ?></a>
+views/edit_form_layout.php:300:                                <a href="<?php echo $edit_field_url.'&field_id='.$option['field_id']; ?>" class="edit"><img src="<?php echo get_instance()->config->slash_item('theme_folder_url'); ?>third_party/proform/images/cog.png">Edit...</a>
