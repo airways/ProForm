@@ -71,6 +71,7 @@ $lang = array(
     // Buttons
     'home' => 'Forms',
     'module_settings' => 'Module Settings',
+    'help' => 'Help',
     'list_drivers' => 'Drivers',
     'maintenance' => 'Maintenance',
     'new_form' => 'Create New Contact Form',

@@ -90,6 +90,7 @@ class Proform_mcp extends Prolib_base_mcp {
                 'list_drivers' => TAB_ACTION.'method=list_drivers',
                 'maintenance' => TAB_ACTION.'method=maintenance',
                 'module_settings' => TAB_ACTION.'method=module_settings',
+                'help' => TAB_ACTION.'method=help',
                 ));
 
         $this->config_overrides = $this->EE->config->item('proform');
@@ -485,6 +486,14 @@ class Proform_mcp extends Prolib_base_mcp {
             $this->EE->extensions->call('proform_process_module_settings', $this);
         }
         return TRUE;
+    }
+    
+    function help()
+    {
+        $this->sub_page('help');
+        $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
+        $vars['versions'] = $this->versions;
+        return $this->EE->load->view('help', $vars, TRUE);
     }
     
     function maintenance()
