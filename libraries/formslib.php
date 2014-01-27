@@ -162,7 +162,7 @@ class Formslib
      * @param $nl code used to insert newlines between each element in the markup, set to a blank
      *        string to prevent newlines; "\n" by default
      */
-    function implode_errors_array($errors, $start = '<ul class="pf_field_errors">', $end = '</ul>', $item_start = '<li>', $item_end = '</li>', $nl = "\n")
+    function implode_errors_array($errors, $start = '', $end = '', $item_start = '', $item_end = '', $nl = "\n")
     {
         $result = $start.$nl;
 
@@ -478,9 +478,13 @@ class Formslib
                 if(is_array($field_errors[$field->field_name]))
                 {
                     $field_array['field_error'] = $this->EE->formslib->implode_errors_array($field_errors[$field->field_name]);
+                    $field_array['field_errors'] = $this->EE->pl_parser->wrap_array($field_errors[$field->field_name], 'error_no', 'error');
+
                 } else {
                     $field_array['field_error'] = $field_errors[$field->field_name];
+                    $field_array['field_errors'] = $this->EE->pl_parser->wrap_array(array($field_errors[$field->field_name]), 'error_no', 'error');
                 }
+                //echo 'field_errors '.$field->field_name.' = <pre>'; var_dump($field_array['field_errors']); echo '</pre><br/>';
             }
 
             $field_array['field_filename'] = '';
