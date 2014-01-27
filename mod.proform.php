@@ -1778,7 +1778,7 @@ class Proform {
                 {
                     $multi = FALSE;
                     $option_valid = FALSE;
-
+                    
                     if(isset($form_session->values[$field->field_name]))
                     {
                         
@@ -1852,7 +1852,8 @@ class Proform {
                     $form_session->add_error($field->field_name, $error);
                 }
             }
-            else if($field->type != 'file' && $field->type != 'hidden'
+            
+            if($field->type != 'file' && $field->type != 'hidden'
             		|| ($field->type == 'hidden' && $form_session->config['step'] == $step_count 
             			&& $this->EE->input->get_post('_pf_finish')) )  
             {
@@ -1931,7 +1932,7 @@ class Proform {
 
 
         // send the compiled rules on to the validation class
-//		echo "<pre>"; var_dump($validation_rules); echo "</pre>";
+		//echo "<pre>"; var_dump($validation_rules); echo "</pre>";
         $this->EE->pl_validation->set_rules($validation_rules);
 
         // set custom error messages as provided on the form tag
