@@ -750,6 +750,8 @@ class Proform {
 
                 $this->prolib->copy_values($form_session->config, $variables);
                 $this->EE->formslib->copy_form_values($form_obj, $variables);
+                $variables['form:entry_id'] = $form_session->values['form:entry_id'];
+                $variables['form_entry_id'] = $form_session->values['form_entry_id'];
 
                 $variables['fieldrows'] = $this->EE->formslib->create_fields_array($form_obj, FALSE, $form_session->errors, $form_session->values, $form_session->checked_flags, TRUE);
                 $variables['fields'] = $this->EE->formslib->create_fields_array($form_obj, FALSE, $form_session->errors, $form_session->values, $form_session->checked_flags, FALSE, FALSE);
@@ -2060,7 +2062,9 @@ class Proform {
 
                 $form_entry_id = $this->EE->db->insert_id();
                 $form_session->values['form:entry_id'] = $form_entry_id;
+                $form_session->values['form_entry_id'] = $form_entry_id;
                 $form_session->values['form:name'] = $form_obj->form_name;
+                $form_session->values['form_name'] = $form_obj->form_name;
 
                 // Let field drivers cleanup as needed
                 foreach($form_obj->fields() as $field)
@@ -2084,7 +2088,9 @@ class Proform {
 
             } else {
                 $form_session->values['form:entry_id'] = 0;
+                $form_session->values['form_entry_id'] = 0;
                 $form_session->values['form:name'] = $form_obj->form_name;
+                $form_session->values['form_name'] = $form_obj->form_name;
             }
 
             if ($this->EE->extensions->active_hook('proform_insert_end') === TRUE)
@@ -2098,7 +2104,9 @@ class Proform {
             }
         } else {
             $form_session->values['form:entry_id'] = 0;
+            $form_session->values['form_entry_id'] = 0;
             $form_session->values['form:name'] = $form_obj->form_name;
+            $form_session->values['form_name'] = $form_obj->form_name;
 
             if ($this->EE->extensions->active_hook('proform_no_insert') === TRUE)
             {
