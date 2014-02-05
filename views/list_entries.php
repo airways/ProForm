@@ -34,34 +34,14 @@
 <div class="list_entries">
             
 
-    <?php
-            echo form_open($action_url);
-            $base = BASE.'&C=addons_modules&M=show_module_cp&module=proform';
-            $export_entries_label = lang('export_entries');
-            $html_export_label = lang('html_export');
-            $html_report_label = lang('html_report');
-            $txt_report_label = lang('txt_report');
-//            <span class="button"><a href="{$base}&method=export_entries&form_id={$form_id}">{$export_entries_label}</a></span>
-
-            echo $pl_drivers->list_entries_commands($form_id, <<<END
-
-    <div class="dropdown-wrap">
-        <span class="button content-btn"><a title="" class="submit" href="#">Entries Export / Reports</a></span>
-        <div class="dropdown">
-            <ul>
-                <li><a href="{$base}&method=export_entries&form_id={$form_id}&format=csv">{$export_entries_label}</a></li>
-                <li><a href="{$base}&method=export_entries&form_id={$form_id}&format=html_export">{$html_export_label}</a></li>
-                <li><a href="{$base}&method=export_entries&form_id={$form_id}&format=html_report">{$html_report_label}</a></li>
-                <li><a href="{$base}&method=export_entries&form_id={$form_id}&format=txt_report">{$txt_report_label}</a></li>
-            </ul>
-        </div>
-    </div>
-
-
-END
-); ?>
-
-
+<?php
+    echo form_open($action_url);
+    $base = BASE.'&C=addons_modules&M=show_module_cp&module=proform';
+    $export_entries_label = lang('export_entries');
+    $html_export_label = lang('html_export');
+    $html_report_label = lang('html_report');
+    $txt_report_label = lang('txt_report');
+?>
 
             <span class="action-list">
                 <a href="<?php echo $edit_form_url; ?>">Edit Form Settings</a>
