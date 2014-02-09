@@ -31,6 +31,7 @@ global $PROLIB;
  * to this clause.
  *
  **/ ?>
+ 
 <?php if(!isset($license_key) || !$license_key || strlen($license_key) < 16): ?>
 
     <div class="warning">
@@ -84,8 +85,7 @@ endif;
     $table_heading = array(lang('heading_property'), lang('heading_value'));
     $this->table->set_template($table_template);
     $this->table->set_heading($table_heading);
-
-
+    
     foreach($form as $field)
     {
         if(!is_array($field))

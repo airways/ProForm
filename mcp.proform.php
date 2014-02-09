@@ -269,6 +269,7 @@ class Proform_mcp extends Prolib_base_mcp {
             $form->edit_fields_link         = ACTION_BASE.AMP.'method=edit_form'.AMP.'form_id='.$form->form_id.AMP.'active_tabs=tab-content-layout';
             //$form->edit_preset_values_link  = ACTION_BASE.AMP.'method=edit_form_preset_values'.AMP.'form_id='.$form->form_id;
             $form->list_entries_link        = ACTION_BASE.AMP.'method=list_entries'.AMP.'form_id='.$form->form_id;
+            $form->copy_link                = ACTION_BASE.AMP.'method=copy_form'.AMP.'form_id='.$form->form_id;
             $form->delete_link              = ACTION_BASE.AMP.'method=delete_form'.AMP.'form_id='.$form->form_id;
 
             $form->entries_count    = $form->count_entries();
@@ -1151,6 +1152,89 @@ class Proform_mcp extends Prolib_base_mcp {
         }
 
 
+    }
+
+    function copy_form()
+    {
+        if($this->EE->input->post('form_id') !== FALSE)
+        {
+            if($this->process_copy_form()) return;
+        }
+
+        $this->EE->load->library('formslib');
+        $form_id = $this->EE->input->get('form_id');
+        $form = $this->EE->formslib->forms->get($form_id);
+
+        $vars = array();
+        $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=copy_form';
+        $vars['object_type'] = 'form';
+        $vars['object_name'] = $form->form_name;
+        $vars['hidden'] = array('form_id' => $form->form_id);
+
+        $this->sub_page('tab_copy_form');
+
+        $this->EE->load->library('table');
+        
+        $types = array(
+            'form_id' => 'read_only',
+            'new_form_name' => 'text',
+            'new_site_id' => array('dropdown', array(1 => 'Site 1')),
+        );
+
+        $copy_obj = array(
+            'form_id' => $form_id,
+            'new_form_name' => '',
+            'new_site_id' => '0',
+        );
+
+        $copy_form = $this->EE->pl_forms->create_cp_form($copy_obj, $types);
+        $vars['form'] = $copy_form;
+        $vars['form_name'] = $form->form_name;
+        
+        if ($this->EE->extensions->active_hook('proform_copy_form') === TRUE)
+        {
+            $vars = $this->EE->extensions->call('proform_copy_form', $this, $vars);
+        }
+        $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
+        $vars['versions'] = $this->versions;
+        return $this->EE->load->view('copy_form', $vars, TRUE);
+    }
+
+
+    function process_copy_form()
+    {
+        $form_id = trim($this->EE->input->post('form_id'));
+        if ($this->EE->extensions->active_hook('proform_process_copy_form') === TRUE)
+        {
+            $this->EE->extensions->call('proform_process_copy_form', $this);
+            if($this->EE->extensions->end_script === TRUE) return TRUE;
+        }
+
+        // run form validation
+        $this->_run_validation('copy_form');
+        
+        if(is_numeric($form_id))
+        {
+            $this->EE->load->library('formslib');
+
+            $form = $this->EE->formslib->forms->get($form_id);
+
+            $new_form_name = trim($this->EE->input->post('new_form_name'));
+            $new_site_id = $this->EE->input->post('new_site_id');
+
+            // Copy form row to new site and name
+            $form->copy_to($new_form_name, $new_site_id, TRUE);
+
+            // go back to form listing
+            $this->EE->session->set_flashdata('message', lang('msg_form_copied'));
+            $this->EE->functions->redirect(ACTION_BASE);
+            return TRUE;
+        }
+        else
+        {
+            pl_show_error(lang('invalid_form_id').' [11]');
+            return FALSE;
+        }
     }
 
     function delete_form()

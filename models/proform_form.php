@@ -41,6 +41,7 @@ class PL_Form extends PL_RowInitialized {
     var $form_label;
     var $form_name;
     var $form_driver;
+    var $site_id;
     
     var $encryption_on = 'n';
     var $table_override = '';
@@ -1072,5 +1073,55 @@ class PL_Form extends PL_RowInitialized {
             $this->__form_field_options = array('' => 'None') + $result;
         }
         return $this->__form_field_options;
+    }
+    
+    function copy_to($new_form_name, $new_site_id, $include_fields)
+    {
+        // Copy form row to new site and name
+        $form_query = $this->__EE->db->where('form_id', $this->form_id)->get('proform_forms');
+        
+        $form_row = $form_query->row_array();
+        unset($form_row['form_id']);
+        $form_row['form_name'] = $new_form_name;
+        
+        $this->__EE->db->insert('proform_forms', $form_row);
+        $new_form_id = $this->__EE->db->insert_id();
+        
+        if($include_fields)
+        {
+            // Get assigned fields
+            $assigned_fields_query = $this->__EE->db->where('form_id', $this->form_id)->get('proform_form_fields');
+            $assigned_field_ids = array();
+            
+            // Create a map of field_id to itself, this may be replaced if the site_id is different
+            foreach($assigned_fields_query->result_array() as $row)
+            {
+                $assigned_field_ids[$row['field_id']] = $row['field_id'];
+            }
+            
+            // Copy fields to new site (if needed, if current site do nothing)
+            if($new_site_id != $this->site_id)
+            {
+                $field_query = $this->__EE->db->where_in('field_id', $assigned_field_ids)->get('proform_fields');
+                foreach($field_query->result_array() as $field_row)
+                {
+                    unset($field_row['field_id']);
+                    $old_field_id = $field_row['field_id'];
+                    $field_row['site_id'] = $new_site_id;
+                    $this->__EE->db->insert('proform_forms', $field_row);
+                    $assigned_field_ids[$old_field_id] = $this->__EE->db->insert_id();
+                }
+            }
+        
+            // Copy field assignments to new form_id / site
+            $assign_query = $this->__EE->db->where('form_id', $this->form_id)->get('proform_form_fields');
+            foreach($assign_query->result_array() as $assign_row)
+            {
+                unset($assign_row['form_field_id']);
+                $assign_row['form_id'] = $new_form_id;
+                $assign_row['field_id'] = $assigned_field_ids[$assign_row['field_id']];
+                $this->__EE->db->insert('proform_form_fields', $assign_row);
+            }
+        }
     }
 }
