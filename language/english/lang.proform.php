@@ -32,6 +32,7 @@ $lang = array(
     'heading_entries_count' => 'Form Entry Count',
     'heading_edit_fields' => 'Edit Layout',
     'heading_edit_form' => 'Edit Settings',
+    'heading_copy_form' => 'Copy',
     'heading_edit_preset_values' => 'Edit Preset Values',
     'heading_property' => 'Property',
     'heading_value' => 'Value',
@@ -104,6 +105,7 @@ $lang = array(
     'tab_edit_fields' => 'Form Layout',
     'tab_form_preset_values' => 'Form Preset Values',
     'tab_list_entries' => 'Form Entries',
+    'tab_copy_form' => 'Copy Form',
     'tab_delete_form' => 'Delete Form',
     'tab_list_fields' => 'Available Form Fields',
     'tab_new_field' => 'New Field',
@@ -153,7 +155,9 @@ $lang = array(
     'field_template_name' => 'Template Name',
     'field_template' => 'Template Code',
     'field_template_desc' => 'Replaces form values as template variables, then runs through full template parser',
-
+    'field_new_form_name' => 'New Form Name',
+    'field_new_site_id' => 'New Site',
+    
     'notification_general' => 'General Notification Settings',
     'notification_general_desc' => 'Settings that apply to all notification groups below.',
     'notification_list_name' => 'Notification List Settings',
@@ -303,6 +307,7 @@ $lang = array(
 
     // Messages
     'msg_form_created' => 'New form successfully created',
+    'msg_form_copied' => 'Form successfully copied',
     'msg_form_deleted' => 'Form successfully deleted',
 
     'msg_field_created' => 'New field successfully created',

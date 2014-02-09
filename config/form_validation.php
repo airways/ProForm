@@ -44,7 +44,9 @@ $config = array(
     ),
     'edit_separator' => array(
         array('field' => 'heading',          	'label' => 'lang:field_heading',         	'rules' => 'trim|required'),
-        
+    ),
+    'copy_form' => array(
+        array('field' => 'new_form_name',       'label' => 'lang:field_new_form_name',      'rules' => 'trim|required'),
     ),
 );
 
