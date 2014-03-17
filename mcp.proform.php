@@ -2357,9 +2357,9 @@ class Proform_mcp extends Prolib_base_mcp {
         switch($batch_command)
         {
             case 'delete':
-                foreach($batch_entries as $entry)
+                foreach($batch_id as $entry_id)
                 {
-                    $form_obj->delete_entry($entry->form_entry_id);
+                    $form_obj->delete_entry($entry_id);
                 }
                 break;
             default:
