@@ -17,6 +17,7 @@
     <li>AJAX posting</li>
     <li>Mailing list opt-in</li>
     <li>CAPTCHA support to help prevent spam</li>
+    <li>Advanced SpamGuard driver to prevent even more spam</li>
     <li>File uploads</li>
     <li>Send notifications, rendered using EE templates, to admins and/or any email address entered in the form</li>
     <li>CodeIgniter based validation including content filtering and encoding options (required, valid e-mail, strip HTML, base64 encode, etc.)</li>
@@ -53,6 +54,13 @@
     <li><a href="{root_url}tags/results.html">Results Tag</a></li>
     <li><a href="{root_url}tags/entries.html">Entries Tag</a></li>
 </ul>
+
+<h3>Drivers</h3>
+<ul>
+    <li><a href="{root_url}drivers/spamguard.html">SpamGuard</a></li>
+    <!--<li><a href="{root_url}drivers/calculated.html">Calculated Fields</a></li>-->
+</ul>
+
 
 <h3>Sample template</h3>
 <ul>

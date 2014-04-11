@@ -20,8 +20,7 @@ body {
 .nav-global-top li a,
 .nav-global-top li span {
     color: white;
-    padding-top: 12px;
-    font: 400 24px/1 "Puritan";
+    font: 400 20px/1 "Puritan", Helvetica, Arial, sans-serif;
 }
 
 .grid-group {
@@ -59,10 +58,16 @@ a:hover {
     -moz-border-radius: 10px;
     border-radius: 10px;
     border: 1px #ccc solid;
-    -webkit-box-shadow: 1px -2px 4px #999999;
+/*    -webkit-box-shadow: 1px -2px 4px #999999;
     -moz-box-shadow: 1px -2px 4px #999999;
-    box-shadow: 1px -2px 4px #999999;
+    box-shadow: 1px -2px 4px #999999;*/
     margin: 0 0 20px;
+}
+
+.sidebar {
+    padding: 12px;
+    background: url('../images/sidebar.png') no-repeat #FFFFFF;
+    width: 227px;
 }
 
 
@@ -70,10 +75,14 @@ a:hover {
     Top Nav styles
 ------------------------------------------------------------------------ */
 
+.nav-global-top {
+    background: url('../images/navbar.png') no-repeat;
+}
+
 .nav-global-top .nav-logo-header {
-    background: url('../images/logo-header.png') no-repeat;
+/*    background: url('../images/logo-header.png') no-repeat;*/
     width: 161px;
-    text-indent: -9999px;
+/*    text-indent: -9999px;*/
 }
 
 .nav-global-top li,
@@ -84,30 +93,36 @@ a:hover {
     display: block;
 }
 
+.nav-global-top li a {
+    padding-top: 12px;
+    padding-right: 24px;
+}
+
 .nav-2-prod {
-    background: url('../images/nav-2.png') no-repeat;
-    width: 151px;
+/*    background: url('../images/nav-2.png') no-repeat;
+    width: 151px;*/
 }
 
 .nav-3-doc {
-    background: url('../images/nav-3.png') no-repeat;
-    width: 179px;
+/*    background: url('../images/nav-3.png') no-repeat;
+    width: 179px;*/
 }
 
 .nav-4-links {
-    background: url('../images/nav-4.png') no-repeat;
-    width: 121px;
+/*    background: url('../images/nav-4.png') no-repeat;
+    width: 121px;*/
 }
 
 .nav-5-con {
-    background: url('../images/nav-5.png') no-repeat;
-    width: 137px;
+/*    background: url('../images/nav-5.png') no-repeat;
+    width: 137px;*/
 }
 
 .nav-right-end-search {
     background: url('../images/nav-right-end-search.png') no-repeat;
     width: 231px;
     padding-top: 12px;
+    float: right !important;
 }
 
 .nav-right-end-search input {
@@ -171,6 +186,7 @@ h5 {
 .wysiwyg h3, h4, h5, h6 {
     margin-top: 20px;
 }
+
 
 .section-products {
     position: relative;
@@ -248,7 +264,7 @@ h5 {
 ------------------------------------------------------------------------ */
 
 .aside-buttons {
-    margin: 0 25px 0 0;
+    margin: 0 12px 0 6px;
 }
 
 .aside-buttons li.box {
@@ -265,7 +281,7 @@ h5 {
 }
 
 .aside-buttons li.text {
-    width: 250px;
+    width: 225px;
 }
 
 .aside-buttons li.box p {
@@ -372,7 +388,7 @@ h3.screenshots-header {
 
 .wysiwyg p {
     font-size: 14px;
-    padding-bottom: 5px;
+    margin-bottom: 16px;
 }
 
 #documentation .box,
@@ -584,4 +600,84 @@ form.basic {
 form.basic label {
     display: block;
     font-weight: bold;
+}
+
+.pf_row p {
+    margin-bottom:12px;
+}
+
+form.proform .pf_row textarea {
+    height: 100px;
+}
+
+form.proform b {
+    font-weight: bold;
+}
+/* Boxes
+---------------------------------------------------------------------*/
+
+.cbox {
+	padding: 12px;
+	margin-bottom:8px;
+	    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+.box-normal {
+	color:#555;
+	border:1px solid #ccc;
+	background:#eee;
+	padding: 12px;
+}
+.box-info {
+	padding: 12px;
+	border:1px solid #B8E2FB;
+	background:#E8F6FF url("../img/information.png") no-repeat 8px 50%;
+}
+.box-warning{
+	padding: 12px;
+	border:1px solid #F2DD8C;
+	background:#FFF5CC url("../img/error.png") no-repeat 8px 50%;
+}
+.box-error{
+	padding: 12px;
+	border:1px solid #F8ACAC;
+	background:#FFD1D1 url("../img/exclamation.png") no-repeat 8px 50%;
+}
+.box-error-msg{
+	margin-top:-8px;
+	background:#FFF1F1;
+	border:1px solid #FDDCDC;
+	color:#664B4B;
+	padding:12px;
+}
+.box-error-msg ol {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+.box-success{
+	padding: 12px;
+	border:1px solid #BBDF8D;
+	background:#EAF7D9 url("../img/accept.png") no-repeat 8px 50%;
+}
+
+.box a:hover {
+	background: transparent !important;
+}
+
+
+.cbox h1, .cbox h2, .cbox h3, .cbox h4, .cbox h5, .cbox h6 {
+    margin: 0 0 5px 0;
+}
+.cbox p {
+    margin-bottom: 6px;
+}
+
+.box, .box-info, .box-warning, .box-error, .box-success {
+    margin-bottom: 12px;
+    padding-bottom: 2px;
+}
+
+small {
+font-size: 0.9em;
 }
