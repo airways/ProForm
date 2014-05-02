@@ -1869,7 +1869,11 @@ class Proform {
                     //echo $srule."<br/>";
                     if($srule != 'none' && $srule != '')
                     {
-                        if(($n = strpos($srule, '[')) !== FALSE)
+                        if(is_object($srule))
+                        {
+                            $rule = array($srule->_, isset($srule->{$srule->_}) ? $srule->{$srule->_} : '');
+                        }
+                        elseif(($n = strpos($srule, '[')) !== FALSE)
                         {
                             // has a param - remove the ']' from the end
                             if($srule[strlen($srule)-1] == ']') $srule = substr($srule, 0, -1);

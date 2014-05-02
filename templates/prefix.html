@@ -258,6 +258,39 @@ buttonList: [
     'hr', 'link', 'unlink',
     'removeFormat',
 ]};
+function pf_update_conditionals() {
+    $('.pf_column[data-conditional]').hide().each(function() {
+        var thisVal = $('#'+$(this).attr('data-conditional')).val();
+        var checkVal = $(this).attr('data-conditional-value');
+        switch($(this).attr('data-conditional-operator')) {
+            case '=':
+                if(thisVal == checkVal) {
+                    $(this).show();
+                }
+                break;
+            case '>':
+                if(thisVal > checkVal) {
+                    $(this).show();
+                }
+                break;
+            case '<':
+                if(thisVal < checkVal) {
+                    $(this).show();
+                }
+                break;
+            case '>=':
+                if(thisVal >= checkVal) {
+                    $(this).show();
+                }
+                break;
+            case '<=':
+                if(thisVal <= checkVal) {
+                    $(this).show();
+                }
+                break;
+        }
+    });
+}
 $(document).ready(function() {
     $('ul.pf_row').each(function() {
         var $items = $(this).find('li.pf_column');
@@ -281,5 +314,7 @@ $(document).ready(function() {
     $('input.time').timepicker({ ampm: true });
     // Need to hide this or a small outline is visible before the box is shown at the bottom of the page:
     $('#ui-datepicker-div').hide();
+    pf_update_conditionals();
+    $('.pf_field input, .pf_field select, .pf_field textarea').change(pf_update_conditionals);
 });
 </script>

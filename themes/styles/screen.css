@@ -535,9 +535,11 @@ ul.targetRow .ui-sortable-placeholder {
 	height: 150px;
 }
 
+/*
 #gridrow_validation {
 	border-collapse: collapse;
 }
+*/
 
 #gridrow_validation tr.even td {
 	background-color: #F4F6F6;
@@ -547,11 +549,13 @@ ul.targetRow .ui-sortable-placeholder {
 	width: 50px;
 }
 
+/*
 #gridrow_validation td {
 	border: 0 !important;
 	border-bottom: 1px solid #D0D7DF !important;
 	border-left: 1px solid #D0D7DF !important;
 }
+*/
 
 .pagination-btn {
 	display: inline-block;

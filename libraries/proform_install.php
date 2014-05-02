@@ -170,6 +170,8 @@ class Proform_install
             'placeholder'    => array('type' => 'varchar', 'constraint' => '250', 'default' => ''),
             'settings'       => array('type' => 'blob'),
             'site_id'        => array('type' => 'int', 'constraint' => '4', 'default' => 1),
+            'conditional_type'  => array('type' => 'varchar', 'constraint' => '64'),
+            'conditional_rules' => array('type' => 'text'),
         );
         $this->EE->dbforge->add_field($fields);
         $forge->add_key('field_id', TRUE);
@@ -415,6 +417,15 @@ class Proform_install
                 'form_driver'                       => array('type' => 'varchar', 'constraint' => '32', 'default' => ''),
             );
             $forge->add_column('proform_forms', $fields);
+        }
+
+        if($current < 1.46)
+        {
+            $fields = array(
+                'conditional_type'  => array('type' => 'varchar', 'constraint' => '64'),
+                'conditional_rules' => array('type' => 'text'),
+            );
+            $forge->add_column('proform_fields', $fields);
         }
 
         return TRUE;
