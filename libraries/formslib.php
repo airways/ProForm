@@ -420,11 +420,8 @@ class Formslib
                                                                   && $field_checked_flags[$field->field_name]) ? 'checked="checked"' : '',
                     'field_control'             => $field->get_control(),
                     'field_number'              => $count,
-                    /*
-                    'field_conditional'         => $field->conditional_field,
-                    'field_conditional_value'   => $field->conditional_value,
-                    'field_conditional_operator'=> $field->conditional_operator,
-                    */
+                    'field_conditionals_type'   => $field->conditional_type ? $field->conditional_type : 'all',
+                    'field_conditionals'        => $this->EE->pl_parser->wrap_array($field->get_conditionals(), 'rule', 'label'),
                 );
 
             // Create a fieldset for field_validation: to contain rows that are applied to each field, makes conditionals

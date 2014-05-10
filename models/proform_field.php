@@ -377,4 +377,29 @@ class PL_Field extends PL_RowInitialized
     {
         return $this->is_required == 'y' || in_array('required', explode('|', $this->validation));
     }
+    
+    function get_conditionals()
+    {
+        $json_rules = array();
+        if($this->conditional_rules)
+        {
+            $json_rules = json_decode($this->conditional_rules);
+        }
+        
+        $rules = array();
+        
+        foreach($json_rules as $json_rule)
+        {
+            $rule_value = isset($json_rule->{$json_rule->_}) ? $json_rule->{$json_rule->_} : '';
+            var_dump($json_rule);
+            $rules[] = array(
+                'field' => $json_rule->_,
+                
+                'value' => $rule_value,
+                $json_rule->_ => $rule_value,
+            );
+        }
+        
+        return $rules;
+    }
 }

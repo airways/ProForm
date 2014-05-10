@@ -47,10 +47,12 @@
         <ul class="pf_row">
             {pf_fields}
                 {if pf_field_type != "invisible"}
-                    <li id="{pf_field_html_id}" class="pf_column {pf_field_html_class}" {if pf_field_conditional}
-                            data-conditional="{pf_field_conditional}"
-                            data-conditional-operator="{pf_field_conditional_operator}"
-                            data-conditional-value="{pf_field_conditional_value}"       {/if}>
+                    <li id="{pf_field_html_id}" class="pf_column {pf_field_html_class}">
+                    {pf_field_conditionals}
+                        {pf_field_name}
+                        {pf_operator}
+                        {pf_value}
+                    {/pf_field_conditionals}
                     {if pf_field_html_block}
                         {pf_field_html_block}
                     {if:elseif pf_field_heading}

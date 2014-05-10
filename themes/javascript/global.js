@@ -267,9 +267,9 @@ var pl_grid = {
     data: {},
     forms: {},
     help: {},
-    bind_events: function(key, id, allow_duplicate) {
+    bind_events: function(key, id) {
         if(id) {
-            $('#field_'+key+' .add_grid_row').unbind('click').click(function(e) {
+            $('.add_grid_row').unbind('click').click(function(e) {
                 var val = $('#add'+id).val();
                 /*if(!$('#'+id+' tbody').length) {
                     $('#'+id).append('<tbody></tbody>');
@@ -283,78 +283,17 @@ var pl_grid = {
                     }
                 }
                 
-                if(!found || allow_duplicate)
+                if(!found)
                 {
                     // <button data-key="' + kbm_form_editey + '" data-opt="' + val + '" type="button" class="remove_grid_row">X</button></td>
-                    var data_row = {"_": val};
-                    var row = $('#field_'+key+' .grid_row').length;
+                    pl_grid.data[key].push([val]);
                     
-                    var form = '<input data-key="' + key + '" data-opt="' + val + '" data-row="' + row +'" type="text" size="5" class="grid_param" />';
+                    var form = '<input data-key="' + key + '" data-opt="' + val + '" type="text" size="5" class="grid_param" />';
                     
-                    //console.log(pl_grid.forms[key]);
                     if(pl_grid.forms[key])
                     {
-                        // Render form into columns for the grid
-                        var generated_form = '';
-                        i = 0;
-                        for(var column in pl_grid.forms[key])
-                        {
-                            var settings = pl_grid.forms[key][column];
-                            
-                            if(i > 0)
-                            {
-                                generated_form += '</td><td>';
-                            }
-                            
-                            var type = 'input';
-                            
-                            if(Array.isArray(settings)) {
-                                type = settings[0];
-                            } else {
-                                type = settings;
-                            }
-                            
-                            switch(type)
-                            {
-                                case 'dropdown':
-                                    generated_form += '<select data-key="' + key + '" data-opt="' + column + '" data-row="' + row +'" class="grid_param">';
-                                    //console.log(settings);
-                                    var opt_count = 0;
-                                    for(var option in settings[1])
-                                    {
-                                        if(opt_count == 0) data_row[column] = option;
-                                        generated_form += '<option value="' + option + '">' + settings[1][option].label + '</option>';
-                                        opt_count++;
-                                    }
-                                    generated_form += '</select>';
-                                    break;
-                                case 'input':
-                                    data_row[column] = '';
-                                    generated_form += '<input data-key="' + key + '" data-opt="' + column + '" data-row="' + row +'" type="text" size="40" class="grid_param" />';
-                                    break;
-                                default:
-                                    generated_form += 'Unknown grid column type ' + type + ' at ' + i;
-                            }
-                            
-                            
-                            i++;
-                        }
-                        
-                        if(i > 0)
-                        {
-                            form = generated_form;
-                        }
-                        //console.log('form = '+form);
+                        form = pl_grid.forms[key];
                     }
-                    
-                    pl_grid.data[key].push(data_row);
-                    
-                    /*
-                    console.log('#'+id+' tbody ==');
-                    console.log($('#'+id+' tbody'));
-                    console.log(pl_grid.options[key]);
-                    console.log(val);
-                    */
                     
                     $('#'+id+' tbody').append(
                         '<tr class="grid_row">'
@@ -363,7 +302,7 @@ var pl_grid = {
                                 pl_grid.options[key][val].flags && pl_grid.options[key][val].flags.indexOf('has_param') > -1
                                     ? '<td>'+form+'<span class="help">'+pl_grid.help[key][val]+'</span></td>'
                                     : '<td><span class="help">'+pl_grid.help[key][val]+'</span></td>'
-                            )+'<td><a href="#" class="remove_grid_row" data-key="'+ key +'" data-opt="' + val +'" data-row="' + row +'">X</a></td>'
+                            )+'<td><a href="#" class="remove_grid_row" data-key="'+ key +'" data-opt="' + val +'">X</a></td>'
                             +'</tr>'
                     );
                     pl_grid.bind_events();
@@ -375,41 +314,24 @@ var pl_grid = {
         
         var save_val = function() {
             var data = pl_grid.data[$(this).attr('data-key')];
-            
-            var row = $(this).attr('data-row');
-            var opt = $(this).attr('data-opt');
-            data[row][opt] = $(this).val();
-
-            /*
-            console.log(row);
-            console.log(opt);
-            console.log($(this).val());
-            console.log(pl_grid.data);
-            */
-            
-            /*
-            // Only works for grids that do not allow duplicates
             for(var i = 0; i < data.length; i++) {
                 if(data[i][0] == $(this).attr('data-opt')) {
-                    //data[i][1] = $(this).val();
-                    data[i][$(this).attr('data-opt')] = $(this).val();
+                    data[i][1] = $(this).val();
                 }
             }
-            */
+            //console.log(pl_grid.data['validation'][1][1]);
         }
         
         $('.grid_param').unbind('change').change(save_val);
         $('.grid_param').unbind('keyup').keyup(save_val);
-        $('.grid_param').unbind('click').click(save_val);
         
         $('.remove_grid_row').unbind('click').click(function(e) {
             var data = pl_grid.data[$(this).attr('data-key')];
             //console.log(data);
             for(var i = 0; i < data.length; i++) {
                 //console.log(data[i][0] + ' ? ' + $(this).attr('data-opt'));
-                if(data[i]['_'] == $(this).attr('data-opt')) {
+                if(data[i][0] == $(this).attr('data-opt')) {
                     data.remove(i);
-                    // TODO: renumber all rows beyond i
                 }
             }
             //console.log(data);
@@ -421,42 +343,28 @@ var pl_grid = {
         $('form.generic_edit').unbind('submit').submit(function() {
             proform_mod.dirty = false;
             
-            pl_grid.serialize();
-        });
-        
-    },
-    
-    serialize: function() {
-        $('.pl_grid').each(function() {
-            var key = $(this).attr('data-key')
-            
-            
-            /*
-            var val = '';
-            
-            for(var i = 0; i < pl_grid.data[key].length; i++)
-            {
-                val += pl_grid.data[key][i][0];
+            $(this).find('.pl_grid').each(function() {
+                var key = $(this).attr('data-key');
+                var val = '';
                 
-                if(pl_grid.data[key][i].length > 1)
+                //console.log(pl_grid.data[key]);
+                
+                for(var i = 0; i < pl_grid.data[key].length; i++)
                 {
-                    val += '[' + pl_grid.data[key][i][1] + ']';
+                    val += pl_grid.data[key][i][0];
+                    
+                    if(pl_grid.data[key][i].length > 1)
+                    {
+                        val += '[' + pl_grid.data[key][i][1] + ']';
+                    }
+                    val += '|';
                 }
-                val += '|';
-            }
-            val.trim('|');
-            */
-            
-            var val = JSON.stringify(pl_grid.data[key]);
-            
-            $('input[name='+key+']').val(val);
-            
-            //console.log(pl_grid.data);
-            console.log(key+' = '+$('input[name='+key+']').val());
-            
+                val.trim('|');
+                
+                $('input[name='+key+']').val(val);
+            });
         });
         
-        //console.log(pl_grid.data);
     }
 }
 
