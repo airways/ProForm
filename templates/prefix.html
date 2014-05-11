@@ -283,6 +283,11 @@ function pf_update_conditionals() {
                         $(this).show();
                     }
                     break;
+                case '!=':
+                    if(thisVal != checkVal) {
+                        $(this).show();
+                    }
+                    break;
                 case '>':
                     if(thisVal > checkVal) {
                         $(this).show();
@@ -331,6 +336,6 @@ $(document).ready(function() {
     // Need to hide this or a small outline is visible before the box is shown at the bottom of the page:
     $('#ui-datepicker-div').hide();
     pf_update_conditionals();
-    $('.pf_field input, .pf_field select, .pf_field textarea').change(pf_update_conditionals);
+    $('.pf_field input, .pf_field select, .pf_field textarea').change(pf_update_conditionals).keyup(pf_update_conditionals).click(pf_update_conditionals);
 });
 </script>

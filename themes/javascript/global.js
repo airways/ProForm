@@ -318,7 +318,7 @@ var pl_grid = {
                             
                             // These data-* attributes are used by save_val() to know which data row in the pl_grid.data array to update
                             // when the form element is modified
-                            var col_extra = 'data-key="'+column+'" data-opt="'+key+'" data-row="'+row_count+'" class="grid_param"';
+                            var col_extra = 'data-key="'+key+'" data-opt="'+column+'" data-row="'+row_count+'" class="grid_param"';
                             
                             switch(col_type)
                             {
@@ -405,15 +405,30 @@ var pl_grid = {
         $('.grid_param').unbind('keyup').keyup(save_val);
         
         $('.remove_grid_row').unbind('click').click(function(e) {
-            var data = pl_grid.data[$(this).attr('data-key')];
-            //console.log(data);
-            for(var i = 0; i < data.length; i++) {
-                //console.log(data[i][0] + ' ? ' + $(this).attr('data-opt'));
-                if(data[i][0] == $(this).attr('data-opt')) {
-                    data.remove(i);
+            var key = $(this).attr('data-key');
+            var data = pl_grid.data[key];
+            if(pl_grid.forms[key])
+            {
+                // New object-based data row
+                var opt_name = $(this).attr('data-opt');
+                var opt_row = $(this).attr('data-row');
+                // Remove the row from the array
+                pl_grid.remove_row(key, opt_row);
+            } else {
+                // Old array-based data row
+                for(var i = 0; i < data.length; i++) {
+                    //console.log(data[i][0] + ' ? ' + $(this).attr('data-opt'));
+                    if(data[i][0] == $(this).attr('data-opt')) {
+                        pl_grid.remove_row(key, i);
+                        /*
+                        data.remove(i);
+                        pl_grid.renumber(key, i+1, -1);
+                        */
+                    }
                 }
             }
-            //console.log(data);
+            console.log(data);
+            console.log($('#field_'+key+' .grid_row'));
             $(this).parents('tr.grid_row').remove();
             
             e.preventDefault();
@@ -421,34 +436,57 @@ var pl_grid = {
         
         $('form.generic_edit').unbind('submit').submit(function() {
             proform_mod.dirty = false;
-            
-            $(this).find('.pl_grid').each(function() {
-                var key = $(this).attr('data-key');
-                var val = '';
-                
-                if(pl_grid.forms[key])
-                {
-                    // New object-based grid are saved as JSON arrays of objects
-                    val = JSON.stringify(pl_grid.data[key]);
-                } else {
-                    // Old array-based grid data are saved as CodeIgniter-style
-                    // validation strings
-                    for(var i = 0; i < pl_grid.data[key].length; i++)
-                    {
-                        val += pl_grid.data[key][i][0];
-                        
-                        if(pl_grid.data[key][i].length > 1)
-                        {
-                            val += '[' + pl_grid.data[key][i][1] + ']';
-                        }
-                        val += '|';
-                    }
-                    val.trim('|');
-                }
-                $('input[name='+key+']').val(val);
-            });
+            pl_grid.serialize();
         });
         
+    },
+    
+    // Renumber data-row attributes to match the current sequence
+    remove_row: function(key, remove_row) {
+        // Remove the row from the data array
+        pl_grid.data[key].remove(remove_row);
+        $('#field_'+key+' .grid_param').each(function() {
+            var row = $(this).attr('data-row');
+            if(row == remove_row) {
+                // Remove the UI row
+                $(this).parent('tr');
+            } else if(row >= remove_row) {
+                // Renumber all UI rows after the removed row
+                $(this).attr('data-row', row-1);
+            }
+        });
+    },
+    
+    // Capture the data in pl_grid.data and convert it to string format in
+    // hidden form elements
+    serialize: function() {
+        $('form.generic_edit').find('.pl_grid').each(function() {
+            var key = $(this).attr('data-key');
+            var val = '';
+            
+            if(pl_grid.forms[key])
+            {
+                // New object-based grid are saved as JSON arrays of objects
+                val = JSON.stringify(pl_grid.data[key]);
+            } else {
+                // Old array-based grid data are saved as CodeIgniter-style
+                // validation strings
+                for(var i = 0; i < pl_grid.data[key].length; i++)
+                {
+                    val += pl_grid.data[key][i][0];
+                    
+                    if(pl_grid.data[key][i].length > 1)
+                    {
+                        val += '[' + pl_grid.data[key][i][1] + ']';
+                    }
+                    val += '|';
+                }
+                val.trim('|');
+            }
+            
+            console.log('key = ' + val);
+            $('input[name='+key+']').val(val);
+        });
     }
 }
 
