@@ -352,7 +352,7 @@ class PL_Field extends PL_RowInitialized
                     $rule->_ = $arr[0];
                     if(count($arr) > 1)
                     {
-                        $rule['value'] = str_replace(']', '', $arr[1]);
+                        $rule->value = str_replace(']', '', $arr[1]);
                     }
                     if($rule->_ != 'none' || $rule->_ != '') continue;
                 }
@@ -390,12 +390,15 @@ class PL_Field extends PL_RowInitialized
         
         foreach($json_rules as $json_rule)
         {
-            $rule_value = isset($json_rule->{$json_rule->_}) ? $json_rule->{$json_rule->_} : '';
-            var_dump($json_rule);
+            $rule_value = isset($json_rule->{$json_rule->_}) ? $json_rule->{$json_rule->_} : 
+                (isset($json_rule->value) ? $json_rule->value : '');
             $rules[] = array(
-                'field' => $json_rule->_,
-                
-                'value' => $rule_value,
+                'cond_field' => $json_rule->_,
+                'cond_field_esc' => str_replace("'", "\\'", $json_rule->_),
+                'cond_op' => $json_rule->operator,
+                'cond_operator' => $json_rule->operator,
+                'cond_value' => $rule_value,
+                'cond_value_esc' => str_replace("'", "\\'", $rule_value),
                 $json_rule->_ => $rule_value,
             );
         }

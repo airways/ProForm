@@ -47,12 +47,15 @@
         <ul class="pf_row">
             {pf_fields}
                 {if pf_field_type != "invisible"}
-                    <li id="{pf_field_html_id}" class="pf_column {pf_field_html_class}">
-                    {pf_field_conditionals}
-                        {pf_field_name}
-                        {pf_operator}
-                        {pf_value}
-                    {/pf_field_conditionals}
+                    <li id="{pf_field_html_id}" class="pf_column {pf_field_html_class}" data-field-name="{pf_field_name}" {if pf_field_conditionals_count}data-has-conditional="yes"{/if}>
+                    {if pf_field_conditionals_count}
+                        <script>
+                        pf_conditionals['{pf_field_name}'] = [];
+                        {pf_field_conditionals}
+                            pf_conditionals['{pf_field_name}'].push(['{pf_cond_field}', '{pf_cond_op}', '{pf_cond_value_esc}']);
+                        {/pf_field_conditionals}
+                        </script>
+                    {/if}
                     {if pf_field_html_block}
                         {pf_field_html_block}
                     {if:elseif pf_field_heading}

@@ -258,36 +258,52 @@ buttonList: [
     'hr', 'link', 'unlink',
     'removeFormat',
 ]};
+var pf_conditionals = [];
 function pf_update_conditionals() {
-    $('.pf_column[data-conditional]').hide().each(function() {
-        var thisVal = $('#'+$(this).attr('data-conditional')).val();
-        var checkVal = $(this).attr('data-conditional-value');
-        switch($(this).attr('data-conditional-operator')) {
-            case '=':
-                if(thisVal == checkVal) {
-                    $(this).show();
-                }
-                break;
-            case '>':
-                if(thisVal > checkVal) {
-                    $(this).show();
-                }
-                break;
-            case '<':
-                if(thisVal < checkVal) {
-                    $(this).show();
-                }
-                break;
-            case '>=':
-                if(thisVal >= checkVal) {
-                    $(this).show();
-                }
-                break;
-            case '<=':
-                if(thisVal <= checkVal) {
-                    $(this).show();
-                }
-                break;
+    $('.pf_column[data-has-conditional=yes]').hide().each(function() {
+        var fieldName = $(this).attr('data-field-name');
+        //console.log(pf_conditionals);
+        for(var i = 0; i < pf_conditionals[fieldName].length; i++) {
+            var cond = pf_conditionals[fieldName][i];
+            var checkField = cond[0];
+            var thisVal = $('#'+cond[0]).val();
+            var op = cond[1];
+            var checkVal = cond[2];
+            /*
+            console.log(fieldName);
+            console.log(cond);
+            console.log(checkField);
+            console.log(thisVal);
+            console.log(op);
+            console.log(checkVal);
+            */
+            switch(op) {
+                case '==':
+                    if(thisVal == checkVal) {
+                        $(this).show();
+                    }
+                    break;
+                case '>':
+                    if(thisVal > checkVal) {
+                        $(this).show();
+                    }
+                    break;
+                case '<':
+                    if(thisVal < checkVal) {
+                        $(this).show();
+                    }
+                    break;
+                case '>=':
+                    if(thisVal >= checkVal) {
+                        $(this).show();
+                    }
+                    break;
+                case '<=':
+                    if(thisVal <= checkVal) {
+                        $(this).show();
+                    }
+                    break;
+            }
         }
     });
 }
