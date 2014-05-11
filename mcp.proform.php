@@ -1717,7 +1717,7 @@ class Proform_mcp extends Prolib_base_mcp {
             '<'     => array('label' => '<', 'flags' => 'has_param'),
             '>='    => array('label' => '&ge;', 'flags' => 'has_param'),
             '<='    => array('label' => '&le;', 'flags' => 'has_param'),
-            'in'    => array('label' => '&isin;', 'flags' => 'has_param'),
+            'in'    => array('label' => '&isin; (in)', 'flags' => 'has_param'),
         );
         //*/
         
