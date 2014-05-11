@@ -271,7 +271,7 @@ var pl_grid = {
         if(id) {
             $('#field_' + key + ' .add_grid_row').unbind('click').click(function(e) {
                 var val = $('#add'+id).val();
-                console.log(val);
+                //console.log(val);
                 
                 /*if(!$('#'+id+' tbody').length) {
                     $('#'+id).append('<tbody></tbody>');
