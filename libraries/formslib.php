@@ -328,12 +328,14 @@ class Formslib
             }
 
             // handle normal posted fields
+            
+            $validation_rules = $field->get_validation();
+            
             $is_required = $field->is_required == 'y';
             if(!$is_required)
             {
                 // look for the always required value in the field's validation rules
-                $field_rules = explode('|', $field->validation);
-                foreach($field_rules as $rule)
+                foreach($validation_rules as $rule)
                 {
                     if($rule == 'required')
                     {
@@ -342,7 +344,7 @@ class Formslib
                 }
             }
 
-            $validation = $this->EE->pl_parser->wrap_array($field->get_validation(), 'rule_no', 'rule');
+            $validation = $this->EE->pl_parser->wrap_array($validation_rules, 'rule_no', 'rule');
             $validation_count = count($validation->array);
 
             // Determine placeholder based on validation rules, if possible - if not, use the type place
@@ -392,6 +394,8 @@ class Formslib
                 $field_value_wrap = FALSE;
             }
 
+            $field_conditionals = $field->get_conditionals();
+            
             $count++;
             $field_array = array(
                     //'field_callback'    => function($form_session->values, $key=FALSE) { return time(); },
@@ -418,13 +422,16 @@ class Formslib
                                                                   && $field_checked_flags[$field->field_name]) ? 'checked="checked"' : '',
                     'field_control'             => $field->get_control(),
                     'field_number'              => $count,
+                    'field_conditionals_type'   => $field->conditional_type ? $field->conditional_type : 'all',
+                    'field_conditionals_count'  => count($field_conditionals),
+                    'field_conditionals'        => $this->EE->pl_parser->wrap_array($field_conditionals, 'rule', 'label'),
                 );
 
             // Create a fieldset for field_validation: to contain rows that are applied to each field, makes conditionals
             // a lot easier
             foreach($validation->array as $rule)
             {
-                $field_array['field_validation:'.$rule] = '1';
+                $field_array['field_validation:'.$rule[0]] = '1';
             }
 
             // Copy field settings for each field type into the field array

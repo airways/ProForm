@@ -71,7 +71,7 @@
 <?php if(!isset($license_key) || !$license_key || strlen($license_key) < 16): ?>
 
     <div class="warning">
-        <p><strong>Reminder:</strong> You have not yet entered your ProForm License Key. Please do so on the <a href="<?php echo TAB_ACTION.'method=module_settings'; ?>">Module Settings</a> page for ProForm. <em>Please keep in mind that ProForm is licensed for use on one production site per license key.</em> Your purchase helps continue further development of ProForm, <b>thank you</b>!</em></p>
+        <p><strong>Reminder:</strong> You have not yet entered your ProForm License Key. Please do so on the <a href="<?php echo TAB_ACTION.'method=module_settings'; ?>">Module Settings</a> page for ProForm. <em>Please keep in mind that ProForm is licensed for use on one production site per license key,</em> and you can always purchase a copy of ProForm on the <a href="http://devot-ee.com/add-ons/proform-drag-and-drop-form-builder" target="_blank">Devot-ee Product Page</a>. Your purchase helps continue further development of ProForm, <b>thank you</b>!</em></p>
     </div>
 <?php endif; ?>
 
@@ -112,16 +112,23 @@
 
 <?php if($show_quickstart_on == 'y'): ?>
     <div class="info">
-        <p><strong>Quick Start:</strong> To get started follow these quick steps:</p>
-        <p>1. Create a new form above with the Create a Form menu above. (User Guide: <a href="http://metasushi.com/documentation/proform/cp/forms.html#create_form" target="_blank">Create Form</a>)</p>
-        <p>2. Click the Edit Layout link for the form, then add fields to it using the Toolbox (User Guide: <a href="http://metasushi.com/documentation/proform/cp/forms.html#layout" target="_blank">Form Layout</a>)</p>
-        <p>3. Insert the simple template tag into a template, using the Form Name value generated for your form (User Guide: <a href="http://metasushi.com/documentation/proform/tags/form.html#simple" target="_blank">Sime Form Tag</a>)<br/><br/>
+        <p><strong>Quick Start &mdash; </strong> To get started follow these quick steps, and optionally see the related User Guide pages for more details on each step.</p>
+        <p>1. Create a new form above by hovering on <i>Create a Form</i> then clicking <i>Basic Form</i>. (User Guide: <a href="http://metasushi.com/documentation/proform/cp/forms.html#create_form" target="_blank">Create Form</a>)</p>
+        <p>2. After adding the form, click the <i>Edit Layout</i> link for the form in the list above, then add fields to it using the Toolbox. (User Guide: <a href="http://metasushi.com/documentation/proform/cp/forms.html#layout" target="_blank">Form Layout</a>)</p>
+        <p>3. Insert the simple template tag into a template, using the <i>Form Name</i> value shown above for your form. (User Guide: <a href="http://metasushi.com/documentation/proform/tags/form.html#simple" target="_blank">Simple Form Tag</a>)<br/><br/>
+            For example:</p>
             <pre>
-                {exp:proform:simple form="name_of_form"}
+                {exp:proform:simple form="form_name_here"}
             </pre>
         </p>
-        <p>That's all there is to it!</p>
-        <p>(You can hide this message on the <a href="<?php echo TAB_ACTION.'method=module_settings'; ?>">Module Settings</a> page.</p>
+        <p>That's all there is to it! You can now visit your template and view the form.</p>
+        
+        <p><b>Bonus: Generic Form Template &mdash; </b> To create a generic form template that can show any form you've created, use this sample instead:<br/><br/>
+            <pre>
+                {exp:proform:simple form="{segment_3}"}
+            </pre>
+        If the template is saved as <i>forms/view</i> you would then visit a URL like <i>http://example.com/forms/view/form_name_here</i> to get the same results as the first example.</p>
+        <p>(You can hide this message by settings the <i>Show Quick Start</i> option to <i>No</i> on the <a href="<?php echo TAB_ACTION.'method=module_settings'; ?>">Module Settings</a> page.)</p>
     </div>
 <?php endif; ?>
 <?php if($pagination): ?>

@@ -64,7 +64,7 @@ if(preg_match('#<div.*?id="forumSearchBox".*?>.*?(<form.*?</form>.*?)</div>#s', 
 
 <h3>Recent forum posts</h3>
 <ul>
-<?
+<?php
 if(preg_match_all('#<div.*?class="topicTitle".*?>(.*?)</div>#s', $forum_html, $matches))
 {
     foreach($matches[1] as $match)

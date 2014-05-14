@@ -35,7 +35,7 @@ global $PROLIB;
 <?php if(!isset($license_key) || !$license_key || strlen($license_key) < 16): ?>
 
     <div class="warning">
-        <p><strong>Reminder:</strong> You have not yet entered your ProForm License Key. Please do so on the <a href="<?php echo TAB_ACTION.'method=module_settings'; ?>">Module Settings</a> page for ProForm. <i>Please keep in mind that ProForm is licensed for use on one production site per license key.</i> Your purchase helps continue further development of ProForm, <b>thank you</b>!</em></p>
+        <p><strong>Reminder:</strong> You have not yet entered your ProForm License Key. Please do so on the <a href="<?php echo TAB_ACTION.'method=module_settings'; ?>">Module Settings</a> page for ProForm. <em>Please keep in mind that ProForm is licensed for use on one production site per license key,</em> and you can always purchase a copy of ProForm on the <a href="http://devot-ee.com/add-ons/proform-drag-and-drop-form-builder" target="_blank">Devot-ee Product Page</a>. Your purchase helps continue further development of ProForm, <b>thank you</b>!</em></p>
     </div>
 <?php endif; ?>
 <?php
@@ -75,13 +75,14 @@ endif;
 ?>
 
 <div class="editForm" id="<?php if(isset($form_name)) echo $form_name; ?>">
+
 <?php
     if(!isset($generic_edit_embedded) || !$generic_edit_embedded)
     {
         echo form_open($action_url, array('class' => 'generic_edit'), isset($hidden) ? $hidden : array());
     }
     $table_template = $cp_table_template;
-    $table_template['cell_start'] = '<td width="50%">';
+    $table_template['cell_start'] = '<td width="20%">';
     $table_heading = array(lang('heading_property'), lang('heading_value'));
     $this->table->set_template($table_template);
     $this->table->set_heading($table_heading);
