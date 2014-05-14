@@ -72,6 +72,8 @@
 
 
 <?php echo form_open($action_url, array('id' => 'main_form'), isset($hidden) ? $hidden : array()); ?>
+<?php echo form_submit(array('name' => 'submit', 'value' => lang('save_form'), 'class' => 'submit')); ?>
+
 <?php echo form_hidden('active_tab'); ?>
 
 <!-- start edit form tab content -->
@@ -100,7 +102,7 @@
 </div>
 
 <?php endif; ?>
-<br/>
+<br/><br/>
 <?php echo form_submit(array('name' => 'submit', 'value' => lang('save_form'), 'class' => 'submit')); ?>
 <?php echo form_close(); ?>
 <?php

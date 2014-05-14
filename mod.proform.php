@@ -104,6 +104,12 @@ class Proform {
         if(!isset($this->cache['prefix_included']) || !$this->cache['prefix_included'])
         {
             $result = file_get_contents(PATH_THIRD.'proform/templates/'.$prefix.'.html');
+            
+            // The default variable_prefix here must match what is in default.html in order for this to work
+            // as expected. It should be (and is) a blank string in the form() tag however.
+            $variable_prefix    = pf_strip_id($this->EE->TMPL->fetch_param('variable_prefix', 'pf_'));
+            $result = str_replace(LD.$variable_prefix.'proform_version'.RD, PROFORM_VERSION, $result);
+            $result = str_replace(LD.$variable_prefix.'proform_debug'.RD, PROFORM_DEBUG, $result);
             $this->cache['prefix_included'] = TRUE;
         }
         return $result;
@@ -198,7 +204,10 @@ class Proform {
         $this->EE->load->library('proform_notifications');
 
         $varsets = array();
-        $variables = array();
+        $variables = array(
+            'proform_version' => PROFORM_VERSION,
+            'proform_debug' => PROFORM_DEBUG,
+        );
 
         $module_preferences = $this->EE->formslib->prefs->get_preferences();
         $varsets[] = array('pref', $module_preferences);
@@ -230,6 +239,10 @@ class Proform {
         $hidden_fields_mode = strtolower($this->EE->TMPL->fetch_param('hidden_fields_mode', 'split'));
         $last_step_summary  = $this->EE->TMPL->fetch_param('last_step_summary') == 'yes';
         $placeholders       = $this->EE->pl_parser->fetch_param_group('placeholder');
+        // compress: "trim" (remove all indentation in template + duplicate blank lines in final output),
+        //        or "strip" (trim + remove all newlines in template)
+        $p_compress         = $this->EE->TMPL->fetch_param('compress', '');
+
         
         if(!isset($this->cache['set_fields'][$form_name]))
         {
@@ -658,6 +671,16 @@ class Proform {
         }
 
         // Parse variables
+        if($p_compress == 'trim' || $p_compress == 'strip')
+        {
+            // Remove all indentation from the template
+            $tagdata = preg_replace('/^\s+/m', '', $tagdata);
+            if($p_compress == 'strip')
+            {
+                $tagdata = preg_replace('/\n/m', '', $tagdata);
+            }
+        }
+
         $output .= $this->EE->pl_parser->parse_variables_ex(array(
             'rowdata' => $tagdata,
             'row_vars' => $variables,
@@ -683,8 +706,27 @@ class Proform {
 
         ////////////////////
         // Return result
+        if($p_compress == 'trim' || $p_compress == 'strip')
+        {
+            // Remove multiple blank newlines in sequence
+            $textarea = array();
+            /*
+            if(preg_match_all('/<textarea(.*)</textarea>/m', $output, $matches))
+            {
+                
+            }
+            */
+            
+            $output = preg_replace('/^\h*\v+/m', '', $output);
+            
+            foreach($textareas as $id => $markup)
+            {
+                
+            }
+        }
+        
         $this->return_data = $output;
-
+        
 
         if($this->debug)
         {
@@ -1764,6 +1806,77 @@ class Proform {
         {
             // Only process validation for the current form
             if($field->step_no != $form_session->config['step']) continue;
+            
+            // Conditional Fields: Only process validation for fields that have all conditions met
+            $conditionals = $field->get_conditionals();
+            if(count($conditionals) == 0)
+            {
+                $visible = true;
+            } else {
+                $conditional_type = $field->conditional_type ? $field->conditional_type : 'all';
+                switch($conditional_type)
+                {
+                    case 'all':
+                        $visible = true;
+                        break;
+                    case 'all':
+                        $visible = false;
+                        break;
+                    default:
+                        $visible = false;
+                }
+                
+                foreach($conditionals as $cond)
+                {
+                    $cond = (object)$cond;
+
+                    if(isset($form_session->values[$cond->cond_field])) {
+                        $this_val = $form_session->values[$cond->cond_field];
+                    } else {
+                        $this_val = '';
+                    }
+                    switch($cond->cond_op)
+                    {
+                        case '==':
+                            $op_result = $this_val == $cond->cond_value;
+                            break;
+                        case '!=':
+                            $op_result = $this_val != $cond->cond_value;
+                            break;
+                        case '>':
+                            $op_result = $this_val > $cond->cond_value;
+                            break;
+                        case '<':
+                            $op_result = $this_val < $cond->cond_value;
+                            break;
+                        case '>=':
+                            $op_result = $this_val >= $cond->cond_value;
+                            break;
+                        case '<=':
+                            $op_result = $this_val <= $cond->cond_value;
+                            break;
+                    }
+                    
+                    switch($conditional_type)
+                    {
+                        case 'all':
+                            $visible = $visible && $op_result;
+                            break;
+                        case 'any':
+                            if($op_result)
+                                $visible = true;
+                            break;
+                        default:
+                            if($op_result)
+                                $visible = true;
+                            break;
+                    }
+                }
+            }
+
+            // Now we skip if the field isn't visible
+            if(!$visible) continue;
+            
             if($field->type == 'list' || $field->type == 'relationship')
             {
                 // Check that the value submitted is one of the available options
@@ -1869,7 +1982,11 @@ class Proform {
                     //echo $srule."<br/>";
                     if($srule != 'none' && $srule != '')
                     {
-                        if(($n = strpos($srule, '[')) !== FALSE)
+                        if(is_object($srule))
+                        {
+                            $rule = array($srule->_, isset($srule->{$srule->_}) ? $srule->{$srule->_} : '');
+                        }
+                        elseif(($n = strpos($srule, '[')) !== FALSE)
                         {
                             // has a param - remove the ']' from the end
                             if($srule[strlen($srule)-1] == ']') $srule = substr($srule, 0, -1);

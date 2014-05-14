@@ -62,6 +62,8 @@ class PL_Field extends PL_RowInitialized
     var $field_name = FALSE;
     var $type = 'string';
     var $length = FALSE;
+    var $conditional_type = FALSE;
+    var $conditional_rules = FALSE;
     var $validation = FALSE;
     var $placeholder = FALSE;
     var $upload_pref_id = FALSE;
@@ -326,11 +328,42 @@ class PL_Field extends PL_RowInitialized
     {
         // Explode the validation string, and remove any blank values found in it, as well as the 'none'
         // value used to indicate a lack of validation.
-        $field_rules = array_filter_values(explode('|', $this->validation), array('none', ''));
+        if($this->validation[0] == '[')
+        {
+            // Load new JSON grid syntax
+            $field_rules = json_decode($this->validation);
+        } else {
+            // Load old CI validation syntax
+            $field_rules = array_filter_values(explode('|', $this->validation), array('none', ''));
+        }
+        
+        foreach($field_rules as $rule)
+        {
+            if($rule) {
+                if(!is_object($rule)) {
+                    // Load old CI validation syntax
+                    if(strpos($rule, '[') !== FALSE)
+                    {
+                        $arr = explode('[',$rule);
+                    } else {
+                        $arr = array($rule);
+                    }
+                    $rule = (object)array();
+                    $rule->_ = $arr[0];
+                    if(count($arr) > 1)
+                    {
+                        $rule->value = str_replace(']', '', $arr[1]);
+                    }
+                    if($rule->_ != 'none' || $rule->_ != '') continue;
+                }
+            }
+        }
+        
         if($this->is_required == 'y')
         {
-            $field_rules[] = 'required';
+            $field_rules[] = (object)array('_' => 'required');
         }
+        
         return $field_rules;
     }
 
@@ -343,5 +376,33 @@ class PL_Field extends PL_RowInitialized
     function is_required()
     {
         return $this->is_required == 'y' || in_array('required', explode('|', $this->validation));
+    }
+    
+    function get_conditionals()
+    {
+        $json_rules = array();
+        if($this->conditional_rules)
+        {
+            $json_rules = json_decode($this->conditional_rules);
+        }
+        
+        $rules = array();
+        
+        foreach($json_rules as $json_rule)
+        {
+            $rule_value = isset($json_rule->{$json_rule->_}) ? $json_rule->{$json_rule->_} : 
+                (isset($json_rule->value) ? $json_rule->value : '');
+            $rules[] = array(
+                'cond_field' => $json_rule->_,
+                'cond_field_esc' => str_replace("'", "\\'", $json_rule->_),
+                'cond_op' => $json_rule->operator,
+                'cond_operator' => $json_rule->operator,
+                'cond_value' => $rule_value,
+                'cond_value_esc' => str_replace("'", "\\'", $rule_value),
+                $json_rule->_ => $rule_value,
+            );
+        }
+        
+        return $rules;
     }
 }

@@ -269,8 +269,10 @@ var pl_grid = {
     help: {},
     bind_events: function(key, id) {
         if(id) {
-            $('.add_grid_row').unbind('click').click(function(e) {
+            $('#field_' + key + ' .add_grid_row').unbind('click').click(function(e) {
                 var val = $('#add'+id).val();
+                //console.log(val);
+                
                 /*if(!$('#'+id+' tbody').length) {
                     $('#'+id).append('<tbody></tbody>');
                 }*/
@@ -285,56 +287,148 @@ var pl_grid = {
                 
                 if(!found)
                 {
-                    // <button data-key="' + kbm_form_editey + '" data-opt="' + val + '" type="button" class="remove_grid_row">X</button></td>
-                    pl_grid.data[key].push([val]);
+                    var row_count = $('#field_' + key + ' .grid_row').length;
+                    var html_form = '<input data-key="' + key + '" data-opt="' + val + '" type="text" size="5" class="grid_param" />';
                     
-                    var form = '<input data-key="' + key + '" data-opt="' + val + '" type="text" size="5" class="grid_param" />';
-                    
+                    // If we have custom form settings, we will initialize an object-based data row and generate the HTML
+                    // for the row with the right form elements in it
                     if(pl_grid.forms[key])
                     {
-                        form = pl_grid.forms[key];
+                        // Start the blank object-based data row. The weird _ property is the value of the first item in the grid - 
+                        // which is always chosen from a fixed set of options (pl_grid.options[] for that grid).
+                        var data_row = {'_': val};
+                        var form = pl_grid.forms[key];
+                        
+                        // Generate the HTML for the form from the columns for this grid
+                        html_form = '';
+                        var col_count = 0;
+                        for(var column in form)
+                        {
+                            col_count++;
+                            
+                            // Each column's settings are either a single string value, which is the column type,
+                            // or an array of two items: column type, additional options
+                            var col = form[column];
+                            if(Array.isArray(col)) {
+                                var col_type = col[0];
+                                var col_options = col[1];
+                            } else {
+                                var col_type = col;
+                            }
+                            
+                            // These data-* attributes are used by save_val() to know which data row in the pl_grid.data array to update
+                            // when the form element is modified
+                            var col_extra = 'data-key="'+key+'" data-opt="'+column+'" data-row="'+row_count+'" class="grid_param"';
+                            
+                            switch(col_type)
+                            {
+                                case 'dropdown':
+                                    // Generate a dropdown with the first option set as the default in the data row
+                                    html_form += '<select type="text" name="'+key+'_'+column+'" '+col_extra+'>';
+                                    var opt_count = 0;
+                                    for(var opt_key in col_options)
+                                    {
+                                        opt_count++;
+                                        // If this is the first option, set it as the value in the data row so it will be saved
+                                        // if left unchanged in the dropdown
+                                        if(opt_count == 1) data_row[column] = opt_key;
+                                        // Generate the option
+                                        html_form += '<option value="'+opt_key+'">'+col_options[opt_key].label+'</option>';
+                                    }
+                                    html_form += '</select>';
+                                    break;
+                                case 'input':
+                                    // Generate a simple text input with a blank string as the default in the data row
+                                    data_row[column] = '';
+                                    html_form += '<input type="text" name="'+key+'_'+column+'" value="" '+col_extra+' />';
+                                    break;
+                                default:
+                                    html_form += 'Unknown column type at column ' + col_count;
+                            }
+                            
+                            if(col_count < Object.keys(form).length) {
+                                html_form += '</td><td>';
+                            }
+                        }
+                        // Push the initialized object-based default data row. This value will be modified over as the user uses the interface
+                        pl_grid.data[key].push(data_row);
+                    } else {
+                        // Push a simple, array-based data row
+                        pl_grid.data[key].push([val]);
                     }
                     
+                    // Insert the table row into the grid
                     $('#'+id+' tbody').append(
                         '<tr class="grid_row">'
                             +'<td>'+pl_grid.options[key][val].label+'</td>'
                             +(
                                 pl_grid.options[key][val].flags && pl_grid.options[key][val].flags.indexOf('has_param') > -1
-                                    ? '<td>'+form+'<span class="help">'+pl_grid.help[key][val]+'</span></td>'
+                                    ? '<td>'+html_form+'<span class="help">'+pl_grid.help[key][val]+'</span></td>'
                                     : '<td><span class="help">'+pl_grid.help[key][val]+'</span></td>'
                             )+'<td><a href="#" class="remove_grid_row" data-key="'+ key +'" data-opt="' + val +'">X</a></td>'
                             +'</tr>'
                     );
+                    
+                    // Rebind jQuery events so they apply to this row as well
                     pl_grid.bind_events();
                 }
                 
+                // Don't actually submit anything just yet
                 e.preventDefault();
             });
         }
         
+        // This function is bound as the change, keyup, and other events on every grid input element so that we can capture
+        // the value for each element and save it to the pl_grid.data array which is serialized before submit
         var save_val = function() {
-            var data = pl_grid.data[$(this).attr('data-key')];
-            for(var i = 0; i < data.length; i++) {
-                if(data[i][0] == $(this).attr('data-opt')) {
-                    data[i][1] = $(this).val();
+            var key = $(this).attr('data-key');
+            var data = pl_grid.data[key];
+            
+            if(pl_grid.forms[key])
+            {
+                // New object-based data row
+                var opt_name = $(this).attr('data-opt');
+                var opt_row = $(this).attr('data-row');
+                data[opt_row][opt_name] = $(this).val();
+            } else {
+                // Old array-based data row
+                for(var i = 0; i < data.length; i++) {
+                    if(data[i][0] == $(this).attr('data-opt')) {
+                        data[i][1] = $(this).val();
+                    }
                 }
             }
-            //console.log(pl_grid.data['validation'][1][1]);
+            //console.log(pl_grid.data[key]);
         }
         
         $('.grid_param').unbind('change').change(save_val);
         $('.grid_param').unbind('keyup').keyup(save_val);
         
         $('.remove_grid_row').unbind('click').click(function(e) {
-            var data = pl_grid.data[$(this).attr('data-key')];
-            //console.log(data);
-            for(var i = 0; i < data.length; i++) {
-                //console.log(data[i][0] + ' ? ' + $(this).attr('data-opt'));
-                if(data[i][0] == $(this).attr('data-opt')) {
-                    data.remove(i);
+            var key = $(this).attr('data-key');
+            var data = pl_grid.data[key];
+            if(pl_grid.forms[key])
+            {
+                // New object-based data row
+                var opt_name = $(this).attr('data-opt');
+                var opt_row = $(this).attr('data-row');
+                // Remove the row from the array
+                pl_grid.remove_row(key, opt_row);
+            } else {
+                // Old array-based data row
+                for(var i = 0; i < data.length; i++) {
+                    //console.log(data[i][0] + ' ? ' + $(this).attr('data-opt'));
+                    if(data[i][0] == $(this).attr('data-opt')) {
+                        pl_grid.remove_row(key, i);
+                        /*
+                        data.remove(i);
+                        pl_grid.renumber(key, i+1, -1);
+                        */
+                    }
                 }
             }
-            //console.log(data);
+            console.log(data);
+            console.log($('#field_'+key+' .grid_row'));
             $(this).parents('tr.grid_row').remove();
             
             e.preventDefault();
@@ -342,13 +436,41 @@ var pl_grid = {
         
         $('form.generic_edit').unbind('submit').submit(function() {
             proform_mod.dirty = false;
+            pl_grid.serialize();
+        });
+        
+    },
+    
+    // Renumber data-row attributes to match the current sequence
+    remove_row: function(key, remove_row) {
+        // Remove the row from the data array
+        pl_grid.data[key].remove(remove_row);
+        $('#field_'+key+' .grid_param').each(function() {
+            var row = $(this).attr('data-row');
+            if(row == remove_row) {
+                // Remove the UI row
+                $(this).parent('tr');
+            } else if(row >= remove_row) {
+                // Renumber all UI rows after the removed row
+                $(this).attr('data-row', row-1);
+            }
+        });
+    },
+    
+    // Capture the data in pl_grid.data and convert it to string format in
+    // hidden form elements
+    serialize: function() {
+        $('form.generic_edit').find('.pl_grid').each(function() {
+            var key = $(this).attr('data-key');
+            var val = '';
             
-            $(this).find('.pl_grid').each(function() {
-                var key = $(this).attr('data-key');
-                var val = '';
-                
-                //console.log(pl_grid.data[key]);
-                
+            if(pl_grid.forms[key])
+            {
+                // New object-based grid are saved as JSON arrays of objects
+                val = JSON.stringify(pl_grid.data[key]);
+            } else {
+                // Old array-based grid data are saved as CodeIgniter-style
+                // validation strings
                 for(var i = 0; i < pl_grid.data[key].length; i++)
                 {
                     val += pl_grid.data[key][i][0];
@@ -360,11 +482,11 @@ var pl_grid = {
                     val += '|';
                 }
                 val.trim('|');
-                
-                $('input[name='+key+']').val(val);
-            });
+            }
+            
+            console.log('key = ' + val);
+            $('input[name='+key+']').val(val);
         });
-        
     }
 }
 

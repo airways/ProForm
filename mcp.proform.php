@@ -723,11 +723,17 @@ class Proform_mcp extends Prolib_base_mcp {
 
             $vars['special_options'] = array(
                 array('label' => 'Heading',                     'type' => 'heading',                 'icon' => 'flag_blue.png',
-                      'url' => ACTION_BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_separator'.AMP.'form_id='.$form_id.AMP.'type='.PL_Form::SEPARATOR_HEADING),
+                      'url' => cp_url('cp/addons_modules/show_module_cp', array('module' => 'proform', 'method' => 'new_separator', 'form_id' => $form_id,
+                      'type' => PL_Form::SEPARATOR_HEADING)),
+                ),
                 array('label' => 'Form Step',                   'type' => 'step',                    'icon' => 'page_add.png',
-                      'url' => ACTION_BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_separator'.AMP.'form_id='.$form_id.AMP.'type='.PL_Form::SEPARATOR_STEP),
+                      'url' => cp_url('cp/addons_modules/show_module_cp', array('module' => 'proform', 'method' => 'new_separator', 'form_id' => $form_id,
+                      'type' => PL_Form::SEPARATOR_STEP)),
+                ),
                 array('label' => 'HTML Block',                   'type' => 'html',                    'icon' => 'html_add.png',
-                      'url' => ACTION_BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=new_separator'.AMP.'form_id='.$form_id.AMP.'type='.PL_Form::SEPARATOR_HTML),
+                      'url' => cp_url('cp/addons_modules/show_module_cp', array('module' => 'proform', 'method' => 'new_separator', 'form_id' => $form_id,
+                      'type' => PL_Form::SEPARATOR_HTML)),
+                ),
             );
             
             $form_obj = $form;
@@ -1599,6 +1605,13 @@ class Proform_mcp extends Prolib_base_mcp {
         $this->EE->load->library('formslib');
 
         $form_id = (int)$this->EE->input->get('form_id');
+        if($form_id) {
+            $form_obj = $this->EE->formslib->forms->get_object($form_id);
+        } elseif((int)$this->EE->input->get('auto_add_form_id')) {
+            $form_obj = $this->EE->formslib->forms->get_object((int)$this->EE->input->get('auto_add_form_id'));
+        } else {
+            $form_obj = FALSE;
+        }
 
         if($editing && $this->EE->input->post('field_id') !== FALSE)
         {
@@ -1664,12 +1677,70 @@ class Proform_mcp extends Prolib_base_mcp {
 
         // Chop off last comma and space
         $field->assigned_forms = rtrim($field->assigned_forms, ', ');
-
-
+        
+        $conditional_options = array('all' => 'All', 'any' => 'Any');
+        
+        if($form_obj) {
+            $form_field_options = $form_obj->get_form_field_options();
+        } else {
+            $form_field_options = array();
+        }
+        
+        $grid_form_field_options = array();
+        foreach($form_field_options as $option_value => $form_field_option)
+        {
+            if($form_field_option == 'None') continue;
+            $grid_form_field_option = array(
+                'label' => $form_field_option,
+                'flags' => 'has_param'
+            );
+            $grid_form_field_options[$option_value] = $grid_form_field_option;
+        }
+        
+        /*
+        $operator_options = array(
+            '=='    => array('label' => 'Equals', 'flags' => 'has_param'),
+            '!='    => array('label' => 'Does Not Equal', 'flags' => 'has_param'),
+            '>'     => array('label' => 'Is Greater Than', 'flags' => 'has_param'),
+            '<'     => array('label' => 'Is Less Than', 'flags' => 'has_param'),
+            '>='    => array('label' => 'Is Greater Than or Equal To', 'flags' => 'has_param'),
+            '<='    => array('label' => 'Is Less Than or Equal To', 'flags' => 'has_param'),
+            'in'    => array('label' => 'Equals One Of', 'flags' => 'has_param'),
+        );
+        //*/
+        
+        //*
+        $operator_options = array(
+            '=='    => array('label' => '=', 'flags' => 'has_param'),
+            '!='    => array('label' => '&ne;', 'flags' => 'has_param'),
+            '>'     => array('label' => '>', 'flags' => 'has_param'),
+            '<'     => array('label' => '<', 'flags' => 'has_param'),
+            '>='    => array('label' => '&ge;', 'flags' => 'has_param'),
+            '<='    => array('label' => '&le;', 'flags' => 'has_param'),
+            'in'    => array('label' => '&isin; (in)', 'flags' => 'has_param'),
+        );
+        //*/
+        
         $types = array(
             'field_id'          => 'read_only',
             'field_label'       => 'input',
             'field_name'        => 'input',
+            'conditional_type'  => array('dropdown', $conditional_options),
+            'conditional_rules' => array(
+                'grid', array( /* options for items that can be added to the grid */
+                    'headings'  => array('Field', 'Operator', 'Value'),
+                    'options'   => $grid_form_field_options,
+                    'allow_duplicate' => true,
+                    'form'      => array(
+                            'operator'  => array('dropdown', $operator_options),
+                            'value'     => 'input',
+                        ),
+                    )),
+            /*
+            'conditional_field' => array('dropdown', $form_field_options),
+            'conditional_operator' => array('dropdown', $operator_options),
+            'conditional_value' => 'input',
+            */
             'type'              => array(
                 'dropdown', $this->field_type_options, $this->field_type_settings),
             'length'            => 'input',
@@ -2897,8 +2968,8 @@ class Proform_mcp extends Prolib_base_mcp {
         return TRUE;
     }
 
-
-    function _render_grid($key, $headings, $options, $value)
+/*
+    function _render_grid($key, $headings, $options, $value, $form = FALSE)
     {
         $out = '';
 
@@ -2976,24 +3047,27 @@ class Proform_mcp extends Prolib_base_mcp {
         $out .= 'pl_grid.options["'.$key.'"] = ' . json_encode($options) . ';';
         $out .= 'pl_grid.help["'.$key.'"] = ' . json_encode($help) . ';';
         $out .= 'pl_grid.data["'.$key.'"] = ' . json_encode($grid) . ';';
-        /*$out .= 'var options = {';
-        foreach($options as $option => $opts)
-        {
-            $out .= $option.': {';
-            foreach($opts as $k => $v)
-            {
-                $out .= $k.': "'.$v.'",';
-            }
-            $out = substr($out, 0, -1);
-            $out .= '},';
-        }
+        $out .= 'pl_grid.forms["'.$key.'"] = ' . json_encode($form) . ';';
+        
+        #$out .= 'var options = {';
+        #foreach($options as $option => $opts)
+        #{
+        #    $out .= $option.': {';
+        #    foreach($opts as $k => $v)
+        #    {
+        #        $out .= $k.': "'.$v.'",';
+        #    }
+        #    $out = substr($out, 0, -1);
+        #    $out .= '},';
+        #}
         $out = substr($out, 0, -1);
-        $out .= '};';*/
+        $out .= '};';
         $out .= 'pl_grid.bind_events("'.$key.'", "gridrow_'.$key.'");</script>';
         $out .= '</div>';
 
         return $out;
     } // function _render_grid
+*/
 
     function _get_mailinglists()
     {
