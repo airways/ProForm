@@ -38,19 +38,20 @@
 <div class="section-content-wrapper grid-group">
     <ul class="nav-global-top grid-group">
         <li>
-            <h1 class="text-replace nav-logo-header"><a href="http://metasushi.com/">MetaSushi</a></h1>
+            <h1 class="text-replace nav-logo-header"><a href="http://metasushi.com/">METASUSHI</a></h1>
         </li>
         <li><a class="nav-2-prod" href="http://metasushi.com/products">Products</a></li>
+        <li><a class="nav-2-prod" href="http://metasushi.com/services">Services</a></li>
         <li><a class="nav-3-doc" href="http://metasushi.com/documentation">Documentation</a></li>
         <li><a class="nav-4-links" href="http://metasushi.com/blog">Blog</a></li>
         <li><span class="nav-5-con" href="index.html">&nbsp;</span></li>
         <li class="nav-right-end-search">
-
+            
             <form action="http://metasushi.com/search/" method="get">
                 <input type="submit" value="">
                 <input type="text" name="q" value="" placeholder="Search...">
             </form>
-
+            
         </li>
     </ul>
     <div class="section-content-wide content-box" id="documentation">

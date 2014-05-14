@@ -28,9 +28,10 @@
 <div class="section-content-wrapper grid-group">
     <ul class="nav-global-top grid-group">
         <li>
-            <h1 class="text-replace nav-logo-header"><a href="http://metasushi.com/">MetaSushi</a></h1>
+            <h1 class="text-replace nav-logo-header"><a href="http://metasushi.com/">METASUSHI</a></h1>
         </li>
         <li><a class="nav-2-prod" href="http://metasushi.com/products">Products</a></li>
+        <li><a class="nav-2-prod" href="http://metasushi.com/services">Services</a></li>
         <li><a class="nav-3-doc" href="http://metasushi.com/documentation">Documentation</a></li>
         <li><a class="nav-4-links" href="http://metasushi.com/blog">Blog</a></li>
         <li><span class="nav-5-con" href="index.html">&nbsp;</span></li>
@@ -182,7 +183,16 @@
 </tr>
 <!-------------------->
 <tr><td><b>proform_insert_end</b></td>
-    <td>$module, $form_obj, $data</td>
+    <td>$module, $form_session</td>
+    <td>none</td>
+</tr>
+<tr><td colspan="3">
+    <p><b>Description</b></p>
+    <p>This hook is called just after inserting the data for the form submission into the database. This can be used to push the final data array to an external source, generating some sort of custom notification, or a number of other purposes.<p></td>
+</tr>
+<!-------------------->
+<tr><td><b>proform_insert_end_ex</b></td>
+    <td>$module, $form_obj, $form_session</td>
     <td>none</td>
 </tr>
 <tr><td colspan="3">
@@ -201,7 +211,7 @@
 </tr>
 </table>
     <div id="footer">
-            <p>ProForm version 1.23</p>
+            <p>ProForm version 1.44</p>
     </div>
     </div>
 </div>
