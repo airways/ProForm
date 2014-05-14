@@ -2,7 +2,9 @@ if(!Array.prototype.remove)
 {
     Array.prototype.remove = function(from, to) {
       var rest = this.slice((to || from) + 1 || this.length);
-      this.length = from < 0 ? this.length + from : from;
+      var newLength = from < 0 ? this.length + from : from;
+      if(newLength >= 0)
+      this.length = newLength;
       return this.push.apply(this, rest);
     };
 }
@@ -288,7 +290,7 @@ var pl_grid = {
                 if(!found)
                 {
                     var row_count = $('#field_' + key + ' .grid_row').length;
-                    var html_form = '<input data-key="' + key + '" data-opt="' + val + '" type="text" size="5" class="grid_param" />';
+                    var html_form = '<input data-key="' + key + '" data-opt="' + val + '" data-row="' + row_count + '" type="text" size="5" class="grid_param" />';
                     
                     // If we have custom form settings, we will initialize an object-based data row and generate the HTML
                     // for the row with the right form elements in it
@@ -365,7 +367,7 @@ var pl_grid = {
                                 pl_grid.options[key][val].flags && pl_grid.options[key][val].flags.indexOf('has_param') > -1
                                     ? '<td>'+html_form+'<span class="help">'+pl_grid.help[key][val]+'</span></td>'
                                     : '<td><span class="help">'+pl_grid.help[key][val]+'</span></td>'
-                            )+'<td><a href="#" class="remove_grid_row" data-key="'+ key +'" data-opt="' + val +'">X</a></td>'
+                            )+'<td><a href="#" class="remove_grid_row" data-key="'+ key +'" data-opt="' + val +'" data-row="' + row_count + '">X</a></td>'
                             +'</tr>'
                     );
                     
@@ -427,8 +429,8 @@ var pl_grid = {
                     }
                 }
             }
-            console.log(data);
-            console.log($('#field_'+key+' .grid_row'));
+            //console.log(data);
+            //console.log($('#field_'+key+' .grid_row'));
             $(this).parents('tr.grid_row').remove();
             
             e.preventDefault();
@@ -484,7 +486,7 @@ var pl_grid = {
                 val.trim('|');
             }
             
-            console.log('key = ' + val);
+            //console.log('key = ' + val);
             $('input[name='+key+']').val(val);
         });
     }
