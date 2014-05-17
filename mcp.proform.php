@@ -719,7 +719,7 @@ class Proform_mcp extends Prolib_base_mcp {
             $vars['hidden']['form_id'] = $form_id;
             $vars['new_item_url'] = ACTION_BASE.AMP.'method=new_field'.AMP.'auto_add_form_id='.$form_id;
             $vars['add_item_url'] = ACTION_BASE.AMP.'method=assign_field'.AMP.'form_id='.$form_id;
-            $vars['edit_field_url'] = ACTION_BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=edit_field'.AMP.'form_id='.$form_id;
+            $vars['edit_field_url'] = ACTION_BASE.AMP.'method=edit_field'.AMP.'form_id='.$form_id;
 
             $vars['special_options'] = array(
                 array('label' => 'Heading',                     'type' => 'heading',                 'icon' => 'flag_blue.png',
