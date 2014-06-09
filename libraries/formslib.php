@@ -137,6 +137,21 @@ class Formslib
     }
 
     /**
+     * Get list of forms to be used in a form_dropdown field
+     *
+     * @return array
+     */
+    function get_form_options()
+    {
+        $query = $this->EE->db->get('exp_proform_forms');
+        foreach($query->result() as $row)
+        {
+            $result[$row->form_id] = $row->form_label;
+        }
+        return $result;
+    }
+
+    /**
      * Get list of field groups to be used in a form_dropdown field
      *
      * @return array

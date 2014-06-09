@@ -483,8 +483,9 @@ class PL_Form extends PL_RowInitialized {
                     $this->__EE->db->select('form_entry_id');
                     if(is_array($search) AND count($search) > 0)
                     {
-                        $search = $this->_translate_search($search);
+                        list($search, $like) = $this->_translate_search($search);
                         $this->__EE->db->where($search);
+                        $this->__EE->db->like($like);
                     }
                     $result = $this->__EE->db->count_all_results($this->table_name());
                 }
@@ -500,7 +501,9 @@ class PL_Form extends PL_RowInitialized {
 
     function entries($search=array(), $start_row = 0, $limit = 0, $orderby = 'form_entry_id', $sort = 'desc')
     {
-        $this->__EE->lang->loadfile('proform');
+        if(is_callable(array($this->__EE->lang, 'loadfile'))) {
+            $this->__EE->lang->loadfile('proform');
+        }
         switch($this->form_type)
         {
             case 'form':
@@ -514,8 +517,9 @@ class PL_Form extends PL_RowInitialized {
                         // We have an array of entry IDs instead of an array of field names
                         $this->__EE->db->where_in('form_entry_id', $search);
                     } else {
-                        $search = $this->_translate_search($search);
+                        list($search, $like) = $this->_translate_search($search);
                         $this->__EE->db->where($search);
+                        $this->__EE->db->like($like);
                     }
                 }
 
@@ -553,12 +557,14 @@ class PL_Form extends PL_RowInitialized {
 
     function _translate_search($search)
     {
+        $like = array();
+        
         foreach($search as $field => $val)
         {
             if(!$this->__fields) $this->fields();
             if(!$this->__db_fields) $this->db_fields();
             
-            if(in_array($field, $this->__db_fields))
+            /*if(in_array($field, $this->__db_fields))
             {
                 $search[$field] = $val;
             } else {
@@ -566,8 +572,8 @@ class PL_Form extends PL_RowInitialized {
                 {
                     show_error($this->__EE->lang->line('invalid_field_name').': "'.$field.'"');
                 }
-
-                if(preg_match("/([|<|>|!|=|]+)/i", $val, $matches))
+            */
+                if(preg_match("/^([<>!=~]+)/i", $val, $matches))
                 {
                     // delete old field pair
                     unset($search[$field]);
@@ -575,15 +581,20 @@ class PL_Form extends PL_RowInitialized {
                     // remove the operator from value
                     $val = str_replace($matches[1], '', $val);
 
-                    // move it to the end of the field name
-                    $field = $field.' '.$matches[1];
-
-                    // set new pair
-                    $search[$field] = $val;
+                    if($matches[1] == '~') {
+                        $like[$field] = $val;
+                    } else {
+                        // move it to the end of the field name
+                        $field = $field.' '.$matches[1];
+                        
+                        // set new pair
+                        $search[$field] = $val;
+                    }
                 }
-            }
+            //}
         }
-        return $search;
+        
+        return array($search, $like);
     }
     
     function _has_operator($str)
