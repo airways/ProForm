@@ -2479,6 +2479,7 @@ class Proform_mcp extends Prolib_base_mcp {
                                 ));  
         $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
         $vars['versions'] = $this->versions;
+        $this->_get_flashdata($vars);
         
         $this->data_table_js();
         $this->EE->javascript->compile();

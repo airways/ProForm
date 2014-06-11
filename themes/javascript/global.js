@@ -34,6 +34,21 @@ var proform_mod = {
         
         $('.datepicker').datepicker();
         
+        $('body').append($('<div id="proform_dialog"></div>'));
+        
+        $("#proform_dialog").dialog({
+            autoOpen: false,
+            width: 600,
+            height: 400,
+            modal: true
+        });
+        
+        $('.proform_dialog').click(function(event) {
+            var url = $(this).attr('href');
+            proform_mod.show_dialog(url);
+            event.preventDefault();
+        });
+        
         proform_mod.bind_advanced_settings();
         proform_mod.bind_tabs();
     },
@@ -190,6 +205,15 @@ var proform_mod = {
         var active_sidebar2 = $('.tabs#script-sidebar-tabs ul li.active a').attr('href');
         var active_tabs = active_main + ',' + active_sidebar + ',' + active_sidebar2;
         $('input[name=active_tabs]').val(active_tabs);
+    },
+    show_dialog: function(url) {
+        $('#proform_dialog').html('Please wait...');
+        $('#proform_dialog').load(url, '', function() {
+            $('.proform_dialog_close').click(function() {
+                $('#proform_dialog').dialog('close');
+            });
+        });
+        $('#proform_dialog').dialog('open');
     },
     make_name: function(s) {
         var r = s.toLowerCase();

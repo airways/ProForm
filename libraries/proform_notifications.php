@@ -292,6 +292,11 @@ class Proform_notifications
         return $result;
     } // function send_notifications()
 
+    public function send_notification($template_name, &$form, &$data, $subject, $notification_list, $reply_to=FALSE, $reply_to_name=FALSE, $send_attachments=FALSE)
+    {
+        return $this->_send_notifications('custom', $template_name, $form, $data, $subject, $notification_list, $reply_to, $reply_to_name, $send_attachments);
+    }
+    
     function _send_notifications($type, $template_name, &$form, &$data, $subject, $notification_list, $reply_to=FALSE, $reply_to_name=FALSE, $send_attachments=FALSE)
     {
         $result = FALSE;
@@ -306,6 +311,18 @@ class Proform_notifications
             // $message = $this->EE->parser->parse_string($template, $data, TRUE);
             // $subject = $this->EE->parser->parse_string($subject, $data, TRUE);
 // echo "<b>_send_notifications TEMPLATE PARSING</b>";
+
+            if(!isset($this->EE->TMPL)) {
+                if(!class_exists('EE_Template')) {
+                    $this->EE->load->helper('text');
+                    $this->EE->load->library('Template');
+                }
+                $this->EE->TMPL = new EE_Template();
+                $clearTMPL = TRUE;
+            } else {
+                $clearTMPL = FALSE;
+            }
+            
             $message = $this->EE->pl_parser->parse_variables_ex(array(
                 'rowdata' => $template,
                 'row_vars' => $data,
@@ -320,6 +337,7 @@ class Proform_notifications
 
             // parse the template for EE tags, conditionals, etc.
             $oldTMPL = $this->EE->TMPL;
+            
 // var_dump($this->EE->TMPL);
             $this->EE->TMPL = new EE_Template();
             $this->EE->TMPL->template = $message;
@@ -331,6 +349,9 @@ class Proform_notifications
             $message = $this->EE->TMPL->final_template;
             
             $this->EE->TMPL = $oldTMPL;
+            if($clearTMPL) {
+                unset($this->EE->TMPL);
+            }
 // var_dump($this->EE->pl_parser->variable_prefix);
 // var_dump($data);
 // echo "<pre>";
@@ -391,6 +412,7 @@ class Proform_notifications
                     }
                 }
                 
+                $this->_debug('To: '.$to_email);
                 $this->EE->pl_email->to($to_email);
                 $this->EE->pl_email->subject($subject);
 

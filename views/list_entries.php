@@ -89,7 +89,11 @@
                 break;
             case "list":
                 echo '<label for="search['.$field.']">'.$headings[$field].'</label>';
-                echo form_select('search['.$field.']', $options, $value_search);
+                $options = array(
+                    '' => '[Any]'
+                );
+                foreach($field_options[$field] as $opt) $options[$opt['option']] = $opt['key'];
+                echo form_dropdown('search['.$field.']', $options, $value_search);
                 break;
             default:
                 echo '<label for="search['.$field.']">'.$headings[$field].'</label>';
