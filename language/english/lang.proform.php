@@ -253,7 +253,12 @@ $lang = array(
     'field_pref_safecracker_separate_channels_on' => 'SafeCracker: Separate Channel Per Form',
     'field_pref_show_quickstart_on' => 'Show Quick Start',
     'field_pref_show_quickstart_on_desc' => 'Turns on the Quick Start box displayed under the list of forms on the main page of ProForm',
-    
+    'field_pref_permission_manage_module' => 'Module Management Member Groups',
+    'field_pref_permission_manage_module_desc' => 'These member groups may manage the ProForm Module\'s Settings, provided they have access to the CP',
+    'field_pref_permission_manage_forms' => 'Form Management Member Groups',
+    'field_pref_permission_manage_forms_desc' => 'These member groups may manage ProForm Form Settings, provided they have access to the CP',
+    'field_pref_permission_manage_entries' => 'Form Entries Management Groups',
+    'field_pref_permission_manage_entries_desc' => 'These member groups may manage ProForm Entries, provided they have access to the CP',
 
     'field_form_entry_id' => 'Entry ID',
     'field_updated' => 'Updated',

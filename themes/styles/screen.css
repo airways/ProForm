@@ -905,10 +905,37 @@ span.value_file a {
 }
 
 
+.table_filters {
+    float: left;
+    width: 25%;
+    padding-top: 15px;
+    border-top: 1px solid #d1d7df;
+}
+
+.table_filters input[type=text],
+.table_filters select {
+    width: 95%;
+}
+
+.table_filters input[type=text].two_up,
+.table_filters select.two_up {
+    width: 45%;
+}
+
+.table_filters label {
+    display: block;
+    margin-top: 5px;
+}
+
+.table_filters .submit {
+    margin-top: 5px;
+}
+
 .table_wrapper {
+    float: left;
+    width: 70%;
     padding-top: 15px;
     min-height: 60px;
-    min-width: 900px;
     border-top: 1px solid #d1d7df;
     overflow-x: auto;
 }

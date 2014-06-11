@@ -74,9 +74,11 @@ body {
 
 
 
+/* Messes up datepicker
 th, td {
     padding: 7px !important;
 }
+*/
 
 .pageContents {
 /*    padding: 0px !important;*/
@@ -174,6 +176,10 @@ table.plain tr {
 
 textarea, textarea.markItUpEditor, input[type="text"], input[type="password"] {
     width: 95%;
+}
+
+textarea.two_up, input[type="text"].two_up, input[type="password"].two_up {
+    width: 40%;
 }
 
 .help {

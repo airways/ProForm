@@ -55,7 +55,9 @@ class Formslib
         'from_name' => '',
         'reply_to_address' => '',
         'reply_to_name' => '',
-
+        'permission_manage_module' => '',
+        'permission_manage_forms' => '',
+        'permission_manage_entries' => '',
     );
 
     public $__advanced_settings_options = array(
@@ -572,6 +574,34 @@ class Formslib
         return $result;
     } // create_fields_array
 
+    public function check_permission($level)
+    {
+        $group_id = $this->EE->session->userdata('group_id');
+        if($group_id == 1) return true;
+        
+        $result = false;
+        
+        // Each level includes all of the previous level's access - if the member's group is in one of the permissions
+        // that is "higher" on this list (near the bottom), that should override and give them access even if they 
+        // didn't have the "lower" level (near the top).
+        switch($level)
+        {
+            case 'entries':
+                if(!$this->prefs->ini('permission_manage_entries')) $result = true; // All selected
+                else $result = in_array($group_id, explode('|', $this->prefs->ini('permission_manage_entries')));
+                break;
+            case 'forms':
+                if(!$this->prefs->ini('permission_manage_forms')) $result = true; // All selected
+                else $result = in_array($group_id, explode('|', $this->prefs->ini('permission_manage_forms')));
+                break;
+            case 'module':
+                if(!$this->prefs->ini('permission_manage_module')) $result = true; // All selected
+                else $result = in_array($group_id, explode('|', $this->prefs->ini('permission_manage_module')));
+                break;
+        }
+
+        if(!$result) pl_show_error('You do not have the "'.$level.'" permission in ProForm.');
+    }
     private function _get_placeholder($type, $default = '')
     {
         $result = $default;

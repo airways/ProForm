@@ -499,7 +499,27 @@ class PL_Form extends PL_RowInitialized {
         return $result;
     } // function count_entries()
 
+    
     function entries($search=array(), $start_row = 0, $limit = 0, $orderby = 'form_entry_id', $sort = 'desc')
+    {
+        $entry_ids = array();
+        
+        // If the search parameter has numeric keys, it is actually
+        // the entry_ids parameter, so swap places with it
+        if(is_array($search) && count($search) > 0)
+        {
+            $keys = array_keys($search);
+            if(is_numeric($keys[0]))
+            {
+                $entry_ids = $search;
+                $search = array();
+            }
+        }
+        
+        return $this->entries_filtered($search, $entry_ids, $start_row, $limit, $orderby, $sort);
+    } // entries
+    
+    function entries_filtered($search=array(), $entry_ids=array(), $start_row = 0, $limit = 0, $orderby = 'form_entry_id', $sort = 'desc')
     {
         if(is_callable(array($this->__EE->lang, 'loadfile'))) {
             $this->__EE->lang->loadfile('proform');
@@ -511,16 +531,15 @@ class PL_Form extends PL_RowInitialized {
 
                 if(is_array($search) && count($search) > 0)
                 {
-                    $keys = array_keys($search);
-                    if(is_numeric($keys[0]))
-                    {
-                        // We have an array of entry IDs instead of an array of field names
-                        $this->__EE->db->where_in('form_entry_id', $search);
-                    } else {
-                        list($search, $like) = $this->_translate_search($search);
-                        $this->__EE->db->where($search);
-                        $this->__EE->db->like($like);
-                    }
+                    list($search, $like) = $this->_translate_search($search);
+                    $this->__EE->db->where($search);
+                    $this->__EE->db->like($like);
+                }
+
+                if(is_array($entry_ids) && count($entry_ids) > 0)
+                {
+                    // We have an array of entry IDs instead of an array of field names
+                    $this->__EE->db->where_in('form_entry_id', $entry_ids);
                 }
 
                 if($start_row >= 0 && $limit > 0) {
@@ -553,7 +572,7 @@ class PL_Form extends PL_RowInitialized {
                 return array();
                 break;
         }
-    } // function entries()
+    } // entries_filtered
 
     function _translate_search($search)
     {

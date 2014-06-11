@@ -32,6 +32,8 @@ var proform_mod = {
             $(this).parents('.dropdown-wrap').find('.dropdown').hide();
         });
         
+        $('.datepicker').datepicker();
+        
         proform_mod.bind_advanced_settings();
         proform_mod.bind_tabs();
     },

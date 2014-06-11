@@ -51,18 +51,65 @@
                 <?php echo form_hidden('select_all_entries', $select_all_entries) ?>
                 
             </span>
-            
-    <div class="table_wrapper">
+<br/>
+<div class="table_filters">
+    <?php
+    
+    $search = ee()->input->get_post('search') ? ee()->input->get_post('search') : array();
+    $search_from = ee()->input->get_post('search_from') ? ee()->input->get_post('search_from') : array();
+    $search_to = ee()->input->get_post('search_to') ? ee()->input->get_post('search_to') : array();
+    
+    if(count($search) > 0 || count($search_from) > 0 || count($search_to) > 0): ?>
 
+    <?php
+    endif;
+    
+    foreach($field_order as $field)
+    {
+        if($field[0] == '_') continue;
+        $value_search = array_key_exists($field, $search) ? $search[$field] : '';
+        $value_from = array_key_exists($field, $search_from) ? $search_from[$field] : '';
+        $value_to = array_key_exists($field, $search_to) ? $search_to[$field] : '';
 
-<?php if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>'; ?>
-<?php if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>'; ?>
+        if(!isset($field_types[$field]))
+        {
+            $type = 'text';
+        } else {
+            $type = $field_types[$field];
+        }
 
-<div class="filters">
-    <?php echo $pl_drivers->list_entries_filters_view(); ?>
+        switch($type)
+        {
+            case "date":
+            case "datetime":
+                echo '<label for="from['.$field.']">'.$headings[$field].'</label>';
+                echo form_input('from['.$field.']', $value_from, 'class="two_up datepicker"');
+                echo ' - ';
+                echo form_input('to['.$field.']', $value_to, 'class="two_up datepicker"');
+                break;
+            case "list":
+                echo '<label for="search['.$field.']">'.$headings[$field].'</label>';
+                echo form_select('search['.$field.']', $options, $value_search);
+                break;
+            default:
+                echo '<label for="search['.$field.']">'.$headings[$field].'</label>';
+                echo form_input('search['.$field.']', $value_search);
+                break;
+        }
+    }
+    ?>
+    <input type="submit" value="Search" class="submit" />
 </div>
 
-<?php
+<div class="table_wrapper">
+    <?php if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>'; ?>
+    <?php if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>'; ?>
+    
+    <div class="filters">
+        <?php echo $pl_drivers->list_entries_filters_view(); ?>
+    </div>
+    
+    <?php
     $this->table->set_template($cp_table_template);
 
     // put the headings into the order specified by field_order
@@ -175,7 +222,6 @@
     ?>
 
     <div class="tableFooter">
-
         <div class="tableSubmit">
             <?php 
                 echo form_submit('batch_submit', 'Submit', 'class="submit" id="pl_batch_submit"');
@@ -188,6 +234,8 @@
         <span class="pagination" id="filter_pagination"></span>
     </div>
 </div>
+
+<div class="clear"></div>
 
 <?php echo form_close(); ?>
 </div>
