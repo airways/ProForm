@@ -602,6 +602,7 @@ class Formslib
 
         if(!$result) pl_show_error('You do not have the "'.$level.'" permission in ProForm.');
     }
+    
     private function _get_placeholder($type, $default = '')
     {
         $result = $default;
@@ -610,6 +611,30 @@ class Formslib
             $result = $this->default_placeholders[$type];
         }
         return $result;
+    }
+    
+    public function import_xml($filename)
+    {
+    
+        if(!class_exists('SimpleXMLElement')) {
+            pl_show_error('ProForm Form Import requires the SimpleXML PHP5 module to be installed');
+        }
+        
+        $result = array();
+        
+        $content = file_get_contents($filename);
+        $xml = new SimpleXMLElement($content);
+        foreach($xml->children() as $node) {
+            if($node->getName() == "forms") {
+                foreach($node->children() as $form_xml) {
+                    $form = PL_Form::import($form_xml);
+                    $result[] = $form;
+                }
+            }
+        }
+        
+        return $result;
+        
     }
 } // class Formslib
 }

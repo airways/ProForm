@@ -47,6 +47,7 @@ class Proform_notifications
     var $debug = FALSE;
     var $debug_str = '<b>Debug Output</b><br/>';
     var $var_pairs = array();
+    var $special_attachments = array();
     
     function __construct()
     {
@@ -292,6 +293,16 @@ class Proform_notifications
         return $result;
     } // function send_notifications()
 
+    public function clear_attachments()
+    {
+        $this->special_attachments = array();
+    }
+    
+    public function special_attachment($filename)
+    {
+        $this->special_attachments[] = $filename;
+    }
+    
     public function send_notification($template_name, &$form, &$data, $subject, $notification_list, $reply_to=FALSE, $reply_to_name=FALSE, $send_attachments=FALSE)
     {
         return $this->_send_notifications('custom', $template_name, $form, $data, $subject, $notification_list, $reply_to, $reply_to_name, $send_attachments);
@@ -409,6 +420,12 @@ class Proform_notifications
                                 }
                             }
                         }
+                    }
+                    
+
+                    foreach($this->special_attachments as $filename)
+                    {
+                        $this->EE->pl_email->attach($filename);
                     }
                 }
                 

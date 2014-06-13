@@ -387,6 +387,12 @@ class PL_Form extends PL_RowInitialized {
         }
         return $this->__db_fields;
     }
+    
+    function reset_db_fields()
+    {
+        unset($this->EE->db->data_cache['field_names'][$this->table_name()]);
+        $this->__db_fields = FALSE;
+    }
 
     // unserialize settings for a form field assignment row and merge with default values
     function get_form_field_settings($settings='')
@@ -470,6 +476,16 @@ class PL_Form extends PL_RowInitialized {
         }
         
     } // function set_all_form_field_settings()
+    
+    function set_form_field_settings($field_id, $form_field_settings)
+    {
+        $data = array(
+            'form_field_settings' => serialize($form_field_settings)
+        );
+
+        $this->__EE->db->where(array('field_id' => $field_id, 'form_id' => $this->form_id))
+                       ->update('proform_form_fields', $data);
+    }
 
     function count_entries($search=array())
     {
@@ -1153,5 +1169,84 @@ class PL_Form extends PL_RowInitialized {
                 $this->__EE->db->insert('proform_form_fields', $assign_row);
             }
         }
+    }
+    
+    static function import($element)
+    {
+        $form_row = array();
+        $fields = FALSE;
+        foreach ($element->children() as $property) {
+            $prop_name = $property->getName();
+            $value = (string)$property;
+            if($prop_name == '__fields') $fields = $property;
+            if(substr($prop_name, 0, 2) == '__') continue;
+            if(in_array($prop_name, array('form_id', 'site_id'))) continue;
+            if(in_array($prop_name, array('settings'))) $value = trim($value);
+            
+            $form_row[$prop_name] = $value;
+        }
+        
+        ee()->db->insert('proform_forms', $form_row);
+        $new_form_id = ee()->db->insert_id();
+        $form = ee()->formslib->forms->get($new_form_id);
+        $form->init();
+        
+        if($fields)
+        {
+            foreach($fields->children() as $field)
+            {
+                $field_row = array();
+                $meta = array();
+                
+                foreach($field->children() as $property) {
+                    $prop_name = $property->getName();
+                    $value = (string)$property;
+                    if($value == '@recursion') $value = NULL;
+                    
+                    #if($prop_name == '__fields') $fields = $property;
+                    if(substr($prop_name, 0, 2) == '__') continue;
+                    if(in_array($prop_name, array('field_id', 'site_id', 'form_field_id', 'form_id', 'field_order', 'field_row', 'is_required',
+                        'heading', 'separator_type', 'step_no'))) {
+                        $meta[$prop_name] = $value;
+                    } else {
+                        if(in_array($prop_name, array('settings', 'form_field_settings'))) {
+                            $value = array();
+                            foreach($property->children() as $setting) {
+                                if(in_array($setting->getName(), array('type_channels', 'type_categories'))) {
+                                    $value[$setting->getName()] = array();
+                                    foreach($setting->children() as $setting) {
+                                        $value[$setting->getName()][] = (string)$setting;
+                                    }
+                                } else {
+                                    $value[$setting->getName()] = (string)$setting;
+                                }
+                            }
+                        }
+                        if($prop_name == 'form_field_settings') {
+                            $meta[$prop_name] = $value;
+                        } else {
+                            $field_row[$prop_name] = $value;
+                        }
+                    }
+                }
+                
+                if(is_null($field_row['type'])) {    // Separator
+                    $form->add_separator($meta['heading'], $meta['separator_type']);
+                } else {                            // Field
+                    $field = ee()->formslib->fields->get($field_row['field_name'], FALSE);
+                    if(!$field) {
+                        ee()->formslib->fields->create($field_row);
+                        $field = ee()->formslib->fields->get($field_row['field_name']);
+                    }
+                    $form->reset_db_fields();
+                    $form->assign_field($field);
+                    $form->set_form_field_settings($field->field_id, $meta['form_field_settings']);
+                }
+                #var_dump($field_row);
+
+            }
+        }
+        
+        return $form;
     }
 }

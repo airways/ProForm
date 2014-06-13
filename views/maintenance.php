@@ -31,6 +31,11 @@
  **/ ?>
 
 <h2>Maintanance Tasks</h2><br/>
+<?php
+if(isset($message) && $message != FALSE) echo '<div class="message error-message">'.$message.'</div>';
+if(isset($error) && $error != FALSE) echo '<div class="message error-message">'.$error.'</div>';
+
+?>
 <div class="warning">
     <p>You should only use these functions if you have been asked to do so by a MetaSushi, LLC support agent.</p>
 </div>
@@ -40,6 +45,15 @@
 <div>
     <span class="button content-btn"><a class="submit" href="<?php echo ACTION_BASE.AMP.'method=maint_export_forms'; ?>">Export Forms &amp; Fields</a></span>
 </div>
+
+<h3>Import</h3>
+<p><b>Experimental!</b> You can import XML files produced by the above tool into your site.</p>
+
+<?php echo form_open_multipart($import_action_url, array('class' => 'generic_edit'), isset($hidden) ? $hidden : array()); ?>
+    <label for="import_xml">Import File</label><br/>
+    <input type="file" name="import_xml_file" /><br/><br/>
+    <input type="submit" value="Import XML" class="submit" />
+<?php echo form_close(); ?>
 
 <?php /*
 

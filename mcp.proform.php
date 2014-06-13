@@ -519,6 +519,9 @@ class Proform_mcp extends Prolib_base_mcp {
         $this->sub_page('maintenance');
         $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
         $vars['versions'] = $this->versions;
+        $vars['import_action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=maint_process_import';
+        $this->_get_flashdata($vars);
+       
         return $this->EE->load->view('maintenance', $vars, TRUE);
     }
     
@@ -631,10 +634,31 @@ class Proform_mcp extends Prolib_base_mcp {
         
     }
     
-    function process_import()
+    function maint_process_import()
     {
         $this->EE->formslib->check_permission('module');
         
+        $upload_config = array(
+            'upload_path' => APPPATH.'cache/',
+            'allowed_types' => 'xml',
+            'encrypt_name' => TRUE,
+            'remove_space' => TRUE,
+        );
+        
+        $this->EE->load->library('upload', $upload_config);
+        
+        if($this->EE->upload->do_upload('import_xml_file'))
+        {
+            $file = $this->EE->upload->data();
+            $filename = $file['full_path'];
+            $result = $this->EE->formslib->import_xml($filename);
+            if(count($result) > 0) {
+                $this->EE->session->set_flashdata('message', 'Imported '.count($result.' forms!'));
+            }
+        } else {
+            $this->EE->session->set_flashdata('error', $this->EE->upload->display_errors('',''));
+            $this->EE->functions->redirect(ACTION_BASE.AMP.'method=maintenance');
+        }
     }
     
     function version_check()
