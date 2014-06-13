@@ -604,7 +604,8 @@ Messages / Form Errors
 	color: #a43333;
 }
 
-.tabs {
+.tabs,
+.static-tabs {
 	overflow: hidden;
 /*  border-bottom: 1px solid #d1d7df; */
 }
@@ -624,7 +625,8 @@ Messages / Form Errors
     margin-top: 5px;
 }
 
-.tabs li {
+.tabs li,
+.static-tabs li {
 	float: left;
 	height: 26px;
 	line-height: 26px;
@@ -644,25 +646,33 @@ Messages / Form Errors
 	display: block; 
 }
 
-.pageContents .tabs li a {
+.pageContents .tabs li a,
+.pageContents .static-tabs li a {
 	display: block;
 	color: #333E46;	
 	font-weight: bold;
 	padding: 0 15px;
 }
 
-.tabs li:first-child {
+.tabs li:first-child,
+.static-tabs li:first-child {
 	border-left: 0;
 } 
 
-.tabs li.active {
+.tabs li.active,
+.static-tabs li.active {
 	border: 1px solid transparent;
 	height: 26px;
 	background: #2d363b url('../images/bg-btn.jpg') 0 0 repeat-x;
 }
 
-.tabs li.active a {
+.tabs li.active a,
+.static-tabs li.active a {
 	color: #fff;
+}
+
+.static-tabs {
+    float: left;
 }
 
 #main-tabs {

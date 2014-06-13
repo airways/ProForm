@@ -2356,7 +2356,7 @@ class Proform_mcp extends Prolib_base_mcp {
         $vars['select_all_entries'] = $this->EE->input->post('select_all_entries');
         
         // Get page of data
-        $search = $this->_get_search_input();
+        $search = $this->_get_search_input($form);
         $search = $this->prolib->pl_drivers->list_entries_search($form_id, $search);
         //var_dump($form->__internal_fields);exit;
         $entries = $form->entries($search, $rownum, $this->perpage, 'updated', 'DESC');
@@ -2501,6 +2501,11 @@ class Proform_mcp extends Prolib_base_mcp {
                                     'repoty_text'  => 'Text Report',
                                     
                                 ));  
+        if(method_exists($driver, 'batch_commands'))
+        {
+            $vars['batch_commands'] = $driver->batch_commands($vars['batch_commands']);
+        }
+        
         $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
         $vars['versions'] = $this->versions;
         $this->_get_flashdata($vars);
@@ -2548,6 +2553,14 @@ class Proform_mcp extends Prolib_base_mcp {
                     );
                     $hash = $this->EE->formslib->vault->put($export_data);
                     header(str_replace('&amp;', '&', 'Refresh: 0;url='.ACTION_BASE.'method=do_export_entries'.AMP.'hash='.$hash));
+                } else {
+                    if($driver = $form_obj->get_driver())
+                    {
+                        if(method_exists($driver, $batch_command))
+                        {
+                            $driver->$batch_command($form_obj, $batch_id);
+                        }
+                    }
                 }
             
                 break;
@@ -2874,7 +2887,7 @@ class Proform_mcp extends Prolib_base_mcp {
             if($this->EE->extensions->end_script === TRUE) return TRUE;
         }
 
-        $search = $this->_get_search_input();
+        $search = $this->_get_search_input($form);
         $entries = $form->entries_filtered($search, $batch_id);
 
         switch($batch_command)
@@ -3083,12 +3096,22 @@ class Proform_mcp extends Prolib_base_mcp {
         return TRUE;
     }
 
-    private function _get_search_input()
+    private function _get_search_input($form)
     {
         $search = $this->EE->input->get_post('search') ? $this->EE->input->get_post('search') : array();
         foreach($search as $key => $value) {
             if(!$value) unset($search[$key]);
             else $search[$key] = '~'.$search[$key];
+        }
+        
+        if(count($search) == 0) {
+            if($driver = $form->get_driver())
+            {
+                if(method_exists($driver, 'default_search'))
+                {
+                    $search = $driver->default_search();
+                }
+            }
         }
         /*
         if(count($search) > 0) {
