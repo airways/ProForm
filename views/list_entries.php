@@ -67,6 +67,8 @@
     foreach($field_order as $field)
     {
         if($field[0] == '_') continue;
+        if($field == 'form_entry_id') continue;
+        
         $value_search = array_key_exists($field, $search) ? $search[$field] : '';
         $value_from = array_key_exists($field, $search_from) ? $search_from[$field] : '';
         $value_to = array_key_exists($field, $search_to) ? $search_to[$field] : '';
