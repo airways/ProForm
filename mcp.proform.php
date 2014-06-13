@@ -398,7 +398,7 @@ class Proform_mcp extends Prolib_base_mcp {
                     case 'pref_permission_manage_module':
                     case 'pref_permission_manage_forms':
                     case 'pref_permission_manage_entries':
-                        $control = form_multiselect($f_name, $member_groups, $value);
+                        $control = form_multiselect($f_name.'[]', $member_groups, explode('|', $value));
                         break;
                     default:
                         $control = form_input($f_name, $value);
@@ -438,11 +438,16 @@ class Proform_mcp extends Prolib_base_mcp {
         {
             $f_name = 'pref_' . $pref;
             $value = $this->EE->input->post($f_name);
+            
+            //echo '<b>'.$f_name.'</b>';
+            //var_dump($value);
+            
             if($value != $existing_value)
             {
                 if($value)
                 {
                     $value = $this->EE->input->post($f_name);
+                    if(is_array($value)) $value = implode('|', $value);
                     $this->EE->formslib->prefs->set($pref, $value);
                 } else {
                     switch($f_name)
@@ -461,6 +466,7 @@ class Proform_mcp extends Prolib_base_mcp {
                 }
             }
         }
+        //exit;
 
         //////////
         // Try to find advanced settings
@@ -2491,6 +2497,7 @@ class Proform_mcp extends Prolib_base_mcp {
             $vars = $this->EE->extensions->call('proform_list_entries', $this, $vars);
         }
         $vars['batch_commands'] = array(
+                                '' => 'Select an Action',
                                 'Batch Commands' => array(
                                     'delete' => 'Delete Selected',
                                 ),
