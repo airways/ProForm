@@ -379,7 +379,7 @@ class Formslib
 
             if($field->type == 'list' || $field->type == 'relationship')
             {
-                $field_options = $field->get_list_options($field_values[$field->field_name]);
+                $field_options = $field->get_list_options($field_value);
 
                 if(is_array($field_value))
                 {
