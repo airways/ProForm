@@ -574,7 +574,7 @@ class Formslib
         return $result;
     } // create_fields_array
 
-    public function check_permission($level)
+    public function check_permission($level, $die=TRUE)
     {
         $group_id = $this->EE->session->userdata('group_id');
         if($group_id == 1) return true;
@@ -600,7 +600,12 @@ class Formslib
                 break;
         }
 
-        if(!$result) pl_show_error('You do not have the "'.$level.'" permission in ProForm.');
+        if($die)
+        {
+            if(!$result) pl_show_error('You do not have the "'.$level.'" permission in ProForm.');
+        }
+        
+        return $result;
     }
     
     private function _get_placeholder($type, $default = '')

@@ -83,16 +83,33 @@ class Proform_mcp extends Prolib_base_mcp {
         $this->EE->view = new PF_View($this->EE->view);
 
         $this->EE->pl_drivers->init();
+    
+        $this->EE->load->library('formslib');
+        
+        $main_nav = array(
+            'home' => TAB_ACTION,
+        );
+        
+        if($this->EE->formslib->check_permission('forms', FALSE)) {
+            $main_nav['list_fields'] = TAB_ACTION.'method=list_fields';
+        }
+        
+        if($this->EE->formslib->check_permission('module', FALSE)) {
+            $main_nav['list_drivers'] = TAB_ACTION.'method=list_drivers';
+        }
+        
+        if($this->EE->formslib->check_permission('module', FALSE)) {
+            $main_nav['maintenance'] = TAB_ACTION.'method=maintenance';
+        }
+        
+        if($this->EE->formslib->check_permission('module', FALSE)) {
+            $main_nav['module_settings'] = TAB_ACTION.'method=module_settings';
+        }
 
-        $this->EE->cp->set_right_nav(array(
-                'home' => TAB_ACTION,
-                'list_fields' => TAB_ACTION.'method=list_fields',
-                'list_drivers' => TAB_ACTION.'method=list_drivers',
-                'maintenance' => TAB_ACTION.'method=maintenance',
-                'module_settings' => TAB_ACTION.'method=module_settings',
-                'help' => TAB_ACTION.'method=help',
-                ));
-
+        $main_nav['help'] = TAB_ACTION.'method=help';
+        
+        $this->EE->cp->set_right_nav($main_nav);
+        
         $this->config_overrides = $this->EE->config->item('proform');
 
         //////////
@@ -223,7 +240,6 @@ class Proform_mcp extends Prolib_base_mcp {
         
         $this->EE->javascript->compile();
         
-        $this->EE->load->library('formslib');
         $this->versions = $this->EE->formslib->vault->get('versions');
 
     }

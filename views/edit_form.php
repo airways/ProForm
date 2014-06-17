@@ -63,7 +63,11 @@
     
     <?php if(isset($view_entries_link)): ?>
     <span class="action-list">
-        <a href="<?php echo $view_entries_link; ?>">View Form Entries</a>
+        <?php
+        if(ee()->formslib->check_permission('entries', FALSE)) {
+            echo '<a href="'.$view_entries_link.'">View Form Entries</a>';
+        }
+        ?>
     </span>
     <?php endif; ?>
 </div>

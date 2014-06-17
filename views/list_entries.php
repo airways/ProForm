@@ -44,7 +44,11 @@
 ?>
 
             <span class="action-list">
-                <a href="<?php echo $edit_form_url; ?>">Edit Form Settings</a>
+                <?php
+                if(ee()->formslib->check_permission('forms', FALSE)) {
+                    echo '<a href="'.$edit_form_url.'">Edit Form Settings</a>';
+                }
+                ?>
                 <span id="pl_select_all_entries_span" class="info" style="display:none;" data-entry-count="<?php echo $total_entries; ?>">Would you like to <a id="pl_select_all_entries_link" href="#">select all <?php echo $total_entries; ?> entries</a>?
                 </span>
                 <span id="pl_all_entries_selected" class="info" style="display:none;">All <?php echo $total_entries; ?> entries selected</span>
