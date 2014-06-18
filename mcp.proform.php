@@ -3132,7 +3132,7 @@ class Proform_mcp extends Prolib_base_mcp {
             {
                 if(method_exists($driver, 'default_search'))
                 {
-                    $search = $driver->default_search();
+                    $search = $driver->default_search($form->form_id);
                 }
             }
         }
