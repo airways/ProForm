@@ -413,6 +413,11 @@ class Proform {
                     $form_session->config[$k] = $this->EE->TMPL->parse_globals($v);
             }
 
+            if($driver = $form_obj->get_driver())
+            {
+                $form_session = $driver->form_start_session($this, $form_obj, $form_session);
+            }
+            
             $form_session_enc = $this->EE->formslib->vault->put($form_session);
 
             if ($this->EE->extensions->active_hook('proform_form_start') === TRUE)
@@ -420,11 +425,7 @@ class Proform {
                 $form_obj = $this->EE->extensions->call('proform_form_start', $this, $form_obj);
             }
             
-            if($driver = $form_obj->get_driver())
-            {
-                $driver->form_start($this, $form_obj);
-            }
-
+            $driver->form_start($this, $form_obj);
 
             if($form_obj->fields())
             {
@@ -2084,7 +2085,7 @@ class Proform {
             }
         }
         
-        $this->EE->pl_drivers->process_validation_end($form_obj, $form_session);
+        #$this->EE->pl_drivers->process_validation_end($form_obj, $form_session);
         
         if ($this->EE->extensions->active_hook('proform_validation_end') === TRUE)
         {
