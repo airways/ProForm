@@ -2505,7 +2505,7 @@ class Proform_mcp extends Prolib_base_mcp {
         {
             if(method_exists($driver, 'list_data'))
             {
-                $driver->list_data($form, $vars, $entry);
+                $driver->list_data($form, $vars, false);
             }
         }
         if ($this->EE->extensions->active_hook('proform_list_entries') === TRUE)
