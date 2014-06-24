@@ -108,6 +108,7 @@ class Proform_mcp extends Prolib_base_mcp {
 
         $main_nav['help'] = TAB_ACTION.'method=help';
         
+        $main_nav = $this->EE->pl_drivers->main_nav($main_nav);
         $this->EE->cp->set_right_nav($main_nav);
         
         $this->config_overrides = $this->EE->config->item('proform');
@@ -2358,30 +2359,48 @@ class Proform_mcp extends Prolib_base_mcp {
 
         // Get params
         $form_id = $this->EE->input->get('form_id');
+
+        // Has a union with other form tables been requested?
+        list($form_id, $is_union, $union) = $this->parse_union($form_id);
+        $return_form_id = count($union) > 0 ? $form_id.'|'.implode('|', $union) : $form_id;
+        
         $rownum = (int)$this->EE->input->get_post('rownum');
 
         // Get form object
         $form = &$this->EE->formslib->forms->get($form_id);
+        $driver = $form->get_driver();
         $fields = $form->fields();
 
         // Set up UI
-        $this->sub_page(lang('tab_list_entries').' in <em>'.$form->form_name.'</em>');
+        if($this->EE->input->get_post('T'))
+        {
+            $this->sub_page(lang($this->EE->input->get_post('T')));
+        } else {
+            if(!$is_union)
+            {
+                $this->sub_page(lang('tab_list_entries').' in <em>'.$form->form_name.'</em>');
+            } else {
+                $this->sub_page(lang('tab_list_entries').' for multiple forms');
+            }
+        }
         $vars['form_id'] = $form_id;
-        $vars['view_entry_url'] = ACTION_BASE.'method=view_form_entry'.AMP.'form_id='.$form_id;
-        $vars['edit_entry_url'] = ACTION_BASE.'method=edit_form_entry'.AMP.'form_id='.$form_id;
-        $vars['delete_entry_url'] = ACTION_BASE.'method=delete_form_entry'.AMP.'form_id='.$form_id;
+        $vars['list_entries_base_url'] = ACTION_BASE.'method=list_entries';
+        $vars['view_entry_url'] = ACTION_BASE.'method=view_form_entry';
+        $vars['edit_entry_url'] = ACTION_BASE.'method=edit_form_entry';
+        $vars['delete_entry_url'] = ACTION_BASE.'method=delete_form_entry';
         $vars['edit_form_url']     = ACTION_BASE.'method=edit_form'.AMP.'form_id='.$form->form_id;
-        $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=list_entries'.AMP.'form_id='.$form_id;
+        $vars['action_url'] = 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=proform'.AMP.'method=list_entries'.AMP.'form_id='.$form_id . (count($union) > 0 ? '|'.implode('|', $union) : '');
         $vars['total_entries'] = $form->count_entries();
         $vars['select_all'] = $this->EE->input->post('select_all');
         $vars['batch_id'] = $this->EE->input->post('batch_id');
         $vars['select_all_entries'] = $this->EE->input->post('select_all_entries');
+        $vars['is_union'] = $is_union;
         
         // Get page of data
         $search = $this->_get_search_input($form);
         $search = $this->prolib->pl_drivers->list_entries_search($form_id, $search);
         //var_dump($form->__internal_fields);exit;
-        $entries = $form->entries($search, $rownum, $this->perpage, 'updated', 'DESC');
+        $entries = $form->entries($search, $rownum, $this->perpage, 'updated', 'DESC', $union);
         if(!is_array($entries)) $entries = array();
         if($form->encryption_on == 'y')
         {
@@ -2427,7 +2446,7 @@ class Proform_mcp extends Prolib_base_mcp {
         ////////////////////////////////////////
         // Pagination
         $total = $form->count_entries($search);
-        $p_config = $this->pagination_config('list_entries&form_id='.$form_id, $total); // creates our pagination config for us
+        $p_config = $this->pagination_config('list_entries&form_id='.$return_form_id, $total); // creates our pagination config for us
         $this->EE->pagination->initialize($p_config);
         $vars['pagination'] = $this->EE->pagination->create_links();
 
@@ -2435,8 +2454,14 @@ class Proform_mcp extends Prolib_base_mcp {
         // Table Headings
         $vars['hidden_columns'] = array("ip_address", "user_agent", "dst_enabled");
 
-        $headings = array('form_entry_id' => 'ID', 'updated' => 'Last Updated');
-        $field_order = array('form_entry_id', 'updated');
+        if($is_union)
+        {
+            $headings = array('form_entry_id' => 'ID', 'form_id' => 'Form ID', 'updated' => 'Last Updated');
+            $field_order = array('form_entry_id', 'form_id', 'updated');
+        } else {
+            $headings = array('form_entry_id' => 'ID', 'updated' => 'Last Updated');
+            $field_order = array('form_entry_id', 'updated');
+        }
 
         $vars['fields'] = array('updated');
         $vars['field_types'] = array('updated' => 'datetime');
@@ -2469,11 +2494,11 @@ class Proform_mcp extends Prolib_base_mcp {
 
             $field_order[] = $field->field_name;
 
-            if($driver = $field->get_driver())
+            if($field_driver = $field->get_driver())
             {
-                if(method_exists($driver, 'list_data'))
+                if(method_exists($field_driver, 'list_data'))
                 {
-                    $driver->list_data($form_obj, $field, $vars);
+                    $field_driver->list_data($form_obj, $field, $vars);
                 }
             }
         }
@@ -2486,12 +2511,13 @@ class Proform_mcp extends Prolib_base_mcp {
         foreach($vars['entries'] as $entry)
         {
             $action_list = '<span class="action-list">';
+            $fid = isset($entry->form_id) ? $entry->form_id : $form_id;
             $action_list .= $this->EE->pl_drivers->list_entries_action_list_view(
-                    $form_id,
+                    $fid,
                     $entry,
-                    '<a href="'.$vars['edit_entry_url'].'&entry_id='.$entry->form_entry_id.'">Edit</a> '.
-                    '<a href="'.$vars['view_entry_url'].'&entry_id='.$entry->form_entry_id.'">View</a> '.
-                    '<a href="'.$vars['delete_entry_url'].'&entry_id='.$entry->form_entry_id.'" class="pl_confirm" rel="Are you sure you want to delete this entry?">Delete</a>');
+                    '<a href="'.$vars['edit_entry_url'].AMP.'form_id='.$fid.AMP.'entry_id='.$entry->form_entry_id.'">Edit</a> '.
+                    '<a href="'.$vars['view_entry_url'].AMP.'form_id='.$fid.AMP.'entry_id='.$entry->form_entry_id.'">View</a> '.
+                    '<a href="'.$vars['delete_entry_url'].AMP.'form_id='.$fid.AMP.'return_form_id='.$return_form_id.AMP.'entry_id='.$entry->form_entry_id.'" class="pl_confirm" rel="Are you sure you want to delete this entry?">Delete</a>');
 
             $action_list .= '</span>';
 
@@ -2501,7 +2527,7 @@ class Proform_mcp extends Prolib_base_mcp {
 
         $vars = $this->prolib->pl_drivers->list_entries_data($vars);
         $vars['pl_drivers'] = &$this->prolib->pl_drivers;
-        if($driver = $form->get_driver())
+        if($driver)
         {
             if(method_exists($driver, 'list_data'))
             {
@@ -2514,16 +2540,21 @@ class Proform_mcp extends Prolib_base_mcp {
         }
         $vars['batch_commands'] = array(
                                 '' => 'Select an Action',
-                                'Batch Commands' => array(
-                                    'delete' => 'Delete Selected',
-                                ),
-                                    'Export Entries' => array(
+                                );
+
+        // Batch delete cannot be safely used with a union
+        if(!$is_union)
+        {
+            $vars['batch_commands']['Batch Commands'] = array(
+                                        'delete' => 'Delete Selected',
+                                    );
+        }
+        $vars['batch_commands']['Export Entries'] = array(
                                     'export_csv'   => 'CSV Export',
                                     'export_html'  => 'HTML Export',
                                     'report_html'  => 'HTML Report',
                                     'repoty_text'  => 'Text Report',
-                                    
-                                ));  
+                                );
         if(method_exists($driver, 'batch_commands'))
         {
             $vars['batch_commands'] = $driver->batch_commands($vars['batch_commands']);
@@ -2545,7 +2576,11 @@ class Proform_mcp extends Prolib_base_mcp {
         $this->EE->formslib->check_permission('entries');
 
         $this->EE->load->library('formslib');
-        $form_id = (int)$this->EE->input->get('form_id');
+        $form_id = $this->EE->input->get('form_id');
+
+        // Has a union with other form tables been requested?
+        list($form_id, $is_union, $union) = $this->parse_union($form_id);
+
         $form_obj = $this->EE->formslib->forms->get($form_id);
 
         $batch_command = $this->EE->input->post('batch_command');
@@ -2571,6 +2606,8 @@ class Proform_mcp extends Prolib_base_mcp {
                 {
                     $export_data = array(
                         'form_id' => $form_id,
+                        'is_union' => $is_union,
+                        'union' => $union,
                         'batch_command' => $batch_command,
                         'batch_id' => $batch_id,
                     );
@@ -2877,13 +2914,23 @@ class Proform_mcp extends Prolib_base_mcp {
 
         $form_id = (int)$this->EE->input->get('form_id');
         $form_entry_id = (int)$this->EE->input->get('entry_id');
+        $return_form_id = $this->EE->input->get('return_form_id');
+        if($return_form_id)
+        {
+            $return_form_id = explode('|', $return_form_id);
+            foreach($return_form_id as $key => $val)
+            {
+                $return_form_id[$key] = (int)$val;
+            }
+            $return_form_id = implode('|', $return_form_id);
+        }
 
         $form_obj = $this->EE->formslib->forms->get($form_id);
         if($form_obj)
         {
             $form_obj->delete_entry($form_entry_id);
         }
-        $this->EE->functions->redirect(ACTION_BASE.AMP.'method=list_entries'.AMP.'form_id='.$form_id);
+        $this->EE->functions->redirect(ACTION_BASE.AMP.'method=list_entries'.AMP.'form_id='.($return_form_id ? $return_form_id : $form_id));
         return TRUE;
     }
 
@@ -2898,6 +2945,9 @@ class Proform_mcp extends Prolib_base_mcp {
         $export_data = $this->EE->formslib->vault->get($hash);
         
         $form_id = $export_data['form_id'];
+        $is_union = $export_data['is_union'];
+        $union = $export_data['union'];
+        
         $batch_command = $export_data['batch_command'];
         $batch_id = $export_data['batch_id'];
 
@@ -2911,8 +2961,11 @@ class Proform_mcp extends Prolib_base_mcp {
         }
 
         $search = $this->_get_search_input($form);
-        $entries = $form->entries_filtered($search, $batch_id);
-
+        $entries = $form->entries_filtered($search, $batch_id, 0, 0, 'form_entry_id', 'DESC', $union);
+        #var_dump($union);
+        #var_dump($entries);
+        #exit;
+        
         switch($batch_command)
         {
             case 'export_csv':
@@ -3024,6 +3077,33 @@ class Proform_mcp extends Prolib_base_mcp {
     // Helpers                                                          //
     //////////////////////////////////////////////////////////////////////
 
+    function parse_union($form_id)
+    {
+        if(strpos($form_id, '|') !== FALSE)
+        {
+            // A union with other form tables has been requested
+            $raw_union = explode('|', $form_id);
+            // Remove first ID which is the "primary" form
+            $form_id = (int)array_shift($raw_union);
+            $union = array();
+            foreach($raw_union as $union_id)
+            {
+                $union_id = (int)$union_id;
+                if($union_id)
+                {
+                    $union[] = (int)$union_id;
+                }
+            }
+            
+            $is_union = true;
+        } else {
+            $union = array();
+            $is_union = false;
+        }
+        
+        return array($form_id, $is_union, $union);
+    }
+    
     function data_table_js()
     {
         $this->EE->javascript->output(array(

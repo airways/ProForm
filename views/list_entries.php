@@ -45,8 +45,11 @@
 
             <span class="action-list">
                 <?php
-                if(ee()->formslib->check_permission('forms', FALSE)) {
-                    echo '<a href="'.$edit_form_url.'">Edit Form Settings</a>';
+                if(!$is_union)
+                {
+                    if(ee()->formslib->check_permission('forms', FALSE)) {
+                        echo '<a href="'.$edit_form_url.'">Edit Form Settings</a>';
+                    }
                 }
                 ?>
                 <span id="pl_select_all_entries_span" class="info" style="display:none;" data-entry-count="<?php echo $total_entries; ?>">Would you like to <a id="pl_select_all_entries_link" href="#">select all <?php echo $total_entries; ?> entries</a>?
@@ -211,7 +214,12 @@
                                 $column .= form_checkbox('batch_id[]', $value, is_array($batch_id) && in_array($value, $batch_id), 'class="batch_id"').'&nbsp';
                             }
                             
-                            $column .= htmlspecialchars($value).'</span>';
+                            if($field == 'form_id')
+                            {
+                                $column .= '<a href="'.$list_entries_base_url.AMP.'form_id='.$value.'">'.$value.'</a></span>';
+                            } else {
+                                $column .= htmlspecialchars($value).'</span>';
+                            }
                             $row[] = $column;
                         }
                 }

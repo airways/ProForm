@@ -126,6 +126,11 @@ class PL_Form extends PL_RowInitialized {
                 //             exit;
                 $forge->create_table(PL_Form::make_table_name($this->form_name));
             }
+            
+            if($driver = $this->get_driver())
+            {
+                $driver->init_form($this);
+            }
         }
     }
 
@@ -516,7 +521,7 @@ class PL_Form extends PL_RowInitialized {
     } // function count_entries()
 
     
-    function entries($search=array(), $start_row = 0, $limit = 0, $orderby = 'form_entry_id', $sort = 'desc')
+    function entries($search=array(), $start_row = 0, $limit = 0, $orderby = 'form_entry_id', $sort = 'desc', $union = array())
     {
         $entry_ids = array();
         
@@ -532,43 +537,149 @@ class PL_Form extends PL_RowInitialized {
             }
         }
         
-        return $this->entries_filtered($search, $entry_ids, $start_row, $limit, $orderby, $sort);
+        return $this->entries_filtered($search, $entry_ids, $start_row, $limit, $orderby, $sort, $union);
     } // entries
     
-    function entries_filtered($search=array(), $entry_ids=array(), $start_row = 0, $limit = 0, $orderby = 'form_entry_id', $sort = 'desc')
+    function entries_filtered($search=array(), $entry_ids=array(), $start_row = 0, $limit = 0, $orderby = 'form_entry_id', $sort = 'desc', $union = array())
     {
+        foreach($entry_ids as $key => $val)
+        {
+            $entry_ids[$key] = (int)$val;
+        }
+        
         if(is_callable(array($this->__EE->lang, 'loadfile'))) {
             $this->__EE->lang->loadfile('proform');
         }
         switch($this->form_type)
         {
             case 'form':
-                $this->__EE->db->select('*');
-
+                $like = array();
+                
                 if(is_array($search) && count($search) > 0)
                 {
                     list($search, $like) = $this->_translate_search($search);
-                    $this->__EE->db->where($search);
-                    $this->__EE->db->like($like);
                 }
-
-                if(is_array($entry_ids) && count($entry_ids) > 0)
+                
+                if(count($union) == 0)
                 {
-                    // We have an array of entry IDs instead of an array of field names
-                    $this->__EE->db->where_in('form_entry_id', $entry_ids);
+                    $this->__EE->db->select('*');
+                    
+                    if(is_array($search) && count($search) > 0)
+                    {
+                        $this->__EE->db->where($search);
+                    }
+                    
+                    if(count($like) > 0)
+                    {
+                        $this->__EE->db->like($like);
+                    }
+                    
+                    if(is_array($entry_ids) && count($entry_ids) > 0)
+                    {
+                        // Absolutely only return entries that have these listed IDs
+                        $this->__EE->db->where_in('form_entry_id', $entry_ids);
+                    }
+                    
+                    if($start_row >= 0 && $limit > 0) {
+                        $this->__EE->db->limit($limit, $start_row); // yes it is reversed compared to MySQL
+                    }
+                    
+                    if($orderby && $sort)
+                    {
+                        $this->__EE->db->order_by($orderby, $sort);
+                    }
+                    
+                    $query = $this->__EE->db->get($this->table_name());
+                } else {
+                    $union_forms = array();
+                    foreach($union as $union_form_id)
+                    {
+                        $union_forms[] = $this->__EE->formslib->forms->get($union_form_id);
+                    }
+                    
+                    $forms = array_merge(array($this), $union_forms);
+                    $sql = '';
+                    foreach($forms as $i => $form)
+                    {
+                        $field_list = $form->form_id.' AS form_id, ';
+                        $union_fields = $form->db_fields();
+                        foreach($this->db_fields() as $field)
+                        {
+                            if(in_array($field, $union_fields))
+                            {
+                                $field_list .= '`'.$field.'`, ';
+                            } else {
+                                $field_list .= 'NULL AS `'.$field.'`, ';
+                            }
+                        }
+                        $field_list = trim($field_list, ', ');
+                        
+                        $sql .= 'SELECT '.$field_list.' FROM `exp_'.$form->table_name().'` ';
+                        
+                        if((is_array($search) && count($search) > 0) || count($like) > 0 || count($entry_ids) > 0)
+                        {
+                            $sql .='WHERE (';
+                        }
+                        
+                        $count = 0;
+                        foreach($search as $field => $value)
+                        {
+                            $sql .= '`exp_'.$form->table_name().'`.`'.$field.'` = '.$this->EE->db->escape($value).' ';
+                            $count++;
+                            if($count < count($search)) $sql .= 'AND ';
+                        }
+                        
+                        if((is_array($search) && count($search) > 0) && (count($like) > 0 || count($entry_ids) > 0))
+                        {
+                            $sql .=') AND (';
+                        }
+                        
+                        if(count($entry_ids) > 0)
+                        {
+                            $sql .= '`exp_'.$form->table_name().'`.`form_entry_id` IN ('.implode(',', $entry_ids).')';
+                            
+                            if(count($like) > 0)
+                            {
+                                $sql .= ') AND (';
+                            }
+                        }
+                        
+                        $count = 0;
+                        foreach($like as $field => $value)
+                        {
+                            $sql .= '`exp_'.$form->table_name().'`.`'.$field.'` LIKE \'%'.$this->EE->db->escape_like_str($value).'%\' ';
+                            $count++;
+                            if($count < count($like)) $sql .= 'AND ';
+                        }
+                        
+                        if((is_array($search) && count($search) > 0) || count($like) > 0 || count($entry_ids) > 0)
+                        {
+                            $sql .= ') ';
+                        }
+                        
+                        if($i < count($forms)-1)
+                        {
+                            $sql .= "\nUNION ALL\n";
+                        }
+                    }
+                    
+                    if($orderby)
+                    {
+                        $sql .= "\n";
+                        $sql .= 'ORDER BY '.$orderby.' '.$sort.' ';
+                    }
+                    
+                    if($limit && $start_row)
+                    {
+                        $sql .= "\n";
+                        $sql .= 'LIMIT '.$start_row.', '.$limit.' ';
+                    }
+                    
+                    
+                    #echo $sql;
+                    //exit;
+                    $query = $this->__EE->db->query($sql);
                 }
-
-                if($start_row >= 0 && $limit > 0) {
-                    $this->__EE->db->limit($limit, $start_row); // yes it is reversed compared to MySQL
-                }
-
-                if($orderby && $sort)
-                {
-                    $this->__EE->db->order_by($orderby, $sort);
-                }
-
-                $query = $this->__EE->db->get($this->table_name());
-
                 $this->__entries = array();
                 if($query->num_rows > 0)
                 {
@@ -674,7 +785,8 @@ class PL_Form extends PL_RowInitialized {
     function assign_field($field, $is_required = 'n')
     {
         // add an existing field to this form/table
-
+        $new_form_field_id = 0;
+        
         // check if the field is already associated with the form
         $query = $this->__EE->db->get_where('exp_proform_form_fields', array('form_id' => $this->form_id, 'field_id' => $field->field_id));
 
@@ -876,6 +988,7 @@ class PL_Form extends PL_RowInitialized {
             );
 
             $this->__EE->db->insert('exp_proform_form_fields', $data);
+            $new_form_id = $this->__EE->db->insert_id();
         } else {
             // update assignment saved field_name so this will work next time
             $data  = array(
@@ -887,6 +1000,8 @@ class PL_Form extends PL_RowInitialized {
         // trigger refresh on next request for field list
         $this->__fields = FALSE;
         $this->__db_fields = FALSE;
+        
+        return $new_form_field_id;
     } // function assign_field()
 
 
@@ -1132,6 +1247,8 @@ class PL_Form extends PL_RowInitialized {
         
         $this->__EE->db->insert('proform_forms', $form_row);
         $new_form_id = $this->__EE->db->insert_id();
+        $new_form = $this->__EE->formslib->forms->get($new_form_id);
+        $new_form->init();
         
         if($include_fields)
         {
@@ -1163,10 +1280,17 @@ class PL_Form extends PL_RowInitialized {
             $assign_query = $this->__EE->db->where('form_id', $this->form_id)->get('proform_form_fields');
             foreach($assign_query->result_array() as $assign_row)
             {
+                $field_id = $assign_row['field_id'];
                 unset($assign_row['form_field_id']);
-                $assign_row['form_id'] = $new_form_id;
-                $assign_row['field_id'] = $assigned_field_ids[$assign_row['field_id']];
-                $this->__EE->db->insert('proform_form_fields', $assign_row);
+                unset($assign_row['form_id']);
+                unset($assign_row['field_id']);
+                //$assign_row['form_id'] = $new_form_id;
+                //$assign_row['field_id'] = $assigned_field_ids[$assign_row['field_id']];
+                //$this->__EE->db->insert('proform_form_fields', $assign_row);
+                $field = $this->__EE->formslib->fields->get($field_id);
+                $new_form_field_id = $new_form->assign_field($field);
+                $this->__EE->db->where('form_field_id', $new_form_field_id)
+                               ->update('proform_form_fields', $assign_row);
             }
         }
     }
