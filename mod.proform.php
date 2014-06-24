@@ -1477,10 +1477,10 @@ class Proform {
 
                     $this->_process_insert($form_obj, $form_session);
 
-                    $form_session->values['entry_id'] = $form_obj->get_inserted_id();
+                    $form_session->values['entry_id'] = $form_session->values['form_entry_id'];
                     if($form_session->values['entry_id'])
                     {
-                        $entry_data = $form_obj->get_entry($form_session->values['entry_id']);
+                        $entry_data = $form_obj->get_entry($form_session->values['form_entry_id']);
                     } else {
                         $entry_data = $form_session->values;
                     }
@@ -1511,6 +1511,8 @@ class Proform {
                 }
                 return $form_session;
             }
+        } else {
+            pl_show_error('Invalid form object');
         }
     }
     
@@ -2104,7 +2106,8 @@ class Proform {
     private function _process_insert(&$form_obj, &$form_session)
     {
         $form_session->values['dst_enabled'] = $this->prolib->dst_enabled ? 'y' : 'n';
-
+        $form_entry_id = 0;
+        
         if($form_obj->form_type == 'form')
         {
             if ($this->EE->extensions->active_hook('proform_insert_start') === TRUE)
@@ -2233,7 +2236,7 @@ class Proform {
         }
 
 
-
+        return $form_entry_id;
     } // _process_insert
 
     private function _process_mailinglist(&$form_obj, &$form_session)

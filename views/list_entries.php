@@ -244,7 +244,7 @@
             <?php 
                 echo form_submit('batch_submit', 'Submit', 'class="submit" id="pl_batch_submit"');
                 echo "&nbsp&nbsp";
-                echo form_dropdown('batch_command', $batch_commands); 
+                echo form_dropdown('batch_command', $batch_commands, ''); 
             ?>
         </div>
 
