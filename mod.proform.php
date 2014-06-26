@@ -1620,6 +1620,9 @@ class Proform {
                         $form_session->values[$field->field_name] = date('Y-m-d H:i:s', $date);
                     }
                     break;
+                case 'currency':
+                    $form_session->values[$field->field_name] = preg_replace('/[^0-9.]/', '', $form_session->values[$field->field_name]);
+                    break;
                 default:
                     if($driver = $field->get_driver())
                     {
