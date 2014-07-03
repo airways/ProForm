@@ -48,6 +48,7 @@ class Proform_notifications
     var $debug_str = '<b>Debug Output</b><br/>';
     var $var_pairs = array();
     var $special_attachments = array();
+    var $parse_ee_tags = TRUE;
     
     function __construct()
     {
@@ -303,6 +304,11 @@ class Proform_notifications
         $this->special_attachments[] = $filename;
     }
     
+    public function enabled_parse_ee_tags($val)
+    {
+        $this->parse_ee_tags = $val;
+    }
+    
     public function send_notification($template_name, &$form, &$data, $subject, $notification_list, $reply_to=FALSE, $reply_to_name=FALSE, $send_attachments=FALSE)
     {
         return $this->_send_notifications('custom', $template_name, $form, $data, $subject, $notification_list, $reply_to, $reply_to_name, $send_attachments);
@@ -347,112 +353,129 @@ class Proform_notifications
             ));
 
             // parse the template for EE tags, conditionals, etc.
-            $oldTMPL = $this->EE->TMPL;
-            
+            if($this->parse_ee_tags)
+            {
+                $this->_debug('Parsing EE tags...');
+                $oldTMPL = $this->EE->TMPL;
+                
 // var_dump($this->EE->TMPL);
-            $this->EE->TMPL = new EE_Template();
-            $this->EE->TMPL->template = $message;
-            $this->EE->TMPL->template = $this->EE->TMPL->parse_globals($this->EE->TMPL->template);
-            $this->EE->TMPL->parse($message);
-
-            // final output to send
-            $this->EE->TMPL->final_template = $this->EE->TMPL->parse_globals($this->EE->TMPL->final_template);
-            $message = $this->EE->TMPL->final_template;
-            
-            $this->EE->TMPL = $oldTMPL;
-            if($clearTMPL) {
-                unset($this->EE->TMPL);
-            }
+                $this->EE->TMPL = new EE_Template();
+                $this->EE->TMPL->template = $message;
+                $this->EE->TMPL->template = $this->EE->TMPL->parse_globals($this->EE->TMPL->template);
+                $this->EE->TMPL->parse($message);
+    
+                // final output to send
+                $this->EE->TMPL->final_template = $this->EE->TMPL->parse_globals($this->EE->TMPL->final_template);
+                $message = $this->EE->TMPL->final_template;
+                
+                $this->EE->TMPL = $oldTMPL;
+                if($clearTMPL) {
+                    unset($this->EE->TMPL);
+                }
 // var_dump($this->EE->pl_parser->variable_prefix);
 // var_dump($data);
 // echo "<pre>";
 // echo htmlentities($message);
 // exit;
+            } else {
+                $this->_debug('Not parsing EE tags');
+            }
             $this->_debug($message);
             $result = TRUE;
-            foreach($notification_list as $to_email)
+            
+            if($driver = $form->get_driver())
             {
-                $this->EE->pl_email->PL_initialize();
-
-                if($this->default_from_address)
+                $this->_debug('Calling form driver->prep_notifications');
+                $result = $driver->prep_notifications($this, $type, $template_name, $form, $data, $subject, $notification_list, $reply_to, $reply_to_name, $send_attachments, $result);
+                $this->_debug('Result after driver->prep_notifications - ' . ($result ? 'okay' : 'failed'));
+            }
+            
+            if($result)
+            {
+                foreach($notification_list as $to_email)
                 {
-                    $this->EE->pl_email->from($this->default_from_address, $this->default_from_name);
-                }
-
-                if($reply_to)
-                {
-                    if($reply_to_name)
+                    $this->EE->pl_email->PL_initialize();
+    
+                    if($this->default_from_address)
                     {
-                        $this->EE->pl_email->reply_to($reply_to, $reply_to_name);
-                    } else {
-                        $this->EE->pl_email->reply_to($reply_to);
+                        $this->EE->pl_email->from($this->default_from_address, $this->default_from_name);
                     }
-                } else {
-                    // use the form's reply-to email and name if they have been set
-                    if(trim($form->reply_to_address) != '')
+    
+                    if($reply_to)
                     {
-                        if(trim($form->reply_to_name) != '')
+                        if($reply_to_name)
                         {
-                            $this->EE->pl_email->reply_to($form->reply_to_address, $form->reply_to_name);
+                            $this->EE->pl_email->reply_to($reply_to, $reply_to_name);
                         } else {
-                            $this->EE->pl_email->reply_to($form->reply_to_address);
+                            $this->EE->pl_email->reply_to($reply_to);
                         }
-                    } elseif($this->default_reply_to_address) {
-                        // use the default reply-to address if it's been set
-                        $this->EE->pl_email->reply_to($this->default_reply_to_address, $this->default_reply_to_name);
-                    }
-                }
-
-                // Only normal forms can have files uploaded to them
-                if($form->form_type == 'form')
-                {
-                    // Attach files
-                    if($send_attachments)
-                    {
-                        foreach($form->fields() as $field)
+                    } else {
+                        // use the form's reply-to email and name if they have been set
+                        if(trim($form->reply_to_address) != '')
                         {
-                            if($field->type == 'file')
+                            if(trim($form->reply_to_name) != '')
                             {
-                                $upload_pref = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
-                                if ($upload_pref)
+                                $this->EE->pl_email->reply_to($form->reply_to_address, $form->reply_to_name);
+                            } else {
+                                $this->EE->pl_email->reply_to($form->reply_to_address);
+                            }
+                        } elseif($this->default_reply_to_address) {
+                            // use the default reply-to address if it's been set
+                            $this->EE->pl_email->reply_to($this->default_reply_to_address, $this->default_reply_to_name);
+                        }
+                    }
+    
+                    // Only normal forms can have files uploaded to them
+                    if($form->form_type == 'form')
+                    {
+                        // Attach files
+                        if($send_attachments)
+                        {
+                            foreach($form->fields() as $field)
+                            {
+                                if($field->type == 'file')
                                 {
-                                    $this->EE->pl_email->attach($upload_pref['server_path'].$data[$field->field_name]);
+                                    $upload_pref = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
+                                    if ($upload_pref)
+                                    {
+                                        $this->EE->pl_email->attach($upload_pref['server_path'].$data[$field->field_name]);
+                                    }
                                 }
                             }
                         }
+                        
+    
+                        foreach($this->special_attachments as $filename)
+                        {
+                            $this->EE->pl_email->attach($filename);
+                        }
                     }
                     
-
-                    foreach($this->special_attachments as $filename)
+                    $this->_debug('To: '.$to_email);
+                    $this->EE->pl_email->to($to_email);
+                    $this->EE->pl_email->subject($subject);
+    
+                    // We need to call entities_to_ascii() for text mode email w/ entry encoded data.
+                    // $message will automatically have {if plain_email} and {if html_email} handled inside the pl_email class
+                    // The message will also be automatically stripped of markup for the plain text version since we are not
+                    // providing an explicit alternative, in which case a lack of a check for either of those variables will
+                    // still generate a passable text email if the markup was not totally reliant on images.
+                    //$this->EE->pl_email->message(entities_to_ascii($message));
+                    $this->EE->pl_email->message($message);
+    
+                    $this->EE->pl_email->send = TRUE;
+                    if ($this->EE->extensions->active_hook('proform_notification_message') === TRUE)
                     {
-                        $this->EE->pl_email->attach($filename);
+                        $this->EE->extensions->call('proform_notification_message', $type, $form, $this->EE->pl_email, $this);
+                        if($this->EE->extensions->end_script) return;
                     }
+    
+                    if($this->EE->pl_email->send)
+                    {
+                        $result = $result && $this->EE->pl_email->Send();
+                    }
+    
                 }
-                
-                $this->_debug('To: '.$to_email);
-                $this->EE->pl_email->to($to_email);
-                $this->EE->pl_email->subject($subject);
-
-                // We need to call entities_to_ascii() for text mode email w/ entry encoded data.
-                // $message will automatically have {if plain_email} and {if html_email} handled inside the pl_email class
-                // The message will also be automatically stripped of markup for the plain text version since we are not
-                // providing an explicit alternative, in which case a lack of a check for either of those variables will
-                // still generate a passable text email if the markup was not totally reliant on images.
-                //$this->EE->pl_email->message(entities_to_ascii($message));
-                $this->EE->pl_email->message($message);
-
-                $this->EE->pl_email->send = TRUE;
-                if ($this->EE->extensions->active_hook('proform_notification_message') === TRUE)
-                {
-                    $this->EE->extensions->call('proform_notification_message', $type, $form, $this->EE->pl_email, $this);
-                    if($this->EE->extensions->end_script) return;
-                }
-
-                if($this->EE->pl_email->send)
-                {
-                    $result = $result && $this->EE->pl_email->Send();
-                }
-
             }
         }
 

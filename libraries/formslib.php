@@ -303,7 +303,8 @@ class Formslib
     }
     
     public function create_fields_array($form_obj, $form_session = FALSE, $field_errors = array(), $field_values = array(),
-                                         $field_checked_flags = array(), $create_field_rows = TRUE, $hidden = NULL, $all = FALSE)
+                                         $field_checked_flags = array(), $create_field_rows = TRUE, $hidden = NULL, $all = FALSE,
+                                         $include_empty = TRUE)
     {
         if(is_object($field_values))
         {
@@ -543,6 +544,12 @@ class Formslib
                 $field_array['field_driver'] = FALSE;
             }
 
+            if(!$include_empty)
+            {
+                if(!$field_array['field_name']) continue;
+                if(!$field_array['field_value']) continue;
+            }
+            
             if($create_field_rows)
             {
                 if($field->field_row != $last_field_row)
