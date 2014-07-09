@@ -29,9 +29,10 @@
  * to this clause.
  *
  **/ 
- 
- 
- /*
+
+require_once(PATH_THIRD.'proform/views/_advanced_settings.php');
+
+/*
 <div class="edit_form">
 <?php if(isset($form_name)): ?>
 <h2 class="content-heading">Editing <em><?php echo $form_name; ?></em></h2>
@@ -76,30 +77,39 @@
 
 <?php echo form_hidden('active_tab'); ?>
 
-<!-- start edit form tab content -->
+<!-- start settings tab -->
 <div class="tab-content main tab-content-settings">
 
     <?php $generic_edit_embedded = TRUE; include(PATH_THIRD.'proform/views/generic_edit.php'); ?>
 
 </div>
-<!-- end edit form tab content -->
+<!-- end settings tab -->
 
-<!-- start advanced settings -->
+<!-- start actions tab -->
 <div class="tab-content main tab-content-advanced">
 
-    <?php include(PATH_THIRD.'proform/views/_advanced_settings.php'); ?>
+    <?php proform_build_advanced_grid('form_actions', $form_actions, $action_event_options, $action_forms, $advanced_settings_help, false); ?>
 
 </div>
-<!-- end advanced settings -->
+<!-- end actions tab -->
+
+<!-- start advanced settings tab -->
+<div class="tab-content main tab-content-advanced">
+
+    <?php proform_build_advanced_grid('form_advanced_settings', $settings, $advanced_settings_options, $advanced_settings_forms, $advanced_settings_help, false); ?>
+
+</div>
+<!-- end advanced settings tab -->
 
 <?php if(isset($form_id) AND $form_id): ?>
 
-<!-- start tab content -->
+<!-- start layout tab -->
 <div class="grid-group tab-content main tab-content-layout">
 
     <?php include(PATH_THIRD.'proform/views/edit_form_layout.php'); ?>
 
 </div>
+<!-- end layout tab -->
 
 <?php endif; ?>
 <br/><br/>
