@@ -433,7 +433,7 @@ class Formslib
                     'field_error'               => array_key_exists($field->field_name, $field_errors)
                                                         ? $field_errors[$field->field_name]
                                                             : '',
-                    'field_value'               => $field_value,
+                    'field_value'               => is_array($field_value) ? implode('|', $field_value) : $field_value,
                     'field_values'              => $field_value_wrap,
                     'field_options'             => $field_options,
                     'field_checked'             => (array_key_exists($field->field_name, $field_checked_flags)

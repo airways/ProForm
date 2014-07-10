@@ -1,6 +1,5 @@
 <?php
 
-
 echo '<script type="text/javascript">'."\n";
 echo 'proform_mod.forms = '.json_encode($advanced_settings_forms, JSON_FORCE_OBJECT) . ';'."\n";
 echo 'proform_mod.help = '.json_encode($advanced_settings_help ? $advanced_settings_help : array(), JSON_FORCE_OBJECT) . ';'."\n";
