@@ -55,6 +55,7 @@ class Formslib
         'from_name' => '',
         'reply_to_address' => '',
         'reply_to_name' => '',
+        'listings_show_list_values' => 'n',
         'permission_manage_module' => '',
         'permission_manage_forms' => '',
         'permission_manage_entries' => '',

@@ -410,6 +410,7 @@ class Proform_mcp extends Prolib_base_mcp {
                         $control = form_dropdown($f_name, $groups, $value);
                         break;
                     case 'pref_show_quickstart_on':
+                    case 'pref_listings_show_list_values':
                         $control = form_dropdown($f_name, $yes_no_options, $value);
                         break;
                     case 'pref_permission_manage_module':

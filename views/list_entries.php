@@ -178,7 +178,11 @@
                             {
                                 if(in_array($option['key'], $value))
                                 {
-                                    $cell .= $option['label'].' ['.$option['key'].']<br/>';
+                                    $cell .= $option['label'];
+                                    if(ee()->formslib->prefs->ini('listings_show_list_values') == 'y') {
+                                        $cell .= ' ['.$option['key'].']';
+                                    }
+                                    $cell .= '<br/>';
                                 }
                             }
                         $cell .= '</span>';

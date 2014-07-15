@@ -259,7 +259,9 @@ $lang = array(
     'field_pref_permission_manage_forms_desc' => 'These member groups may manage ProForm Form Settings, provided they have access to the CP',
     'field_pref_permission_manage_entries' => 'Form Entries Management Groups',
     'field_pref_permission_manage_entries_desc' => 'These member groups may manage ProForm Entries, provided they have access to the CP',
-
+    'field_pref_listings_show_list_values' => 'Show List Field Values in Listings',
+    'field_pref_listings_show_list_values_desc' => 'In addition to the labels for selected options, also show the values in square brackets (old behavior)',
+    
     'field_form_entry_id' => 'Entry ID',
     'field_updated' => 'Updated',
     'field_ip_address' => 'IP Address',
