@@ -1,10 +1,10 @@
 <?php
 // est72-build11
 // est69-build2
-// @version 1.50
+// @version 1.51
 // @prolib 0.73
 
-define('PROFORM_VERSION', '1.50');
+define('PROFORM_VERSION', '1.51');
 define('PROFORM_NAME', 'ProForm');
 define('PROFORM_CLASS', 'Proform'); // must match module class name
 define('PROFORM_DESCRIPTION', 'ProForm is an advanced form management module for ExpressionEngine 2.0, designed to make creation and management of forms easier for developers and end users.');
