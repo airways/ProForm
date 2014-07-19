@@ -1222,6 +1222,16 @@ class PL_Form extends PL_RowInitialized {
             }
         }
         #ksort($result);
+        
+        $custom = $this->__EE->formslib->prefs->ini('custom_form_settings');
+        if($custom)
+        {
+            $custom_options = $this->__EE->formslib->parse_options($custom);
+            foreach($custom_options as $key => $option)
+            {
+                $result['custom_'.$key] = $option;
+            }
+        }
         return $result;
     }
     

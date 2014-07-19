@@ -78,7 +78,7 @@ var proform_mod = {
                             input += '</table><table class="mainTable" border="0" cellspacing="0" cellpadding="0" width="100%"><tr><th colspan="2">'+form[x]['control']+'</th></tr>';
                             f_even = true;
                         } else {
-                            input += '<tr class="'+(f_even ? 'even' : 'odd')+'"><td width="50%"><label>' + proform_mod.slang(form[x]['lang_field']) + '</td><td width="50%">' + form[x]['control'] + '<br/></label></tr>';
+                            input += '<tr class="'+(f_even ? 'even' : 'odd')+'"><td width="20%"><label>' + proform_mod.slang(form[x]['lang_field']) + '</td><td width="80%">' + form[x]['control'] + '<br/></label></tr>';
                         }
                         
                         f_even = !f_even;

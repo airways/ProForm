@@ -418,6 +418,9 @@ class Proform_mcp extends Prolib_base_mcp {
                     case 'pref_permission_manage_entries':
                         $control = form_multiselect($f_name.'[]', $member_groups, explode('|', $value));
                         break;
+                    case 'pref_custom_form_settings':
+                        $control = form_textarea($f_name, $value);
+                        break;
                     default:
                         $control = form_input($f_name, $value);
                 }

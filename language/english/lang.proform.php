@@ -261,6 +261,8 @@ $lang = array(
     'field_pref_permission_manage_entries_desc' => 'These member groups may manage ProForm Entries, provided they have access to the CP',
     'field_pref_listings_show_list_values' => 'Show List Field Values in Listings',
     'field_pref_listings_show_list_values_desc' => 'In addition to the labels for selected options, also show the values in square brackets (old behavior)',
+    'field_pref_custom_form_settings' => 'Custom Form Settings',
+    'field_pref_custom_form_settings_desc' => 'These custom options will be available on every form\'s Advanced Settings tab.<br/>Each line should be separated by a colon with the custom setting name on the left, and the label for the setting on the right.<br/>All settings will be available inside of the <kbd>{exp:proform:form}</kbd> tag via variables named <kbd>{formpref:custom_<em>setting_name</em>}</kbd> where <kbd><em>setting_name</em></kbd> is the name of each line here.',
     
     'field_form_entry_id' => 'Entry ID',
     'field_updated' => 'Updated',

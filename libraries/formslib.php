@@ -59,6 +59,7 @@ class Formslib
         'permission_manage_module' => '',
         'permission_manage_forms' => '',
         'permission_manage_entries' => '',
+        'custom_form_settings' => '',
     );
 
     public $__advanced_settings_options = array(
@@ -648,6 +649,31 @@ class Formslib
         
         return $result;
         
+    }
+    
+    public function parse_options($string)
+    {
+        $result = array();
+        $list = explode("\n", $string);
+        $valid = FALSE;
+        foreach($list as $option)
+        {
+            if(strpos($option, ':') !== FALSE)
+            {
+                $option = explode(':', $option, 2);
+                $key = trim($option[0]);
+                $option = trim($option[1]);
+            } else {
+                $option = trim($option);
+                $key = $option;
+            }
+            
+            if($option != '' || $key != '')
+            {
+                $result[$key] = $option;
+            }
+        }
+        return $result;
     }
 } // class Formslib
 }
