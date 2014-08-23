@@ -307,7 +307,7 @@ var pl_grid = {
                     
                     // If we have custom form settings, we will initialize an object-based data row and generate the HTML
                     // for the row with the right form elements in it
-                    if(pl_grid.forms[id][key])
+                    if(pl_grid.forms[id] && pl_grid.forms[id][key])
                     {
                         // Start the blank object-based data row. The weird _ property is the value of the first item in the grid - 
                         // which is always chosen from a fixed set of options (pl_grid.options[] for that grid).
@@ -379,7 +379,7 @@ var pl_grid = {
                             +(
                                 pl_grid.options[key][val].flags && pl_grid.options[key][val].flags.indexOf('has_param') > -1
                                     ? '<td>'+html_form+'<span class="help">'+pl_grid.help[id][key][val]+'</span></td>'
-                                    : '<td><span class="help">'+pl_grid.help[id][key][val]+'</span></td>'
+                                    : '<td><span class="help">'+(pl_grid.help[id] ? pl_grid.help[id][key][val] : '')+'</span></td>'
                             )+'<td><a href="#" class="remove_grid_row" data-key="'+ key +'" data-opt="' + val +'" data-row="' + row_count + '">X</a></td>'
                             +'</tr>'
                     );
@@ -479,7 +479,7 @@ var pl_grid = {
             var key = $(this).attr('data-key');
             var val = '';
             
-            if(pl_grid.forms[id][key])
+            if(pl_grid.forms[key])
             {
                 // New object-based grid are saved as JSON arrays of objects
                 val = JSON.stringify(pl_grid.data[key]);
