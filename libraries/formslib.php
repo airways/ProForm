@@ -446,7 +446,7 @@ class Formslib
             // a lot easier
             foreach($validation->array as $rule)
             {
-                $field_array['field_validation:'.$rule[0]] = '1';
+                $field_array['field_validation:'.$rule->_] = '1';
             }
 
             // Copy field settings for each field type into the field array
