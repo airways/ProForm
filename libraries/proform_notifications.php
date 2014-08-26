@@ -340,7 +340,7 @@ class Proform_notifications
             $result = TRUE;
             foreach($notification_list as $to_email)
             {
-                $this->EE->pl_email->PL_initialize();
+                $this->EE->pl_email->PL_initialize($this->EE->formslib->prefs->ini('mailtype'));
 
                 if($this->default_from_address)
                 {

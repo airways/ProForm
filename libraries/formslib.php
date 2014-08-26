@@ -43,6 +43,7 @@ class Formslib
 
     var $form_types = array('form' => 'Entry Form', 'saef' => 'SAEF Form', 'share' => 'Share Form');
     var $var_pairs = array('fieldrows', 'fields', 'hidden_fields', 'errors', 'steps', 'field_validation');
+    var $mailtypes = array('html' => 'HTML', 'text' => 'Plain Text');
     
     // Fields that will not be encrypted or decrypted
     var $field_encryption_disabled = array('dst_enabled');
@@ -55,7 +56,7 @@ class Formslib
         'from_name' => '',
         'reply_to_address' => '',
         'reply_to_name' => '',
-
+        'mailtype' => 'html',
     );
 
     public $__advanced_settings_options = array(

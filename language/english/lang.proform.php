@@ -253,6 +253,8 @@ $lang = array(
     'field_pref_safecracker_separate_channels_on' => 'SafeCracker: Separate Channel Per Form',
     'field_pref_show_quickstart_on' => 'Show Quick Start',
     'field_pref_show_quickstart_on_desc' => 'Turns on the Quick Start box displayed under the list of forms on the main page of ProForm',
+    'field_pref_mailtype' => 'Email Format',
+    'field_pref_mailtype_desc' => 'Format to send all ProForm generated emails in',
     
 
     'field_form_entry_id' => 'Entry ID',
