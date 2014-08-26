@@ -386,6 +386,9 @@ class Proform_mcp extends Prolib_base_mcp {
                     case 'pref_show_quickstart_on':
                         $control = form_dropdown($f_name, $yes_no_options, $value);
                         break;
+                    case 'pref_mailtype':
+                        $control = form_dropdown($f_name, $this->EE->formslib->mailtypes, $value);
+                        break;
                     default:
                         $control = form_input($f_name, $value);
                 }
