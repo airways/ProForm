@@ -831,10 +831,13 @@ class Proform_mcp extends Prolib_base_mcp {
 
 
             'reply_to_field' => array('dropdown', $form_field_options),
+            'reply_to_name_field' => array('dropdown', $form_field_options),
             'submitter_email_field' => array('dropdown', $form_field_options),
             'submitter_reply_to_field' => array('dropdown', $form_field_options),
+            'submitter_reply_to_name_field' => array('dropdown', $form_field_options),
             'share_email_field' => array('dropdown', $form_field_options),
             'share_reply_to_field' => array('dropdown', $form_field_options),
+            'share_reply_to_name_field' => array('dropdown', $form_field_options),
         );
 
         $extra = array('after' => array());

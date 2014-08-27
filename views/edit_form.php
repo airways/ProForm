@@ -85,6 +85,7 @@ require_once(PATH_THIRD.'proform/views/_advanced_settings.php');
 </div>
 <!-- end settings tab -->
 
+<?php /*
 <!-- start actions tab -->
 <div class="tab-content main tab-content-advanced">
 
@@ -92,6 +93,7 @@ require_once(PATH_THIRD.'proform/views/_advanced_settings.php');
 
 </div>
 <!-- end actions tab -->
+*/ ?>
 
 <!-- start advanced settings tab -->
 <div class="tab-content main tab-content-advanced">

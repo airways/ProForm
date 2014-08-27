@@ -243,10 +243,10 @@ class Formslib
                 if(is_object($row))
                 {
 //                echo 'o ' . $field->field_name.' = '.$row->{$field->field_name};
-                    $row_vars['value:'.$field->field_name] = $row->{$field->field_name};
+                    if(isset($row->{$field->field_name})) $row_vars['value:'.$field->field_name] = $row->{$field->field_name};
                 } elseif(is_array($row)) {
 //                echo 'a ' . $field->field_name.' = '.$row[$field->field_name];
-                    $row_vars['value:'.$field->field_name] = $row[$field->field_name];
+                    if(isset($row[$field->field_name])) $row_vars['value:'.$field->field_name] = $row[$field->field_name];
                 }
 
                 if($field->type == 'file' && $row_vars['value:'.$field->field_name] != '')

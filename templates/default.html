@@ -46,7 +46,7 @@
         {pf_fieldrows}
         <ul class="pf_row">
             {pf_fields}
-                {if pf_field_type != "invisible"}
+                {if pf_field_type != "invisible" && pf_field_type != "calculated"}
                     <li id="{pf_field_html_id}" class="pf_column {pf_field_html_class}" data-field-name="{pf_field_name}" {if pf_field_conditionals_count}data-has-conditional="yes"{/if}>
                     {if pf_field_conditionals_count}
                         <script>
