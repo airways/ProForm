@@ -183,6 +183,8 @@ $lang = array(
     'field_mailinglist_id' => 'Mailing List',
     'field_reply_to_field' => 'Reply-To Field',
     'field_reply_to_field_desc' => 'Field on the form containing the email address to set as this notification\'s Reply-To',
+    'field_reply_to_name_field' => 'Reply-To Name FIeld',
+    'field_reply_to_name_field_desc' => 'Field on the form containing the name to set in the notification\'s Reply-To',
     'field_notification_list_attachments' => 'Send attachments?',
     'field_notification_list_attachments_desc' => 'If enabled, all uploaded files will be sent to this group as attachments',
 
@@ -198,6 +200,8 @@ $lang = array(
     'field_submitter_email_field_desc' => 'Field on the form containing the email address to send notifications to: use a List type to allow the user to choose a department or individual, or use a Text field to allow them to enter their own address',
     'field_submitter_reply_to_field' => 'Reply-To Field',
     'field_submitter_reply_to_field_desc' => 'Field on the form containing the email address to set as this notification\'s Reply-To',
+    'field_submitter_reply_to_name_field' => 'Reply-To Name FIeld',
+    'field_submitter_reply_to_name_field_desc' => 'Field on the form containing the name to set in the notification\'s Reply-To',
     'field_submitter_notification_attachments' => 'Send attachments?',
     'field_submitter_notification_attachments_desc' => 'If enabled, all uploaded files will be sent to this group as attachments',
 
@@ -212,6 +216,8 @@ $lang = array(
     'field_share_email_field_desc' => 'Field on the form containing the email address to send notifications to: use a List type to allow the user to choose a department or individual, or use a Text field to allow them to enter their own address',
     'field_share_reply_to_field' => 'Reply-To Field',
     'field_share_reply_to_field_desc' => 'Field on the form containing the email address to set as this notification\'s Reply-To',
+    'field_share_reply_to_name_field' => 'Reply-To Name FIeld',
+    'field_share_reply_to_name_field_desc' => 'Field on the form containing the name to set in the notification\'s Reply-To',
     'field_share_notification_attachments' => 'Send attachments?',
     'field_share_notification_attachments_desc' => 'If enabled, all uploaded files will be sent to this group as attachments',
 
@@ -263,6 +269,8 @@ $lang = array(
     'field_pref_listings_show_list_values_desc' => 'In addition to the labels for selected options, also show the values in square brackets (old behavior)',
     'field_pref_custom_form_settings' => 'Custom Form Settings',
     'field_pref_custom_form_settings_desc' => 'These custom options will be available on every form\'s Advanced Settings tab.<br/>Each line should be separated by a colon with the custom setting name on the left, and the label for the setting on the right.<br/>All settings will be available inside of the <kbd>{exp:proform:form}</kbd> tag via variables named <kbd>{formpref:custom_<em>setting_name</em>}</kbd> where <kbd><em>setting_name</em></kbd> is the name of each line here.',
+    'field_pref_mailtype' => 'Email Format',
+    'field_pref_mailtype_desc' => 'Format to send all ProForm generated emails in',
     
     'field_form_entry_id' => 'Entry ID',
     'field_updated' => 'Updated',

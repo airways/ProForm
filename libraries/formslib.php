@@ -43,6 +43,7 @@ class Formslib
 
     var $form_types = array('form' => 'Entry Form', 'saef' => 'SAEF Form', 'share' => 'Share Form');
     var $var_pairs = array('fieldrows', 'fields', 'hidden_fields', 'errors', 'steps', 'field_validation');
+    var $mailtypes = array('html' => 'HTML', 'text' => 'Plain Text');
     
     // Fields that will not be encrypted or decrypted
     var $field_encryption_disabled = array('dst_enabled');
@@ -60,6 +61,7 @@ class Formslib
         'permission_manage_forms' => '',
         'permission_manage_entries' => '',
         'custom_form_settings' => '',
+        'mailtype' => 'html',
     );
 
     public $__advanced_settings_options = array(
@@ -246,10 +248,10 @@ class Formslib
                 if(is_object($row))
                 {
 //                echo 'o ' . $field->field_name.' = '.$row->{$field->field_name};
-                    $row_vars['value:'.$field->field_name] = $row->{$field->field_name};
+                    if(isset($row->{$field->field_name})) $row_vars['value:'.$field->field_name] = $row->{$field->field_name};
                 } elseif(is_array($row)) {
 //                echo 'a ' . $field->field_name.' = '.$row[$field->field_name];
-                    $row_vars['value:'.$field->field_name] = $row[$field->field_name];
+                    if(isset($row[$field->field_name])) $row_vars['value:'.$field->field_name] = $row[$field->field_name];
                 }
 
                 if($field->type == 'file' && $row_vars['value:'.$field->field_name] != '')
@@ -451,7 +453,7 @@ class Formslib
             // a lot easier
             foreach($validation->array as $rule)
             {
-                $field_array['field_validation:'.$rule[0]] = '1';
+                $field_array['field_validation:'.$rule->_] = '1';
             }
 
             // Copy field settings for each field type into the field array

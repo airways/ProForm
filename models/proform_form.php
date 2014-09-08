@@ -54,6 +54,7 @@ class PL_Form extends PL_RowInitialized {
     var $notification_list;
     var $subject;
     var $reply_to_field;
+    var $reply_to_name_field;
     var $notification_list_attachments = 'n';
 
     var $submitter_notification_on = 'n';
@@ -61,6 +62,7 @@ class PL_Form extends PL_RowInitialized {
     var $submitter_notification_subject;
     var $submitter_email_field;
     var $submitter_reply_to_field;
+    var $submitter_reply_to_name_field;
     var $submitter_notification_attachments = 'n';
 
     var $share_notification_on = 'n';
@@ -68,6 +70,7 @@ class PL_Form extends PL_RowInitialized {
     var $share_notification_subject;
     var $share_email_field;
     var $share_reply_to_field;
+    var $share_reply_to_name_field;
     var $share_notification_attachments = 'n';
 
     var $settings;

@@ -331,13 +331,14 @@ class PL_Field extends PL_RowInitialized
         if($this->validation[0] == '[')
         {
             // Load new JSON grid syntax
-            $field_rules = json_decode($this->validation);
+            $raw_rules = json_decode($this->validation);
         } else {
             // Load old CI validation syntax
-            $field_rules = array_filter_values(explode('|', $this->validation), array('none', ''));
+            $raw_rules = array_filter_values(explode('|', $this->validation), array('none', ''));
         }
         
-        foreach($field_rules as $rule)
+        $field_rules = array();
+        foreach($raw_rules as $rule)
         {
             if($rule) {
                 if(!is_object($rule)) {
@@ -354,8 +355,9 @@ class PL_Field extends PL_RowInitialized
                     {
                         $rule->value = str_replace(']', '', $arr[1]);
                     }
-                    if($rule->_ != 'none' || $rule->_ != '') continue;
+                    if($rule->_ == 'none' || $rule->_ == '') continue;
                 }
+                $field_rules[] = $rule;
             }
         }
         
@@ -363,7 +365,7 @@ class PL_Field extends PL_RowInitialized
         {
             $field_rules[] = (object)array('_' => 'required');
         }
-        
+        //var_dump($field_rules);
         return $field_rules;
     }
 

@@ -420,6 +420,8 @@ class Proform_mcp extends Prolib_base_mcp {
                         break;
                     case 'pref_custom_form_settings':
                         $control = form_textarea($f_name, $value);
+                    case 'pref_mailtype':
+                        $control = form_dropdown($f_name, $this->EE->formslib->mailtypes, $value);
                         break;
                     default:
                         $control = form_input($f_name, $value);
@@ -912,10 +914,13 @@ class Proform_mcp extends Prolib_base_mcp {
 
 
             'reply_to_field' => array('dropdown', $form_field_options),
+            'reply_to_name_field' => array('dropdown', $form_field_options),
             'submitter_email_field' => array('dropdown', $form_field_options),
             'submitter_reply_to_field' => array('dropdown', $form_field_options),
+            'submitter_reply_to_name_field' => array('dropdown', $form_field_options),
             'share_email_field' => array('dropdown', $form_field_options),
             'share_reply_to_field' => array('dropdown', $form_field_options),
+            'share_reply_to_name_field' => array('dropdown', $form_field_options),
         );
 
         $extra = array('after' => array());
