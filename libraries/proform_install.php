@@ -433,12 +433,15 @@ class Proform_install
 
         if($current < 1.55)
         {
-            $fields = array(
-                'reply_to_name_field'            => array('type' => 'varchar', 'constraint' => '32', 'default' => ''),
-                'submitter_reply_to_name_field'  => array('type' => 'varchar', 'constraint' => '32', 'default' => ''),
-                'share_reply_to_name_field'      => array('type' => 'varchar', 'constraint' => '32', 'default' => ''),
-            );
-            $forge->add_column('proform_forms', $fields);
+            if(!$this->EE->db->field_exists('reply_to_name_field', 'proform_forms')) 
+            {
+                $fields = array(
+                    'reply_to_name_field'            => array('type' => 'varchar', 'constraint' => '32', 'default' => ''),
+                    'submitter_reply_to_name_field'  => array('type' => 'varchar', 'constraint' => '32', 'default' => ''),
+                    'share_reply_to_name_field'      => array('type' => 'varchar', 'constraint' => '32', 'default' => ''),
+                );
+                $forge->add_column('proform_forms', $fields);
+            }
         }
 
         return TRUE;

@@ -2564,10 +2564,12 @@ class Proform_mcp extends Prolib_base_mcp {
                                     'report_html'  => 'HTML Report',
                                     'repoty_text'  => 'Text Report',
                                 );
+
         if(method_exists($driver, 'batch_commands'))
         {
             $vars['batch_commands'] = $driver->batch_commands($vars['batch_commands']);
         }
+        $vars['batch_commands'] = $this->EE->pl_drivers->batch_commands_global($vars['batch_commands']);
         
         $vars['license_key'] = $this->EE->formslib->prefs->ini('license_key');
         $vars['versions'] = $this->versions;
@@ -2623,12 +2625,11 @@ class Proform_mcp extends Prolib_base_mcp {
                     $hash = $this->EE->formslib->vault->put($export_data);
                     header(str_replace('&amp;', '&', 'Refresh: 0;url='.ACTION_BASE.'method=do_export_entries'.AMP.'hash='.$hash));
                 } else {
-                    if($driver = $form_obj->get_driver())
+                    if($driver = $form_obj->get_driver() && isset($driver) && method_exists($driver, $batch_command))
                     {
-                        if(method_exists($driver, $batch_command))
-                        {
-                            $driver->$batch_command($form_obj, $batch_id);
-                        }
+                        $driver->$batch_command($form_obj, $batch_id);
+                    } else {
+                        $this->EE->pl_drivers->$batch_command($form_obj, $batch_id);
                     }
                 }
             
@@ -3224,6 +3225,8 @@ class Proform_mcp extends Prolib_base_mcp {
                     $search = $driver->default_search($form->form_id);
                 }
             }
+            
+            $search = $this->EE->pl_drivers->default_search_global($form->form_id, $search);
         }
         /*
         if(count($search) > 0) {
