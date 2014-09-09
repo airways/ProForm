@@ -71,7 +71,7 @@ var proform_mod = {
                     $('#'+id+' .advanced_settings_options').children('option[value='+key+']').remove();
                 }
                 var input = '<input type="text" name="settings['+key+']" />';
-                if(proform_mod.forms[id][key])
+                if(proform_mod.forms[id] && proform_mod.forms[id][key])
                 {
                     form = proform_mod.forms[id][key];
                     input = '<table class="mainTable" border="0" cellspacing="0" cellpadding="0" width="100%">';
@@ -404,7 +404,7 @@ var pl_grid = {
                             +'<td>'+pl_grid.options[key][val].label+'</td>'
                             +(
                                 pl_grid.options[key][val].flags && pl_grid.options[key][val].flags.indexOf('has_param') > -1
-                                    ? '<td>'+html_form+'<span class="help">'+pl_grid.help[id][key][val]+'</span></td>'
+                                    ? '<td>'+html_form+'<span class="help">'+(pl_grid.help[id] && pl_grid.help[id][key] && pl_grid.help[id][key][val] ? pl_grid.help[id][key][val] : '' )+'</span></td>'
                                     : '<td><span class="help">'+(pl_grid.help[id] ? pl_grid.help[id][key][val] : '')+'</span></td>'
                             )+'<td><a href="#" class="remove_grid_row" data-key="'+ key +'" data-opt="' + val +'" data-row="' + row_count + '">X</a></td>'
                             +'</tr>'
@@ -425,7 +425,7 @@ var pl_grid = {
             var key = $(this).attr('data-key');
             var data = pl_grid.data[key];
             
-            if(pl_grid.forms[id][key])
+            if(pl_grid.forms[id] && pl_grid.forms[id][key])
             {
                 // New object-based data row
                 var opt_name = $(this).attr('data-opt');
@@ -448,7 +448,7 @@ var pl_grid = {
         $('.remove_grid_row').unbind('click').click(function(e) {
             var key = $(this).attr('data-key');
             var data = pl_grid.data[key];
-            if(pl_grid.forms[id][key])
+            if(pl_grid.forms[id] && pl_grid.forms[id][key])
             {
                 // New object-based data row
                 var opt_name = $(this).attr('data-opt');
