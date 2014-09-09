@@ -2042,8 +2042,10 @@ class Proform {
             }
         }
 
-        /*echo "<b>Rules:</b>";
-        krumo($validation_rules);*/
+        /*
+        echo "<b>Rules:</b>";
+        krumo($validation_rules);
+        // */
 
         if ($this->EE->extensions->active_hook('proform_validation_check_rules') === TRUE)
         {
