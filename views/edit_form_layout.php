@@ -9,18 +9,19 @@ function print_hidden($field)
          '<input type="hidden" name="field_id[]" value="'               . $field['field_id']                                    . '" class="fieldId" />'.
          '<input type="hidden" name="field_order[]" value="'            . $field['field_id']                                    . '" />'.
          '<input type="hidden" name="field_row[]" value="'              . $field['field_row']                                   . '" class="fieldRowFlag" />'.
-         '<input type="hidden" name="field_label[]" value="'            . htmlentities($field['settings']['label'])             . '" class="fieldLabel" />'.
+         //'<input type="hidden" name="field_label[]" value="'            . htmlentities($field['settings']['label'])             . '" class="fieldLabel" />'.
          '<input type="hidden" name="field_original_label[]" value="'   . htmlentities($field['field_label'])                   . '" class="fieldOriginalLabel" />'.
-         '<input type="hidden" name="field_placeholder[]" value="'      . htmlentities($field['settings']['placeholder'])       . '" class="fieldPlaceholder" />'.
-         '<input type="hidden" name="field_preset_value[]" value="'     . htmlentities($field['settings']['preset_value'])      . '" class="fieldPresetValue" />'.
-         '<input type="hidden" name="field_preset_forced[]" value="'    . $field['settings']['preset_forced']                   . '" class="fieldPresetForced" />'.
-         '<input type="hidden" name="field_html_id[]" value="'          . htmlentities($field['settings']['html_id'])           . '" class="fieldHtmlId" />'.
-         '<input type="hidden" name="field_html_class[]" value="'       . htmlentities($field['settings']['html_class'])        . '" class="fieldHtmlClass" />'.
-         '<input type="hidden" name="field_extra1[]" value="'           . htmlentities($field['settings']['extra1'])            . '" class="fieldExtra1" />'.
-         '<input type="hidden" name="field_extra2[]" value="'           . htmlentities($field['settings']['extra2'])            . '" class="fieldExtra2" />'.
-         '<input type="hidden" name="field_show_in_listing[]" value="'  . $field['settings']['show_in_listing']                 . '" class="fieldShowInListing" />'.
+         //'<input type="hidden" name="field_placeholder[]" value="'      . htmlentities($field['settings']['placeholder'])       . '" class="fieldPlaceholder" />'.
+         //'<input type="hidden" name="field_preset_value[]" value="'     . htmlentities($field['settings']['preset_value'])      . '" class="fieldPresetValue" />'.
+         //'<input type="hidden" name="field_preset_forced[]" value="'    . $field['settings']['preset_forced']                   . '" class="fieldPresetForced" />'.
+         //'<input type="hidden" name="field_html_id[]" value="'          . htmlentities($field['settings']['html_id'])           . '" class="fieldHtmlId" />'.
+         //'<input type="hidden" name="field_html_class[]" value="'       . htmlentities($field['settings']['html_class'])        . '" class="fieldHtmlClass" />'.
+         //'<input type="hidden" name="field_extra1[]" value="'           . htmlentities($field['settings']['extra1'])            . '" class="fieldExtra1" />'.
+         //'<input type="hidden" name="field_extra2[]" value="'           . htmlentities($field['settings']['extra2'])            . '" class="fieldExtra2" />'.
+         //'<input type="hidden" name="field_show_in_listing[]" value="'  . $field['settings']['show_in_listing']                 . '" class="fieldShowInListing" />'.
          '<input type="hidden" name="field_heading[]" value="'          . htmlentities($field['heading'])                       . '" class="fieldHeading" />'.
          '<input type="hidden" name="field_separator_type[]" value="'   . htmlentities($field['separator_type'])                . '" class="fieldSeparatorType" />'.
+         '<input type="hidden" name="field_json[]" value="'             . htmlentities($field['json'])                          . '" class="fieldJson" />'.
          ''
          ;
 }
@@ -84,7 +85,7 @@ $alt = FALSE;
 
                 print_hidden($field);
 
-                $display_label = trim($field['settings']['label']) != '' ? $field['settings']['label'] :  $field['field_label'];
+                $display_label = trim($field['json_decoded']['label']) != '' ? $field['json_decoded']['label'] :  $field['field_label'];
 
                 ?>
                 <span class="move-link"></span>
@@ -128,13 +129,13 @@ $alt = FALSE;
                     case 'relationship': ?>
                         <label class="field-label label-checkbox"><?php echo $display_label; ?></label>
                         <?php
-                        $type = isset($field['settings']['type_style']) ? $field['settings']['type_style'] : '';
+                        $type = isset($field['json_decoded']['type_style']) ? $field['json_decoded']['type_style'] : '';
                         switch($type):
                             case '': ?>
                                 <select name="" id="" class="placeHolder" disabled="disabled" />
                                     <?php
-                                    if(isset($field['settings']['type_list'])):
-                                        foreach(explode("\n", $field['settings']['type_list']) as $option):
+                                    if(isset($field['json_decoded']['type_list'])):
+                                        foreach(explode("\n", $field['json_decoded']['type_list']) as $option):
                                         $option = explode(':', $option);
                                         if(count($option) == 1) $option[1] = $option[0];
                                         ?>
@@ -150,8 +151,8 @@ $alt = FALSE;
                             case 'radio': ?>
                                 <div class="option-list">
                                 <?php
-                                if(isset($field['settings']['type_list'])):
-                                    foreach(explode("\n", $field['settings']['type_list']) as $option):
+                                if(isset($field['json_decoded']['type_list'])):
+                                    foreach(explode("\n", $field['json_decoded']['type_list']) as $option):
                                     $option = explode(':', $option);
                                     if(count($option) == 1) $option[1] = $option[0];
                                     if(strlen($option[0]) > 0 && $option[0][0] == '-'): ?>
@@ -351,6 +352,10 @@ $alt = FALSE;
                 <li>
                     <input type="checkbox" id="field-show-in-listing" /> <label for="field-show-in-listing" class="checkbox">Show in Listing?</label>
                     <p>Should this field be shown as a column in the Form Entries listing?</p>
+                </li>
+                <li>
+                    <input type="checkbox" id="field-show-in-search" /> <label for="field-show-in-search" class="checkbox">Show in Search?</label>
+                    <p>Should this field be shown in the Form Entries listing as an available field to search?</p>
                 </li>
             </ul>
         </div>

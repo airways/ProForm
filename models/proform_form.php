@@ -405,7 +405,7 @@ class PL_Form extends PL_RowInitialized {
     // unserialize settings for a form field assignment row and merge with default values
     function get_form_field_settings($settings='')
     {
-        if($settings)
+        if($settings && substr($settings, 0, 2) == 'a:')
         {
             $settings = unserialize($settings);
         } else {
@@ -467,11 +467,24 @@ class PL_Form extends PL_RowInitialized {
         {
             $form_field_settings = $all_settings[$form_field_id];
             
+            /*
             foreach($settings_map as $setting => $values)
             {
+                if($setting == 'json') continue;
                 if(isset($values[$i]))
                 {
                     $form_field_settings[$setting] = $values[$i];
+                }
+            }
+            */
+            
+            // Merge in new JSON blob
+            if(isset($settings_map['json'][$i]) && is_string($settings_map['json'][$i]))
+            {
+                $json = $settings_map['json'][$i];
+                if($json[0] == '{' && $json[strlen($json)-1] == '}')
+                {
+                    $form_field_settings = array_merge($form_field_settings, (array)json_decode($json));
                 }
             }
             

@@ -71,7 +71,7 @@
     <?php
     endif;
     
-    foreach($field_order as $field)
+    foreach($search_field_order as $field)
     {
         if($field[0] == '_') continue;
         if($field == 'form_entry_id') continue;

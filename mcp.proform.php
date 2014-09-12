@@ -1034,8 +1034,10 @@ class Proform_mcp extends Prolib_base_mcp {
             {
                 $row_array = $field->to_array();;
 
-                $row_array['settings']          = array_merge($field->settings, $field->form_field_settings);
-
+                //$row_array['settings']          = array_merge($field->settings, $field->form_field_settings);
+                $row_array['json_decoded'] = array_merge($field->settings, $field->form_field_settings);
+                $row_array['json'] = json_encode($row_array['json_decoded']);
+                
                 if($row_array['heading'])
                 {
                     $row_array['edit_link']     = ACTION_BASE.'method=edit_separator'.AMP.'form_field_id='.$field->form_field_id.AMP.'form_id='.$form->form_id;
@@ -1054,7 +1056,7 @@ class Proform_mcp extends Prolib_base_mcp {
                                         'class'     =>'toggle');
 
                 $row_array['driver'] = $field->get_driver();
-
+                
                 $vars['fields'][] = $row_array;
             }
         }
@@ -1131,6 +1133,7 @@ class Proform_mcp extends Prolib_base_mcp {
             $form->set_layout($field_order, $this->EE->input->post('field_row'), $this->EE->input->post('form_field_id'));
 
             $settings_map = array(
+                /*
                 'label'         => $this->EE->input->post('field_label'),
                 'preset_value'  => $this->EE->input->post('field_preset_value'),
                 'preset_forced' => $this->EE->input->post('field_preset_forced'),
@@ -1138,43 +1141,14 @@ class Proform_mcp extends Prolib_base_mcp {
                 'html_class'    => $this->EE->input->post('field_html_class'),
                 'extra1'        => $this->EE->input->post('field_extra1'),
                 'extra2'        => $this->EE->input->post('field_extra2'),
-                'show_in_listing'        => $this->EE->input->post('field_show_in_listing'),
+                'show_in_listing' => $this->EE->input->post('field_show_in_listing'),
                 'placeholder'   => $this->EE->input->post('field_placeholder'),
+                */
+                'json'          => $this->EE->input->post('field_json'),
             );
             
             $form->set_all_form_field_settings($this->EE->input->post('form_field_id'), $settings_map);
         }
-
-        // process adding a field
-        // $add_item = trim($this->EE->input->get_post('add_item'));
-        // if($add_item != Proform_mcp::NONE)
-        // {
-        //     if(is_numeric($add_item) && ($add_item == Proform_mcp::ITEM_NEW_FIELD || $add_item >= 1))
-        //     {
-        //         $field_id = $add_item;
-        //         if($field_id == -1)
-        //         {
-        //             $this->EE->functions->redirect(ACTION_BASE.AMP.'method=new_field'.AMP.'auto_add_form_id='.$form_id);
-        //         } else {
-        //             $field = $this->EE->formslib->fields->get($field_id);
-        //             if($field)
-        //             {
-        //                 $form->assign_field($field);
-        //                 $this->EE->session->set_flashdata('message', lang('msg_field_added'));
-        //             } else {
-        //                 pl_show_error(lang('invalid_field_id'));
-        //             }
-        //         }
-        //     } else {
-        //         // Add special item
-        //         switch($add_item)
-        //         {
-        //             case Proform_mcp::ITEM_HEADING:
-        //                 $this->EE->functions->redirect(ACTION_BASE.AMP.'method=new_heading'.AMP.'form_id='.$form_id);
-        //                 break;
-        //         }
-        //     }
-        // }
 
         // check that the reply_to field names are valid
         $fields = $form->fields();
@@ -2472,12 +2446,25 @@ class Proform_mcp extends Prolib_base_mcp {
             $field_order = array('form_entry_id', 'updated');
         }
 
+        $vars['search_fields'] = array('updated');
+        $vars['search_field_types'] = array('updated' => 'datetime');
+        $search_field_order = array();
+        foreach($fields as $field)
+        {
+            if($field->heading) continue;
+            if($field->get_form_field_setting('show_in_search', 'n') == 'n') continue;
+            $vars['search_fields'][] = $field->field_name;
+            $search_field_order[] = $field->field_name;
+        }
+        $vars['search_field_order'] = $search_field_order;
+
         $vars['fields'] = array('updated');
         $vars['field_types'] = array('updated' => 'datetime');
         foreach($fields as $field)
         {
             if($field->heading) continue;
-            if($field->get_form_field_setting('show_in_listing', 'n') != 'y') continue;
+            if($field->get_form_field_setting('show_in_listing', 'n') == 'n') continue;
+
 
             $vars['fields'][] = $field->field_name;
             $vars['field_types'][$field->field_name] = $field->type;
