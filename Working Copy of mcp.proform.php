@@ -411,7 +411,6 @@ class Proform_mcp extends Prolib_base_mcp {
                         break;
                     case 'pref_show_quickstart_on':
                     case 'pref_listings_show_list_values':
-                    case 'pref_show_internal_fields':
                         $control = form_dropdown($f_name, $yes_no_options, $value);
                         break;
                     case 'pref_permission_manage_module':
@@ -1034,7 +1033,7 @@ class Proform_mcp extends Prolib_base_mcp {
             foreach($form->fields() as $field)
             {
                 $row_array = $field->to_array();;
-                $row_array['internal'] = FALSE;
+                $row_array['internal'] = FALSEs;
                 //$row_array['settings']          = array_merge($field->settings, $field->form_field_settings);
                 $row_array['json_decoded'] = array_merge($field->settings, $field->form_field_settings);
                 $row_array['json'] = json_encode($row_array['json_decoded']);
@@ -1059,38 +1058,6 @@ class Proform_mcp extends Prolib_base_mcp {
                 $row_array['driver'] = $field->get_driver();
                 
                 $vars['fields'][] = $row_array;
-            }
-            
-            if($this->EE->formslib->prefs->ini('show_internal_fields') == 'y')
-            {
-                $hidden_row = 99000000;
-                foreach($form->internal_fields(FALSE) as $field_name => $field)
-                {
-                    $row_array = (array)$field;
-                    $row_array['field_name'] = $field_name;
-                    if(!$row_array['field_label']) $row_array['field_label'] = $field_name;
-                    $row_array['field_id'] = -1;
-                    $row_array['form_field_id'] = -1;
-                    $row_array['field_row'] = $hidden_row++;
-                    $row_array['heading'] = FALSE;
-                    $row_array['is_required'] = FALSE;
-                    $row_array['edit_link'] = '';
-                    $row_array['remove_link'] = '';
-                    $row_array['separator_type'] = '';
-                    if(!isset($row_array['json_decoded'])) {
-                        $row_array['json_decoded'] = array();
-                        $row_array['json_decoded']['label'] = '';
-                        $row_array['json_decoded']['internal'] = TRUE;
-                        $row_array['json_decoded']['name'] = $field_name;
-                    }
-                    if(isset($form->internal_field_settings[$field_name]))
-                    {
-                        $row_array['json_decoded'] = array_merge($row_array['json_decoded'], $form->internal_field_settings[$field_name]);
-                    }
-                    
-                    $row_array['json'] = json_encode($row_array['json_decoded']);
-                    $vars['fields'][] = $row_array;
-                }
             }
         }
 
@@ -2385,8 +2352,7 @@ class Proform_mcp extends Prolib_base_mcp {
         // Get form object
         $form = &$this->EE->formslib->forms->get($form_id);
         $driver = $form->get_driver();
-        $fields = array_merge($form->fields(), $form->internal_fields(FALSE));
-        
+        $fields = $form->fields();
 
         // Set up UI
         if($this->EE->input->get_post('T'))
@@ -2480,24 +2446,20 @@ class Proform_mcp extends Prolib_base_mcp {
             $field_order = array('form_entry_id', 'updated');
         }
 
-        $vars['fields'] = array('updated');
-        $vars['field_types'] = array('updated' => 'datetime');
-
         $vars['search_fields'] = array('updated');
         $vars['search_field_types'] = array('updated' => 'datetime');
-        $vars['search_field_order'] = array();
+        $search_field_order = array();
         foreach($fields as $field)
         {
             if($field->heading) continue;
-            if($field->field_name == '__archive_status') continue;
             if($field->get_form_field_setting('show_in_search', 'n') == 'n') continue;
             $vars['search_fields'][] = $field->field_name;
-            $vars['search_field_order'][] = $field->field_name;
-            $vars['search_fields'][] = $field->field_name;
-            $vars['field_types'][$field->field_name] = $field->type;
-            $vars['field_options'][$field->field_name] = $field->get_list_options();
+            $search_field_order[] = $field->field_name;
         }
+        $vars['search_field_order'] = $search_field_order;
 
+        $vars['fields'] = array('updated');
+        $vars['field_types'] = array('updated' => 'datetime');
         foreach($fields as $field)
         {
             if($field->heading) continue;
@@ -2517,15 +2479,13 @@ class Proform_mcp extends Prolib_base_mcp {
             if(array_search($field->field_name, $vars['hidden_columns']) === FALSE)
             {
                 // Prepare headings from lang file and from Field configs
-                if(lang('heading_' . $field->field_name) == 'heading_' . $field->field_name && $field->field_name[0] != '_')
+                if(lang('heading_' . $field->field_name) == 'heading_' . $field->field_name)
                 {
                     $field = $this->EE->formslib->fields->get($field->field_name);
                     $headings[$field->field_name] = $field->field_label;
                 } else {
                     $headings[$field->field_name] = lang('heading_' . $field->field_name);
                 }
-            } else {
-                $headings[$field->field_name] = lang($field->field_name);
             }
 
             $field_order[] = $field->field_name;
@@ -3239,28 +3199,9 @@ class Proform_mcp extends Prolib_base_mcp {
     private function _get_search_input($form)
     {
         $search = $this->EE->input->get_post('search') ? $this->EE->input->get_post('search') : array();
-        $search_from = $this->EE->input->get_post('search_from') ? $this->EE->input->get_post('search_from') : array();
-        $search_to = $this->EE->input->get_post('search_to') ? $this->EE->input->get_post('search_to') : array();
-        
         foreach($search as $key => $value) {
             if(!$value) unset($search[$key]);
-            else {
-                $search[$key] = '~'.$value;
-            }
-        }
-        
-        foreach($search_from as $key => $value) {
-            if($value)
-            {
-                $search[$key.' >='] = $value;
-            }
-        }
-        
-        foreach($search_to as $key => $value) {
-            if($value)
-            {
-                $search[$key.' <='] = $value;
-            }
+            else $search[$key] = '~'.$search[$key];
         }
         
         if(count($search) == 0) {

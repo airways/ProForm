@@ -74,6 +74,7 @@ class PL_Form extends PL_RowInitialized {
     var $share_notification_attachments = 'n';
 
     var $settings;
+    var $internal_field_settings;
 
     const SEPARATOR_HEADING  = 'HEAD';
     const SEPARATOR_STEP     = 'STEP';
@@ -113,13 +114,7 @@ class PL_Form extends PL_RowInitialized {
             if($this->form_type == 'form')
             {
                 // Create FORM table for storing actual form entries
-                $fields = array(
-                    'form_entry_id'     => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE, 'auto_increment' => TRUE),
-                    'updated'           => array('type' => 'timestamp'),
-                    'ip_address'        => array('type' => 'varchar', 'constraint' => '128'),
-                    'user_agent'        => array('type' => 'varchar', 'constraint' => '255'),
-                    'dst_enabled'       => array('type' => 'varchar', 'constraint' => '1'),
-                );
+                $fields = $this->internal_fields();
 
                 $forge->add_field($fields);
                 $forge->add_key('form_entry_id', TRUE);
@@ -135,6 +130,37 @@ class PL_Form extends PL_RowInitialized {
                 $driver->init_form($this);
             }
         }
+    }
+    
+    public function internal_fields($sql=true)
+    {
+        $fields = array(
+            'form_entry_id'     => $sql ? array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE, 'auto_increment' => TRUE)    : array('type' => 'hidden', 'length' => 10),
+            'updated'           => $sql ? array('type' => 'timestamp')                                                                  : array('type' => 'hidden', 'length' => 10),
+            'ip_address'        => $sql ? array('type' => 'varchar', 'constraint' => '128')                                             : array('type' => 'hidden', 'length' => 128),
+            'user_agent'        => $sql ? array('type' => 'varchar', 'constraint' => '255')                                             : array('type' => 'hidden', 'length' => 255),
+            'dst_enabled'       => $sql ? array('type' => 'varchar', 'constraint' => '1')                                               : array('type' => 'hidden', 'length' => 1),
+            '__archive_status'  => $sql ? array('type' => 'varchar', 'constraint' => '30', 'default' => 'open')                         : array('type' => 'hidden', 'length' => 30),
+        );
+        
+        if($driver = $this->get_driver())
+        {
+            $fields = $driver->internal_fields($this, $fields);
+        }
+
+        if(!$sql)
+        {
+            foreach(array_keys($fields) as $field)
+            {
+                if(!isset($fields[$field]['type']))             $fields[$field]['type'] = 'hidden';
+                if(!isset($fields[$field]['internal']))         $fields[$field]['internal'] = TRUE;
+                if(!isset($fields[$field]['driver']))           $fields[$field]['driver'] = '';
+                if(!isset($fields[$field]['field_name']))       $fields[$field]['field_name'] = $field;
+                $fields[$field] = new PL_InternalField($this, $fields[$field]);
+            }
+        }
+        
+        return $fields;
     }
 
     function pre_save()
@@ -170,6 +196,11 @@ class PL_Form extends PL_RowInitialized {
         if(!$this->settings)
         {
             $this->settings = array();
+        }
+
+        if(!$this->internal_field_settings)
+        {
+            $this->internal_field_settings = array();
         }
 
         $this->__original_name = $this->form_name;
@@ -463,37 +494,45 @@ class PL_Form extends PL_RowInitialized {
             if(!$all_settings[$row->form_field_id]) $all_settings[$row->form_field_id] = array();
         }
 
+        $new_internal_field_settings = array();
+        
         foreach($form_fields_ids as $i => $form_field_id)
         {
-            $form_field_settings = $all_settings[$form_field_id];
-            
-            /*
-            foreach($settings_map as $setting => $values)
-            {
-                if($setting == 'json') continue;
-                if(isset($values[$i]))
-                {
-                    $form_field_settings[$setting] = $values[$i];
-                }
-            }
-            */
-            
-            // Merge in new JSON blob
+            // Parse new JSON based settings blob
+            $json_settings = array();
             if(isset($settings_map['json'][$i]) && is_string($settings_map['json'][$i]))
             {
                 $json = $settings_map['json'][$i];
                 if($json[0] == '{' && $json[strlen($json)-1] == '}')
                 {
-                    $form_field_settings = array_merge($form_field_settings, (array)json_decode($json));
+                    $json_settings = (array)json_decode($json);
                 }
             }
             
-            $data = array(
-                'form_field_settings' => serialize($form_field_settings)
-            );
-
-            $this->__EE->db->where(array('form_field_id' => $form_field_id, 'form_id' => $this->form_id))
-                           ->update('proform_form_fields', $data);
+            if($form_field_id > 0)
+            {
+                // Get existing settings
+                $form_field_settings = $all_settings[$form_field_id];
+                // Merge in new JSON blob
+                $form_field_settings = array_merge($form_field_settings, $json_settings);
+                $data = array(
+                    'form_field_settings' => serialize($form_field_settings)
+                );
+                $this->__EE->db->where(array('form_field_id' => $form_field_id, 'form_id' => $this->form_id))
+                               ->update('proform_form_fields', $data);
+            } else {    // Internal field
+                $internal_field_name = $json_settings['name'];
+                unset($json_settings['internal']);
+                unset($json_settings['label']);
+                unset($json_settings['name']);
+                
+                $new_internal_field_settings[$internal_field_name] = $json_settings;
+            }
+        }
+        
+        if(count($new_internal_field_settings) > 0)
+        {
+            $this->internal_field_settings = $new_internal_field_settings;
         }
         
     } // function set_all_form_field_settings()
@@ -726,36 +765,31 @@ class PL_Form extends PL_RowInitialized {
             if(!$this->__fields) $this->fields();
             if(!$this->__db_fields) $this->db_fields();
             
-            /*if(in_array($field, $this->__db_fields))
+            if(preg_match("/^([<>!=~]+)/i", $val, $matches))
             {
-                $search[$field] = $val;
-            } else {
-                if(array_search($field, array_keys($this->__fields)) === FALSE)
-                {
-                    show_error($this->__EE->lang->line('invalid_field_name').': "'.$field.'"');
-                }
-            */
-                if(preg_match("/^([<>!=~]+)/i", $val, $matches))
-                {
-                    // delete old field pair
-                    unset($search[$field]);
+                // delete old field pair
+                unset($search[$field]);
 
-                    // remove the operator from value
-                    $val = str_replace($matches[1], '', $val);
+                // remove the operator from value
+                $val = str_replace($matches[1], '', $val);
 
-                    if($matches[1] == '~') {
-                        $like[$field] = $val;
-                    } else {
-                        // move it to the end of the field name
-                        $field = $field.' '.$matches[1];
-                        
-                        // set new pair
-                        $search[$field] = $val;
-                    }
+                if($matches[1] == '~') {
+                    $like[$field] = $val;
+                } else {
+                    // move it to the end of the field name
+                    $field = $field.' '.$matches[1];
+                    
+                    // set new pair
+                    $search[$field] = $val;
                 }
-            //}
+            }
         }
-        
+        /*
+        echo '<b>Search:</b>';
+        var_dump($search);
+        echo '<b>Like:</b>';
+        var_dump($like);
+        */
         return array($search, $like);
     }
     

@@ -70,11 +70,13 @@
 
     <?php
     endif;
-    
+    function explode_yyyymmdd($date)
+    {
+        return $date ? substr($date,0,4).'-'.substr($date,4,2).'-'.substr($date,6,2) : '';
+    }
     foreach($search_field_order as $field)
     {
-        if($field[0] == '_') continue;
-        if($field == 'form_entry_id') continue;
+        //if($field == 'form_entry_id') continue;
         
         $value_search = array_key_exists($field, $search) ? $search[$field] : '';
         $value_from = array_key_exists($field, $search_from) ? $search_from[$field] : '';
@@ -91,10 +93,20 @@
         {
             case "date":
             case "datetime":
-                echo '<label for="from['.$field.']">'.$headings[$field].'</label>';
-                echo form_input('from['.$field.']', $value_from, 'class="two_up datepicker"');
+                echo '<label for="search_from['.$field.']">'.$headings[$field].'</label>';
+                echo form_input('search_from['.$field.']', $value_from, 'class="two_up datepicker"');
                 echo ' - ';
-                echo form_input('to['.$field.']', $value_to, 'class="two_up datepicker"');
+                echo form_input('search_to['.$field.']', $value_to, 'class="two_up datepicker"');
+                break;
+            case "dateyyyymmdd":
+                echo '<label for="search_from['.$field.']">'.$headings[$field].'</label>';
+                //echo form_input('search_from['.$field.']', $value_from, 'class="two_up datepickeryyyymmdd"');
+                echo pl_form_hidden('search_from['.$field.']', $value_from, 'search_from_'.$field);
+                echo form_input('search_junk_from['.$field.']', explode_yyyymmdd($value_from), 'class="two_up datepickeryyyymmdd" data-alt-field="search_from_'.$field.'"');
+                echo ' - ';
+                //echo form_input('search_to['.$field.']', $value_to, 'class="two_up datepickeryyyymmdd"');
+                echo pl_form_hidden('search_to['.$field.']', $value_to, 'search_to_'.$field);
+                echo form_input('search_junk_to['.$field.']', explode_yyyymmdd($value_to), 'class="two_up datepickeryyyymmdd" data-alt-field="search_to_'.$field.'"');
                 break;
             case "list":
                 echo '<label for="search['.$field.']">'.$headings[$field].'</label>';
@@ -105,7 +117,7 @@
                 echo form_dropdown('search['.$field.']', $options, $value_search);
                 break;
             default:
-                echo '<label for="search['.$field.']">'.$headings[$field].'</label>';
+                echo '<label for="search['.$field.']">'.(array_key_exists($field, $headings) ? $headings[$field] : $field).'</label>';
                 echo form_input('search['.$field.']', $value_search);
                 break;
         }
@@ -129,7 +141,7 @@
     $ordered_headings = array();
     foreach($field_order as $i => $field)
     {
-        $ordered_headings[] = $headings[$field];
+        $ordered_headings[] = lang($headings[$field]);
     }
 
     $ordered_headings[0] = form_checkbox('select_all', '1', $select_all, 'id="pl_select_all"').'&nbsp'.$ordered_headings[0];
@@ -172,7 +184,9 @@
                         break;
                     case 'list':
                     case 'relationship':
-                        $value = explode('|', $value);
+                        if(is_string($value)) $value = explode('|', $value);
+                        if(is_null($value)) $value = array();
+                        
                         $cell = '<span class="value_'.$type.$short.'">';
                             foreach($field_options[$field] as $option)
                             {

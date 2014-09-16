@@ -46,6 +46,9 @@ $lang = array(
     'heading_template_name' => 'Template Name',
     'heading_delete_template' => 'Delete Template',
     'heading_form_entry_id' => 'Form Entry ID',
+    'form_entry_id' => 'Form Entry ID',
+    'heading___archive_status' => 'Archive Status',
+    '__archive_status' => 'Archive Status',
     'heading_updated' => 'Last Updated',
     'heading_required' => 'Required',
     'heading_field_value' => 'Preset Field Value',
@@ -57,6 +60,7 @@ $lang = array(
     'heading_driver_name' => 'Name',
     'heading_driver_version' => 'Version',
     'heading_driver_key' => 'Key',
+    'heading___archive_Status' => 'Archive Status',
 
     // Table results
     'no_forms' => 'No forms created yet',
@@ -271,11 +275,15 @@ $lang = array(
     'field_pref_custom_form_settings_desc' => 'These custom options will be available on every form\'s Advanced Settings tab.<br/>Each line should be separated by a colon with the custom setting name on the left, and the label for the setting on the right.<br/>All settings will be available inside of the <kbd>{exp:proform:form}</kbd> tag via variables named <kbd>{formpref:custom_<em>setting_name</em>}</kbd> where <kbd><em>setting_name</em></kbd> is the name of each line here.',
     'field_pref_mailtype' => 'Email Format',
     'field_pref_mailtype_desc' => 'Format to send all ProForm generated emails in',
+    'field_pref_show_internal_fields' => 'Show Internal Fields on Layout',
+    'field_pref_show_internal_fields_desc' => 'Show internal fields on the Form Layout screen, allows control over which fields show in the Entries Listing',
     
     'field_form_entry_id' => 'Entry ID',
     'field_updated' => 'Updated',
     'field_ip_address' => 'IP Address',
     'field_user_agent' => 'User Agent',
+    'dst_enabled' => 'DST Enabled',
+    'user_agent' => 'User Agent',
 
     'field_heading' => 'Heading',
     'field_step_name' => 'Step Name',

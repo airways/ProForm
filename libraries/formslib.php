@@ -62,6 +62,7 @@ class Formslib
         'permission_manage_entries' => '',
         'custom_form_settings' => '',
         'mailtype' => 'html',
+        'show_internal_fields' => 'n',
     );
 
     public $__advanced_settings_options = array(
@@ -96,7 +97,7 @@ class Formslib
         // what we have in the $default_prefs array on this object.
         $this->prefs = new PL_prefs("proform_preferences", FALSE, $this->default_prefs, $this->prolib->site_id);
 
-        $this->forms = new PL_handle_mgr("proform_forms", "form", "PL_Form");
+        $this->forms = new PL_handle_mgr("proform_forms", "form", "PL_Form", array('settings', 'internal_field_settings'));
         //$this->forms->get_all();
         
         $this->fields = new PL_handle_mgr("proform_fields", "field", "PL_Field");

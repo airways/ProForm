@@ -134,16 +134,18 @@ var proform_edit_form_layout = {
                 $active_field.find('.fieldShowInListing').val($('#field-show-in-listing').is(':checked') ? 'y' : 'n');
                 */
                 
-                
-                update_meta('is_required', $('#field-required').is(':checked') ? 'y' : 'n');
-                update_meta('label', $('#field-label').val());
-                update_meta('preset_value', $('#field-preset-value').val());
-                update_meta('preset_forced', $('#field-preset-forced').is(':checked') ? 'y' : 'n');
-                update_meta('placeholder', $('#field-placeholder').val());
-                update_meta('html_id', $('#field-html-id').val());
-                update_meta('html_class', $('#field-html-class').val());
-                update_meta('extra1', $('#field-extra1').val());
-                update_meta('extra2', $('#field-extra2').val());
+                if(get_meta('internal', false) == false)
+                {
+                    update_meta('is_required', $('#field-required').is(':checked') ? 'y' : 'n');
+                    update_meta('label', $('#field-label').val());
+                    update_meta('preset_value', $('#field-preset-value').val());
+                    update_meta('preset_forced', $('#field-preset-forced').is(':checked') ? 'y' : 'n');
+                    update_meta('placeholder', $('#field-placeholder').val());
+                    update_meta('html_id', $('#field-html-id').val());
+                    update_meta('html_class', $('#field-html-class').val());
+                    update_meta('extra1', $('#field-extra1').val());
+                    update_meta('extra2', $('#field-extra2').val());
+                }
                 update_meta('show_in_listing', $('#field-show-in-listing').is(':checked') ? 'y' : 'n');
                 update_meta('show_in_search', $('#field-show-in-search').is(':checked') ? 'y' : 'n');
                 
@@ -204,9 +206,15 @@ var proform_edit_form_layout = {
             $active_field = $(this);
             $(this).addClass('active');
             load_meta();
-        
+            
             //$('#edit-field-name').text($active_field.find('.fieldLabel').val());
             $('.field-modifications input').removeAttr('disabled');
+
+            if(get_meta('internal', false)) {
+                // Hide overrides that don't work for internal fields
+                $('.field-modifications .normal-fields-only').attr('disabled', 'disabled');
+            }
+        
         
         });
     

@@ -211,9 +211,11 @@ $alt = FALSE;
                 foreach($hidden_fields as $field):
                     echo '<li>';
                     print_hidden($field); ?>
-                        <label><?php echo $field['field_label']; ?></label>
+                        <label><?php echo lang($field['field_label']); ?></label>
+                        <?php if(!$field['internal']): ?>
                         <a href="<?php echo $field['edit_link']; ?>" class="edit action-link">Edit</a>
                         <a href="<?php echo $field['remove_link']; ?>" class="delete action-link">Remove</a>
+                        <?php endif; ?>
                     <?php
                     echo '</li>';
                 endforeach;
@@ -312,7 +314,7 @@ $alt = FALSE;
             <div class="section-header">
                 <h3><strong>Local Field Overrides</strong> <span id="edit-field-name"></span></h3>
                 <div class="required-field">
-                    <input type="checkbox" id="field-required" name="field-required" />
+                    <input type="checkbox" id="field-required" name="field-required" class="normal-fields-only" />
                     <label for="field-required">Required</label>
                 </div>
             </div>
@@ -320,34 +322,34 @@ $alt = FALSE;
                 <li>Override values for this field on this particular form. All values are optional.</li>
                 <li>
                     <label for="">Field Label</label>
-                    <input type="text" id="field-label" />
+                    <input type="text" id="field-label" class="normal-fields-only" />
                 </li>
                 <li>
                     <label for="">Field Default Value</label>
-                    <input type="text" id="field-preset-value" />
+                    <input type="text" id="field-preset-value" class="normal-fields-only" />
                 </li>
                 <li>
-                    <input type="checkbox" id="field-preset-forced" /> <label for="field-preset-forced" class="checkbox">Force Default Value</label>
+                    <input type="checkbox" id="field-preset-forced" class="normal-fields-only" /> <label for="field-preset-forced" class="checkbox">Force Default Value</label>
                 </li>
                 <li>
                     <label for="">Field Placeholder</label>
-                    <input type="text" id="field-placeholder" />
+                    <input type="text" id="field-placeholder" class="normal-fields-only" />
                 </li>
                 <li>
                     <label for="">Field Id</label>
-                    <input type="text" id="field-html-id" />
+                    <input type="text" id="field-html-id" class="normal-fields-only" />
                 </li>
                 <li>
                     <label for="">Field Class</label>
-                    <input type="text" id="field-html-class" />
+                    <input type="text" id="field-html-class" class="normal-fields-only" />
                 </li>
                 <li>
                     <label for=""><?php echo isset($settings['extra1_label']) ? $settings['extra1_label'] : 'Extra 1'; ?></label>
-                    <input type="text" id="field-extra1" />
+                    <input type="text" id="field-extra1" class="normal-fields-only" />
                 </li>
                 <li>
                     <label for=""><?php echo isset($settings['extra2_label']) ? $settings['extra2_label'] : 'Extra 2'; ?></label>
-                    <input type="text" id="field-extra2" />
+                    <input type="text" id="field-extra2" class="normal-fields-only" />
                 </li>
                 <li>
                     <input type="checkbox" id="field-show-in-listing" /> <label for="field-show-in-listing" class="checkbox">Show in Listing?</label>

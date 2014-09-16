@@ -33,7 +33,16 @@ var proform_mod = {
             $(this).parents('.dropdown-wrap').find('.dropdown').hide();
         });
         
-        $('.datepicker').datepicker();
+        $('.datepicker').datepicker({
+            dateFormat: 'yy-mm-dd'
+        });
+        $('.datepickeryyyymmdd').each(function() {
+            $(this).datepicker({
+                dateFormat: 'yy-mm-dd',
+                altField: '#'+$(this).attr('data-alt-field'),
+                altFormat: 'yymmdd'
+            });
+        });
         
         $('body').append($('<div id="proform_dialog"></div>'));
         
