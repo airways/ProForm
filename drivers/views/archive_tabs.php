@@ -1,7 +1,7 @@
 <?php
 $__archive_status = '';
-$search = ee()->input->get_post('search');
-if($search && is_array($search)) {
+//$search = ee()->input->get_post('search');
+if($search && is_array($search) && array_key_exists('__archive_status', $search)) {
     $__archive_status = $search['__archive_status'];
 }
 

@@ -165,6 +165,13 @@ class Proform {
         
         $template = file_get_contents(PATH_THIRD.'proform/templates/'.$template.'.html');
 
+        // Parse globals - these would have already been replaced if the template code was inline
+        foreach(array_merge($this->EE->TMPL->segment_vars, $this->EE->TMPL->global_vars, $this->EE->TMPL->embed_vars,
+            $this->EE->TMPL->template_route_vars, $this->EE->TMPL->layout_vars) as $var => $val)
+        {
+            $template = str_replace(LD.$var.RD, $val, $template);
+        }
+
         // Swap out the "embed" parameter for form_name in the template
         // $template = str_replace(LD.'embed:form_name'.RD, $form_name, $template);
 
@@ -637,6 +644,7 @@ class Proform {
             list($tagdata, $form_obj, $variables, $this->var_pairs) = $this->EE->extensions->call('proform_form_preparse', $this, $tagdata, $form_obj, $variables, $this->var_pairs);
         }
 
+        
 
         if($form_obj)
         {
@@ -691,7 +699,7 @@ class Proform {
             'pairs' => $this->var_pairs,
             'variable_prefix' => $variable_prefix,
         ));
-
+        
         if($form_obj)
         {
             // Close form
@@ -731,7 +739,6 @@ class Proform {
         
         $this->return_data = $output;
         
-
         if($this->debug)
         {
             echo $this->debug_str;

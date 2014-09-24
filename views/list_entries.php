@@ -62,9 +62,11 @@
 <div class="table_filters">
     <?php
     
-    $search = ee()->input->get_post('search') ? ee()->input->get_post('search') : array();
+    /*$search = ee()->input->get_post('search') ? ee()->input->get_post('search') : array();
     $search_from = ee()->input->get_post('search_from') ? ee()->input->get_post('search_from') : array();
     $search_to = ee()->input->get_post('search_to') ? ee()->input->get_post('search_to') : array();
+    */
+    
     
     if(count($search) > 0 || count($search_from) > 0 || count($search_to) > 0): ?>
 

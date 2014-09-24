@@ -79,7 +79,11 @@ class Archive_driver extends PL_base_driver {
         if($form_obj)
         {
             $this->check_form_fields($form_obj);
-            $vars = array();
+            list($search, $search_from, $search_to) = $this->EE->formslib->get_search_arrays();
+            
+            $vars = array(
+                'search' => $search,
+            );
             return $this->view('archive_tabs', $vars, FALSE);
         } else {
             return $output;
@@ -103,6 +107,17 @@ class Archive_driver extends PL_base_driver {
             '__archive_status' => 'open',
         );
     }
+    
+    /*
+    public function pagination_config($form, $p_config)
+    {
+        $status = 'open';
+        $search = $this->EE->input->get_post('search');
+        if(is_array($search) && array_key_exists('__archive_status', $search)) $status = $search['__archive_status'];
+        $p_config['base_url'] .= AMP.'search[__archive_status]='.$status;
+        return $p_config;
+    }
+    */
     
     public function archive_close_entries($form, $batch_ids)
     {

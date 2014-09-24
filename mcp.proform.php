@@ -2414,7 +2414,12 @@ class Proform_mcp extends Prolib_base_mcp {
         $vars['is_union'] = $is_union;
         
         // Get page of data
-        $search = $this->_get_search_input($form);
+        list($a_search, $a_search_from, $a_search_to) = $this->EE->formslib->get_search_arrays();
+        $vars['search'] = $a_search;
+        $vars['search_from'] = $a_search_from;
+        $vars['search_to'] = $a_search_to;
+        
+        $search = $this->EE->formslib->get_search_input($form);
         $search = $this->prolib->pl_drivers->list_entries_search($form_id, $search);
         //var_dump($form->__internal_fields);exit;
         $entries = $form->entries($search, $rownum, $this->perpage, 'updated', 'DESC', $union);
@@ -2463,7 +2468,21 @@ class Proform_mcp extends Prolib_base_mcp {
         ////////////////////////////////////////
         // Pagination
         $total = $form->count_entries($search);
+        
         $p_config = $this->pagination_config('list_entries&form_id='.$return_form_id, $total); // creates our pagination config for us
+        foreach($a_search as $key => $val)
+        {
+            if($val) $p_config['base_url'] .= AMP.'s_'.$key.'='.$val;
+        }
+        foreach($a_search_from as $key => $val)
+        {
+            if($val) $p_config['base_url'] .= AMP.'sfrom_'.$key.'='.$val;
+        }
+        foreach($a_search_to as $key => $val)
+        {
+            if($val) $p_config['base_url'] .= AMP.'sto_'.$key.'='.$val;
+        }
+        $p_config = $this->prolib->pl_drivers->pagination_config($form, $search, $p_config);
         $this->EE->pagination->initialize($p_config);
         $vars['pagination'] = $this->EE->pagination->create_links();
 
@@ -2997,7 +3016,7 @@ class Proform_mcp extends Prolib_base_mcp {
             if($this->EE->extensions->end_script === TRUE) return TRUE;
         }
 
-        $search = $this->_get_search_input($form);
+        $search = $this->EE->formslib->get_search_input($form);
         $entries = $form->entries_filtered($search, $batch_id, 0, 0, 'form_entry_id', 'DESC', $union);
         #var_dump($union);
         #var_dump($entries);
@@ -3236,51 +3255,6 @@ class Proform_mcp extends Prolib_base_mcp {
         return TRUE;
     }
 
-    private function _get_search_input($form)
-    {
-        $search = $this->EE->input->get_post('search') ? $this->EE->input->get_post('search') : array();
-        $search_from = $this->EE->input->get_post('search_from') ? $this->EE->input->get_post('search_from') : array();
-        $search_to = $this->EE->input->get_post('search_to') ? $this->EE->input->get_post('search_to') : array();
-        
-        foreach($search as $key => $value) {
-            if(!$value) unset($search[$key]);
-            else {
-                $search[$key] = '~'.$value;
-            }
-        }
-        
-        foreach($search_from as $key => $value) {
-            if($value)
-            {
-                $search[$key.' >='] = $value;
-            }
-        }
-        
-        foreach($search_to as $key => $value) {
-            if($value)
-            {
-                $search[$key.' <='] = $value;
-            }
-        }
-        
-        if(count($search) == 0) {
-            if($driver = $form->get_driver())
-            {
-                if(method_exists($driver, 'default_search'))
-                {
-                    $search = $driver->default_search($form->form_id);
-                }
-            }
-            
-            $search = $this->EE->pl_drivers->default_search_global($form->form_id, $search);
-        }
-        /*
-        if(count($search) > 0) {
-            var_dump($search);exit;
-        }
-        // */
-        return $search;
-    }
 /*
     function _render_grid($key, $headings, $options, $value, $form = FALSE)
     {

@@ -38,17 +38,18 @@ require_once PATH_THIRD.'proform/models/proform_session.php';
 if(!class_exists('Formslib')) {
 class Formslib
 {
-    var $prefs;
-    var $session_mgr;
+    private $cache = array();
+    public $prefs;
+    public $session_mgr;
 
-    var $form_types = array('form' => 'Entry Form', 'saef' => 'SAEF Form', 'share' => 'Share Form');
-    var $var_pairs = array('fieldrows', 'fields', 'hidden_fields', 'errors', 'steps', 'field_validation');
-    var $mailtypes = array('html' => 'HTML', 'text' => 'Plain Text');
+    public $form_types = array('form' => 'Entry Form', 'saef' => 'SAEF Form', 'share' => 'Share Form');
+    public $var_pairs = array('fieldrows', 'fields', 'hidden_fields', 'errors', 'steps', 'field_validation');
+    public $mailtypes = array('html' => 'HTML', 'text' => 'Plain Text');
     
     // Fields that will not be encrypted or decrypted
-    var $field_encryption_disabled = array('dst_enabled');
+    public $field_encryption_disabled = array('dst_enabled');
 
-    var $default_prefs = array(
+    public $default_prefs = array(
         'license_key' => '',
         'show_quickstart_on' => 'y',
         'notification_template_group' => 'notifications',
@@ -678,6 +679,81 @@ class Formslib
         }
         return $result;
     }
+
+    public function get_search_arrays()
+    {
+        if(isset($this->cache['get_search_arrays'])) return $this->cache['get_search_arrays'];
+        
+        $search = $this->EE->input->get_post('search') ? $this->EE->input->get_post('search') : array();
+        $search_from = $this->EE->input->get_post('search_from') ? $this->EE->input->get_post('search_from') : array();
+        $search_to = $this->EE->input->get_post('search_to') ? $this->EE->input->get_post('search_to') : array();
+        
+        // Build from GET parameters used for pagination links
+        foreach($_GET as $key => $val)
+        {
+            if(substr($key, 0, 2) == 's_') {
+                $search[substr($key, 2, strlen($key)-2)] = $val;
+            }
+            if(substr($key, 0, 6) == 'sfrom_') {
+                $search_from[substr($key, 6, strlen($key)-6)] = $val;
+            }
+            if(substr($key, 0, 4) == 'sto_') {
+                $search_to[substr($key, 4, strlen($key)-4)] = $val;
+            }
+        }
+        
+        $search = $this->EE->security->xss_clean($search);
+        $search_from = $this->EE->security->xss_clean($search_from);
+        $search_to = $this->EE->security->xss_clean($search_to);
+        
+        $this->cache['get_search_arrays'] = array($search, $search_from, $search_to);
+        return $this->cache['get_search_arrays'];
+    }
+    
+    public function get_search_input($form)
+    {
+        list($search, $search_from, $search_to) = $this->get_search_arrays();
+        
+        foreach($search as $key => $value) {
+            if(!$value) unset($search[$key]);
+            else {
+                $search[$key] = '~'.$value;
+            }
+        }
+        
+        foreach($search_from as $key => $value) {
+            if($value)
+            {
+                $search[$key.' >='] = $value;
+            }
+        }
+        
+        foreach($search_to as $key => $value) {
+            if($value)
+            {
+                $search[$key.' <='] = $value;
+            }
+        }
+        
+        if(count($search) == 0) {
+            if($driver = $form->get_driver())
+            {
+                if(method_exists($driver, 'default_search'))
+                {
+                    $search = $driver->default_search($form->form_id);
+                }
+            }
+            
+            $search = $this->EE->pl_drivers->default_search_global($form->form_id, $search);
+        }
+        /*
+        if(count($search) > 0) {
+            var_dump($search);exit;
+        }
+        // */
+        return $search;
+    }
+
 } // class Formslib
 }
 
