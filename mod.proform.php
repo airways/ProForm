@@ -166,8 +166,10 @@ class Proform {
         $template = file_get_contents(PATH_THIRD.'proform/templates/'.$template.'.html');
 
         // Parse globals - these would have already been replaced if the template code was inline
-        foreach(array_merge($this->EE->TMPL->segment_vars, $this->EE->TMPL->global_vars, $this->EE->TMPL->embed_vars,
-            $this->EE->TMPL->template_route_vars, $this->EE->TMPL->layout_vars) as $var => $val)
+        $tpl_vars = array();
+        $tpl_var_arrays = array('segment_vars', 'global_vars', 'embed_vars', 'template_route_vars', 'layout_vars');
+        foreach($tpl_var_arrays as $array) if(isset($this->EE->TMPL->$array)) $tpl_vars = array_merge($tpl_vars, $this->EE->TMPL->$array);
+        foreach($tpl_vars as $var => $val)
         {
             $template = str_replace(LD.$var.RD, $val, $template);
         }

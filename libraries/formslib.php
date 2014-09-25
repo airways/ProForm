@@ -463,6 +463,9 @@ class Formslib
             {
                 foreach($field->form_field_settings as $k => $v)
                 {
+                    // Only concerned with string settings
+                    if(is_array($v) || is_object($v)) continue;
+                    
                     // Don't override defaults if there is no value provided in the override
                     if(trim($v) != '' OR !isset($field_array['field_'.$k]))
                     {
