@@ -364,6 +364,10 @@ class Formslib
                     if($rule == 'required')
                     {
                         $is_required = TRUE;
+                    } elseif(is_object($rule)) {
+                        if($rule->_ == 'required') {
+                            $is_required = TRUE;
+                        }
                     }
                 }
             }
