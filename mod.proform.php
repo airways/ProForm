@@ -1997,12 +1997,12 @@ class Proform {
 
                 foreach($field_rules as $srule)
                 {
-                    //echo $srule."<br/>";
+                    //krumo($srule);
                     if($srule != 'none' && $srule != '')
                     {
                         if(is_object($srule))
                         {
-                            $rule = array($srule->_, isset($srule->{$srule->_}) ? $srule->{$srule->_} : '');
+                            $rule = array($srule->_, isset($srule->{$srule->_}) ? $srule->{$srule->_} : (isset($srule->value) ? $srule->value : ''));
                         }
                         elseif(($n = strpos($srule, '[')) !== FALSE)
                         {
