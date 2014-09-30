@@ -342,12 +342,12 @@ var pl_grid = {
                     
                     // If we have custom form settings, we will initialize an object-based data row and generate the HTML
                     // for the row with the right form elements in it
-                    if(pl_grid.forms[id] && pl_grid.forms[id][key])
+                    if(pl_grid.forms[key])
                     {
                         // Start the blank object-based data row. The weird _ property is the value of the first item in the grid - 
                         // which is always chosen from a fixed set of options (pl_grid.options[] for that grid).
                         var data_row = {'_': val};
-                        var form = pl_grid.forms[id][key];
+                        var form = pl_grid.forms[key];
                         
                         // Generate the HTML for the form from the columns for this grid
                         html_form = '';
@@ -434,7 +434,7 @@ var pl_grid = {
             var key = $(this).attr('data-key');
             var data = pl_grid.data[key];
             
-            if(pl_grid.forms[id] && pl_grid.forms[id][key])
+            if(pl_grid.forms[key])
             {
                 // New object-based data row
                 var opt_name = $(this).attr('data-opt');
@@ -457,7 +457,7 @@ var pl_grid = {
         $('.remove_grid_row').unbind('click').click(function(e) {
             var key = $(this).attr('data-key');
             var data = pl_grid.data[key];
-            if(pl_grid.forms[id] && pl_grid.forms[id][key])
+            if(pl_grid.forms[key])
             {
                 // New object-based data row
                 var opt_name = $(this).attr('data-opt');
