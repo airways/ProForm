@@ -82,7 +82,11 @@ class Proform {
         }
         $this->cache =& $this->EE->session->cache['proform'];
 
-        @session_start();
+        if(session_id() == '')
+        {
+            session_start();
+        }
+        
         if(!isset($_SESSION['pl_form']))
         {
             $_SESSION['pl_form'] = array();

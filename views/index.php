@@ -150,7 +150,7 @@
                 {exp:proform:simple form="{segment_3}"}
             </pre>
         If the template is saved as <i>forms/view</i> you would then visit a URL like <i>http://example.com/forms/view/form_name_here</i> to get the same results as the first example.</p>
-        <p>(You can hide this message by settings the <i>Show Quick Start</i> option to <i>No</i> on the <a href="<?php echo TAB_ACTION.'method=module_settings'; ?>">Module Settings</a> page.)</p>
+        <p>(You can hide this message by setting the <i>Show Quick Start</i> option to <i>No</i> on the <a href="<?php echo TAB_ACTION.'method=module_settings'; ?>">Module Settings</a> page.)</p>
     </div>
 <?php endif; ?>
 <?php if($pagination): ?>

@@ -120,7 +120,8 @@
                                                     {/if}
                                                     <fieldset>
                                                         <legend>{pf_label}</legend>
-                                                {if:else}
+                                                {/if}
+                                                {if pf_is_divider == 0}
                                                     <div class="pf_option {if pf_vertical}pf_vertical{/if}">
                                                         {if pf_field_setting_style == "check"}
                                                             <input type="checkbox" name="{pf_field_name}[]" id="{pf_field_name}_{pf_key}" value="{pf_key}" {if pf_selected}checked="checked"{/if} class="{pf_field_is_required}" />
@@ -135,7 +136,9 @@
                                             {if pf_divider_count > 0}
                                                 </fieldset>
                                             {/if}
-                                        {if:else}
+                                        {/if}
+                                        
+                                        {if pf_field_setting_style == ""}
                                             <select name="{pf_field_name}" id="{pf_field_name}" {if pf_multiple}multiple="multiple"{/if} class="{pf_field_is_required}">
                                                 {pf_field_options}
                                                     {if pf_is_divider}
@@ -143,7 +146,9 @@
                                                             </optgroup>
                                                         {/if}
                                                         <optgroup label="{pf_label}">
-                                                    {if:else}
+                                                    {/if}
+                                                    
+                                                    {if pf_is_divider == 0}
                                                         <option value="{pf_key}" {pf_selected}>{pf_row}</option>
                                                     {/if}
                                                 {/pf_field_options}
@@ -168,11 +173,11 @@
                                 {/if}
                             {/if}
                         </li>
-                        {/if}
-                    {/pf_fields}
-                    </ul>
-                    <div class="pf_clear"></div>
-                {/pf_fieldrows}
+                    {/if}
+                {/pf_fields}
+                </ul>
+                <div class="pf_clear"></div>
+            {/pf_fieldrows}
             
             <div class="pf_buttons">
                 {if pf_use_captcha}

@@ -510,6 +510,8 @@ class Formslib
                     $field_array['field_setting_'.$k] = $v;
                 }
             }
+            
+            if(!isset($field_array['field_setting_style'])) $field_array['field_setting_style'] = '';
 
             if(array_key_exists($field->field_name, $field_errors))
             {
