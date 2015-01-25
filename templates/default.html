@@ -39,141 +39,192 @@
             {pf_fieldrows}
                 <ul class="pf_row">
                 {pf_fields}
-                    {if pf_field_type != "invisible" && pf_field_type != "calculated"}
-                        <li id="{pf_field_html_id}" class="pf_column {pf_field_html_class}" data-field-name="{pf_field_name}" {if pf_field_conditionals_count}data-has-conditional="yes"{/if}>
-                            {if pf_field_conditionals_count}
-                                <script>
-                                    pf_meta.conditionals['{pf_field_name}'] = [];
-                                    pf_meta.conditionals_type['{pf_field_name}'] = '{pf_field_conditionals_type}';
-                                    {pf_field_conditionals}
-                                        pf_meta.conditionals['{pf_field_name}'].push(['{pf_cond_field}', '{pf_cond_op}', '{pf_cond_value_esc}']);
-                                    {/pf_field_conditionals}
-                                </script>
+                    <li id="{pf_field_html_id}" class="pf_column {pf_field_html_class}" data-field-name="{pf_field_name}" {if pf_field_conditionals_count}data-has-conditional="yes"{/if}>
+                        {if pf_field_conditionals_count}
+                            <script>
+                                pf_meta.conditionals['{pf_field_name}'] = [];
+                                pf_meta.conditionals_type['{pf_field_name}'] = '{pf_field_conditionals_type}';
+                                {pf_field_conditionals}
+                                    pf_meta.conditionals['{pf_field_name}'].push(['{pf_cond_field}', '{pf_cond_op}', '{pf_cond_value_esc}']);
+                                {/pf_field_conditionals}
+                            </script>
+                        {/if}
+                        
+                        {pf_html_block}
+                            {pf_field_html_block}
+                        {/pf_html_block}
+                        
+                        {pf_heading}
+                            {if pf_field_is_step == ''}
+                                <h3>{pf_field_heading}</h3>
                             {/if}
-                            {if pf_field_html_block}
-                                {pf_field_html_block}
-                            {if:elseif pf_field_heading}
-                                {if pf_field_is_step == ''}
-                                    <h3>{pf_field_heading}</h3>
-                                {/if}
+                        {/pf_heading}
+                        
+                        {pf_checkbox}
+                            <label for="{pf_field_name}">{pf_field_label} {if pf_field_is_required}<span class="required">*</span>{/if}</label>
+                            <div class="pf_field {if pf_vertical}pf_vertical{/if}">
+                        {/pf_checkbox}
+                        
+                        {pf_string}
+                            {if pf_field_validation:valid_email}
+                                <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="validate-email {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
                             {if:else}
-                                {if pf_field_html_block}
-                                    {pf_field_html_block}
-                                {if:elseif pf_field_heading}
-                                    {if pf_field_is_step == ''}
-                                        <h3>{pf_field_heading}</h3>
-                                    {/if}
+                                {if pf_field_length <= 255}
+                                    <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="{pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
                                 {if:else}
-                                    {if pf_field_type != "checkbox"}
-                                        <label for="{pf_field_name}">{pf_field_label} {if pf_field_is_required}<span class="required">*</span>{/if}</label>
-                                        <div class="pf_field {if pf_vertical}pf_vertical{/if}">
+                                    {if pf_wysiwyg}
+                                        <textarea name="{pf_field_name}" id="{pf_field_name}" class="{pf_field_is_required}">{pf_field_value}</textarea>
+                                        <script type="text/javascript">bkLib.onDomLoaded(function() { new nicEditor(pf_nic_config).panelInstance('{pf_field_name}'); });</script>
+                                    {if:else}
+                                        <textarea name="{pf_field_name}" id="{pf_field_name}" class="{pf_field_is_required}">{pf_field_value}</textarea>
                                     {/if}
-                                    {if pf_field_type == "string"}
-                                        {if pf_field_validation:valid_email}
-                                            <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="validate-email {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
-                                        {if:else}
-                                            {if pf_field_length <= 255}
-                                                <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="{pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
-                                            {if:else}
-                                                {if pf_wysiwyg}
-                                                    <textarea name="{pf_field_name}" id="{pf_field_name}" class="{pf_field_is_required}">{pf_field_value}</textarea>
-                                                    <script type="text/javascript">bkLib.onDomLoaded(function() { new nicEditor(pf_nic_config).panelInstance('{pf_field_name}'); });</script>
-                                                {if:else}
-                                                    <textarea name="{pf_field_name}" id="{pf_field_name}" class="{pf_field_is_required}">{pf_field_value}</textarea>
-                                                {/if}
+                                {/if}
+                            {/if}
+                        {/pf_string}
+                        
+                        {pf_text}
+                            {if pf_wysiwyg}
+                                <textarea name="{pf_field_name}" id="{pf_field_name}" class="{pf_field_is_required}">{pf_field_value}</textarea>
+                                <script type="text/javascript">bkLib.onDomLoaded(function() { new nicEditor(pf_nic_config).panelInstance('{pf_field_name}'); });</script>
+                            {if:else}
+                                <textarea name="{pf_field_name}" id="{pf_field_name}" class="custom_class_here {pf_field_is_required}">{pf_field_value}</textarea>
+                            {/if}
+                        {/pf_text}
+                        
+                        {pf_date}
+                            <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="date {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
+                        {/pf_date}
+                        
+                        {pf_datetime}
+                            <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="datetime {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
+                        {/pf_datetime}
+                        
+                        {pf_time}
+                            <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="time {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
+                        {/pf_time}
+                        
+                        {pf_integer}
+                            <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="validate-integer {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
+                        {/pf_integer}
+                        
+                        {pf_float}
+                            <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="validate-float {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
+                        {/pf_float}
+                        
+                        {pf_file}
+                            <div class="pf_files">
+                                <input name="{pf_field_name}" id="{pf_field_name}" type="file" class="{pf_field_is_required}" />
+                                {if pf_field_value}<p>File previously uploaded: <b>{pf_field_filename}</b>. You may upload a new file to replace it.</p>{/if}
+                            </div>
+                        {/pf_file}
+                        
+                        {pf_checkbox}
+                            <div class="pf_field">
+                                <div class="pf_option">
+                                    <input type="checkbox" name="{pf_field_name}" id="{pf_field_name}" value="y" {if pf_field_checked}checked="checked"{/if} class="{pf_field_is_required}" /><label for="{pf_field_name}">{pf_field_label}</label>
+                                </div>
+                            </div>
+                        {/pf_checkbox}
+                        
+                        {pf_relationship}
+                        
+                            {pf_dropdown_style}
+                                <select name="{pf_field_name}" id="{pf_field_name}" {if pf_multiple}multiple="multiple"{/if} class="{pf_field_is_required}">
+                                    {pf_field_options}
+                                        {if pf_is_divider}
+                                            {if pf_divider_number > 0}
+                                                </optgroup>
                                             {/if}
-                                        {/if}
-                                    {if:elseif pf_field_type == "text"}
-                                        {if pf_wysiwyg}
-                                            <textarea name="{pf_field_name}" id="{pf_field_name}" class="{pf_field_is_required}">{pf_field_value}</textarea>
-                                            <script type="text/javascript">bkLib.onDomLoaded(function() { new nicEditor(pf_nic_config).panelInstance('{pf_field_name}'); });</script>
-                                        {if:else}
-                                            <textarea name="{pf_field_name}" id="{pf_field_name}" class="custom_class_here {pf_field_is_required}">{pf_field_value}</textarea>
-                                        {/if}
-                                    {if:elseif pf_field_type == "date"}
-                                        <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="date {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
-                                    {if:elseif pf_field_type == "datetime"}
-                                        <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="datetime {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
-                                    {if:elseif pf_field_type == "time"}
-                                        <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="time {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
-                                    {if:elseif pf_field_type == "integer"}
-                                        <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="validate-integer {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
-                                    {if:elseif pf_field_type == "float"}
-                                        <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="validate-float {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
-                                    {if:elseif pf_field_type == "file"}
-                                        <div class="pf_files">
-                                            <input name="{pf_field_name}" id="{pf_field_name}" type="file" class="{pf_field_is_required}" />
-                                            {if pf_field_value}<p>File previously uploaded: <b>{pf_field_filename}</b>. You may upload a new file to replace it.</p>{/if}
-                                        </div>
-                                    {if:elseif pf_field_type == "checkbox"}
-                                        <div class="pf_field">
-                                            <div class="pf_option">
-                                                <input type="checkbox" name="{pf_field_name}" id="{pf_field_name}" value="y" {if pf_field_checked}checked="checked"{/if} class="{pf_field_is_required}" /><label for="{pf_field_name}">{pf_field_label}</label>
-                                            </div>
-                                        </div>
-                                    {if:elseif pf_field_type == "list" || pf_field_type == "relationship"}
-                                        {if pf_field_setting_style == "check" || pf_field_setting_style == "radio"}
-                                            {pf_field_options}
-                                                {if pf_is_divider}
-                                                    {if pf_divider_number > 0}
-                                                        </fieldset>
-                                                    {/if}
-                                                    <fieldset>
-                                                        <legend>{pf_label}</legend>
-                                                {/if}
-                                                {if pf_is_divider == 0}
-                                                    <div class="pf_option {if pf_vertical}pf_vertical{/if}">
-                                                        {if pf_field_setting_style == "check"}
-                                                            <input type="checkbox" name="{pf_field_name}[]" id="{pf_field_name}_{pf_key}" value="{pf_key}" {if pf_selected}checked="checked"{/if} class="{pf_field_is_required}" />
-                                                        {/if}
-                                                        {if pf_field_setting_style == "radio"}
-                                                            <input type="radio" name="{pf_field_name}" id="{pf_field_name}_{pf_key}" value="{pf_key}" {if pf_selected}checked="checked"{/if} class="{pf_field_is_required}" />
-                                                        {/if}
-                                                        <label for="{pf_field_name}_{pf_key}">{pf_label}</label>
-                                                    </div>
-                                                {/if}
-                                            {/pf_field_options}
-                                            {if pf_divider_count > 0}
-                                                </fieldset>
-                                            {/if}
+                                            <optgroup label="{pf_label}">
                                         {/if}
                                         
-                                        {if pf_field_setting_style == ""}
-                                            <select name="{pf_field_name}" id="{pf_field_name}" {if pf_multiple}multiple="multiple"{/if} class="{pf_field_is_required}">
-                                                {pf_field_options}
-                                                    {if pf_is_divider}
-                                                        {if pf_divider_number > 0}
-                                                            </optgroup>
-                                                        {/if}
-                                                        <optgroup label="{pf_label}">
-                                                    {/if}
-                                                    
-                                                    {if pf_is_divider == 0}
-                                                        <option value="{pf_key}" {pf_selected}>{pf_row}</option>
-                                                    {/if}
-                                                {/pf_field_options}
-                                                {if pf_divider_count > 0}
-                                                    </optgroup>
-                                                {/if}
-                                            </select>
+                                        {if pf_is_divider == 0}
+                                            <option value="{pf_key}" {pf_selected}>{pf_row}</option>
                                         {/if}
-                                    {if:else}
-                                        {if pf_field_driver}
-                                            {pf_field_driver}
-                                        {if:else}
-                                            <input type="{pf_field_control}" id="{pf_field_name}" name="{pf_field_name}" value="{pf_field_value}" class="{pf_field_is_required}" />
-                                        {/if}
+                                    {/pf_field_options}
+                                    {if pf_divider_count > 0}
+                                        </optgroup>
                                     {/if}
-            
-                                    {if pf_field_error}<div id="text-E" class="errMsg"><span>{pf_field_error}</span></div>{/if}
+                                </select>
+                            {/pf_dropdown_style}
+                        {/pf_relationship}
+                        
+                        {pf_list}
                             
-                                    {if pf_field_type != "checkbox"}
+                            {pf_dropdown_style}
+                                <select name="{pf_field_name}" id="{pf_field_name}" {if pf_multiple}multiple="multiple"{/if} class="{pf_field_is_required}">
+                                    {pf_field_options}
+                                        {if pf_is_divider}
+                                            {if pf_divider_number > 0}
+                                                </optgroup>
+                                            {/if}
+                                            <optgroup label="{pf_label}">
+                                        {/if}
+                                        
+                                        {if pf_is_divider == 0}
+                                            <option value="{pf_key}" {pf_selected}>{pf_row}</option>
+                                        {/if}
+                                    {/pf_field_options}
+                                    {if pf_divider_count > 0}
+                                        </optgroup>
+                                    {/if}
+                                </select>
+                            {/pf_dropdown_style}
+                            
+                            {pf_check_style}
+                                {pf_field_options}
+                                    {if pf_is_divider}
+                                        {if pf_divider_number > 0}
+                                            </fieldset>
+                                        {/if}
+                                        <fieldset>
+                                            <legend>{pf_label}</legend>
+                                    {/if}
+                                    {if pf_is_divider == 0}
+                                        <div class="pf_option {if pf_vertical}pf_vertical{/if}">
+                                            <input type="checkbox" name="{pf_field_name}[]" id="{pf_field_name}_{pf_key}" value="{pf_key}" {if pf_selected}checked="checked"{/if} class="{pf_field_is_required}" />
+                                            <label for="{pf_field_name}_{pf_key}">{pf_label}</label>
                                         </div>
                                     {/if}
+                                {/pf_field_options}
+                                {if pf_divider_count > 0}
+                                    </fieldset>
                                 {/if}
-                            {/if}
-                        </li>
-                    {/if}
+                            {/pf_check_style}
+                            
+                            {pf_radio_style}
+                                {pf_field_options}
+                                    {if pf_is_divider}
+                                        {if pf_divider_number > 0}
+                                            </fieldset>
+                                        {/if}
+                                        <fieldset>
+                                            <legend>{pf_label}</legend>
+                                    {/if}
+                                    {if pf_is_divider == 0}
+                                        <div class="pf_option {if pf_vertical}pf_vertical{/if}">
+                                            <input type="radio" name="{pf_field_name}" id="{pf_field_name}_{pf_key}" value="{pf_key}" {if pf_selected}checked="checked"{/if} class="{pf_field_is_required}" />
+                                            <label for="{pf_field_name}_{pf_key}">{pf_label}</label>
+                                        </div>
+                                    {/if}
+                                {/pf_field_options}
+                                {if pf_divider_count > 0}
+                                    </fieldset>
+                                {/if}
+                            {/pf_radio_style}
+                        {/pf_list}
+                        
+                        
+                        {if pf_field_driver}
+                            {pf_field_driver}
+                        {/if}
+
+                        {if pf_field_error}<div id="text-E" class="errMsg"><span>{pf_field_error}</span></div>{/if}
+                
+                        {if pf_field_type != "checkbox"}
+                            </div>
+                        {/if}
+                    </li>
                 {/pf_fields}
                 </ul>
                 <div class="pf_clear"></div>

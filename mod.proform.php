@@ -699,6 +699,12 @@ class Proform {
             }
         }
 
+        /*
+        echo '====root level variables====<br>';
+        krumo($variables);
+        echo '====end root level variables====<br>';
+        // */
+        
         $output .= $this->EE->pl_parser->parse_variables_ex(array(
             'rowdata' => $tagdata,
             'row_vars' => $variables,
