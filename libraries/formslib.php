@@ -43,9 +43,10 @@ class Formslib
     public $session_mgr;
 
     public $form_types = array('form' => 'Entry Form', 'saef' => 'SAEF Form', 'share' => 'Share Form');
-    public $var_pairs = array('fieldrows', 'fields', 'hidden_fields', 'errors', 'steps', 'field_validation', 'field_options', 'dropdown_style', 'radio_style', 'check_style');
+    public $var_pairs = array('fieldrows', 'fields', 'hidden_fields', 'errors', 'steps', 'field_validation', 'dropdown_style', 'radio_style', 'check_style', 'field_options', 'field_conditionals', 'field_conditionals_type', 'field_conditionals_count');
     public $type_pairs = array('checkbox', 'string', 'text', 'date', 'datetime', 'time', 'integer', 'float', 'file', 'list', 'relationship', 'html_block', 'heading');
-    public $root_fields = array('field_type', 'field_heading', 'field_html_block', 'field_number', 'field_error', 'field_driver', 'field_errors', 'field_conditionals', 'field_conditionals_type', 'field_conditionals_count');
+    //public $root_fields = array('field_type', 'field_name', 'field_html_block', 'field_html_id', 'field_html_class', 'field_heading', 'field_html_block', 'field_number', 'field_error', 'field_driver', 'field_errors', 'field_conditionals', 'field_conditionals_type', 'field_conditionals_count');
+    public $typed_fields = array('field_options');
     public $mailtypes = array('html' => 'HTML', 'text' => 'Plain Text');
     
     // Fields that will not be encrypted or decrypted
@@ -598,14 +599,26 @@ class Formslib
             if($field_array['field_driver']) {
                 $field_array['field_type'] = $field_array['field_driver'];
             }
+
+            if($field_array['field_type'] == 'heading' && isset($field_array['field_html_block'])) {
+                $field_array['field_type'] = 'html_block';
+            }
             
             // Add type tag pairs
             $type_array = array($field_array['field_type'] => array($field_array));
             
             // Move root-level variables
-            foreach($this->root_fields as $field)
+            /*foreach($this->root_fields as $field)
             {
                 if(isset($field_array[$field])) {
+                    $type_array[$field] = $field_array[$field];
+                    unset($field_array[$field]);
+                }
+            }*/
+
+            foreach($field_array as $field => $value)
+            {
+                if(!in_array($field, $this->typed_fields)) {
                     $type_array[$field] = $field_array[$field];
                     unset($field_array[$field]);
                 }
@@ -623,19 +636,27 @@ class Formslib
             
             $field_type = $field_array['field_type'];
             
-            //echo 'create_fields_array, field_type: '. $field_type.'<br/>';
             
             if($field_type == 'list' || $field_type == 'relationship') {
                 if($field_array[$field_type][0]['field_setting__type'] == 'list') {
                     $field_array[$field_type][0]['field_setting__type'] = 'dropdown';
                 }
             }
+
+            /*
+            echo 'create_fields_array, field_type: '. $field_type.'<br/>';
+            if($field_type == 'list') {
+                echo 'list type = '.$field_array[$field_type][0]['field_setting__type'].'<br/>';
+            }
+            krumo($field_array);
+            // */
             
             // If there is a type style setting, move all of the field variables into a nested loop named after that style. For instance,
             // a style value of "dropdown" would cause all variables to be moved into {dropdown_style}{/dropdown_style}. This
             // is MUCH more efficient than using conditionals for theh same thhing (ex {if field_setting_stype == "dropdown"} due to
             // the way that EE is currently processing conditionals.
-            if($field_array[$field_type][0]['field_setting__type'])
+            if(isset($field_array[$field_type][0]['field_setting__type'])
+                && $field_array[$field_type][0]['field_setting__type'])
             {
                 $style_key = $field_array[$field_type][0]['field_setting__type'].'_style';
                 //echo 'create_fields_array, style_key: '.$style_key.'<br/>';
@@ -675,9 +696,10 @@ class Formslib
 
         } // foreach($form_obj->fields() as $field)
 
-        //echo 'create_fields_array, result:<br/>';
-        //krumo($result);
-
+        /*
+        echo 'create_fields_array, result:<br/>';
+        krumo($result);
+        */
         if ($this->EE->extensions->active_hook('proform_create_fields') === TRUE) 
         {
             $result = $this->EE->extensions->call('proform_create_fields', $this, $result, $create_field_rows); 

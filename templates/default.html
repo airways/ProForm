@@ -37,9 +37,9 @@
         
         <div class="pf_wrap">
             {pf_fieldrows}
-                <ul class="pf_row">
+                <ul id="pf_row_{pf_fieldrow:count}" class="pf_row">
                 {pf_fields}
-                    <li id="{pf_field_html_id}" class="pf_column {pf_field_html_class}" {if pf_field_html_block}
+                    <li id="{if pf_field_html_id}{pf_field_html_id}{if:else}pf_field_{pf_field_number}{/if}" class="pf_column pf_field {pf_field_html_class}" {if pf_field_html_block}
                             {!-- if you want to have an HTML block hidden or shown based on other field values, change the conditional here
                             to whatever field_number your block is assigned, then add rules to pf_meta.conditionals* as is done below for normal fields --}
                             data-field-name="html_block_{pf_field_number}" {if pf_field_number == -1}data-has-conditional="yes"{/if}
@@ -65,17 +65,17 @@
                             {/if}
                         {/pf_heading}
                         
-                        {pf_checkbox}
                             <label for="{pf_field_name}">{pf_field_label} {if pf_field_is_required}<span class="required">*</span>{/if}</label>
+                        {pf_checkbox}
                             <div class="pf_field {if pf_vertical}pf_vertical{/if}">
                         {/pf_checkbox}
                         
                         {pf_string}
                             {if pf_field_validation:valid_email}
-                                <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="validate-email {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
+                                <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="validate-email {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" /><!-- valid_email -->
                             {if:else}
                                 {if pf_field_length <= 255}
-                                    <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="{pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
+                                    <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="{pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" /><!-- string -->
                                 {if:else}
                                     {if pf_wysiwyg}
                                         <textarea name="{pf_field_name}" id="{pf_field_name}" class="{pf_field_is_required}">{pf_field_value}</textarea>
@@ -97,11 +97,11 @@
                         {/pf_text}
                         
                         {pf_date}
-                            <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="date {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
+                            <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="date {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" /><!-- date -->
                         {/pf_date}
                         
                         {pf_datetime}
-                            <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="datetime {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" />
+                            <input type="text" name="{pf_field_name}" id="{pf_field_name}" class="datetime {pf_field_is_required}" value="{pf_field_value}" placeholder="{pf_field_placeholder}" /><!-- datetime -->
                         {/pf_datetime}
                         
                         {pf_time}
@@ -232,7 +232,7 @@
                     </li>
                 {/pf_fields}
                 </ul>
-                <div class="pf_clear"></div>
+                <div id="pf_row_clear_{pf_fieldrow:count}" class="pf_clear"></div>
             {/pf_fieldrows}
             
             <div class="pf_buttons">
