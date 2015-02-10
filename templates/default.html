@@ -39,7 +39,12 @@
             {pf_fieldrows}
                 <ul class="pf_row">
                 {pf_fields}
-                    <li id="{pf_field_html_id}" class="pf_column {pf_field_html_class}" data-field-name="{pf_field_name}" {if pf_field_conditionals_count}data-has-conditional="yes"{/if}>
+                    <li id="{pf_field_html_id}" class="pf_column {pf_field_html_class}" {if pf_field_html_block}
+                            {!-- if you want to have an HTML block hidden or shown based on other field values, change the conditional here
+                            to whatever field_number your block is assigned, then add rules to pf_meta.conditionals* as is done below for normal fields --}
+                            data-field-name="html_block_{pf_field_number}" {if pf_field_number == -1}data-has-conditional="yes"{/if}
+                            {if:else}
+                            data-field-name="{pf_field_name}" {if pf_field_conditionals_count}data-has-conditional="yes"{/if}{/if}>
                         {if pf_field_conditionals_count}
                             <script>
                                 pf_meta.conditionals['{pf_field_name}'] = [];
