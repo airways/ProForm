@@ -949,3 +949,7 @@ span.value_file a {
     border-top: 1px solid #d1d7df;
     overflow-x: auto;
 }
+
+.form_top_commands {
+    margin-bottom: 10px;
+}

@@ -37,23 +37,13 @@ require_once PATH_THIRD.'prolib/prolib.php';
  * as well as passing data and email templates to the template engine for
  * parsing.
  */
-class Proform_notifications
+class Proform_notifications extends PL_Notifications
 {
-    /**
-     * Handle manager for accessing template data
-     * @var PL_handler_mgr
-     */
-    var $template_mgr;
-    var $debug = FALSE;
-    var $debug_str = '<b>Debug Output</b><br/>';
-    var $var_pairs = array();
-    var $special_attachments = array();
-    var $parse_ee_tags = TRUE;
-    
+    protected $hook_prefix = 'proform';
+
     function __construct()
     {
-        prolib($this, 'proform');
-        $this->mgr = new PL_handle_mgr();
+        parent::__construct();
 
         /*
          * Get settings
@@ -104,11 +94,6 @@ class Proform_notifications
 
     } // function __construct()
 
-    function _debug($msg)
-    {
-        $this->debug_str .= htmlentities($msg) . '<br/>';
-    }
-
     function has_notifications($form, $form_session)
     {
 
@@ -150,10 +135,6 @@ class Proform_notifications
                 $data[$k] = $v;
             }
         }
-
-        $this->EE->load->library('parser');
-        $this->EE->load->library('template');
-        $this->EE->load->helper('text');
 
         if($this->EE->extensions->active_hook('proform_notification_start') === TRUE)
         {
@@ -215,8 +196,9 @@ class Proform_notifications
                     $reply_to_name = FALSE;
                 }
 
-                $result &= $this->_send_notifications('admin', $form->notification_template, $form, $data,
-                                                        $form->subject, $notification_list, $reply_to, $reply_to_name, $form->notification_list_attachments === 'y');
+                $result &= $this->send_notification_email('admin', $form->notification_template, $form, $data,
+                                                        $form->subject, $notification_list, $reply_to, $reply_to_name, $form->notification_list_attachments === 'y',
+                                                        $form->get_driver());
 
                 $this->_debug('Done with admin notifications - new result - ' . ($result ? 'okay' : 'failed'));
             } else {
@@ -253,9 +235,10 @@ class Proform_notifications
             
             $this->_debug('submitter_notification notification list - ' . print_r($submitter_email, TRUE));
 
-            $result &= $this->_send_notifications('submitter', $form->submitter_notification_template,
+            $result &= $this->send_notification_email('submitter', $form->submitter_notification_template,
                 $form, $data, $form->submitter_notification_subject ? $form->submitter_notification_subject : $form->subject,
-                array($submitter_email), $reply_to, $reply_to_name, $form->submitter_notification_attachments === 'y');
+                array($submitter_email), $reply_to, $reply_to_name, $form->submitter_notification_attachments === 'y',
+                $form->get_driver());
 
             $this->_debug('Done with submitter_notification - new result - ' . ($result ? 'okay' : 'failed'));
         } else {
@@ -287,9 +270,10 @@ class Proform_notifications
             
             $this->_debug('share_notification notification list - ' . print_r($share_email, TRUE));
             
-            $result &= $this->_send_notifications('share', $form->share_notification_template,
+            $result &= $this->send_notification_email('share', $form->share_notification_template,
                 $form, $data, $form->share_notification_subject ? $form->share_notification_subject : $form->subject,
-                array($share_email), $reply_to, $reply_to_name, $form->share_notification_attachments === 'y');
+                array($share_email), $reply_to, $reply_to_name, $form->share_notification_attachments === 'y',
+                $form->get_driver());
 
             $this->_debug('Sending share_notification - new result - ' . ($result ? 'okay' : 'failed'));
 
@@ -315,281 +299,5 @@ class Proform_notifications
         return $result;
     } // function send_notifications()
 
-    public function clear_attachments()
-    {
-        $this->special_attachments = array();
-    }
-    
-    public function special_attachment($filename)
-    {
-        $this->special_attachments[] = $filename;
-    }
-    
-    public function enabled_parse_ee_tags($val)
-    {
-        $this->parse_ee_tags = $val;
-    }
-    
-    public function send_notification($template_name, &$form, &$data, $subject, $notification_list, $reply_to=FALSE, $reply_to_name=FALSE, $send_attachments=FALSE)
-    {
-        return $this->_send_notifications('custom', $template_name, $form, $data, $subject, $notification_list, $reply_to, $reply_to_name, $send_attachments);
-    }
-    
-    function _send_notifications($type, $template_name, &$form, &$data, $subject, $notification_list, $reply_to=FALSE, $reply_to_name=FALSE, $send_attachments=FALSE)
-    {
-        $result = FALSE;
-        $template = $this->get_template($template_name);
-
-        $this->EE->pl_email->clear(TRUE);
-        
-        if($template)
-        {
-            // parse data from the entry
-            $this->_debug($template);
-            // $message = $this->EE->parser->parse_string($template, $data, TRUE);
-            // $subject = $this->EE->parser->parse_string($subject, $data, TRUE);
-// echo "<b>_send_notifications TEMPLATE PARSING</b>";
-
-            if(!isset($this->EE->TMPL)) {
-                if(!class_exists('EE_Template')) {
-                    $this->EE->load->helper('text');
-                    $this->EE->load->library('Template');
-                }
-                $this->EE->TMPL = new EE_Template();
-                $clearTMPL = TRUE;
-            } else {
-                $clearTMPL = FALSE;
-            }
-            
-            $message = $this->EE->pl_parser->parse_variables_ex(array(
-                'rowdata' => $template,
-                'row_vars' => $data,
-                'pairs' => $this->var_pairs,
-            ));
-
-            $subject = $this->EE->pl_parser->parse_variables_ex(array(
-                'rowdata' => $subject,
-                'row_vars' => $data,
-                'pairs' => $this->var_pairs,
-            ));
-
-            // parse the template for EE tags, conditionals, etc.
-            if($this->parse_ee_tags)
-            {
-                $this->_debug('Parsing EE tags...');
-                $oldTMPL = $this->EE->TMPL;
-                
-// var_dump($this->EE->TMPL);
-                $this->EE->TMPL = new EE_Template();
-                $this->EE->TMPL->template = $message;
-                $this->EE->TMPL->template = $this->EE->TMPL->parse_globals($this->EE->TMPL->template);
-                $this->EE->TMPL->parse($message);
-    
-                // final output to send
-                $this->EE->TMPL->final_template = $this->EE->TMPL->parse_globals($this->EE->TMPL->final_template);
-                $message = $this->EE->TMPL->final_template;
-                
-                $this->EE->TMPL = $oldTMPL;
-                if($clearTMPL) {
-                    unset($this->EE->TMPL);
-                }
-// var_dump($this->EE->pl_parser->variable_prefix);
-// var_dump($data);
-// echo "<pre>";
-// echo htmlentities($message);
-// exit;
-            } else {
-                $this->_debug('Not parsing EE tags');
-            }
-            $this->_debug($message);
-            $result = TRUE;
-            
-            if($driver = $form->get_driver())
-            {
-                $this->_debug('Calling form driver->prep_notifications');
-                $result = $driver->prep_notifications($this, $type, $template_name, $form, $data, $subject, $notification_list, $reply_to, $reply_to_name, $send_attachments, $result);
-                $this->_debug('Result after driver->prep_notifications - ' . ($result ? 'okay' : 'failed'));
-            }
-            
-            if($result)
-            {
-                foreach($notification_list as $to_email)
-                {
-                    $this->EE->pl_email->PL_initialize($this->EE->formslib->prefs->ini('mailtype'));
-    
-                    if($this->default_from_address)
-                    {
-                        $this->EE->pl_email->from($this->default_from_address, $this->default_from_name);
-                    }
-    
-                    if($reply_to)
-                    {
-                        if($reply_to_name)
-                        {
-                            $this->EE->pl_email->reply_to($reply_to, $reply_to_name);
-                        } else {
-                            $this->EE->pl_email->reply_to($reply_to);
-                        }
-                    } else {
-                        // use the form's reply-to email and name if they have been set
-                        if(trim($form->reply_to_address) != '')
-                        {
-                            if(trim($form->reply_to_name) != '')
-                            {
-                                $this->EE->pl_email->reply_to($form->reply_to_address, $form->reply_to_name);
-                            } else {
-                                $this->EE->pl_email->reply_to($form->reply_to_address);
-                            }
-                        } elseif($this->default_reply_to_address) {
-                            // use the default reply-to address if it's been set
-                            $this->EE->pl_email->reply_to($this->default_reply_to_address, $this->default_reply_to_name);
-                        }
-                    }
-    
-                    // Only normal forms can have files uploaded to them
-                    if($form->form_type == 'form')
-                    {
-                        // Attach files
-                        if($send_attachments)
-                        {
-                            foreach($form->fields() as $field)
-                            {
-                                if($field->type == 'file')
-                                {
-                                    $upload_pref = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
-                                    if ($upload_pref && file_exists($upload_pref['server_path'].$data[$field->field_name]))
-                                    {
-                                        $this->EE->pl_email->attach($upload_pref['server_path'].$data[$field->field_name]);
-                                    }
-                                }
-                            }
-                        }
-                        
-    
-                        foreach($this->special_attachments as $filename)
-                        {
-                            $this->EE->pl_email->attach($filename);
-                        }
-                    }
-                    
-                    $this->_debug('To: '.$to_email);
-                    $this->EE->pl_email->to($to_email);
-                    $this->EE->pl_email->subject($subject);
-    
-                    // We need to call entities_to_ascii() for text mode email w/ entry encoded data.
-                    // $message will automatically have {if plain_email} and {if html_email} handled inside the pl_email class
-                    // The message will also be automatically stripped of markup for the plain text version since we are not
-                    // providing an explicit alternative, in which case a lack of a check for either of those variables will
-                    // still generate a passable text email if the markup was not totally reliant on images.
-                    //$this->EE->pl_email->message(entities_to_ascii($message));
-                    $this->EE->pl_email->message($message);
-    
-                    $this->EE->pl_email->send = TRUE;
-                    if ($this->EE->extensions->active_hook('proform_notification_message') === TRUE)
-                    {
-                        $this->EE->extensions->call('proform_notification_message', $type, $form, $this->EE->pl_email, $this);
-                        if($this->EE->extensions->end_script) return;
-                    }
-    
-                    if($this->EE->pl_email->send)
-                    {
-                        $result = $result && $this->EE->pl_email->Send();
-                    }
-    
-                }
-            }
-        }
-
-        return $result;
-    } // function _send_notifications()
-
-    /**
-     * Get a list of EE template group names from the database. These will be used as the options
-     * for setting the template group in module settings.
-     *
-     * @return array of template groups suitable for use in form_dropdown()
-     */
-    function get_template_group_names()
-    {
-        $result = array();
-        $query = $this->EE->db->where('site_id', $this->prolib->site_id)->get('exp_template_groups');
-        foreach($query->result() as $row)
-        {
-            $result[$row->group_name] = $row->group_name;
-        }
-        ksort($result);
-        return $result;
-    } // function get_template_group_names()
-
-    /**
-     * Get a list of template names for the given group name. Used on form settings to specify
-     * what template should be used to send notifications.
-     *
-     * @return array of template names suitable for use in form_dropdown()
-     */
-    function get_template_names($group_name)
-    {
-        $result = array();
-
-        $this->EE->db->where('group_name', $this->EE->db->escape_str($group_name));
-        $this->EE->db->where('site_id', $this->EE->config->item('site_id'));
-        $query = $this->EE->db->get('template_groups');
-
-        if($query->num_rows > 0)
-        {
-            $group_id = $query->row()->group_id;
-            $sql = "SELECT template_id, template_name FROM exp_templates WHERE group_id = $group_id AND site_id = ".$this->prolib->site_id;
-            $query = $this->EE->db->query($sql);
-            foreach($query->result() as $row)
-            {
-                if($row->template_name != 'index')
-                    $result[$row->template_name] = $row->template_name;
-            }
-        }
-        return $result;
-    } // function get_template_names()
-
-    function get_template($template_name)
-    {
-        $this->_debug($this->template_group_name);
-
-        $query = $this->EE->db->query($sql = "SELECT group_id FROM exp_template_groups WHERE group_name = '" . $this->EE->db->escape_str($this->template_group_name) . "' AND site_id = ".$this->prolib->site_id);
-        if($query->num_rows() > 0)
-        {
-            $group_id = $query->row()->group_id;
-
-            $this->_debug('Template group ID: '.$group_id);
-
-            $sql = "SELECT * FROM exp_templates WHERE group_id = {$group_id} AND template_name = '" . $this->EE->db->escape_str($template_name) . "' AND site_id = ".$this->prolib->site_id;
-            $query = $this->EE->db->query($sql);
-            if($query->num_rows() > 0)
-            {
-                $row = $query->row();
-                if($row->save_template_file == 'y')
-                {
-                    // we need to load data from the template file
-                    $template_file = $this->EE->config->slash_item('tmpl_file_basepath')
-                                    . $this->EE->config->slash_item('site_short_name')
-                                    . $this->template_group_name.'.group/'
-                                    . $template_name.'.html';
-
-                    $this->_debug('Template saved as file '.$template_file);
-
-                    $template_data = file_get_contents($template_file);
-                } else {
-                    $this->_debug('Template from DB');
-                    $template_data = $query->row()->template_data;
-                }
-
-                $this->_debug('Template: '.$template_data);
-
-                return $template_data;
-            } else {
-                return FALSE;
-            }
-        } else { // if($query->num_rows() > 0)
-            return FALSE;
-        }
-    } // function get_template()
 
 } // class Proform_notifications

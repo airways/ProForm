@@ -77,7 +77,9 @@ require_once(PATH_THIRD.'proform/views/_advanced_settings.php');
 
 
 <?php echo form_open($action_url, array('id' => 'main_form'), isset($hidden) ? $hidden : array()); ?>
-<?php echo form_submit(array('name' => 'submit', 'value' => lang('save_form'), 'class' => 'submit')); ?>
+<div class="form_top_commands">
+<?php echo form_submit(array('name' => 'submit', 'value' => lang('save_form'), 'class' => 'submit top-submit')); ?>
+</div>
 
 <?php echo form_hidden('active_tab'); ?>
 

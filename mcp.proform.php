@@ -397,7 +397,7 @@ class Proform_mcp extends Prolib_base_mcp {
                 switch($f_name)
                 {
                     case 'pref_notification_template_group':
-                        $groups = $this->EE->proform_notifications->get_template_group_names();
+                        $groups = $this->EE->pl_eetemplates->get_template_group_names();
                         $groups = array(0 => 'None') + $groups;
                         $control = form_dropdown($f_name, $groups, $value);
                         break;
@@ -421,6 +421,7 @@ class Proform_mcp extends Prolib_base_mcp {
                         break;
                     case 'pref_custom_form_settings':
                         $control = form_textarea($f_name, $value);
+                        break;
                     case 'pref_mailtype':
                         $control = form_dropdown($f_name, $this->EE->formslib->mailtypes, $value);
                         break;
@@ -853,7 +854,7 @@ class Proform_mcp extends Prolib_base_mcp {
 
         $this->EE->load->library('proform_notifications');
         $this->EE->load->library('formslib');
-        $template_options = $this->EE->proform_notifications->get_template_names(
+        $template_options = $this->EE->pl_eetemplates->get_template_names(
             $this->EE->formslib->prefs->ini('notification_template_group', 'notifications'));
         $template_options = array(0 => 'None') + $template_options;
 
