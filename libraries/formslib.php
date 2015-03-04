@@ -638,47 +638,56 @@ class Formslib
             
             
             if($field_type == 'list' || $field_type == 'relationship') {
-                if($field_array[$field_type][0]['field_setting__type'] == 'list') {
-                    $field_array[$field_type][0]['field_setting__type'] = 'dropdown';
+                if($field_array[$field_type][0]['field_setting_style'] == '') {
+                    $field_array[$field_type][0]['field_setting_style'] = 'dropdown';
                 }
             }
 
+            //echo $field_array['field_type'].'<br>';
+            //Kint::dump($field_array);
             /*
             echo 'create_fields_array, field_type: '. $field_type.'<br/>';
             if($field_type == 'list') {
                 echo 'list type = '.$field_array[$field_type][0]['field_setting__type'].'<br/>';
             }
-            krumo($field_array);
+            echo '<pre>';
+            var_dump($field_array);
+            echo '</pre><hr>';
             // */
             
             // If there is a type style setting, move all of the field variables into a nested loop named after that style. For instance,
             // a style value of "dropdown" would cause all variables to be moved into {dropdown_style}{/dropdown_style}. This
             // is MUCH more efficient than using conditionals for theh same thhing (ex {if field_setting_stype == "dropdown"} due to
             // the way that EE is currently processing conditionals.
-            if(isset($field_array[$field_type][0]['field_setting__type'])
-                && $field_array[$field_type][0]['field_setting__type'])
+            if(isset($field_array[$field_type][0]['field_setting_style'])
+                && $field_array[$field_type][0]['field_setting_style'])
             {
-                $style_key = $field_array[$field_type][0]['field_setting__type'].'_style';
+                $style_key = $field_array[$field_type][0]['field_setting_style'].'_style';
                 //echo 'create_fields_array, style_key: '.$style_key.'<br/>';
                 
                 $field_array[$field_type][0] = array($style_key => array($field_array[$field_type][0]));
                 
                 if($field_array['field_type'] == 'list' || $field_array['field_type'] == 'relationship') {
-                
                     foreach(array('dropdown', 'check', 'radio') as $style) {
-                        if($style != $field_array[$field_type][0][$style_key][0]['field_setting__type']) {
+                        if($style != $field_array[$field_type][0][$style_key][0]['field_setting_style']) {
                             $field_array[$field_type][0][$style.'_style'] = array();
                         }
                     }
-                }
-                
-                if($style_key == 'dropdown_style') {
-                    //var_dump($field_array);exit;
                 }
             
             } else {
                 $style_key = FALSE;
             }
+
+          
+            /*
+            if($field_array['field_type'] == 'list') {
+                echo '<b>LIST</b>';
+                echo 'style_key = '.$style_key;
+                Kint::dump($field_array);
+                echo '<hr>';
+            }
+            // */
             
             // Now add it
             if($create_field_rows)
@@ -704,7 +713,6 @@ class Formslib
         {
             $result = $this->EE->extensions->call('proform_create_fields', $this, $result, $create_field_rows); 
         }
-
         return $result;
     } // create_fields_array
 
