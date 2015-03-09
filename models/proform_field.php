@@ -331,7 +331,7 @@ class PL_Field extends PL_RowInitialized implements IPL_Field
         return $result;
     }
 
-    function get_validation()
+    function get_validation($synthetic_is_required=FALSE)
     {
         // Explode the validation string, and remove any blank values found in it, as well as the 'none'
         // value used to indicate a lack of validation.
@@ -345,6 +345,7 @@ class PL_Field extends PL_RowInitialized implements IPL_Field
         }
         
         $field_rules = array();
+        $found_is_required = FALSE;
         foreach($raw_rules as $rule)
         {
             if($rule) {
@@ -362,10 +363,20 @@ class PL_Field extends PL_RowInitialized implements IPL_Field
                     {
                         $rule->value = str_replace(']', '', $arr[1]);
                     }
+                    if($rules->_ == 'required') $found_is_required = TRUE;
                     if($rule->_ == 'none' || $rule->_ == '') continue;
                 }
                 $field_rules[] = $rule;
             }
+        }
+
+        // Only used when running validation, in this case we need to inject a fake required rule
+        // if the field_setting is_required is set, but only if we did not see an additional required
+        // rule ("Always required") set on the field already.
+        if($this->get_form_field_setting('is_required') == 'y' && $synthetic_is_required && !$found_is_required) {
+            $field_rules[] = (object)array(
+                '_' => 'required',
+            );
         }
         
         return $field_rules;

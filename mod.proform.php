@@ -2012,7 +2012,7 @@ class Proform {
                 $checked_rules = '';
 
                 // validate rules
-                $field_rules = $field->get_validation();
+                $field_rules = $field->get_validation(TRUE);
 
                 foreach($field_rules as $srule)
                 {
