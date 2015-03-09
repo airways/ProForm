@@ -1451,7 +1451,13 @@ class Proform {
             $this->_process_secure_fields($form_obj, $form_session);
 
             $this->_process_validation($form_obj, $form_session);
-
+            
+            /*
+            echo '<pre>';
+            var_dump($_POST);
+            var_dump($form_session->errors);
+            exit;
+            // */
             // Do final processing before inserting
             
             // This is incremented by process_steps, so we need to save it
@@ -1531,6 +1537,7 @@ class Proform {
 
                     $result = TRUE;
                 }
+                //exit('contune form');
                 return $form_session;
             }
         } else {
@@ -1689,15 +1696,17 @@ class Proform {
             $form_session->config['step'] = $step;
         }
 
-        if($this->EE->input->get_post('_pf_goto_next'))
+        if($this->EE->input->get_post('_pf_goto_next') !== FALSE)
         {
+            //echo 'Next step<br/>';
             $step = $form_session->config['step'] + 1;
             if($step > $step_count) $step = $step_count;
             $form_session->config['step'] = $step;
         }
 
-        if($this->EE->input->get_post('_pf_goto_previous'))
+        if($this->EE->input->get_post('_pf_goto_previous') !== FALSE)
         {
+            //echo 'Prev step<br/>';
             $step = $form_session->config['step'] - 1;
             if($step < 1) $step = 1;
             $form_session->config['step'] = $step;

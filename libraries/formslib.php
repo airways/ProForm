@@ -358,24 +358,6 @@ class Formslib
             // handle normal posted fields
             
             $validation_rules = $field->get_validation();
-            
-            $is_required = $field->is_required == 'y';
-            if(!$is_required)
-            {
-                // look for the always required value in the field's validation rules
-                foreach($validation_rules as $rule)
-                {
-                    if($rule == 'required')
-                    {
-                        $is_required = TRUE;
-                    } elseif(is_object($rule)) {
-                        if($rule->_ == 'required') {
-                            $is_required = TRUE;
-                        }
-                    }
-                }
-            }
-
             $validation = $this->EE->pl_parser->wrap_array($validation_rules, 'rule_no', 'rule');
             $validation_count = count($validation->array);
 
@@ -441,7 +423,7 @@ class Formslib
                     'field_heading'             => $field->separator_type != PL_Form::SEPARATOR_HTML ? $field->heading : '',
                     'field_html_block'          => $field->separator_type == PL_Form::SEPARATOR_HTML ? $field->heading : '',
                     'field_is_step'             => $field->separator_type == PL_Form::SEPARATOR_STEP ? 'step' : '',
-                    'field_is_required'         => $is_required ? 'required' : '',
+                    'field_is_required'         => $field->is_required() ? 'required' : '',
                     'field_validation'          => $validation,
                     'field_validation_count'    => $validation_count,
                     'field_error'               => array_key_exists($field->field_name, $field_errors)
@@ -475,7 +457,7 @@ class Formslib
                     if(is_array($v) || is_object($v)) continue;
                     
                     // Don't override defaults if there is no value provided in the override
-                    if(trim($v) != '' OR !isset($field_array['field_'.$k]))
+                    if(trim($v) != '' && !isset($field_array['field_'.$k]))
                     {
                         $field_array['field_'.$k] = $v;
 

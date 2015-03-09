@@ -368,11 +368,6 @@ class PL_Field extends PL_RowInitialized implements IPL_Field
             }
         }
         
-        if($this->is_required == 'y')
-        {
-            $field_rules[] = (object)array('_' => 'required');
-        }
-        //var_dump($field_rules);
         return $field_rules;
     }
 
@@ -384,7 +379,15 @@ class PL_Field extends PL_RowInitialized implements IPL_Field
     
     function is_required()
     {
-        return $this->is_required == 'y' || in_array('required', explode('|', $this->validation));
+        $result = $this->get_form_field_setting('is_required') == 'y'; 
+        $rules = $this->get_validation();
+        foreach($rules as $rule) {
+            if($rule->_ == 'required') {
+                $result = TRUE;
+                break;
+            }
+        }
+        return $result;
     }
     
     function get_conditionals()
