@@ -363,7 +363,7 @@ class PL_Field extends PL_RowInitialized implements IPL_Field
                     {
                         $rule->value = str_replace(']', '', $arr[1]);
                     }
-                    if($rules->_ == 'required') $found_is_required = TRUE;
+                    if($rule->_ == 'required') $found_is_required = TRUE;
                     if($rule->_ == 'none' || $rule->_ == '') continue;
                 }
                 $field_rules[] = $rule;
