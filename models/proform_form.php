@@ -1347,10 +1347,15 @@ class PL_Form extends PL_RowInitialized {
                 //$assign_row['form_id'] = $new_form_id;
                 //$assign_row['field_id'] = $assigned_field_ids[$assign_row['field_id']];
                 //$this->__EE->db->insert('proform_form_fields', $assign_row);
-                $field = $this->__EE->formslib->fields->get($field_id);
-                $new_form_field_id = $new_form->assign_field($field);
-                $this->__EE->db->where('form_field_id', $new_form_field_id)
-                               ->update('proform_form_fields', $assign_row);
+                if($field_id)
+                {
+                    $field = $this->__EE->formslib->fields->get($field_id);
+                    $new_form_field_id = $new_form->assign_field($field);
+                    $this->__EE->db->where('form_field_id', $new_form_field_id)
+                                   ->update('proform_form_fields', $assign_row);
+                } else {
+                    $new_form->add_separator($assign_row['heading'], $assign_row['separator_type']);
+                }
             }
         }
     }
