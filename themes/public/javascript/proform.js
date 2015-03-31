@@ -103,5 +103,7 @@ $(document).ready(function() {
     // Need to hide this or a small outline is visible before the box is shown at the bottom of the page:
     $('#ui-datepicker-div').hide();
     pf_update_conditionals();
-    $('.pf_field input, .pf_field select, .pf_field textarea').change(pf_update_conditionals).keyup(pf_update_conditionals).click(pf_update_conditionals);
+    
+    $('.pf_field select').change(pf_update_conditionals);
+    $('.pf_field input, .pf_field textarea').change(pf_update_conditionals).keyup(pf_update_conditionals).click(pf_update_conditionals);
 });
