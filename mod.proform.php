@@ -244,7 +244,7 @@ class Proform {
         $notify             = explode('|', $this->EE->TMPL->fetch_param('notify', ''));
         $download_url       = $this->EE->TMPL->fetch_param('download_url',  '');
         $download_label     = $this->EE->TMPL->fetch_param('download_label',  '');
-        $this->debug        = $this->EE->TMPL->fetch_param('debug', 'false') == 'yes';
+        $this->debug        = $this->EE->TMPL->fetch_param('debug', 'false') === 'yes';
         $error_delimiters   = explode('|', $this->EE->TMPL->fetch_param('error_delimiters',  '<div class="error">|</div>'));
         $error_messages     = $this->EE->pl_parser->fetch_param_group('message');
         $step               = (int)$this->EE->TMPL->fetch_param('step', 1);
@@ -403,6 +403,7 @@ class Proform {
                     '%uniq%'                        => $uniq,
                 );
             }
+//var_dump($this->debug);var_dump($form_session->config);exit;
             
             $this->_copy_post_to_session($form_obj, $form_session);
 
@@ -1579,7 +1580,6 @@ class Proform {
             //     "parse_data:" => $parse_data,
             //     "entry_row:" => $entry_row,
             // ));
-
             $this->debug = $form_session->config['debug'];
             $this->EE->proform_notifications->debug = $form_session->config['debug'];
 
@@ -1590,6 +1590,7 @@ class Proform {
                     echo '<b>{exp:proform:form} could not send notifications for form: '.$form_obj->form_name.'</b><p/>';
                     echo $this->EE->proform_notifications->debug;
                     echo '<hr/>';
+                    echo 'Email connection debug output:<br/>';
                     $this->EE->pl_email->print_debugger();
                     echo '<hr/>';
                     foreach($this->EE->pl_email->_debug_msg as $row)

@@ -119,7 +119,7 @@ class Proform_notifications extends PL_Notifications
     function send_notifications($form, $data, $form_session)
     {
         $this->_debug('send_notifications start');
-        $this->_debug('data: ' . print_r($data, TRUE));
+        #$this->_debug('data: ' . print_r($data, TRUE));
         
         $this->EE->extensions->end_script = FALSE;
 
@@ -196,6 +196,7 @@ class Proform_notifications extends PL_Notifications
                     $reply_to_name = FALSE;
                 }
 
+                $this->_debug('About to send admin email');
                 $result &= $this->send_notification_email('admin', $form->notification_template, $form, $data,
                                                         $form->subject, $notification_list, $reply_to, $reply_to_name, $form->notification_list_attachments === 'y',
                                                         $form->get_driver());
@@ -292,7 +293,8 @@ class Proform_notifications extends PL_Notifications
         if($this->debug)
         {
             echo $this->debug_str;
-            echo lang('debug_stop');
+            echo '<b><em>'.lang('debug_stop').'</em></b>';
+            echo '<hr/>';
             exit;
         }
 
