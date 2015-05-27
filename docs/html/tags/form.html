@@ -584,10 +584,11 @@
 <h4>{fields} Variable Pairs</h4>
 <p>The following variable pairs are available inside the {fields} pair.</p>
 <ul>
+    <li><a href="#pair_field_type">Field Type Pair</a></li>
     <li><a href="#pair_field_options">{field_options}</a> (formerly {field_setting_list})</li>
     <li><a href="#pair_field_values">{field_values}</a></li>
     <li><a href="#pair_field_validation">{field_validation}</a></li>
-</ul>
+</ ul>
 <h5>{fields} Single Variables</h5>
 <h6><a name="var_field_id">{field_id}</a></h6>
 <p>Provides the unique ID of the field.</p>
@@ -601,7 +602,7 @@
 <h6><a name="var_field_html_block">{field_html_block}</a></h6>
 <p>For items that are actually HTML blocks within a form, will be set to the block of HTML. If this value is blank, the item is either a normal field or a Heading.</p>
 <h6><a name="var_field_type">{field_type}</a></h6>
-<p>The internal type name of the field. A conditional on this value can allow you to present custom rendering for any of the built-in field types.</p>
+<p>The internal type name of the field.</p>
 <h6><a name="var_field_length">{field_length}</a></h6>
 <p>The constraint set for this field. Defaults to 255 characters for all field types.</p>
 <h6><a name="var_field_is_required">{field_is_required}</a></h6>
@@ -654,6 +655,29 @@
 <h6><a name="var_field_value_label">{field_value_label}</a></h6>
 <p><b>Only valid for List type fields.</b> Provides the label of the selected option. This is useful for notification templates primarily, where you may want to display the label of the selected value rather than the actual value stored in the DB.</p>
 <h5>{fields} Variable Pairs</h5>
+<h6><a name="pair_field_type">Field Type Pair</a></h6>
+<p>ProForm provides one variable pair for each type of field available. You use these pairs to provide for different rendering of each field based on its type.</p>
+<p>For instance, you might use the following tag pairs to differentiate between text type fields and date type fields:</p>
+<div class="tip">
+    <h6>Example Usage</h6>
+    <pre class="brush: xml">
+        &#123;fields&#125;
+	        &#123;text&#125;
+	            &lt;textarea name="{field_name}" id="{field_name}" 
+	            	class="custom_class_here {field_is_required}">{field_value}&lt;/textarea&gt;
+	        &#123;/text&#125;
+	        
+	        &#123;date&#125;
+	            &lt;input type="text" name="{field_name}" id="{field_name}" 
+	            	class="date {field_is_required}" value="{field_value}"
+	            	placeholder="{field_placeholder}" /&gt;&lt;!-- date --&gt;
+	        &#123;/date&#125;
+        &#123;/fields&#125;
+    </pre>
+</div>
+
+                        
+                        
 <h6><a name="pair_field_options">{field_options}</a></h6>
 <p><b>Only valid for List and Relationship type fields.</b> The {field_options} loop, which must be used inside of the {fields} pair, provides a list of all of the options available for fields with the type <b>list</b>.</p>
 <div class="tip">
@@ -795,7 +819,7 @@
 <p>See the full <a href="./../tags/form/template.html">Sample Template</a> for the <kbd>Form Tag</kbd>.</p>
 <p>For an example of using AJAX with ProForm, see the <a href="./../tags/form/ajax-template.html">AJAX Sample Template</a>.</p>
     <div id="footer">
-            <p>ProForm version 1.44</p>
+            <p></p>
     </div>
     </div>
 </div>
