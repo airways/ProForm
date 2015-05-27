@@ -374,39 +374,7 @@ class Formslib
 
             $field_value = array_key_exists($field->field_name, $field_values) ? $field_values[$field->field_name] : $field->get_form_field_setting('preset_value');
 
-            if($field->type == 'list' || $field->type == 'relationship')
-            {
-                $field_options = $field->get_list_options($field_value);
-
-                if(is_array($field_value))
-                {
-                    $field_value_selections = array();
-                    foreach($field_value as $kk => $vv)
-                    {
-                        $field_value_selections[$kk] = $vv;
-                    }
-                } else {
-                    $field_value_selections = explode('|', $field_value);
-                }
-
-                // Turn the list of selected options into a wrappable array to be parsed
-                $field_value_array = array();
-                foreach($field_value_selections as $key)
-                {
-                    foreach($field_options as $option)
-                    {
-                        if($option['key'] == $key)
-                        {
-                            $field_value_array[$key] = $option['label'];
-                        }
-                    }
-                }
-                $field_options = $this->EE->pl_parser->wrap_array($field_options, 'key', 'label');
-                $field_value_wrap = $this->EE->pl_parser->wrap_array($field_value_array, 'key', 'label');
-            } else {
-                $field_options = FALSE;
-                $field_value_wrap = FALSE;
-            }
+            list($field_options, $field_value_wrap) = $this->get_field_options($field, $field_value);
 
             $field_conditionals = $field->get_conditionals();
             
@@ -569,120 +537,12 @@ class Formslib
                 $field_array['field_no'] = count($result) + 1;
                 $field_array['field_even'] = $field_array['field_no'] % 2 == 0 ? 'yes' : 'no';
             }
-            
-            if(isset($field_array['field_html_block']) && $field_array['field_html_block']) {
-                $field_array['field_type'] = 'html_block';
-            }
-            
-            if(isset($field_array['field_heading'])) {
-                $field_array['field_type'] = 'heading';
-            }
-            
-            if($field_array['field_driver']) {
-                $field_array['field_type'] = $field_array['field_driver'];
-            }
 
-            if($field_array['field_type'] == 'heading' && isset($field_array['field_html_block'])) {
-                $field_array['field_type'] = 'html_block';
-            }
-            
-            // Add type tag pairs
-            $type_array = array($field_array['field_type'] => array($field_array));
-            
-            // Move root-level variables
-            /*foreach($this->root_fields as $field)
-            {
-                if(isset($field_array[$field])) {
-                    $type_array[$field] = $field_array[$field];
-                    unset($field_array[$field]);
-                }
-            }*/
+            $field_type = $this->fill_field_type($field_array);
 
-            foreach($field_array as $field => $value)
-            {
-                if(!in_array($field, $this->typed_fields)) {
-                    $type_array[$field] = $field_array[$field];
-                    unset($field_array[$field]);
-                }
-            }
-            
-            $field_array = $type_array;
-            unset($type_array);
-            
-            // Set other field types to empty arrays so they are removed from output
-            foreach($this->type_pairs as $type) {
-                if($type != $field_array['field_type']) {
-                    $field_array[$type] = array();
-                }
-            }
-            
-            $field_type = $field_array['field_type'];
-            
-            
-            if($field_type == 'list' || $field_type == 'relationship') {
-                if($field_array[$field_type][0]['field_setting_style'] == '') {
-                    $field_array[$field_type][0]['field_setting_style'] = 'dropdown';
-                }
-            }
+            $this->make_nested_type_array($field_array);
 
-            //echo $field_array['field_type'].'<br>';
-            //Kint::dump($field_array);
-            /*
-            echo 'create_fields_array, field_type: '. $field_type.'<br/>';
-            if($field_type == 'list') {
-                echo 'list type = '.$field_array[$field_type][0]['field_setting__type'].'<br/>';
-            }
-            echo '<pre>';
-            var_dump($field_array);
-            echo '</pre><hr>';
-            // */
-            
-            // If there is a type style setting, move all of the field variables into a nested loop named after that style. For instance,
-            // a style value of "dropdown" would cause all variables to be moved into {dropdown_style}{/dropdown_style}. This
-            // is MUCH more efficient than using conditionals for theh same thhing (ex {if field_setting_stype == "dropdown"} due to
-            // the way that EE is currently processing conditionals.
-            if(isset($field_array[$field_type][0]['field_setting_style'])
-                && $field_array[$field_type][0]['field_setting_style'])
-            {
-                $style_key = $field_array[$field_type][0]['field_setting_style'].'_style';
-                //echo 'create_fields_array, style_key: '.$style_key.'<br/>';
-                
-                $field_array[$field_type][0] = array($style_key => array($field_array[$field_type][0]));
-                
-                if($field_array['field_type'] == 'list' || $field_array['field_type'] == 'relationship') {
-                    foreach(array('dropdown', 'check', 'radio') as $style) {
-                        if($style != $field_array[$field_type][0][$style_key][0]['field_setting_style']) {
-                            $field_array[$field_type][0][$style.'_style'] = array();
-                        }
-                    }
-                }
-            
-            } else {
-                $style_key = FALSE;
-            }
-
-          
-            /*
-            if($field_array['field_type'] == 'list') {
-                echo '<b>LIST</b>';
-                echo 'style_key = '.$style_key;
-                Kint::dump($field_array);
-                echo '<hr>';
-            }
-            // */
-            
-            // Now add it
-            if($create_field_rows)
-            {
-                $result[count($result)-1]['fields'][] = $field_array;
-                $result[count($result)-1]['fieldrow:count'] = count($result[count($result)-1]['fields']);
-                if(!isset($result[count($result)-1]['fieldrow:hidden_count']))
-                    $result[count($result)-1]['fieldrow:hidden_count'] = 0;
-                if($field_control == 'hidden')
-                $result[count($result)-1]['fieldrow:hidden_count'] ++;
-            } else {
-                $result[] = $field_array;
-            }
+            $this->add_field($field_control, $field_array, $create_field_rows, $result);
 
 
         } // foreach($form_obj->fields() as $field)
@@ -865,6 +725,183 @@ class Formslib
         return $search;
     }
 
+    /**
+     * Add a field data array to the result array, generating container fieldrow arrays as we go along, if needed.
+     *
+     * @param $field_control
+     * @param $field_array
+     * @param $create_field_rows
+     * @param $result
+     */
+    private function add_field($field_control, &$field_array, $create_field_rows, &$result)
+    {
+        /*
+        echo 'create_fields_array--add_field, field_type: '. $field_type.'<br/>';
+        if($field_type == 'list') {
+            echo 'list type = '.$field_array[$field_type][0]['field_setting__type'].'<br/>';
+        }
+        krumo($field_array);
+        // */
+
+        $this->make_nested_style_array($field_array);
+
+        // Now add it
+        if ($create_field_rows) {
+            $result[count($result) - 1]['fields'][] = $field_array;
+            $result[count($result) - 1]['fieldrow:count'] = count($result[count($result) - 1]['fields']);
+            if (!isset($result[count($result) - 1]['fieldrow:hidden_count']))
+                $result[count($result) - 1]['fieldrow:hidden_count'] = 0;
+            if ($field_control == 'hidden')
+                $result[count($result) - 1]['fieldrow:hidden_count']++;
+        } else {
+            $result[] = $field_array;
+        }
+    }
+
+    /**
+     * First level of nested arrays, defines the tag paid syntax for field types, example:
+     *   {string}
+     *   {/string}
+     *   {list}
+     *   {/list}
+     *
+     * @param $field_array  field data to modify with nested structure
+     */
+    private function make_nested_type_array(&$field_array)
+    {
+        // Add type tag pairs
+        $type_array = array($field_array['field_type'] => array($field_array));
+
+        // Move root-level variables
+        /*foreach($this->root_fields as $field)
+        {
+            if(isset($field_array[$field])) {
+                $type_array[$field] = $field_array[$field];
+                unset($field_array[$field]);
+            }
+        }*/
+
+        foreach ($field_array as $field => $value) {
+            if (!in_array($field, $this->typed_fields)) {
+                $type_array[$field] = $field_array[$field];
+                unset($field_array[$field]);
+            }
+        }
+
+        $field_array = $type_array;
+        unset($type_array);
+
+        // Set other field types to empty arrays so they are removed from output
+        foreach ($this->type_pairs as $type) {
+            if ($type != $field_array['field_type']) {
+                $field_array[$type] = array();
+            }
+        }
+    }
+
+    /**
+     * The second level of nested arrays, mainly used for list types when introduced, example:
+     *   {list}
+     *     {dropdown_style}
+     *     {/dropdown_style}
+     *   {/list}
+     *
+     * @param $field_array  field data to modify with nested structure
+     */
+    private function make_nested_style_array(&$field_array)
+    {
+        $field_type = $field_array['field_type'];
+
+        if ($field_type == 'list' || $field_type == 'relationship') {
+            if ($field_array[$field_type][0]['field_setting__type'] == 'list') {
+                $field_array[$field_type][0]['field_setting__type'] = 'dropdown';
+            }
+        }
+
+        // If there is a type style setting, move all of the field variables into a nested loop named after that style. For instance,
+        // a style value of "dropdown" would cause all variables to be moved into {dropdown_style}{/dropdown_style}. This
+        // is MUCH more efficient than using conditionals for theh same thhing (ex {if field_setting_stype == "dropdown"} due to
+        // the way that EE is currently processing conditionals.
+        if (isset($field_array[$field_type][0]['field_setting__type'])
+            && $field_array[$field_type][0]['field_setting__type']
+        ) {
+            $style_key = $field_array[$field_type][0]['field_setting__type'] . '_style';
+            //echo 'create_fields_array, style_key: '.$style_key.'<br/>';
+
+            $field_array[$field_type][0] = array($style_key => array($field_array[$field_type][0]));
+
+            if ($field_array['field_type'] == 'list' || $field_array['field_type'] == 'relationship') {
+
+                foreach (array('dropdown', 'check', 'radio') as $style) {
+                    if ($style != $field_array[$field_type][0][$style_key][0]['field_setting__type']) {
+                        $field_array[$field_type][0][$style . '_style'] = array();
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @param $field_array
+     * @param $field_type
+     */
+    private function fill_field_type(&$field_array)
+    {
+        if (isset($field_array['field_html_block']) && $field_array['field_html_block']) {
+            $field_array['field_type'] = 'html_block';
+        }
+
+        if (isset($field_array['field_heading'])) {
+            $field_array['field_type'] = 'heading';
+        }
+
+        if ($field_array['field_driver']) {
+            $field_array['field_type'] = $field_array['field_driver'];
+        }
+
+        if ($field_array['field_type'] == 'heading' && isset($field_array['field_html_block'])) {
+            $field_array['field_type'] = 'html_block';
+        }
+
+        return $field_array['field_type'];
+    }
+
+    /**
+     * @param $field
+     * @param $field_value
+     */
+    private function get_field_options($field, $field_value)
+    {
+        if ($field->type == 'list' || $field->type == 'relationship') {
+            $field_options = $field->get_list_options($field_value);
+
+            if (is_array($field_value)) {
+                $field_value_selections = array();
+                foreach ($field_value as $kk => $vv) {
+                    $field_value_selections[$kk] = $vv;
+                }
+            } else {
+                $field_value_selections = explode('|', $field_value);
+            }
+
+            // Turn the list of selected options into a wrappable array to be parsed
+            $field_value_array = array();
+            foreach ($field_value_selections as $key) {
+                foreach ($field_options as $option) {
+                    if ($option['key'] == $key) {
+                        $field_value_array[$key] = $option['label'];
+                    }
+                }
+            }
+            $field_options = $this->EE->pl_parser->wrap_array($field_options, 'key', 'label');
+            $field_value_wrap = $this->EE->pl_parser->wrap_array($field_value_array, 'key', 'label');
+        } else {
+            $field_options = FALSE;
+            $field_value_wrap = FALSE;
+        }
+
+        return array($field_options, $field_value_wrap);
+    }
 } // class Formslib
 }
 
