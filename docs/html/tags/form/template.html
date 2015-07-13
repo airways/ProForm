@@ -53,6 +53,8 @@
 <p class="strongbox">Example Template</p>
 <textarea cols="80" rows="40" style="width: 100%; font-family: courier;">
 &#123;exp:proform:form form_name="&#123;segment_2&#125;" variable_prefix="pf_"&#125;
+    &#123;pf_formpref:html_prefix&#125;
+
     &#123;if pf_no_results&#125;
         &#123;if pf_pref:invalid_form_message&#125;
             &#123;pf_pref:invalid_form_message&#125;
@@ -60,46 +62,74 @@
             Invalid form name specified!
         &#123;/if&#125;
     &#123;/if&#125;
+
     &#123;if pf_complete&#125;
-        &#123;if pf_pref:thank_you_message&#125;
-            &#123;pf_pref:thank_you_message&#125;
+        &#123;if pf_thank_you_message&#125;
+            &#123;pf_thank_you_message&#125;
         &#123;if:else&#125;
             Thank you for your submission!
         &#123;/if&#125;
     &#123;if:else&#125;
-    &#123;pf_hidden_fields&#125;
-        &lt;input type="hidden" name="&#123;pf_field_name&#125;" value="&#123;pf_field_value&#125;" /&gt;
-    &#123;/pf_hidden_fields&#125;
-    &lt;input type="hidden" name="_pf_current_step" value="&#123;pf_current_step&#125;" /&gt;
-    &lt;input type="hidden" name="_pf_goto_step" value="" /&gt;
-    &#123;if pf_multistep&#125;
-        &lt;ul class="pf_steps"&gt;
-            &#123;pf_steps&#125;
-                &lt;li&gt;&lt;a href="#&#123;pf_step_no&#125;" class="pf_step &#123;pf_step_active&#125;"&gt;&#123;pf_step&#125;&lt;/a&gt;&lt;/li&gt;
-            &#123;/pf_steps&#125;
-        &lt;/ul&gt;
-    &#123;/if&#125;
-    &lt;div class="pf_wrap"&gt;
-        &#123;pf_fieldrows&#125;
-        &lt;ul class="pf_row"&gt;
-            &#123;pf_fields&#125;
-                &#123;if pf_field_type != "invisible"&#125;
-                    &lt;li id="&#123;pf_field_html_id&#125;" class="pf_column &#123;pf_field_html_class&#125;"&gt;
-                    &#123;if pf_field_html_block&#125;
-                        &#123;pf_field_html_block&#125;
-                    &#123;if:elseif pf_field_heading&#125;
-                        &lt;h3&gt;&#123;pf_field_heading&#125;&lt;/h3&gt;
-                    &#123;if:else&#125;
-                        &#123;if pf_field_type != "checkbox"&#125;
-                            &lt;label for="&#123;pf_field_name&#125;"&gt;&#123;pf_field_label&#125; &#123;if pf_field_is_required&#125;&lt;span class="required"&gt;*&lt;/span&gt;&#123;/if&#125;&lt;/label&gt;
-                            &lt;div class="pf_field &#123;if pf_vertical&#125;pf_vertical&#123;/if&#125;"&gt;
+
+        &#123;if pf_form_errors != ''&#125;&lt;span class="error"&gt;&#123;pf_form_errors&#125;&lt;/span&gt;&#123;/if&#125;
+        
+        &#123;pf_hidden_fields&#125;
+            &lt;input type="hidden" name="&#123;pf_field_name&#125;" value="&#123;pf_field_value&#125;" /&gt;
+            &#123;if pf_field_error&#125;&lt;div id="text-E" class="errMsg"&gt;&lt;span&gt;&#123;pf_field_error&#125;&lt;/span&gt;&lt;/div&gt;&#123;/if&#125;
+        &#123;/pf_hidden_fields&#125;
+
+        &lt;input type="hidden" name="_pf_current_step" value="&#123;pf_current_step&#125;" /&gt;
+        &lt;input type="hidden" name="_pf_goto_step" value="" /&gt;
+    
+        &#123;if pf_multistep&#125;
+            &lt;ul class="pf_steps"&gt;
+                &#123;pf_steps&#125;
+                    &lt;li&gt;&lt;a href="#&#123;pf_step_no&#125;" class="pf_step &#123;pf_step_active&#125;"&gt;&#123;pf_step&#125;&lt;/a&gt;&lt;/li&gt;
+                &#123;/pf_steps&#125;
+            &lt;/ul&gt;
+        &#123;/if&#125;
+        
+        &lt;div class="pf_wrap"&gt;
+            &#123;pf_fieldrows&#125;
+                &lt;ul id="pf_row_&#123;pf_fieldrow:count&#125;" class="pf_row"&gt;
+                &#123;pf_fields&#125;
+                    &lt;li id="&#123;if pf_field_html_id&#125;&#123;pf_field_html_id&#125;&#123;if:else&#125;pf_field_&#123;pf_field_number&#125;&#123;/if&#125;" class="pf_column pf_field &#123;pf_field_html_class&#125;" &#123;if pf_field_html_block&#125;
+                            &#123;!-- if you want to have an HTML block hidden or shown based on other field values, change the conditional here
+                            to whatever field_number your block is assigned, then add rules to pf_meta.conditionals* as is done below for normal fields --&#125;
+                            data-field-name="html_block_&#123;pf_field_number&#125;" &#123;if pf_field_number == -1&#125;data-has-conditional="yes"&#123;/if&#125;
+                            &#123;if:else&#125;
+                            data-field-name="&#123;pf_field_name&#125;" &#123;if pf_field_conditionals_count&#125;data-has-conditional="yes"&#123;/if&#125;&#123;/if&#125;&gt;
+                        &#123;if pf_field_conditionals_count&#125;
+                            &lt;script&gt;
+                                pf_meta.conditionals['&#123;pf_field_name&#125;'] = [];
+                                pf_meta.conditionals_type['&#123;pf_field_name&#125;'] = '&#123;pf_field_conditionals_type&#125;';
+                                &#123;pf_field_conditionals&#125;
+                                    pf_meta.conditionals['&#123;pf_field_name&#125;'].push(['&#123;pf_cond_field&#125;', '&#123;pf_cond_op&#125;', '&#123;pf_cond_value_esc&#125;']);
+                                &#123;/pf_field_conditionals&#125;
+                            &lt;/script&gt;
                         &#123;/if&#125;
-                        &#123;if pf_field_type == "string"&#125;
+                        
+                        &#123;pf_html_block&#125;
+                            &#123;pf_field_html_block&#125;
+                        &#123;/pf_html_block&#125;
+                        
+                        &#123;pf_heading&#125;
+                            &#123;if pf_field_is_step == ''&#125;
+                                &lt;h3&gt;&#123;pf_field_heading&#125;&lt;/h3&gt;
+                            &#123;/if&#125;
+                        &#123;/pf_heading&#125;
+                        
+                            &lt;label for="&#123;pf_field_name&#125;"&gt;&#123;pf_field_label&#125; &#123;if pf_field_is_required&#125;&lt;span class="required"&gt;*&lt;/span&gt;&#123;/if&#125;&lt;/label&gt;
+                        &#123;pf_checkbox&#125;
+                            &lt;div class="pf_field &#123;if pf_vertical&#125;pf_vertical&#123;/if&#125;"&gt;
+                        &#123;/pf_checkbox&#125;
+                        
+                        &#123;pf_string&#125;
                             &#123;if pf_field_validation:valid_email&#125;
-                                &lt;input type="text" name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;" class="validate-email &#123;pf_field_is_required&#125;" value="&#123;pf_field_value&#125;" placeholder="&#123;pf_field_placeholder&#125;" /&gt;
+                                &lt;input type="text" name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;" class="validate-email &#123;pf_field_is_required&#125;" value="&#123;pf_field_value&#125;" placeholder="&#123;pf_field_placeholder&#125;" /&gt;&lt;!-- valid_email --&gt;
                             &#123;if:else&#125;
                                 &#123;if pf_field_length &lt;= 255&#125;
-                                    &lt;input type="text" name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;" class="&#123;pf_field_is_required&#125;" value="&#123;pf_field_value&#125;" placeholder="&#123;pf_field_placeholder&#125;" /&gt;
+                                    &lt;input type="text" name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;" class="&#123;pf_field_is_required&#125;" value="&#123;pf_field_value&#125;" placeholder="&#123;pf_field_placeholder&#125;" /&gt;&lt;!-- string --&gt;
                                 &#123;if:else&#125;
                                     &#123;if pf_wysiwyg&#125;
                                         &lt;textarea name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;" class="&#123;pf_field_is_required&#125;"&gt;&#123;pf_field_value&#125;&lt;/textarea&gt;
@@ -109,58 +139,55 @@
                                     &#123;/if&#125;
                                 &#123;/if&#125;
                             &#123;/if&#125;
-                        &#123;if:elseif pf_field_type == "text"&#125;
+                        &#123;/pf_string&#125;
+                        
+                        &#123;pf_text&#125;
                             &#123;if pf_wysiwyg&#125;
                                 &lt;textarea name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;" class="&#123;pf_field_is_required&#125;"&gt;&#123;pf_field_value&#125;&lt;/textarea&gt;
                                 &lt;script type="text/javascript"&gt;bkLib.onDomLoaded(function() &#123; new nicEditor(pf_nic_config).panelInstance('&#123;pf_field_name&#125;'); &#125;);&lt;/script&gt;
                             &#123;if:else&#125;
                                 &lt;textarea name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;" class="custom_class_here &#123;pf_field_is_required&#125;"&gt;&#123;pf_field_value&#125;&lt;/textarea&gt;
                             &#123;/if&#125;
-                        &#123;if:elseif pf_field_type == "date"&#125;
-                            &lt;input type="text" name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;" class="date &#123;pf_field_is_required&#125;" value="&#123;pf_field_value&#125;" placeholder="&#123;pf_field_placeholder&#125;" /&gt;
-                        &#123;if:elseif pf_field_type == "datetime"&#125;
-                            &lt;input type="text" name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;" class="datetime &#123;pf_field_is_required&#125;" value="&#123;pf_field_value&#125;" placeholder="&#123;pf_field_placeholder&#125;" /&gt;
-                        &#123;if:elseif pf_field_type == "time"&#125;
+                        &#123;/pf_text&#125;
+                        
+                        &#123;pf_date&#125;
+                            &lt;input type="text" name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;" class="date &#123;pf_field_is_required&#125;" value="&#123;pf_field_value&#125;" placeholder="&#123;pf_field_placeholder&#125;" /&gt;&lt;!-- date --&gt;
+                        &#123;/pf_date&#125;
+                        
+                        &#123;pf_datetime&#125;
+                            &lt;input type="text" name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;" class="datetime &#123;pf_field_is_required&#125;" value="&#123;pf_field_value&#125;" placeholder="&#123;pf_field_placeholder&#125;" /&gt;&lt;!-- datetime --&gt;
+                        &#123;/pf_datetime&#125;
+                        
+                        &#123;pf_time&#125;
                             &lt;input type="text" name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;" class="time &#123;pf_field_is_required&#125;" value="&#123;pf_field_value&#125;" placeholder="&#123;pf_field_placeholder&#125;" /&gt;
-                        &#123;if:elseif pf_field_type == "integer"&#125;
+                        &#123;/pf_time&#125;
+                        
+                        &#123;pf_integer&#125;
                             &lt;input type="text" name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;" class="validate-integer &#123;pf_field_is_required&#125;" value="&#123;pf_field_value&#125;" placeholder="&#123;pf_field_placeholder&#125;" /&gt;
-                        &#123;if:elseif pf_field_type == "float"&#125;
+                        &#123;/pf_integer&#125;
+                        
+                        &#123;pf_float&#125;
                             &lt;input type="text" name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;" class="validate-float &#123;pf_field_is_required&#125;" value="&#123;pf_field_value&#125;" placeholder="&#123;pf_field_placeholder&#125;" /&gt;
-                        &#123;if:elseif pf_field_type == "file"&#125;
+                        &#123;/pf_float&#125;
+                        
+                        &#123;pf_file&#125;
                             &lt;div class="pf_files"&gt;
                                 &lt;input name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;" type="file" class="&#123;pf_field_is_required&#125;" /&gt;
+                                &#123;if pf_field_value&#125;&lt;p&gt;File previously uploaded: &lt;b&gt;&#123;pf_field_filename&#125;&lt;/b&gt;. You may upload a new file to replace it.&lt;/p&gt;&#123;/if&#125;
                             &lt;/div&gt;
-                        &#123;if:elseif pf_field_type == "checkbox"&#125;
+                        &#123;/pf_file&#125;
+                        
+                        &#123;pf_checkbox&#125;
                             &lt;div class="pf_field"&gt;
                                 &lt;div class="pf_option"&gt;
                                     &lt;input type="checkbox" name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;" value="y" &#123;if pf_field_checked&#125;checked="checked"&#123;/if&#125; class="&#123;pf_field_is_required&#125;" /&gt;&lt;label for="&#123;pf_field_name&#125;"&gt;&#123;pf_field_label&#125;&lt;/label&gt;
                                 &lt;/div&gt;
                             &lt;/div&gt;
-                        &#123;if:elseif pf_field_type == "list" || pf_field_type == "relationship"&#125;
-                            &#123;if pf_field_setting_style == "check" || pf_field_setting_style == "radio"&#125;
-                                &#123;pf_field_options&#125;
-                                    &#123;if pf_is_divider&#125;
-                                        &#123;if pf_divider_number &gt; 0&#125;
-                                            &lt;/fieldset&gt;
-                                        &#123;/if&#125;
-                                        &lt;fieldset&gt;
-                                            &lt;legend&gt;&#123;pf_label&#125;&lt;/legend&gt;
-                                    &#123;if:else&#125;
-                                        &lt;div class="pf_option &#123;if pf_vertical&#125;pf_vertical&#123;/if&#125;"&gt;
-                                            &#123;if pf_field_setting_style == "check"&#125;
-                                                &lt;input type="checkbox" name="&#123;pf_field_name&#125;[]" id="&#123;pf_field_name&#125;_&#123;pf_key&#125;" value="&#123;pf_key&#125;" &#123;if pf_selected&#125;checked="checked"&#123;/if&#125; class="&#123;pf_field_is_required&#125;" /&gt;
-                                            &#123;/if&#125;
-                                            &#123;if pf_field_setting_style == "radio"&#125;
-                                                &lt;input type="radio" name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;_&#123;pf_key&#125;" value="&#123;pf_key&#125;" &#123;if pf_selected&#125;checked="checked"&#123;/if&#125; class="&#123;pf_field_is_required&#125;" /&gt;
-                                            &#123;/if&#125;
-                                            &lt;label for="&#123;pf_field_name&#125;_&#123;pf_key&#125;"&gt;&#123;pf_label&#125;&lt;/label&gt;
-                                        &lt;/div&gt;
-                                    &#123;/if&#125;
-                                &#123;/pf_field_options&#125;
-                                &#123;if pf_divider_count &gt; 0&#125;
-                                    &lt;/fieldset&gt;
-                                &#123;/if&#125;
-                            &#123;if:else&#125;
+                        &#123;/pf_checkbox&#125;
+                        
+                        &#123;pf_relationship&#125;
+                        
+                            &#123;pf_dropdown_style&#125;
                                 &lt;select name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;" &#123;if pf_multiple&#125;multiple="multiple"&#123;/if&#125; class="&#123;pf_field_is_required&#125;"&gt;
                                     &#123;pf_field_options&#125;
                                         &#123;if pf_is_divider&#125;
@@ -168,7 +195,9 @@
                                                 &lt;/optgroup&gt;
                                             &#123;/if&#125;
                                             &lt;optgroup label="&#123;pf_label&#125;"&gt;
-                                        &#123;if:else&#125;
+                                        &#123;/if&#125;
+                                        
+                                        &#123;if pf_is_divider == 0&#125;
                                             &lt;option value="&#123;pf_key&#125;" &#123;pf_selected&#125;&gt;&#123;pf_row&#125;&lt;/option&gt;
                                         &#123;/if&#125;
                                     &#123;/pf_field_options&#125;
@@ -176,48 +205,124 @@
                                         &lt;/optgroup&gt;
                                     &#123;/if&#125;
                                 &lt;/select&gt;
-                            &#123;/if&#125;
-                        &#123;if:else&#125;
-                            &#123;if pf_field_driver&#125;
-                                &#123;pf_field_driver&#125;
-                            &#123;if:else&#125;
-                                &lt;input type="&#123;pf_field_control&#125;" id="&#123;pf_field_name&#125;" name="&#123;pf_field_name&#125;" value="&#123;pf_field_value&#125;" class="&#123;pf_field_is_required&#125;" /&gt;
-                            &#123;/if&#125;
+                            &#123;/pf_dropdown_style&#125;
+                        &#123;/pf_relationship&#125;
+                        
+                        &#123;pf_list&#125;
+                            
+                            &#123;pf_dropdown_style&#125;
+                                &lt;select name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;" &#123;if pf_multiple&#125;multiple="multiple"&#123;/if&#125; class="&#123;pf_field_is_required&#125;"&gt;
+                                    &#123;pf_field_options&#125;
+                                        &#123;if pf_is_divider&#125;
+                                            &#123;if pf_divider_number &gt; 0&#125;
+                                                &lt;/optgroup&gt;
+                                            &#123;/if&#125;
+                                            &lt;optgroup label="&#123;pf_label&#125;"&gt;
+                                        &#123;/if&#125;
+                                        
+                                        &#123;if pf_is_divider == 0&#125;
+                                            &lt;option value="&#123;pf_key&#125;" &#123;pf_selected&#125;&gt;&#123;pf_row&#125;&lt;/option&gt;
+                                        &#123;/if&#125;
+                                    &#123;/pf_field_options&#125;
+                                    &#123;if pf_divider_count &gt; 0&#125;
+                                        &lt;/optgroup&gt;
+                                    &#123;/if&#125;
+                                &lt;/select&gt;
+                            &#123;/pf_dropdown_style&#125;
+                            
+                            &#123;pf_check_style&#125;
+                                &#123;pf_field_options&#125;
+                                    &#123;if pf_is_divider&#125;
+                                        &#123;if pf_divider_number &gt; 0&#125;
+                                            &lt;/fieldset&gt;
+                                        &#123;/if&#125;
+                                        &lt;fieldset&gt;
+                                            &lt;legend&gt;&#123;pf_label&#125;&lt;/legend&gt;
+                                    &#123;/if&#125;
+                                    &#123;if pf_is_divider == 0&#125;
+                                        &lt;div class="pf_option &#123;if pf_vertical&#125;pf_vertical&#123;/if&#125;"&gt;
+                                            &lt;input type="checkbox" name="&#123;pf_field_name&#125;[]" id="&#123;pf_field_name&#125;_&#123;pf_key&#125;" value="&#123;pf_key&#125;" &#123;if pf_selected&#125;checked="checked"&#123;/if&#125; class="&#123;pf_field_is_required&#125;" /&gt;
+                                            &lt;label for="&#123;pf_field_name&#125;_&#123;pf_key&#125;"&gt;&#123;pf_label&#125;&lt;/label&gt;
+                                        &lt;/div&gt;
+                                    &#123;/if&#125;
+                                &#123;/pf_field_options&#125;
+                                &#123;if pf_divider_count &gt; 0&#125;
+                                    &lt;/fieldset&gt;
+                                &#123;/if&#125;
+                            &#123;/pf_check_style&#125;
+                            
+                            &#123;pf_radio_style&#125;
+                                &#123;pf_field_options&#125;
+                                    &#123;if pf_is_divider&#125;
+                                        &#123;if pf_divider_number &gt; 0&#125;
+                                            &lt;/fieldset&gt;
+                                        &#123;/if&#125;
+                                        &lt;fieldset&gt;
+                                            &lt;legend&gt;&#123;pf_label&#125;&lt;/legend&gt;
+                                    &#123;/if&#125;
+                                    &#123;if pf_is_divider == 0&#125;
+                                        &lt;div class="pf_option &#123;if pf_vertical&#125;pf_vertical&#123;/if&#125;"&gt;
+                                            &lt;input type="radio" name="&#123;pf_field_name&#125;" id="&#123;pf_field_name&#125;_&#123;pf_key&#125;" value="&#123;pf_key&#125;" &#123;if pf_selected&#125;checked="checked"&#123;/if&#125; class="&#123;pf_field_is_required&#125;" /&gt;
+                                            &lt;label for="&#123;pf_field_name&#125;_&#123;pf_key&#125;"&gt;&#123;pf_label&#125;&lt;/label&gt;
+                                        &lt;/div&gt;
+                                    &#123;/if&#125;
+                                &#123;/pf_field_options&#125;
+                                &#123;if pf_divider_count &gt; 0&#125;
+                                    &lt;/fieldset&gt;
+                                &#123;/if&#125;
+                            &#123;/pf_radio_style&#125;
+                        &#123;/pf_list&#125;
+                        
+                        
+                        &#123;if pf_field_driver&#125;
+                            &#123;pf_field_driver&#125;
                         &#123;/if&#125;
+
                         &#123;if pf_field_error&#125;&lt;div id="text-E" class="errMsg"&gt;&lt;span&gt;&#123;pf_field_error&#125;&lt;/span&gt;&lt;/div&gt;&#123;/if&#125;
-                        &#123;if pf_field_type != "checkbox"&#125;
+                
+                        &#123;pf_checkbox&#125;
                             &lt;/div&gt;
-                        &#123;/if&#125;
+                        &#123;/pf_checkbox&#125;
                     &lt;/li&gt;
+                &#123;/pf_fields&#125;
+                &lt;/ul&gt;
+                &lt;div id="pf_row_clear_&#123;pf_fieldrow:count&#125;" class="pf_clear"&gt;&lt;/div&gt;
+            &#123;/pf_fieldrows&#125;
+            
+            &lt;div class="pf_buttons"&gt;
+                &#123;if pf_use_captcha&#125;
+                    &#123;if pf_interactive_captcha&#125;
+                        &lt;div class="pf_captcha"&gt;
+                            Enter this word: &#123;pf_captcha&#125;&lt;br/&gt;
+                            &lt;input type="text" name="captcha" /&gt;
+                            &#123;if pf_error:captcha&#125;&lt;span class="error"&gt;&#123;pf_error:captcha&#125;&lt;/span&gt;&#123;/if&#125;
+                        &lt;/div&gt;
+                    &#123;if:else&#125;
+                        &#123;pf_captcha&#125;
+                        &#123;if pf_error:captcha&#125;&lt;span class="error"&gt;&#123;pf_error:captcha&#125;&lt;/span&gt;&#123;/if&#125;
                     &#123;/if&#125;
                 &#123;/if&#125;
-            &#123;/pf_fields&#125;
-            &lt;/ul&gt;
-            &lt;div class="pf_clear"&gt;&lt;/div&gt;
-        &#123;/pf_fieldrows&#125;
-        &lt;div class="pf_buttons"&gt;
-            &#123;if pf_use_captcha&#125;
-                &lt;div class="pf_captcha"&gt;
-                    Enter this word: &#123;pf_captcha&#125;&lt;br/&gt;
-                    &lt;input type="text" name="captcha" /&gt;&#123;if pf_error:captcha&#125;&lt;span class="error"&gt;&#123;pf_error:captcha&#125;&lt;/span&gt;&#123;/if&#125;
-                &lt;/div&gt;
-            &#123;/if&#125;
-            &#123;if pf_multistep&#125;
-                &lt;input type="submit" name="_pf_goto_previous" value="&lt; Previous" &#123;if pf_on_first_step&#125;disabled="disabled"&#123;/if&#125; /&gt;
-                &lt;input type="submit" name="_pf_goto_next" value="Next &gt;" &#123;if pf_on_last_step&#125;disabled="disabled"&#123;/if&#125; /&gt;
-            &#123;/if&#125;
-            &#123;if pf_on_last_step&#125;
-                &lt;input type="submit" name="_pf_finish" value="Submit" /&gt;
-            &#123;if:else&#125;
-                &lt;input type="submit" value="Submit" disabled="disabled" /&gt;
-            &#123;/if&#125;
+                &#123;if pf_multistep&#125;
+                    &lt;input type="submit" name="_pf_goto_previous" value="&lt; Previous" &#123;if pf_on_first_step&#125;disabled="disabled"&#123;/if&#125; /&gt;
+                    &lt;input type="submit" name="_pf_goto_next" value="Next &gt;" &#123;if pf_on_last_step&#125;disabled="disabled"&#123;/if&#125; /&gt;
+                &#123;/if&#125;
+                &#123;if pf_on_last_step&#125;
+                    &lt;input type="submit" name="_pf_finish" value="&#123;if pf_formpref:submit_label&#125;&#123;pf_formpref:submit_label&#125;&#123;if:else&#125;Submit&#123;/if&#125;" /&gt;
+                &#123;if:else&#125;
+                    &lt;input type="submit" value="&#123;if pf_formpref:submit_label&#125;&#123;pf_formpref:submit_label&#125;&#123;if:else&#125;Submit&#123;/if&#125;" disabled="disabled" /&gt;
+                &#123;/if&#125;
+            &lt;/div&gt;
         &lt;/div&gt;
-        &#123;/if&#125;
     &lt;/div&gt;
+    &#123;/if&#125;
+
+    &#123;pf_formpref:html_postfix&#125;
 &#123;/exp:proform:form&#125;
+
+
 </textarea>
     <div id="footer">
-            <p>ProForm version 1.44</p>
+            <p></p>
     </div>
     </div>
 </div>
