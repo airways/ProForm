@@ -131,6 +131,7 @@ class Proform_notifications
 
     function send_notifications($form, $data, $form_session)
     {
+        $result = TRUE;
         $this->_debug('send_notifications start');
         $this->_debug('data: ' . print_r($data, TRUE));
         
@@ -156,7 +157,8 @@ class Proform_notifications
         if($this->EE->extensions->active_hook('proform_notification_start') === TRUE)
         {
             $this->_debug('Calling proform_notification_start - result so far ' . ($result ? 'yes' : 'no'));
-            $this->EE->extensions->call('proform_notification_start', $form, $this);
+            $result = $this->EE->extensions->call('proform_notification_start', $form, $this);
+            $this->_debug('Done with proform_notification_start - result so far ' . ($result ? 'yes' : 'no'));
             if($this->EE->extensions->end_script) return;
         }
 
@@ -306,12 +308,39 @@ class Proform_notifications
             // $message = $this->EE->parser->parse_string($template, $data, TRUE);
             // $subject = $this->EE->parser->parse_string($subject, $data, TRUE);
 // echo "<b>_send_notifications TEMPLATE PARSING</b>";
+
+            if(!isset($this->EE->TMPL)) {
+                if(!class_exists('EE_Template')) {
+                    $this->EE->load->helper('text');
+                    $this->EE->load->library('Template');
+                }
+                $this->EE->TMPL = new EE_Template();
+                $clearTMPL = TRUE;
+            } else {
+                $clearTMPL = FALSE;
+            }
+            
+            if(count($this->var_pairs) == 0)
+            {
+                if(isset($this->EE->formslib))
+                {
+                    $this->var_pairs = $this->EE->formslib->var_pairs;
+                } else {
+                    throw new Exception('var_pairs is empty, notification parsing failed');
+                }
+            }
+
+
             $message = $this->EE->pl_parser->parse_variables_ex(array(
                 'rowdata' => $template,
                 'row_vars' => $data,
                 'pairs' => $this->var_pairs,
             ));
-
+// echo '<pre>';
+// var_dump($this->var_pairs);
+// var_dump($data['fields']);
+// echo htmlentities($message);
+// exit;
             $subject = $this->EE->pl_parser->parse_variables_ex(array(
                 'rowdata' => $subject,
                 'row_vars' => $data,
@@ -388,6 +417,36 @@ class Proform_notifications
                                 }
                             }
                         }
+                        
+    
+                        foreach($this->special_attachments as $filename)
+                        {
+                            $this->EE->pl_email->attach($filename);
+                        }
+                    }
+                    
+                    $this->_debug('To: '.(is_array($to_email) ? implode(',', $to_email) : $to_email));
+                    $this->EE->pl_email->to($to_email);
+                    $this->EE->pl_email->subject($subject);
+    
+                    // We need to call entities_to_ascii() for text mode email w/ entry encoded data.
+                    // $message will automatically have {if plain_email} and {if html_email} handled inside the pl_email class
+                    // The message will also be automatically stripped of markup for the plain text version since we are not
+                    // providing an explicit alternative, in which case a lack of a check for either of those variables will
+                    // still generate a passable text email if the markup was not totally reliant on images.
+                    //$this->EE->pl_email->message(entities_to_ascii($message));
+                    $this->EE->pl_email->message($message);
+    
+                    $this->EE->pl_email->send = TRUE;
+                    if ($this->EE->extensions->active_hook('proform_notification_message') === TRUE)
+                    {
+                        $this->EE->extensions->call('proform_notification_message', $type, $form, $this->EE->pl_email, $this);
+                        if($this->EE->extensions->end_script) return;
+                    }
+    
+                    if($this->EE->pl_email->send)
+                    {
+                        $result = $result && $this->EE->pl_email->Send();
                     }
                 }
                 
@@ -415,7 +474,7 @@ class Proform_notifications
                 }
 
             }
-        }
+        } else $this->_debug('Invalid or empty template: '.$template_name);
 
         return $result;
     } // function _send_notifications()

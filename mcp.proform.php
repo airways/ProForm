@@ -2762,6 +2762,14 @@ class Proform_mcp extends Prolib_base_mcp {
 
         $entries = $form->entries($batch_id);
 
+        $search = $this->EE->formslib->get_search_input($form);
+        $search = $this->prolib->pl_drivers->list_entries_search($form_id, $search);
+        $entries = $form->entries_filtered($search, $batch_id, 0, 0, 'form_entry_id', 'DESC', $union);
+        // var_dump($search);
+        // var_dump($union);
+        // var_dump($entries);
+        // exit;
+        
         switch($batch_command)
         {
             case 'export_csv':

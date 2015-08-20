@@ -1543,11 +1543,11 @@ class Proform {
             $parse_data = $this->EE->formslib->prep_parse_data($form_obj, $form_session, $entry_row);
 
             // $this->debug(array(
-            //     "form_obj:" => $form_obj,
+            //     //"form_obj:" => $form_obj,
             //     "parse_data:" => $parse_data,
             //     "entry_row:" => $entry_row,
             // ));
-
+            
             $this->debug = $form_session->config['debug'];
             $this->EE->proform_notifications->debug = $form_session->config['debug'];
 

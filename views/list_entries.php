@@ -100,7 +100,14 @@
                         {
                             if($value)
                             {
-                                $value = '<a href="'.$field_upload_prefs[$field]['url'].$value.'">'.$value.'</a>';
+                                $info = pathinfo($value);
+                                if(file_exists($field_upload_prefs[$field]['server_path'].$value) && in_array($info['extension'], array('png', 'jpg', 'jpeg', 'gif', 'bmp'))) {
+                                    ee()->load->library('filemanager');
+                                    $thumb = ee()->filemanager->get_thumb($value, $field_upload_prefs[$field]['id']);
+                                    $value = '<a href="'.$field_upload_prefs[$field]['url'].$value.'" style="background: none; padding: 0; height: 60px;"><img src="'.$thumb['thumb'].'" /> '.$value.'</a>';
+                                } else {
+                                    $value = '<a href="'.$field_upload_prefs[$field]['url'].$value.'">'.$value.'</a>';
+                                }
                             }
                             $row[] = '<span class="value_'.$type.$short.'">'.$value.'</span>';
                         } else {
