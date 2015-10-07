@@ -47,6 +47,8 @@ class Proform_notifications
     var $debug = FALSE;
     var $debug_str = '<b>Debug Output</b><br/>';
     var $var_pairs = array();
+    var $parse_ee_tags = TRUE;
+    var $message_count = 0;
     
     function __construct()
     {
@@ -421,7 +423,9 @@ class Proform_notifications
     
                         foreach($this->special_attachments as $filename)
                         {
-                            $this->EE->pl_email->attach($filename);
+                            if(file_exists($filename) && is_file($filename)) {
+                                $this->EE->pl_email->attach($filename);
+                            }
                         }
                     }
                     
@@ -447,6 +451,9 @@ class Proform_notifications
                     if($this->EE->pl_email->send)
                     {
                         $result = $result && $this->EE->pl_email->Send();
+                        if($result) {
+                            $this->message_count ++;
+                        }
                     }
                 }
                 
