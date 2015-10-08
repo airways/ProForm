@@ -260,7 +260,8 @@ class Formslib
                     if(isset($row[$field->field_name])) $row_vars['value:'.$field->field_name] = $row[$field->field_name];
                 }
 
-                if($field->type == 'file' && $row_vars['value:'.$field->field_name] != '')
+                if($field->type == 'file' && isset($row_vars['value:'.$field->field_name]) && 
+                    $row_vars['value:'.$field->field_name] != '')
                 {
                     $dir = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
                     $row_vars['filename:'.$field->field_name] = $row_vars['value:'.$field->field_name];
