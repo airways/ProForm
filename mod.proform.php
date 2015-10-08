@@ -1335,6 +1335,9 @@ class Proform {
 
             if($value !== FALSE)
             {
+                // Doing htmlentities in output (create_fields_array and mcp views) instead of here. We should do field-type
+                // based stripping here in the future for better security.
+            
                 $form_session->values[$field->field_name] = $value;
             } else {
                 if($field->form_field_settings['preset_value'])
