@@ -244,7 +244,7 @@ class Proform {
         $notify             = explode('|', $this->EE->TMPL->fetch_param('notify', ''));
         $download_url       = $this->EE->TMPL->fetch_param('download_url',  '');
         $download_label     = $this->EE->TMPL->fetch_param('download_label',  '');
-        $this->debug        = $this->EE->TMPL->fetch_param('debug', 'false') == 'yes';
+        $this->debug        = $this->EE->TMPL->fetch_param('debug', 'false') === 'yes';
         $error_delimiters   = explode('|', $this->EE->TMPL->fetch_param('error_delimiters',  '<div class="error">|</div>'));
         $error_messages     = $this->EE->pl_parser->fetch_param_group('message');
         $step               = (int)$this->EE->TMPL->fetch_param('step', 1);
@@ -403,6 +403,7 @@ class Proform {
                     '%uniq%'                        => $uniq,
                 );
             }
+//var_dump($this->debug);var_dump($form_session->config);exit;
             
             $this->_copy_post_to_session($form_obj, $form_session);
 
@@ -1334,6 +1335,9 @@ class Proform {
 
             if($value !== FALSE)
             {
+                // Doing htmlentities in output (create_fields_array and mcp views) instead of here. We should do field-type
+                // based stripping here in the future for better security.
+            
                 $form_session->values[$field->field_name] = $value;
             } else {
                 if($field->form_field_settings['preset_value'])
@@ -1451,7 +1455,13 @@ class Proform {
             $this->_process_secure_fields($form_obj, $form_session);
 
             $this->_process_validation($form_obj, $form_session);
-
+            
+            /*
+            echo '<pre>';
+            var_dump($_POST);
+            var_dump($form_session->errors);
+            exit;
+            // */
             // Do final processing before inserting
             
             // This is incremented by process_steps, so we need to save it
@@ -1531,6 +1541,7 @@ class Proform {
 
                     $result = TRUE;
                 }
+                //exit('contune form');
                 return $form_session;
             }
         } else {
@@ -1572,7 +1583,6 @@ class Proform {
             //     "parse_data:" => $parse_data,
             //     "entry_row:" => $entry_row,
             // ));
-
             $this->debug = $form_session->config['debug'];
             $this->EE->proform_notifications->debug = $form_session->config['debug'];
 
@@ -1583,6 +1593,7 @@ class Proform {
                     echo '<b>{exp:proform:form} could not send notifications for form: '.$form_obj->form_name.'</b><p/>';
                     echo $this->EE->proform_notifications->debug;
                     echo '<hr/>';
+                    echo 'Email connection debug output:<br/>';
                     $this->EE->pl_email->print_debugger();
                     echo '<hr/>';
                     foreach($this->EE->pl_email->_debug_msg as $row)
@@ -1689,15 +1700,17 @@ class Proform {
             $form_session->config['step'] = $step;
         }
 
-        if($this->EE->input->get_post('_pf_goto_next'))
+        if($this->EE->input->get_post('_pf_goto_next') !== FALSE)
         {
+            //echo 'Next step<br/>';
             $step = $form_session->config['step'] + 1;
             if($step > $step_count) $step = $step_count;
             $form_session->config['step'] = $step;
         }
 
-        if($this->EE->input->get_post('_pf_goto_previous'))
+        if($this->EE->input->get_post('_pf_goto_previous') !== FALSE)
         {
+            //echo 'Prev step<br/>';
             $step = $form_session->config['step'] - 1;
             if($step < 1) $step = 1;
             $form_session->config['step'] = $step;
@@ -2003,7 +2016,7 @@ class Proform {
                 $checked_rules = '';
 
                 // validate rules
-                $field_rules = $field->get_validation();
+                $field_rules = $field->get_validation(TRUE);
 
                 foreach($field_rules as $srule)
                 {

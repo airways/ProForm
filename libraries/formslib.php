@@ -260,7 +260,8 @@ class Formslib
                     if(isset($row[$field->field_name])) $row_vars['value:'.$field->field_name] = $row[$field->field_name];
                 }
 
-                if($field->type == 'file' && $row_vars['value:'.$field->field_name] != '')
+                if($field->type == 'file' && isset($row_vars['value:'.$field->field_name]) && 
+                    $row_vars['value:'.$field->field_name] != '')
                 {
                     $dir = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
                     $row_vars['filename:'.$field->field_name] = $row_vars['value:'.$field->field_name];
@@ -358,24 +359,6 @@ class Formslib
             // handle normal posted fields
             
             $validation_rules = $field->get_validation();
-            
-            $is_required = $field->is_required == 'y';
-            if(!$is_required)
-            {
-                // look for the always required value in the field's validation rules
-                foreach($validation_rules as $rule)
-                {
-                    if($rule == 'required')
-                    {
-                        $is_required = TRUE;
-                    } elseif(is_object($rule)) {
-                        if($rule->_ == 'required') {
-                            $is_required = TRUE;
-                        }
-                    }
-                }
-            }
-
             $validation = $this->EE->pl_parser->wrap_array($validation_rules, 'rule_no', 'rule');
             $validation_count = count($validation->array);
 
@@ -409,13 +392,13 @@ class Formslib
                     'field_heading'             => $field->separator_type != PL_Form::SEPARATOR_HTML ? $field->heading : '',
                     'field_html_block'          => $field->separator_type == PL_Form::SEPARATOR_HTML ? $field->heading : '',
                     'field_is_step'             => $field->separator_type == PL_Form::SEPARATOR_STEP ? 'step' : '',
-                    'field_is_required'         => $is_required ? 'required' : '',
+                    'field_is_required'         => $field->is_required() ? 'required' : '',
                     'field_validation'          => $validation,
                     'field_validation_count'    => $validation_count,
                     'field_error'               => array_key_exists($field->field_name, $field_errors)
                                                         ? $field_errors[$field->field_name]
                                                             : '',
-                    'field_value'               => is_array($field_value) ? implode('|', $field_value) : $field_value,
+                    'field_value'               => htmlentities(is_array($field_value) ? implode('|', $field_value) : $field_value),
                     'field_values'              => $field_value_wrap,
                     'field_options'             => $field_options,
                     'field_checked'             => (array_key_exists($field->field_name, $field_checked_flags)
@@ -443,7 +426,7 @@ class Formslib
                     if(is_array($v) || is_object($v)) continue;
                     
                     // Don't override defaults if there is no value provided in the override
-                    if(trim($v) != '' OR !isset($field_array['field_'.$k]))
+                    if(trim($v) != '' && !isset($field_array['field_'.$k]))
                     {
                         $field_array['field_'.$k] = $v;
 
@@ -573,7 +556,6 @@ class Formslib
         {
             $result = $this->EE->extensions->call('proform_create_fields', $this, $result, $create_field_rows); 
         }
-
         return $result;
     } // create_fields_array
 
@@ -831,9 +813,14 @@ class Formslib
     {
         $field_type = $field_array['field_type'];
 
+        if (isset($field_array[$field_type][0]['field_setting__type']) && !isset($field_array[$field_type][0]['field_type_style'])) {
+            $field_array[$field_type][0]['field_type_style'] = $field_array[$field_type][0]['field_setting__type'];
+        }
+
         if ($field_type == 'list' || $field_type == 'relationship') {
-            if ($field_array[$field_type][0]['field_setting__type'] == 'list') {
-                $field_array[$field_type][0]['field_setting__type'] = 'dropdown';
+            //var_dump($field_array[$field_type][0]);
+            if ($field_array[$field_type][0]['field_type_style'] == 'list') {
+                $field_array[$field_type][0]['field_type_style'] = 'dropdown';
             }
         }
 
@@ -841,10 +828,10 @@ class Formslib
         // a style value of "dropdown" would cause all variables to be moved into {dropdown_style}{/dropdown_style}. This
         // is MUCH more efficient than using conditionals for theh same thhing (ex {if field_setting_stype == "dropdown"} due to
         // the way that EE is currently processing conditionals.
-        if (isset($field_array[$field_type][0]['field_setting__type'])
-            && $field_array[$field_type][0]['field_setting__type']
+        if (isset($field_array[$field_type][0]['field_type_style'])
+            && $field_array[$field_type][0]['field_type_style']
         ) {
-            $style_key = $field_array[$field_type][0]['field_setting__type'] . '_style';
+            $style_key = $field_array[$field_type][0]['field_type_style'] . '_style';
             //echo 'create_fields_array, style_key: '.$style_key.'<br/>';
 
             $field_array[$field_type][0] = array($style_key => array($field_array[$field_type][0]));
@@ -852,7 +839,7 @@ class Formslib
             if ($field_array['field_type'] == 'list' || $field_array['field_type'] == 'relationship') {
 
                 foreach (array('dropdown', 'check', 'radio') as $style) {
-                    if ($style != $field_array[$field_type][0][$style_key][0]['field_setting__type']) {
+                    if ($style != $field_array[$field_type][0][$style_key][0]['field_type_style']) {
                         $field_array[$field_type][0][$style . '_style'] = array();
                     }
                 }
