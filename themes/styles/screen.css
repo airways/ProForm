@@ -171,21 +171,27 @@ Create Form
 }
 
 .action-list {
-    white-space: nowrap;
+    list-style: none;
+}
+
+.action-list li {
+/*  text-decoration: underline !important;*/
+	display: inline;
+	padding: 0 8px;
+	border-left: 1px solid #555557;	
+    margin: 0;
+    list-style: none;
 }
 
 .action-list a {
-/*  text-decoration: underline !important;*/
-	display: inline-block;
-	padding: 0 8px;
-	border-left: 1px solid #555557;	
+    white-space: nowrap;
 }
 
 .action-item {
 /*  text-decoration: underline !important;  */
 }
 
-.action-list a:first-child {
+.action-list li:first-child {
 	border-left: 0;
 	padding-left: 0;
 }

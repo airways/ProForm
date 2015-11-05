@@ -91,28 +91,31 @@
     if (count($forms) > 0):
         foreach($forms as $form)
         {
-            $actions = '<span class="action-list"> ';
+            $actions = '<ul class="action-list"> ';
             if(ee()->formslib->check_permission('forms', FALSE)) {
-                $actions .= '<a href="'.$form->edit_link.'">'.lang('heading_edit_form').'</a> ';
+                $actions .= '<li><a href="'.$form->edit_link.'">'.lang('heading_edit_form').'</a></li>';
             }
             
             if(ee()->formslib->check_permission('forms', FALSE)) {
-                $actions .= '<a href="'.$form->edit_fields_link.'">'.lang('heading_edit_fields').'</a> ';
+                $actions .= '<li><a href="'.$form->edit_fields_link.'">'.lang('heading_edit_fields').'</a></li>';
             }
             
             if(ee()->formslib->check_permission('entries', FALSE)) {
-                $actions .= '<a href="'.$form->list_entries_link.'">'.lang('heading_list_entries').'</a> ';
+                $actions .= '<li>Entries: <a href="'.$form->list_entries_link.'">'.lang('heading_list_entries').'</a>, ';
+                $actions .= '<a href="'.$form->export_all_link.'">'.lang('heading_export_entries').'</a>';
+                $actions .= '</li>';
+            }
+             
+            if(ee()->formslib->check_permission('forms', FALSE)) {
+                $actions .= '<li><a href="'.$form->copy_link.'">'.lang('heading_copy_form').'</a></li>';
             }
             
             if(ee()->formslib->check_permission('forms', FALSE)) {
-                $actions .= '<a href="'.$form->copy_link.'">'.lang('heading_copy_form').'</a> ';
+                $actions .= '<li><a href="'.$form->delete_link.'">'.lang('heading_delete_form').'</a></li>';
             }
             
-            if(ee()->formslib->check_permission('forms', FALSE)) {
-                $actions .= '<a href="'.$form->delete_link.'">'.lang('heading_delete_form').'</a>';
-            }
-            
-            $actions .= '</span>';
+           
+            $actions .= '</ul>';
             $this->table->add_row(
                     '<a href="'.$form->edit_link.'">'.$form->form_name.'</a>',
                     $form->entries_count,

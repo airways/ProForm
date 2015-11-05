@@ -37,6 +37,7 @@ $lang = array(
     'heading_property' => 'Property',
     'heading_value' => 'Value',
     'heading_list_entries' => 'View Entries',
+    'heading_export_entries' => 'Export All',
     'heading_delete_form' => 'Delete',
     'heading_field_name' => 'Field Name',
     'heading_delete_field' => 'Delete',

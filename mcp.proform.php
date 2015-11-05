@@ -289,6 +289,7 @@ class Proform_mcp extends Prolib_base_mcp {
             $form->list_entries_link        = ACTION_BASE.AMP.'method=list_entries'.AMP.'form_id='.$form->form_id;
             $form->copy_link                = ACTION_BASE.AMP.'method=copy_form'.AMP.'form_id='.$form->form_id;
             $form->delete_link              = ACTION_BASE.AMP.'method=delete_form'.AMP.'form_id='.$form->form_id;
+            $form->export_all_link          = ACTION_BASE.AMP.'method=driver'.AMP.'form_id='.$form->form_id.AMP.'action=export_all_entries';
 
             $form->entries_count    = $form->count_entries();
 
