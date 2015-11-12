@@ -1,3 +1,4 @@
+var pf_debug_js = false;
 pf_nic_config = {
 fullPanel: false,
 buttonList: [
@@ -14,9 +15,18 @@ var pf_meta = {
     'conditionals': {}
 };
 function pf_update_conditionals() {
+    if(pf_debug_js) console.log('-----pf_update_conditionals-----');
+
     $('.pf_column[data-has-conditional=yes]').hide().each(function() {
         var fieldName = $(this).attr('data-field-name');
-        
+
+        if(pf_debug_js) {
+            console.log(fieldName+' conditionals...');
+            console.log(pf_meta.conditionals_type[fieldName]);
+            console.log(pf_meta.conditionals[fieldName]);
+            console.log('-----');
+        }
+
         switch(pf_meta.conditionals_type[fieldName])
         {
             case 'all':
@@ -28,14 +38,37 @@ function pf_update_conditionals() {
             default:
                 var visible = false;
         }
-        
+
+        if(pf_debug_js) {
+            console.log(fieldName+'::default visible state=');
+            console.log(visible);
+        }
+
         for(var i = 0; i < pf_meta.conditionals[fieldName].length; i++) {
             var cond = pf_meta.conditionals[fieldName][i];
             var checkField = cond[0];
-            var thisVal = $('#'+cond[0]).val();
+            var $check = $('#'+cond[0]);
+            var thisVal = $check.val();
             var op = cond[1];
             var checkVal = cond[2];
             var opResult = false;
+
+            if($check.attr('type') == 'checkbox') {
+                if(pf_debug_js) {
+                    console.log('this is a checkbox, special handling');
+                }
+
+                if(!$check.attr('checked')) {
+                    thisVal = '';
+                }
+            }
+
+            if(pf_debug_js) {
+                console.log(fieldName+'::op::'+op);
+                console.log(fieldName+'::thisVal::'+thisVal);
+                console.log(fieldName+'::checkVal::'+checkVal);
+            }
+
             switch(op) {
                 case '==':
                     opResult = thisVal == checkVal;
@@ -56,7 +89,11 @@ function pf_update_conditionals() {
                     opResult = thisVal <= checkVal;
                     break;
             }
-            
+
+            if(pf_debug_js) {
+                console.log(fieldName+'::opResult='+opResult);
+            }
+
             switch(pf_meta.conditionals_type[fieldName])
             {
                 case 'all':
