@@ -1,15 +1,19 @@
 <?php
 
-// @version 1.68
+// @version 1.69
 // @prolib 0.93
 
-define('PROFORM_VERSION', '1.68');
+define('PROFORM_VERSION', '1.69');
 define('PROFORM_NAME', 'ProForm');
 define('PROFORM_CLASS', 'Proform'); // must match module class name
 define('PROFORM_DESCRIPTION', 'ProForm is an advanced form management module for ExpressionEngine 2.0, designed to make creation and management of forms easier for developers and end users.');
 define('PROFORM_DOCSURL', 'http://metasushi.com/documentation/proform');
-define('PROFORM_DEBUG', TRUE);
 
+if(isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] == '127.0.0.1') {
+    define('PROFORM_DEBUG', TRUE);
+} else {
+    define('PROFORM_DEBUG', FALSE);
+}
 
 // EE 2.5.5 or less not officially supported anymore,
 // but keeping this for backwards compatibility.
@@ -43,5 +47,12 @@ if (version_compare(APP_VER, '2.8', '<') && !function_exists('cp_url'))
     	$result .= $qs;
     
     	return $result;
+    }
+}
+
+function pf_log($message, $obj=NULL) {
+    if(PROFORM_DEBUG) {
+        global $pf_log_prefix;
+        error_log('PROFORM '.$pf_log_prefix.' '.$message.(!is_null($obj) ? '::'.preg_replace('/\s+/', ' ',print_r($obj, TRUE)) : ''));
     }
 }

@@ -2363,10 +2363,7 @@ class Proform_mcp extends Prolib_base_mcp {
     {
         $this->EE->formslib->check_permission('entries');
 
-        if($this->EE->input->post('batch_id') !== FALSE)
-        {
-            $this->process_list_entries();
-        }
+        
 
         $this->EE->load->library('formslib');
         $this->EE->load->library('pagination');
@@ -2439,6 +2436,11 @@ class Proform_mcp extends Prolib_base_mcp {
 
         $vars['entries'] = $data;
 
+
+        if($this->EE->input->post('batch_id') !== FALSE)
+        {
+            $this->process_list_entries($search);
+        }
         // $sorted_data = array();
         // foreach($data as $unsorted)
         // {
@@ -2630,7 +2632,7 @@ class Proform_mcp extends Prolib_base_mcp {
         return $this->prolib->pl_drivers->list_entries_view($output);
     }
 
-    function process_list_entries()
+    function process_list_entries($search=array())
     {
         $this->EE->formslib->check_permission('entries');
 
@@ -2654,10 +2656,16 @@ class Proform_mcp extends Prolib_base_mcp {
         switch($batch_command)
         {
             case 'delete':
+                $count = 0;
                 foreach($batch_id as $entry_id)
                 {
                     $form_obj->delete_entry($entry_id);
+                    $count++;
                 }
+                
+                pf_log('Deleted '.$count.' entries, redirecting...');
+                $this->EE->functions->redirect(ACTION_BASE.AMP.'method=list_entries'.AMP.'form_id='.$form_id);
+                exit;
                 break;
             default:
                 $prefix = substr($batch_command, 0, 6);
@@ -2669,10 +2677,14 @@ class Proform_mcp extends Prolib_base_mcp {
                         'union' => $union,
                         'batch_command' => $batch_command,
                         'batch_id' => $batch_id,
+                        'search' => $search,
                     );
                     $hash = $this->EE->formslib->vault->put($export_data);
+                    pf_log(__METHOD__.'::export_data', $export_data);
+                    pf_log(__METHOD__.'::hash', $hash);
                     header(str_replace('&amp;', '&', 'Refresh: 0;url='.ACTION_BASE.'method=do_export_entries'.AMP.'hash='.$hash));
                 } else {
+                    pf_log(__METHOD__.'::plugin batch command', $batch_command);
                     if($driver = $form_obj->get_driver() && isset($driver) && method_exists($driver, $batch_command))
                     {
                         $driver->$batch_command($form_obj, $batch_id);
@@ -2988,13 +3000,16 @@ class Proform_mcp extends Prolib_base_mcp {
         {
             $form_obj->delete_entry($form_entry_id);
         }
+
+        pf_log('Deleted single entry, redirecting...');
         $this->EE->functions->redirect(ACTION_BASE.AMP.'method=list_entries'.AMP.'form_id='.($return_form_id ? $return_form_id : $form_id));
-        return TRUE;
+        exit;
     }
 
 
     public function do_export_entries()
     {
+        pf_log(__METHOD__);
         $this->EE->formslib->check_permission('entries');
 
         $this->EE->load->library('formslib');
@@ -3019,11 +3034,17 @@ class Proform_mcp extends Prolib_base_mcp {
         }
 
         $search = $this->EE->formslib->get_search_input($form);
+        $search = array_merge($search, $export_data['search']);
+        pf_log('search', $search);
+
         $entries = $form->entries_filtered($search, $batch_id, 0, 0, 'form_entry_id', 'DESC', $union);
+        pf_log('entries', $entries);
+
         #var_dump($union);
         #var_dump($entries);
         #exit;
         
+        // Set content type and filename, open output stream
         switch($batch_command)
         {
             case 'export_csv':
@@ -3049,9 +3070,7 @@ class Proform_mcp extends Prolib_base_mcp {
         header('Pragma: no-cache');
         header('Expires: 0');
 
-        // get all entries for form, prepare CSV and send download file
-        //$entries = $form->entries();
-
+        // Prepare export data and send download file
         switch($batch_command)
         {
             case 'export_csv':

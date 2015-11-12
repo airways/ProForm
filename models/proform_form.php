@@ -578,6 +578,8 @@ class PL_Form extends PL_RowInitialized {
     
     function entries($search=array(), $start_row = 0, $limit = 0, $orderby = 'form_entry_id', $sort = 'desc', $union = array())
     {
+        pf_log(__METHOD__);
+        
         $entry_ids = array();
         
         // If the search parameter has numeric keys, it is actually
@@ -597,6 +599,15 @@ class PL_Form extends PL_RowInitialized {
     
     function entries_filtered($search=array(), $entry_ids=array(), $start_row = 0, $limit = 0, $orderby = 'form_entry_id', $sort = 'desc', $union = array())
     {
+        pf_log(__METHOD__);
+        pf_log('search', $search);
+        pf_log('entry_ids', $entry_ids);
+        pf_log('start_row', $start_row);
+        pf_log('limit', $limit);
+        pf_log('orderby', $orderby);
+        pf_log('sort', $sort);
+        pf_log('union', $union);
+
         foreach($entry_ids as $key => $val)
         {
             $entry_ids[$key] = (int)$val;
@@ -645,6 +656,11 @@ class PL_Form extends PL_RowInitialized {
                     }
                     
                     $query = $this->__EE->db->get($this->table_name());
+                    if($query) {
+                        pf_log(__METHOD__.'::normal', $this->__EE->db->last_query());
+                    } else {
+                        pf_log(__METHOD__.'::query failed');
+                    }
                 } else {
                     $union_forms = array();
                     foreach($union as $union_form_id)
@@ -733,6 +749,7 @@ class PL_Form extends PL_RowInitialized {
                     
                     #echo $sql;
                     //exit;
+                    pf_log(__METHOD__.'::union', $sql);
                     $query = $this->__EE->db->query($sql);
                 }
                 $this->__entries = array();
