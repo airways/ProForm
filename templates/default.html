@@ -54,18 +54,16 @@
                                 {/pf_field_conditionals}
                             </script>
                         {/if}
-                        
+
                         {pf_html_block}
                             {pf_field_html_block}
-                        {/pf_html_block}
-                        
-                        {pf_heading}
-                            {if pf_field_is_step == ''}
+                            {if pf_field_heading}
                                 <h3>{pf_field_heading}</h3>
                             {/if}
-                        {/pf_heading}
+                        {/pf_html_block}
                         
-                            <label for="{pf_field_name}">{pf_field_label} {if pf_field_is_required}<span class="required">*</span>{/if}</label>
+                        <label for="{pf_field_name}">{pf_field_label} {if pf_field_is_required}<span class="required">*</span>{/if}</label>
+                        
                         {pf_checkbox}
                             <div class="pf_field {if pf_vertical}pf_vertical{/if}">
                         {/pf_checkbox}

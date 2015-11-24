@@ -579,7 +579,7 @@ class PL_Form extends PL_RowInitialized {
     function entries($search=array(), $start_row = 0, $limit = 0, $orderby = 'form_entry_id', $sort = 'desc', $union = array())
     {
         pf_log(__METHOD__);
-        
+
         $entry_ids = array();
         
         // If the search parameter has numeric keys, it is actually
@@ -655,11 +655,16 @@ class PL_Form extends PL_RowInitialized {
                         $this->__EE->db->order_by($orderby, $sort);
                     }
                     
+                    if(PROFORM_DEBUG) $this->EE->db->save_queries = TRUE;
+                    
                     $query = $this->__EE->db->get($this->table_name());
-                    if($query) {
-                        pf_log(__METHOD__.'::normal', $this->__EE->db->last_query());
-                    } else {
-                        pf_log(__METHOD__.'::query failed');
+
+                    if(PROFORM_DEBUG)  {
+                        if($query) {
+                            pf_log(__METHOD__.'::normal', $this->__EE->db->last_query());
+                        } else {
+                            pf_log(__METHOD__.'::query failed');
+                        }
                     }
                 } else {
                     $union_forms = array();
