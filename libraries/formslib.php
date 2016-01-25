@@ -44,7 +44,7 @@ class Formslib
 
     public $form_types = array('form' => 'Entry Form', 'saef' => 'SAEF Form', 'share' => 'Share Form');
     public $var_pairs = array('fieldrows', 'fields', 'hidden_fields', 'errors', 'steps', 'field_validation', 'dropdown_style', 'radio_style', 'check_style', 'field_options', 'field_conditionals', 'field_conditionals_type', 'field_conditionals_count');
-    public $type_pairs = array('checkbox', 'string', 'text', 'date', 'datetime', 'time', 'integer', 'float', 'file', 'list', 'relationship', 'html_block', 'heading');
+    public $type_pairs = array('checkbox', 'string', 'text', 'date', 'datetime', 'time', 'int', 'float', 'file', 'list', 'relationship', 'html_block', 'heading');
     //public $root_fields = array('field_type', 'field_name', 'field_html_block', 'field_html_id', 'field_html_class', 'field_heading', 'field_html_block', 'field_number', 'field_error', 'field_driver', 'field_errors', 'field_conditionals', 'field_conditionals_type', 'field_conditionals_count');
     public $typed_fields = array('field_options');
     public $mailtypes = array('html' => 'HTML', 'text' => 'Plain Text');
@@ -547,11 +547,11 @@ class Formslib
 
 
         } // foreach($form_obj->fields() as $field)
-
-        /*
+        
+        
         echo 'create_fields_array, result:<br/>';
         krumo($result);
-        */
+        
         if ($this->EE->extensions->active_hook('proform_create_fields') === TRUE) 
         {
             $result = $this->EE->extensions->call('proform_create_fields', $this, $result, $create_field_rows); 
