@@ -549,8 +549,10 @@ class Formslib
         } // foreach($form_obj->fields() as $field)
         
         
+        /*
         echo 'create_fields_array, result:<br/>';
         krumo($result);
+        */
         
         if ($this->EE->extensions->active_hook('proform_create_fields') === TRUE) 
         {
