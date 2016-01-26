@@ -68,6 +68,9 @@ function pf_update_conditionals() {
                 console.log(fieldName+'::thisVal::'+thisVal);
                 console.log(fieldName+'::checkVal::'+checkVal);
             }
+            
+            if($.isNumeric(thisVal)) thisVal = parseFloat(thisVal);
+            if($.isNumeric(checkVal)) checkVal = parseFloat(checkVal);
 
             switch(op) {
                 case '==':
