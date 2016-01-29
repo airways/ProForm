@@ -39,7 +39,7 @@
             {pf_fieldrows}
                 <ul id="pf_row_{pf_fieldrow:count}" class="pf_row">
                 {pf_fields}
-                    <li id="{if pf_field_html_id}{pf_field_html_id}{if:else}pf_field_{pf_field_number}{/if}" class="pf_column pf_field {pf_field_html_class}" {if pf_field_html_block}
+                    <li id="{if pf_field_html_id}{pf_field_html_id}{if:else}pf_field_{pf_field_number}{/if}" class="pf_column pf_field {if pf_field_html_class}{pf_field_html_class}{/if}" {if pf_field_html_block}
                             {!-- if you want to have an HTML block hidden or shown based on other field values, change the conditional here
                             to whatever field_number your block is assigned, then add rules to pf_meta.conditionals* as is done below for normal fields --}
                             data-field-name="html_block_{pf_field_number}" {if pf_field_number == -1}data-has-conditional="yes"{/if}
@@ -62,7 +62,7 @@
                             {/if}
                         {/pf_html_block}
                         
-                        <label for="{pf_field_name}">{pf_field_label} {if pf_field_is_required}<span class="required">*</span>{/if}</label>
+                        {if pf_field_label}<label for="{pf_field_name}">{pf_field_label} {if pf_field_is_required}<span class="required">*</span>{/if}</label>{/if}
                         
                         {pf_checkbox}
                             <div class="pf_field {if pf_vertical}pf_vertical{/if}">
