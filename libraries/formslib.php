@@ -815,38 +815,39 @@ class Formslib
     {
         $field_type = $field_array['field_type'];
 
-        if (isset($field_array[$field_type][0]['field_setting__type']) && !isset($field_array[$field_type][0]['field_type_style'])) {
-            $field_array[$field_type][0]['field_type_style'] = $field_array[$field_type][0]['field_setting__type'];
-        }
+        $arr = $field_array[$field_type][0];
+        $style = false;
 
-        if ($field_type == 'list' || $field_type == 'relationship') {
-            //var_dump($field_array[$field_type][0]);
-            if ($field_array[$field_type][0]['field_type_style'] == 'list') {
-                $field_array[$field_type][0]['field_type_style'] = 'dropdown';
+        foreach(array('field_setting__type', 'field_type_style', 'field_setting_style') as $key)
+        {
+            if(isset($arr[$key]) && trim($arr[$key]) != '')
+            {
+                $style = $arr[$key];
             }
         }
+
+        if($style == 'list') $style = 'dropdown';
+        $field_array[$field_type][0]['field_type_style'] = $style;
 
         // If there is a type style setting, move all of the field variables into a nested loop named after that style. For instance,
         // a style value of "dropdown" would cause all variables to be moved into {dropdown_style}{/dropdown_style}. This
         // is MUCH more efficient than using conditionals for theh same thhing (ex {if field_setting_stype == "dropdown"} due to
         // the way that EE is currently processing conditionals.
-        if (isset($field_array[$field_type][0]['field_type_style'])
-            && $field_array[$field_type][0]['field_type_style']
-        ) {
-            $style_key = $field_array[$field_type][0]['field_type_style'] . '_style';
-            //echo 'create_fields_array, style_key: '.$style_key.'<br/>';
-
+        if ($style) {
+            $style_key = $style . '_style';
             $field_array[$field_type][0] = array($style_key => array($field_array[$field_type][0]));
 
             if ($field_array['field_type'] == 'list' || $field_array['field_type'] == 'relationship') {
 
-                foreach (array('dropdown', 'check', 'radio') as $style) {
-                    if ($style != $field_array[$field_type][0][$style_key][0]['field_type_style']) {
-                        $field_array[$field_type][0][$style . '_style'] = array();
+                foreach (array('dropdown', 'check', 'radio') as $check_style) {
+                    if (!isset($field_array[$field_type][0][$check_style . '_style'])) {
+                        $field_array[$field_type][0][$check_style . '_style'] = array();
                     }
                 }
             }
         }
+        //echo $field_array['field_name'];
+        //krumo($field_array);
     }
 
     /**
