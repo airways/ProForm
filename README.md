@@ -13,11 +13,11 @@ Follow these steps to install ProForm:
  0. This add-on REQUIRES ProLib to be in your third_party directory. Get it here:
        https://github.com/airways/ProLib
 
- 1. Download the ZIP file from the location where you purchased it.
+ 1. (For ZIP file release version) Download the ZIP file from the location where you purchased it.
 
- 2. Extract the ZIP file.
+ 2. (For ZIP file release version) Extract the ZIP file.
 
- 3. Move directories.
+ 3. Move directories:
  
  <b>For git checkout:</b>
  
