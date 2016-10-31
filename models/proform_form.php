@@ -54,6 +54,7 @@ class PL_Form extends PL_RowInitialized {
     var $notification_list;
     var $subject;
     var $reply_to_field;
+    var $reply_to_name_field;
     var $notification_list_attachments = 'n';
 
     var $submitter_notification_on = 'n';
@@ -61,6 +62,7 @@ class PL_Form extends PL_RowInitialized {
     var $submitter_notification_subject;
     var $submitter_email_field;
     var $submitter_reply_to_field;
+    var $submitter_reply_to_name_field;
     var $submitter_notification_attachments = 'n';
 
     var $share_notification_on = 'n';
@@ -68,9 +70,11 @@ class PL_Form extends PL_RowInitialized {
     var $share_notification_subject;
     var $share_email_field;
     var $share_reply_to_field;
+    var $share_reply_to_name_field;
     var $share_notification_attachments = 'n';
 
     var $settings;
+    var $internal_field_settings;
 
     const SEPARATOR_HEADING  = 'HEAD';
     const SEPARATOR_STEP     = 'STEP';
@@ -110,13 +114,7 @@ class PL_Form extends PL_RowInitialized {
             if($this->form_type == 'form')
             {
                 // Create FORM table for storing actual form entries
-                $fields = array(
-                    'form_entry_id'     => array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE, 'auto_increment' => TRUE),
-                    'updated'           => array('type' => 'timestamp'),
-                    'ip_address'        => array('type' => 'varchar', 'constraint' => '128'),
-                    'user_agent'        => array('type' => 'varchar', 'constraint' => '255'),
-                    'dst_enabled'       => array('type' => 'varchar', 'constraint' => '1'),
-                );
+                $fields = $this->internal_fields();
 
                 $forge->add_field($fields);
                 $forge->add_key('form_entry_id', TRUE);
@@ -126,7 +124,43 @@ class PL_Form extends PL_RowInitialized {
                 //             exit;
                 $forge->create_table(PL_Form::make_table_name($this->form_name));
             }
+            
+            if($driver = $this->get_driver())
+            {
+                $driver->init_form($this);
+            }
         }
+    }
+    
+    public function internal_fields($sql=true)
+    {
+        $fields = array(
+            'form_entry_id'     => $sql ? array('type' => 'int', 'constraint' => '10', 'unsigned' => TRUE, 'auto_increment' => TRUE)    : array('type' => 'hidden', 'length' => 10),
+            'updated'           => $sql ? array('type' => 'timestamp')                                                                  : array('type' => 'hidden', 'length' => 10),
+            'ip_address'        => $sql ? array('type' => 'varchar', 'constraint' => '128')                                             : array('type' => 'hidden', 'length' => 128),
+            'user_agent'        => $sql ? array('type' => 'varchar', 'constraint' => '255')                                             : array('type' => 'hidden', 'length' => 255),
+            'dst_enabled'       => $sql ? array('type' => 'varchar', 'constraint' => '1')                                               : array('type' => 'hidden', 'length' => 1),
+            '__archive_status'  => $sql ? array('type' => 'varchar', 'constraint' => '30', 'default' => 'open')                         : array('type' => 'hidden', 'length' => 30),
+        );
+        
+        if($driver = $this->get_driver())
+        {
+            $fields = $driver->internal_fields($this, $fields);
+        }
+
+        if(!$sql)
+        {
+            foreach(array_keys($fields) as $field)
+            {
+                if(!isset($fields[$field]['type']))             $fields[$field]['type'] = 'hidden';
+                if(!isset($fields[$field]['internal']))         $fields[$field]['internal'] = TRUE;
+                if(!isset($fields[$field]['driver']))           $fields[$field]['driver'] = '';
+                if(!isset($fields[$field]['field_name']))       $fields[$field]['field_name'] = $field;
+                $fields[$field] = new PL_InternalField($this, $fields[$field]);
+            }
+        }
+        
+        return $fields;
     }
 
     function pre_save()
@@ -162,6 +196,11 @@ class PL_Form extends PL_RowInitialized {
         if(!$this->settings)
         {
             $this->settings = array();
+        }
+
+        if(!$this->internal_field_settings)
+        {
+            $this->internal_field_settings = array();
         }
 
         $this->__original_name = $this->form_name;
@@ -387,11 +426,17 @@ class PL_Form extends PL_RowInitialized {
         }
         return $this->__db_fields;
     }
+    
+    function reset_db_fields()
+    {
+        unset($this->EE->db->data_cache['field_names'][$this->table_name()]);
+        $this->__db_fields = FALSE;
+    }
 
     // unserialize settings for a form field assignment row and merge with default values
     function get_form_field_settings($settings='')
     {
-        if($settings)
+        if($settings && substr($settings, 0, 2) == 'a:')
         {
             $settings = unserialize($settings);
         } else {
@@ -449,27 +494,58 @@ class PL_Form extends PL_RowInitialized {
             if(!$all_settings[$row->form_field_id]) $all_settings[$row->form_field_id] = array();
         }
 
+        $new_internal_field_settings = array();
+        
         foreach($form_fields_ids as $i => $form_field_id)
         {
-            $form_field_settings = $all_settings[$form_field_id];
-            
-            foreach($settings_map as $setting => $values)
+            // Parse new JSON based settings blob
+            $json_settings = array();
+            if(isset($settings_map['json'][$i]) && is_string($settings_map['json'][$i]))
             {
-                if(isset($values[$i]))
+                $json = $settings_map['json'][$i];
+                if($json[0] == '{' && $json[strlen($json)-1] == '}')
                 {
-                    $form_field_settings[$setting] = $values[$i];
+                    $json_settings = (array)json_decode($json);
                 }
             }
             
-            $data = array(
-                'form_field_settings' => serialize($form_field_settings)
-            );
-
-            $this->__EE->db->where(array('form_field_id' => $form_field_id, 'form_id' => $this->form_id))
-                           ->update('proform_form_fields', $data);
+            if($form_field_id > 0)
+            {
+                // Get existing settings
+                $form_field_settings = $all_settings[$form_field_id];
+                // Merge in new JSON blob
+                $form_field_settings = array_merge($form_field_settings, $json_settings);
+                $data = array(
+                    'form_field_settings' => serialize($form_field_settings)
+                );
+                $this->__EE->db->where(array('form_field_id' => $form_field_id, 'form_id' => $this->form_id))
+                               ->update('proform_form_fields', $data);
+            } else {    // Internal field
+                $internal_field_name = $json_settings['name'];
+                unset($json_settings['internal']);
+                unset($json_settings['label']);
+                unset($json_settings['name']);
+                
+                $new_internal_field_settings[$internal_field_name] = $json_settings;
+            }
+        }
+        
+        if(count($new_internal_field_settings) > 0)
+        {
+            $this->internal_field_settings = $new_internal_field_settings;
         }
         
     } // function set_all_form_field_settings()
+    
+    function set_form_field_settings($field_id, $form_field_settings)
+    {
+        $data = array(
+            'form_field_settings' => serialize($form_field_settings)
+        );
+
+        $this->__EE->db->where(array('field_id' => $field_id, 'form_id' => $this->form_id))
+                       ->update('proform_form_fields', $data);
+    }
 
     function count_entries($search=array())
     {
@@ -499,41 +575,188 @@ class PL_Form extends PL_RowInitialized {
         return $result;
     } // function count_entries()
 
-    function entries($search=array(), $start_row = 0, $limit = 0, $orderby = 'form_entry_id', $sort = 'desc')
+    
+    function entries($search=array(), $start_row = 0, $limit = 0, $orderby = 'form_entry_id', $sort = 'desc', $union = array())
     {
+        pf_log(__METHOD__);
+
+        $entry_ids = array();
+        
+        // If the search parameter has numeric keys, it is actually
+        // the entry_ids parameter, so swap places with it
+        if(is_array($search) && count($search) > 0)
+        {
+            $keys = array_keys($search);
+            if(is_numeric($keys[0]))
+            {
+                $entry_ids = $search;
+                $search = array();
+            }
+        }
+        
+        return $this->entries_filtered($search, $entry_ids, $start_row, $limit, $orderby, $sort, $union);
+    } // entries
+    
+    function entries_filtered($search=array(), $entry_ids=array(), $start_row = 0, $limit = 0, $orderby = 'form_entry_id', $sort = 'desc', $union = array())
+    {
+        pf_log(__METHOD__);
+        pf_log('search', $search);
+        pf_log('entry_ids', $entry_ids);
+        pf_log('start_row', $start_row);
+        pf_log('limit', $limit);
+        pf_log('orderby', $orderby);
+        pf_log('sort', $sort);
+        pf_log('union', $union);
+
+        foreach($entry_ids as $key => $val)
+        {
+            $entry_ids[$key] = (int)$val;
+        }
+        
         if(is_callable(array($this->__EE->lang, 'loadfile'))) {
             $this->__EE->lang->loadfile('proform');
         }
         switch($this->form_type)
         {
             case 'form':
-                $this->__EE->db->select('*');
-
+                $like = array();
+                
                 if(is_array($search) && count($search) > 0)
                 {
-                    $keys = array_keys($search);
-                    if(is_numeric($keys[0]))
+                    list($search, $like) = $this->_translate_search($search);
+                }
+                
+                if(count($union) == 0)
+                {
+                    $this->__EE->db->select('*');
+                    
+                    if(is_array($search) && count($search) > 0)
                     {
-                        // We have an array of entry IDs instead of an array of field names
-                        $this->__EE->db->where_in('form_entry_id', $search);
-                    } else {
-                        list($search, $like) = $this->_translate_search($search);
                         $this->__EE->db->where($search);
+                    }
+                    
+                    if(count($like) > 0)
+                    {
                         $this->__EE->db->like($like);
                     }
+                    
+                    if(is_array($entry_ids) && count($entry_ids) > 0)
+                    {
+                        // Absolutely only return entries that have these listed IDs
+                        $this->__EE->db->where_in('form_entry_id', $entry_ids);
+                    }
+                    
+                    if($start_row >= 0 && $limit > 0) {
+                        $this->__EE->db->limit($limit, $start_row); // yes it is reversed compared to MySQL
+                    }
+                    
+                    if($orderby && $sort)
+                    {
+                        $this->__EE->db->order_by($orderby, $sort);
+                    }
+                    
+                    if(PROFORM_DEBUG) $this->EE->db->save_queries = TRUE;
+                    
+                    $query = $this->__EE->db->get($this->table_name());
+
+                    if(PROFORM_DEBUG)  {
+                        if($query) {
+                            pf_log(__METHOD__.'::normal', $this->__EE->db->last_query());
+                        } else {
+                            pf_log(__METHOD__.'::query failed');
+                        }
+                    }
+                } else {
+                    $union_forms = array();
+                    foreach($union as $union_form_id)
+                    {
+                        $union_forms[] = $this->__EE->formslib->forms->get($union_form_id);
+                    }
+                    
+                    $forms = array_merge(array($this), $union_forms);
+                    $sql = '';
+                    foreach($forms as $i => $form)
+                    {
+                        $field_list = $form->form_id.' AS form_id, ';
+                        $union_fields = $form->db_fields();
+                        foreach($this->db_fields() as $field)
+                        {
+                            if(in_array($field, $union_fields))
+                            {
+                                $field_list .= '`'.$field.'`, ';
+                            } else {
+                                $field_list .= 'NULL AS `'.$field.'`, ';
+                            }
+                        }
+                        $field_list = trim($field_list, ', ');
+                        
+                        $sql .= 'SELECT '.$field_list.' FROM `exp_'.$form->table_name().'` ';
+                        
+                        if((is_array($search) && count($search) > 0) || count($like) > 0 || count($entry_ids) > 0)
+                        {
+                            $sql .='WHERE (';
+                        }
+                        
+                        $count = 0;
+                        foreach($search as $field => $value)
+                        {
+                            $sql .= '`exp_'.$form->table_name().'`.`'.$field.'` = '.$this->EE->db->escape($value).' ';
+                            $count++;
+                            if($count < count($search)) $sql .= 'AND ';
+                        }
+                        
+                        if((is_array($search) && count($search) > 0) && (count($like) > 0 || count($entry_ids) > 0))
+                        {
+                            $sql .=') AND (';
+                        }
+                        
+                        if(count($entry_ids) > 0)
+                        {
+                            $sql .= '`exp_'.$form->table_name().'`.`form_entry_id` IN ('.implode(',', $entry_ids).')';
+                            
+                            if(count($like) > 0)
+                            {
+                                $sql .= ') AND (';
+                            }
+                        }
+                        
+                        $count = 0;
+                        foreach($like as $field => $value)
+                        {
+                            $sql .= '`exp_'.$form->table_name().'`.`'.$field.'` LIKE \'%'.$this->EE->db->escape_like_str($value).'%\' ';
+                            $count++;
+                            if($count < count($like)) $sql .= 'AND ';
+                        }
+                        
+                        if((is_array($search) && count($search) > 0) || count($like) > 0 || count($entry_ids) > 0)
+                        {
+                            $sql .= ') ';
+                        }
+                        
+                        if($i < count($forms)-1)
+                        {
+                            $sql .= "\nUNION ALL\n";
+                        }
+                    }
+                    
+                    if($orderby)
+                    {
+                        $sql .= "\n";
+                        $sql .= 'ORDER BY '.$orderby.' '.$sort.' ';
+                    }
+                    
+                    if($limit && $start_row)
+                    {
+                        $sql .= "\n";
+                        $sql .= 'LIMIT '.$start_row.', '.$limit.' ';
+                    }
+                    
+                    
+                    #echo $sql;
+                    //exit;
+                    pf_log(__METHOD__.'::union', $sql);
+                    $query = $this->__EE->db->query($sql);
                 }
-
-                if($start_row >= 0 && $limit > 0) {
-                    $this->__EE->db->limit($limit, $start_row); // yes it is reversed compared to MySQL
-                }
-
-                if($orderby && $sort)
-                {
-                    $this->__EE->db->order_by($orderby, $sort);
-                }
-
-                $query = $this->__EE->db->get($this->table_name());
-
                 $this->__entries = array();
                 if($query->num_rows > 0)
                 {
@@ -553,7 +776,7 @@ class PL_Form extends PL_RowInitialized {
                 return array();
                 break;
         }
-    } // function entries()
+    } // entries_filtered
 
     function _translate_search($search)
     {
@@ -564,36 +787,31 @@ class PL_Form extends PL_RowInitialized {
             if(!$this->__fields) $this->fields();
             if(!$this->__db_fields) $this->db_fields();
             
-            /*if(in_array($field, $this->__db_fields))
+            if(preg_match("/^([<>!=~]+)/i", $val, $matches))
             {
-                $search[$field] = $val;
-            } else {
-                if(array_search($field, array_keys($this->__fields)) === FALSE)
-                {
-                    show_error($this->__EE->lang->line('invalid_field_name').': "'.$field.'"');
-                }
-            */
-                if(preg_match("/^([<>!=~]+)/i", $val, $matches))
-                {
-                    // delete old field pair
-                    unset($search[$field]);
+                // delete old field pair
+                unset($search[$field]);
 
-                    // remove the operator from value
-                    $val = str_replace($matches[1], '', $val);
+                // remove the operator from value
+                $val = str_replace($matches[1], '', $val);
 
-                    if($matches[1] == '~') {
-                        $like[$field] = $val;
-                    } else {
-                        // move it to the end of the field name
-                        $field = $field.' '.$matches[1];
-                        
-                        // set new pair
-                        $search[$field] = $val;
-                    }
+                if($matches[1] == '~') {
+                    $like[$field] = $val;
+                } else {
+                    // move it to the end of the field name
+                    $field = $field.' '.$matches[1];
+                    
+                    // set new pair
+                    $search[$field] = $val;
                 }
-            //}
+            }
         }
-        
+        /*
+        echo '<b>Search:</b>';
+        var_dump($search);
+        echo '<b>Like:</b>';
+        var_dump($like);
+        */
         return array($search, $like);
     }
     
@@ -639,7 +857,8 @@ class PL_Form extends PL_RowInitialized {
     function assign_field($field, $is_required = 'n')
     {
         // add an existing field to this form/table
-
+        $new_form_field_id = 0;
+        
         // check if the field is already associated with the form
         $query = $this->__EE->db->get_where('exp_proform_form_fields', array('form_id' => $this->form_id, 'field_id' => $field->field_id));
 
@@ -841,6 +1060,7 @@ class PL_Form extends PL_RowInitialized {
             );
 
             $this->__EE->db->insert('exp_proform_form_fields', $data);
+            $new_form_id = $this->__EE->db->insert_id();
         } else {
             // update assignment saved field_name so this will work next time
             $data  = array(
@@ -852,6 +1072,8 @@ class PL_Form extends PL_RowInitialized {
         // trigger refresh on next request for field list
         $this->__fields = FALSE;
         $this->__db_fields = FALSE;
+        
+        return $new_form_field_id;
     } // function assign_field()
 
 
@@ -1072,6 +1294,16 @@ class PL_Form extends PL_RowInitialized {
             }
         }
         #ksort($result);
+        
+        $custom = $this->__EE->formslib->prefs->ini('custom_form_settings');
+        if($custom)
+        {
+            $custom_options = $this->__EE->formslib->parse_options($custom);
+            foreach($custom_options as $key => $option)
+            {
+                $result['custom_'.$key] = $option;
+            }
+        }
         return $result;
     }
     
@@ -1097,6 +1329,8 @@ class PL_Form extends PL_RowInitialized {
         
         $this->__EE->db->insert('proform_forms', $form_row);
         $new_form_id = $this->__EE->db->insert_id();
+        $new_form = $this->__EE->formslib->forms->get($new_form_id);
+        $new_form->init();
         
         if($include_fields)
         {
@@ -1128,11 +1362,102 @@ class PL_Form extends PL_RowInitialized {
             $assign_query = $this->__EE->db->where('form_id', $this->form_id)->get('proform_form_fields');
             foreach($assign_query->result_array() as $assign_row)
             {
+                $field_id = $assign_row['field_id'];
                 unset($assign_row['form_field_id']);
-                $assign_row['form_id'] = $new_form_id;
-                $assign_row['field_id'] = $assigned_field_ids[$assign_row['field_id']];
-                $this->__EE->db->insert('proform_form_fields', $assign_row);
+                unset($assign_row['form_id']);
+                unset($assign_row['field_id']);
+                //$assign_row['form_id'] = $new_form_id;
+                //$assign_row['field_id'] = $assigned_field_ids[$assign_row['field_id']];
+                //$this->__EE->db->insert('proform_form_fields', $assign_row);
+                if($field_id)
+                {
+                    $field = $this->__EE->formslib->fields->get($field_id);
+                    $new_form_field_id = $new_form->assign_field($field);
+                    $this->__EE->db->where('form_field_id', $new_form_field_id)
+                                   ->update('proform_form_fields', $assign_row);
+                } else {
+                    $new_form->add_separator($assign_row['heading'], $assign_row['separator_type']);
+                }
             }
         }
+    }
+    
+    static function import($element)
+    {
+        $form_row = array();
+        $fields = FALSE;
+        foreach ($element->children() as $property) {
+            $prop_name = $property->getName();
+            $value = (string)$property;
+            if($prop_name == '__fields') $fields = $property;
+            if(substr($prop_name, 0, 2) == '__') continue;
+            if(in_array($prop_name, array('form_id', 'site_id'))) continue;
+            if(in_array($prop_name, array('settings'))) $value = trim($value);
+            
+            $form_row[$prop_name] = $value;
+        }
+        
+        ee()->db->insert('proform_forms', $form_row);
+        $new_form_id = ee()->db->insert_id();
+        $form = ee()->formslib->forms->get($new_form_id);
+        $form->init();
+        
+        if($fields)
+        {
+            foreach($fields->children() as $field)
+            {
+                $field_row = array();
+                $meta = array();
+                
+                foreach($field->children() as $property) {
+                    $prop_name = $property->getName();
+                    $value = (string)$property;
+                    if($value == '@recursion') $value = NULL;
+                    
+                    #if($prop_name == '__fields') $fields = $property;
+                    if(substr($prop_name, 0, 2) == '__') continue;
+                    if(in_array($prop_name, array('field_id', 'site_id', 'form_field_id', 'form_id', 'field_order', 'field_row', 'is_required',
+                        'heading', 'separator_type', 'step_no'))) {
+                        $meta[$prop_name] = $value;
+                    } else {
+                        if(in_array($prop_name, array('settings', 'form_field_settings'))) {
+                            $value = array();
+                            foreach($property->children() as $setting) {
+                                if(in_array($setting->getName(), array('type_channels', 'type_categories'))) {
+                                    $value[$setting->getName()] = array();
+                                    foreach($setting->children() as $setting) {
+                                        $value[$setting->getName()][] = (string)$setting;
+                                    }
+                                } else {
+                                    $value[$setting->getName()] = (string)$setting;
+                                }
+                            }
+                        }
+                        if($prop_name == 'form_field_settings') {
+                            $meta[$prop_name] = $value;
+                        } else {
+                            $field_row[$prop_name] = $value;
+                        }
+                    }
+                }
+                
+                if(is_null($field_row['type'])) {    // Separator
+                    $form->add_separator($meta['heading'], $meta['separator_type']);
+                } else {                            // Field
+                    $field = ee()->formslib->fields->get($field_row['field_name'], FALSE);
+                    if(!$field) {
+                        ee()->formslib->fields->create($field_row);
+                        $field = ee()->formslib->fields->get($field_row['field_name']);
+                    }
+                    $form->reset_db_fields();
+                    $form->assign_field($field);
+                    $form->set_form_field_settings($field->field_id, $meta['form_field_settings']);
+                }
+                #var_dump($field_row);
+
+            }
+        }
+        
+        return $form;
     }
 }

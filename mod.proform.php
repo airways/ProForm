@@ -82,7 +82,11 @@ class Proform {
         }
         $this->cache =& $this->EE->session->cache['proform'];
 
-        @session_start();
+        if(session_id() == '')
+        {
+            session_start();
+        }
+        
         if(!isset($_SESSION['pl_form']))
         {
             $_SESSION['pl_form'] = array();
@@ -165,6 +169,15 @@ class Proform {
         
         $template = file_get_contents(PATH_THIRD.'proform/templates/'.$template.'.html');
 
+        // Parse globals - these would have already been replaced if the template code was inline
+        $tpl_vars = array();
+        $tpl_var_arrays = array('segment_vars', 'global_vars', 'embed_vars', 'template_route_vars', 'layout_vars');
+        foreach($tpl_var_arrays as $array) if(isset($this->EE->TMPL->$array)) $tpl_vars = array_merge($tpl_vars, $this->EE->TMPL->$array);
+        foreach($tpl_vars as $var => $val)
+        {
+            $template = str_replace(LD.$var.RD, $val, $template);
+        }
+
         // Swap out the "embed" parameter for form_name in the template
         // $template = str_replace(LD.'embed:form_name'.RD, $form_name, $template);
 
@@ -231,7 +244,7 @@ class Proform {
         $notify             = explode('|', $this->EE->TMPL->fetch_param('notify', ''));
         $download_url       = $this->EE->TMPL->fetch_param('download_url',  '');
         $download_label     = $this->EE->TMPL->fetch_param('download_label',  '');
-        $this->debug        = $this->EE->TMPL->fetch_param('debug', 'false') == 'yes';
+        $this->debug        = $this->EE->TMPL->fetch_param('debug', 'false') === 'yes';
         $error_delimiters   = explode('|', $this->EE->TMPL->fetch_param('error_delimiters',  '<div class="error">|</div>'));
         $error_messages     = $this->EE->pl_parser->fetch_param_group('message');
         $step               = (int)$this->EE->TMPL->fetch_param('step', 1);
@@ -390,6 +403,7 @@ class Proform {
                     '%uniq%'                        => $uniq,
                 );
             }
+//var_dump($this->debug);var_dump($form_session->config);exit;
             
             $this->_copy_post_to_session($form_obj, $form_session);
 
@@ -413,6 +427,11 @@ class Proform {
                     $form_session->config[$k] = $this->EE->TMPL->parse_globals($v);
             }
 
+            if($driver = $form_obj->get_driver())
+            {
+                $form_session = $driver->form_start_session($this, $form_obj, $form_session);
+            }
+            
             $form_session_enc = $this->EE->formslib->vault->put($form_session);
 
             if ($this->EE->extensions->active_hook('proform_form_start') === TRUE)
@@ -420,12 +439,11 @@ class Proform {
                 $form_obj = $this->EE->extensions->call('proform_form_start', $this, $form_obj);
             }
             
-            if($driver = $form_obj->get_driver())
+            if($driver)
             {
                 $driver->form_start($this, $form_obj);
             }
-
-
+            
             if($form_obj->fields())
             {
                 // Ready the form
@@ -633,6 +651,7 @@ class Proform {
             list($tagdata, $form_obj, $variables, $this->var_pairs) = $this->EE->extensions->call('proform_form_preparse', $this, $tagdata, $form_obj, $variables, $this->var_pairs);
         }
 
+        
 
         if($form_obj)
         {
@@ -681,13 +700,19 @@ class Proform {
             }
         }
 
+        /*
+        echo '====root level variables====<br>';
+        krumo($variables);
+        echo '====end root level variables====<br>';
+        // */
+        
         $output .= $this->EE->pl_parser->parse_variables_ex(array(
             'rowdata' => $tagdata,
             'row_vars' => $variables,
             'pairs' => $this->var_pairs,
             'variable_prefix' => $variable_prefix,
         ));
-
+        
         if($form_obj)
         {
             // Close form
@@ -727,7 +752,6 @@ class Proform {
         
         $this->return_data = $output;
         
-
         if($this->debug)
         {
             echo $this->debug_str;
@@ -1311,6 +1335,9 @@ class Proform {
 
             if($value !== FALSE)
             {
+                // Doing htmlentities in output (create_fields_array and mcp views) instead of here. We should do field-type
+                // based stripping here in the future for better security.
+            
                 $form_session->values[$field->field_name] = $value;
             } else {
                 if($field->form_field_settings['preset_value'])
@@ -1428,7 +1455,13 @@ class Proform {
             $this->_process_secure_fields($form_obj, $form_session);
 
             $this->_process_validation($form_obj, $form_session);
-
+            
+            /*
+            echo '<pre>';
+            var_dump($_POST);
+            var_dump($form_session->errors);
+            exit;
+            // */
             // Do final processing before inserting
             
             // This is incremented by process_steps, so we need to save it
@@ -1476,10 +1509,10 @@ class Proform {
 
                     $this->_process_insert($form_obj, $form_session);
 
-                    $form_session->values['entry_id'] = $form_obj->get_inserted_id();
+                    $form_session->values['entry_id'] = $form_session->values['form_entry_id'];
                     if($form_session->values['entry_id'])
                     {
-                        $entry_data = $form_obj->get_entry($form_session->values['entry_id']);
+                        $entry_data = $form_obj->get_entry($form_session->values['form_entry_id']);
                     } else {
                         $entry_data = $form_session->values;
                     }
@@ -1508,8 +1541,11 @@ class Proform {
 
                     $result = TRUE;
                 }
+                //exit('contune form');
                 return $form_session;
             }
+        } else {
+            pl_show_error('Invalid form object');
         }
     }
     
@@ -1547,7 +1583,6 @@ class Proform {
             //     "parse_data:" => $parse_data,
             //     "entry_row:" => $entry_row,
             // ));
-            
             $this->debug = $form_session->config['debug'];
             $this->EE->proform_notifications->debug = $form_session->config['debug'];
 
@@ -1558,6 +1593,7 @@ class Proform {
                     echo '<b>{exp:proform:form} could not send notifications for form: '.$form_obj->form_name.'</b><p/>';
                     echo $this->EE->proform_notifications->debug;
                     echo '<hr/>';
+                    echo 'Email connection debug output:<br/>';
                     $this->EE->pl_email->print_debugger();
                     echo '<hr/>';
                     foreach($this->EE->pl_email->_debug_msg as $row)
@@ -1617,6 +1653,9 @@ class Proform {
                         $form_session->values[$field->field_name] = date('Y-m-d H:i:s', $date);
                     }
                     break;
+                case 'currency':
+                    $form_session->values[$field->field_name] = preg_replace('/[^0-9.]/', '', $form_session->values[$field->field_name]);
+                    break;
                 default:
                     if($driver = $field->get_driver())
                     {
@@ -1661,15 +1700,17 @@ class Proform {
             $form_session->config['step'] = $step;
         }
 
-        if($this->EE->input->get_post('_pf_goto_next'))
+        if($this->EE->input->get_post('_pf_goto_next') !== FALSE)
         {
+            //echo 'Next step<br/>';
             $step = $form_session->config['step'] + 1;
             if($step > $step_count) $step = $step_count;
             $form_session->config['step'] = $step;
         }
 
-        if($this->EE->input->get_post('_pf_goto_previous'))
+        if($this->EE->input->get_post('_pf_goto_previous') !== FALSE)
         {
+            //echo 'Prev step<br/>';
             $step = $form_session->config['step'] - 1;
             if($step < 1) $step = 1;
             $form_session->config['step'] = $step;
@@ -1975,16 +2016,16 @@ class Proform {
                 $checked_rules = '';
 
                 // validate rules
-                $field_rules = $field->get_validation();
+                $field_rules = $field->get_validation(TRUE);
 
                 foreach($field_rules as $srule)
                 {
-                    //echo $srule."<br/>";
+                    //krumo($srule);
                     if($srule != 'none' && $srule != '')
                     {
                         if(is_object($srule))
                         {
-                            $rule = array($srule->_, isset($srule->{$srule->_}) ? $srule->{$srule->_} : '');
+                            $rule = array($srule->_, isset($srule->{$srule->_}) ? $srule->{$srule->_} : (isset($srule->value) ? $srule->value : ''));
                         }
                         elseif(($n = strpos($srule, '[')) !== FALSE)
                         {
@@ -2033,8 +2074,10 @@ class Proform {
             }
         }
 
-        /*echo "<b>Rules:</b>";
-        krumo($validation_rules);*/
+        /*
+        echo "<b>Rules:</b>";
+        krumo($validation_rules);
+        // */
 
         if ($this->EE->extensions->active_hook('proform_validation_check_rules') === TRUE)
         {
@@ -2084,7 +2127,7 @@ class Proform {
             }
         }
         
-        $this->EE->pl_drivers->process_validation_end($form_obj, $form_session);
+        #$this->EE->pl_drivers->process_validation_end($form_obj, $form_session);
         
         if ($this->EE->extensions->active_hook('proform_validation_end') === TRUE)
         {
@@ -2103,7 +2146,8 @@ class Proform {
     private function _process_insert(&$form_obj, &$form_session)
     {
         $form_session->values['dst_enabled'] = $this->prolib->dst_enabled ? 'y' : 'n';
-
+        $form_entry_id = 0;
+        
         if($form_obj->form_type == 'form')
         {
             if ($this->EE->extensions->active_hook('proform_insert_start') === TRUE)
@@ -2232,7 +2276,7 @@ class Proform {
         }
 
 
-
+        return $form_entry_id;
     } // _process_insert
 
     private function _process_mailinglist(&$form_obj, &$form_session)

@@ -114,6 +114,7 @@ class Proform_install
             'reply_to_name'                     => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
             'table_override'                    => array('type' => 'varchar', 'constraint' => '128',    'default' => ''),
             'settings'                          => array('type' => 'blob'),
+            'internal_field_settings'           => array('type' => 'blob'),
 
             'admin_notification_on'             => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
             'notification_template'             => array('type' => 'varchar', 'constraint' => '50',     'default' => ''),
@@ -121,12 +122,14 @@ class Proform_install
             'notification_list_attachments'     => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
             'subject'                           => array('type' => 'varchar', 'constraint' => '128',    'default' => ''),
             'reply_to_field'                    => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
+            'reply_to_name_field'               => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
 
             'submitter_notification_on'         => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
             'submitter_notification_template'   => array('type' => 'varchar', 'constraint' => '50',     'default' => ''),
             'submitter_notification_subject'    => array('type' => 'varchar', 'constraint' => '128',    'default' => ''),
             'submitter_email_field'             => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
             'submitter_reply_to_field'          => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
+            'submitter_reply_to_name_field'     => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
             'submitter_notification_attachments'=> array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
 
             'share_notification_on'             => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
@@ -134,7 +137,8 @@ class Proform_install
             'share_notification_subject'        => array('type' => 'varchar', 'constraint' => '128',    'default' => ''),
             'share_email_field'                 => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
             'share_reply_to_field'              => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
-            'share_notification_attachments'=> array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
+            'share_notification_attachments'    => array('type' => 'varchar', 'constraint' => '1',      'default' => 'n'),
+            'share_reply_to_name_field'         => array('type' => 'varchar', 'constraint' => '32',     'default' => ''),
 
             'site_id'                           => array('type' => 'int', 'constraint' => '4', 'default' => 1),
 
@@ -426,6 +430,30 @@ class Proform_install
                 'conditional_rules' => array('type' => 'text'),
             );
             $forge->add_column('proform_fields', $fields);
+        }
+
+        if($current < 1.55)
+        {
+            if(!$this->EE->db->field_exists('reply_to_name_field', 'proform_forms')) 
+            {
+                $fields = array(
+                    'reply_to_name_field'            => array('type' => 'varchar', 'constraint' => '32', 'default' => ''),
+                    'submitter_reply_to_name_field'  => array('type' => 'varchar', 'constraint' => '32', 'default' => ''),
+                    'share_reply_to_name_field'      => array('type' => 'varchar', 'constraint' => '32', 'default' => ''),
+                );
+                $forge->add_column('proform_forms', $fields);
+            }
+        }
+        
+        if($current < 1.58)
+        {
+            if(!$this->EE->db->field_exists('internal_field_settings', 'proform_forms')) 
+            {
+                $fields = array(
+                    'internal_field_settings' => array('type' => 'blob'),
+                );
+                $forge->add_column('proform_forms', $fields);
+            }
         }
 
         return TRUE;

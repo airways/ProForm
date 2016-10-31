@@ -116,7 +116,7 @@ class Calculated_fields_driver extends PL_base_driver {
                 {
                     $added[] = $id;
                     $form['calculated_fields_'.$id] = array('hidden', '');
-                    $form['calculated_fields_'.$id.'_head'] = array('heading', 'Calculated Field '.$id.($id == $new_id ? ' (new - save to add)' : ''));
+                    $form['calculated_fields_'.$id.'_head'] = array('heading', 'Calculated Field '.$id.($id == $new_id ? ' (new - save to add)' : ' (clear name field to remove)'));
                     $form['calculated_fields_'.$id.'_name'] = array('text', '');
                     $form['calculated_fields_'.$id.'_type'] = array('dropdown', array('template' => 'Template', 'formula' => 'Formula'));
                     $form['calculated_fields_'.$id.'_code'] = array('textarea', '');

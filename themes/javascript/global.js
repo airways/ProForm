@@ -13,6 +13,7 @@ var proform_mod = {
     lang: {},
     forms: {},
     help: {},
+    allow_duplicate: {},
     tab_action: '',
     bind_events: function() {
         $(window).bind('beforeunload', function() { 
@@ -32,22 +33,56 @@ var proform_mod = {
             $(this).parents('.dropdown-wrap').find('.dropdown').hide();
         });
         
+        $('.datepicker').datepicker({
+            dateFormat: 'yy-mm-dd'
+        });
+        $('.datepickeryyyymmdd').each(function() {
+            $(this).datepicker({
+                dateFormat: 'yy-mm-dd',
+                altField: '#'+$(this).attr('data-alt-field'),
+                altFormat: 'yymmdd'
+            });
+        });
+        
+        $('body').append($('<div id="proform_dialog"></div>'));
+        
+        $("#proform_dialog").dialog({
+            autoOpen: false,
+            width: 600,
+            height: 400,
+            modal: true
+        });
+        
+        $('.proform_dialog').click(function(event) {
+            var url = $(this).attr('href');
+            proform_mod.show_dialog(url);
+            event.preventDefault();
+        });
+        
         proform_mod.bind_advanced_settings();
         proform_mod.bind_tabs();
     },
     bind_advanced_settings: function() {
-        $('#add_advanced').unbind('click').click(function() {
-            var $table = $('#advanced_settings table tbody');
-            var even = !($('#advanced_settings table tr').length % 2);
-            var key = $('#advanced_settings_options').val();
+        proform_mod.bind_advanced_grid('form_advanced_settings');
+    },
+    
+    bind_advanced_grid: function(id) {
+        $('#'+id+' .add_advanced').unbind('click').click(function() {
+            var $table = $('#'+id+' .advanced_settings table tbody');
+            var even = !($('#'+id+' .advanced_settings table tr').length % 2);
+            var key = $('#'+id+' .advanced_settings_options').val();
             if(key != '')
             {
-                var label = $('#advanced_settings_options option[value='+key+']').text();
-                $('#advanced_settings_options').children('option[value='+key+']').remove();
-                var input = '<input type="text" name="settings['+key+']" />';
-                if(proform_mod.forms[key])
+                var label = $('#'+id+' .advanced_settings_options option[value='+key+']').text();
+                if(!proform_mod.allow_duplicate[id])
                 {
-                    form = proform_mod.forms[key];
+                    // Prevent adding duplicates by removing the item
+                    $('#'+id+' .advanced_settings_options').children('option[value='+key+']').remove();
+                }
+                var input = '<input type="text" name="settings['+key+']" />';
+                if(proform_mod.forms[id] && proform_mod.forms[id][key])
+                {
+                    form = proform_mod.forms[id][key];
                     input = '<table class="mainTable" border="0" cellspacing="0" cellpadding="0" width="100%">';
                     //console.log(proform_mod);
                     var f_even = true;
@@ -61,7 +96,7 @@ var proform_mod = {
                             input += '</table><table class="mainTable" border="0" cellspacing="0" cellpadding="0" width="100%"><tr><th colspan="2">'+form[x]['control']+'</th></tr>';
                             f_even = true;
                         } else {
-                            input += '<tr class="'+(f_even ? 'even' : 'odd')+'"><td width="50%"><label>' + proform_mod.slang(form[x]['lang_field']) + '</td><td width="50%">' + form[x]['control'] + '<br/></label></tr>';
+                            input += '<tr class="'+(f_even ? 'even' : 'odd')+'"><td width="20%"><label>' + proform_mod.slang(form[x]['lang_field']) + '</td><td width="80%">' + form[x]['control'] + '<br/></label></tr>';
                         }
                         
                         f_even = !f_even;
@@ -70,37 +105,41 @@ var proform_mod = {
                 }
                 
                 help = '';
-                if(proform_mod.help[key])
+                if(proform_mod.help[id][key])
                 {
-                    help = proform_mod.help[key];
+                    help = proform_mod.help[id][key];
                 }
-                
-                $('#advanced_settings > table > tbody > tr:last').after('<tr class="' + (even ? 'even' : 'odd') + '">'+
+                $('#'+id+' .advanced_settings > table > tbody > tr:last').after('<tr class="' + (even ? 'even' : 'odd') + '">'+
                     '<td><span data-key="' + key + '" data-label="' + label + '"><label>' + label + '</label>' + help + (proform_mod.lang['adv_'+key+'_desc'] ? '<br/>'+proform_mod.lang['adv_'+key+'_desc'] : '') + '</span></td>'+
                     '<td>' + input + '</td>'+
                     '<td><a href="#" class="remove_grid_row remove_advanced">X</a></td>'+
                     '</tr>');
-                $('#advanced_settings > table td.placeholder').parent('tr').remove();
+                $('#'+id+' .advanced_settings > table td.placeholder').parent('tr').remove();
             }
-            proform_mod.bind_advanced_settings();
+            proform_mod.bind_advanced_grid(id);
             return false;
         });
 
-        $('.remove_advanced').unbind('click').click(function() {
+        $('#'+id+' .remove_advanced').unbind('click').click(function() {
             var $tr = $(this).parents('tr');
             var key = $tr.find('td:first span').attr('data-key');
             var label = $tr.find('td:first span').attr('data-label');
             $tr.remove();
-            $('#advanced_settings_options option:last').after('<option value="'+key+'">'+label+'</option>');
-            proform_mod.sort_select($('#advanced_settings_options'));
+            if(!proform_mod.allow_duplicate[id])
+            {
+                // Add the removed option back in
+                $('#'+id+' .advanced_settings_options option:last').after('<option value="'+key+'">'+label+'</option>');
+            }
+            proform_mod.sort_select($('#'+id+' .advanced_settings_options'));
             if($('#advanced_settings > table > tbody > tr').length == 0)
             {
                 
-                $('#advanced_settings > table').append('<tbody><tr><td class="placeholder" colspan="3">'+proform_mod.slang('no_advanced_settings')+'</td></tr></tbody>');
+                $('#'+id+' .advanced_settings > table').append('<tbody><tr><td class="placeholder" colspan="3">'+proform_mod.slang('no_advanced_settings')+'</td></tr></tbody>');
             }
             return false;
         });
     },
+    
     bind_tabs: function() {
         $('.tabs li a').unbind('click').click(function() {
             var $tabSet = $(this).parents('.tabs');
@@ -188,6 +227,15 @@ var proform_mod = {
         var active_sidebar2 = $('.tabs#script-sidebar-tabs ul li.active a').attr('href');
         var active_tabs = active_main + ',' + active_sidebar + ',' + active_sidebar2;
         $('input[name=active_tabs]').val(active_tabs);
+    },
+    show_dialog: function(url) {
+        $('#proform_dialog').html('Please wait...');
+        $('#proform_dialog').load(url, '', function() {
+            $('.proform_dialog_close').click(function() {
+                $('#proform_dialog').dialog('close');
+            });
+        });
+        $('#proform_dialog').dialog('open');
     },
     make_name: function(s) {
         var r = s.toLowerCase();
@@ -365,8 +413,8 @@ var pl_grid = {
                             +'<td>'+pl_grid.options[key][val].label+'</td>'
                             +(
                                 pl_grid.options[key][val].flags && pl_grid.options[key][val].flags.indexOf('has_param') > -1
-                                    ? '<td>'+html_form+'<span class="help">'+pl_grid.help[key][val]+'</span></td>'
-                                    : '<td><span class="help">'+pl_grid.help[key][val]+'</span></td>'
+                                    ? '<td>'+html_form+'<span class="help">'+(pl_grid.help[id] && pl_grid.help[id][key] && pl_grid.help[id][key][val] ? pl_grid.help[id][key][val] : '' )+'</span></td>'
+                                    : '<td><span class="help">'+(pl_grid.help[id] ? pl_grid.help[id][key][val] : '')+'</span></td>'
                             )+'<td><a href="#" class="remove_grid_row" data-key="'+ key +'" data-opt="' + val +'" data-row="' + row_count + '">X</a></td>'
                             +'</tr>'
                     );

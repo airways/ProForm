@@ -104,10 +104,24 @@ var proform_edit_form_layout = {
         }
         $('#field-preset-value').keydown(default_updated).keyup(default_updated).change(default_updated);
         
+        function update_meta(key, value)
+        {
+            var meta = JSON.parse($active_field.find('.fieldJson').val());
+            meta[key] = value;
+            $active_field.find('.fieldJson').val(JSON.stringify(meta));
+        }
+        
+        function get_meta(key, def)
+        {
+            var meta = JSON.parse($active_field.find('.fieldJson').val());
+            return meta[key] === undefined ? def : meta[key];
+        }
+        
         function save_meta()
         {
             if($active_field)
             {
+                /*
                 $active_field.find('.fieldRequired').val($('#field-required').is(':checked') ? 'y' : 'n');
                 $active_field.find('.fieldLabel').val($('#field-label').val());
                 $active_field.find('.fieldPresetValue').val($('#field-preset-value').val());
@@ -118,6 +132,22 @@ var proform_edit_form_layout = {
                 $active_field.find('.fieldExtra1').val($('#field-extra1').val());
                 $active_field.find('.fieldExtra2').val($('#field-extra2').val());
                 $active_field.find('.fieldShowInListing').val($('#field-show-in-listing').is(':checked') ? 'y' : 'n');
+                */
+                
+                if(get_meta('internal', false) == false)
+                {
+                    update_meta('is_required', $('#field-required').is(':checked') ? 'y' : 'n');
+                    update_meta('label', $('#field-label').val());
+                    update_meta('preset_value', $('#field-preset-value').val());
+                    update_meta('preset_forced', $('#field-preset-forced').is(':checked') ? 'y' : 'n');
+                    update_meta('placeholder', $('#field-placeholder').val());
+                    update_meta('html_id', $('#field-html-id').val());
+                    update_meta('html_class', $('#field-html-class').val());
+                    update_meta('extra1', $('#field-extra1').val());
+                    update_meta('extra2', $('#field-extra2').val());
+                }
+                update_meta('show_in_listing', $('#field-show-in-listing').is(':checked') ? 'y' : 'n');
+                update_meta('show_in_search', $('#field-show-in-search').is(':checked') ? 'y' : 'n');
                 
                 label_updated();
                 default_updated();
@@ -136,6 +166,7 @@ var proform_edit_form_layout = {
                 //                     $('.meta-sidebar').hide();
                 //                 }
             
+                /*
                 $('#field-required').attr('checked', $active_field.find('.fieldRequired').val() == 'y');
                 $('#field-label').val($active_field.find('.fieldLabel').val());
                 $('#field-preset-value').val($active_field.find('.fieldPresetValue').val());
@@ -146,6 +177,20 @@ var proform_edit_form_layout = {
                 $('#field-extra1').val($active_field.find('.fieldExtra1').val());
                 $('#field-extra2').val($active_field.find('.fieldExtra2').val());
                 $('#field-show-in-listing').attr('checked', $active_field.find('.fieldShowInListing').val() == 'y');
+                $('#field-show-in-search').attr('checked', get_meta('show_in_search', 'n') == 'y');
+                */
+                
+                $('#field-required').attr('checked', get_meta('is_required', 'n') == 'y');
+                $('#field-label').val(get_meta('label', ''));
+                $('#field-preset-value').val(get_meta('preset_value', ''));
+                $('#field-preset-forced').attr('checked', get_meta('preset_forced', 'n') == 'y');
+                $('#field-placeholder').val(get_meta('placeholder', ''));
+                $('#field-html-id').val(get_meta('html_id', ''));
+                $('#field-html-class').val(get_meta('html_class', ''));
+                $('#field-extra1').val(get_meta('extra1', ''));
+                $('#field-extra2').val(get_meta('extra2', ''));
+                $('#field-show-in-listing').attr('checked', get_meta('show_in_listing', 'n') == 'y');
+                $('#field-show-in-search').attr('checked', get_meta('show_in_search', 'n') == 'y');
                 
                 loading_meta = false;
             }
@@ -161,9 +206,15 @@ var proform_edit_form_layout = {
             $active_field = $(this);
             $(this).addClass('active');
             load_meta();
-        
+            
             //$('#edit-field-name').text($active_field.find('.fieldLabel').val());
             $('.field-modifications input').removeAttr('disabled');
+
+            if(get_meta('internal', false)) {
+                // Hide overrides that don't work for internal fields
+                $('.field-modifications .normal-fields-only').attr('disabled', 'disabled');
+            }
+        
         
         });
     

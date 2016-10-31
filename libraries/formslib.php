@@ -38,16 +38,21 @@ require_once PATH_THIRD.'proform/models/proform_session.php';
 if(!class_exists('Formslib')) {
 class Formslib
 {
-    var $prefs;
-    var $session_mgr;
+    private $cache = array();
+    public $prefs;
+    public $session_mgr;
 
-    var $form_types = array('form' => 'Entry Form', 'saef' => 'SAEF Form', 'share' => 'Share Form');
-    var $var_pairs = array('fieldrows', 'fields', 'hidden_fields', 'errors', 'steps', 'field_validation');
+    public $form_types = array('form' => 'Entry Form', 'saef' => 'SAEF Form', 'share' => 'Share Form');
+    public $var_pairs = array('fieldrows', 'fields', 'hidden_fields', 'errors', 'steps', 'field_validation', 'dropdown_style', 'radio_style', 'check_style', 'field_options', 'field_conditionals', 'field_conditionals_type', 'field_conditionals_count');
+    public $type_pairs = array('checkbox', 'string', 'text', 'date', 'datetime', 'time', 'int', 'float', 'file', 'list', 'relationship', 'html_block', 'heading');
+    //public $root_fields = array('field_type', 'field_name', 'field_html_block', 'field_html_id', 'field_html_class', 'field_heading', 'field_html_block', 'field_number', 'field_error', 'field_driver', 'field_errors', 'field_conditionals', 'field_conditionals_type', 'field_conditionals_count');
+    public $typed_fields = array('field_options');
+    public $mailtypes = array('html' => 'HTML', 'text' => 'Plain Text');
     
     // Fields that will not be encrypted or decrypted
-    var $field_encryption_disabled = array('dst_enabled');
+    public $field_encryption_disabled = array('dst_enabled');
 
-    var $default_prefs = array(
+    public $default_prefs = array(
         'license_key' => '',
         'show_quickstart_on' => 'y',
         'notification_template_group' => 'notifications',
@@ -55,7 +60,13 @@ class Formslib
         'from_name' => '',
         'reply_to_address' => '',
         'reply_to_name' => '',
-
+        'listings_show_list_values' => 'n',
+        'permission_manage_module' => '',
+        'permission_manage_forms' => '',
+        'permission_manage_entries' => '',
+        'custom_form_settings' => '',
+        'mailtype' => 'html',
+        'show_internal_fields' => 'n',
     );
 
     public $__advanced_settings_options = array(
@@ -67,6 +78,7 @@ class Formslib
     {
         prolib($this, 'proform');
 
+        $this->var_pairs = array_merge($this->var_pairs, $this->type_pairs);
         $this->prolib->pl_drivers->init();
         
         // If there are already any encrypted forms, then we will default the option to allow encryption
@@ -90,7 +102,7 @@ class Formslib
         // what we have in the $default_prefs array on this object.
         $this->prefs = new PL_prefs("proform_preferences", FALSE, $this->default_prefs, $this->prolib->site_id);
 
-        $this->forms = new PL_handle_mgr("proform_forms", "form", "PL_Form");
+        $this->forms = new PL_handle_mgr("proform_forms", "form", "PL_Form", array('settings', 'internal_field_settings'));
         //$this->forms->get_all();
         
         $this->fields = new PL_handle_mgr("proform_fields", "field", "PL_Field");
@@ -242,13 +254,14 @@ class Formslib
                 if(is_object($row))
                 {
 //                echo 'o ' . $field->field_name.' = '.$row->{$field->field_name};
-                    $row_vars['value:'.$field->field_name] = $row->{$field->field_name};
+                    if(isset($row->{$field->field_name})) $row_vars['value:'.$field->field_name] = $row->{$field->field_name};
                 } elseif(is_array($row)) {
 //                echo 'a ' . $field->field_name.' = '.$row[$field->field_name];
-                    $row_vars['value:'.$field->field_name] = $row[$field->field_name];
+                    if(isset($row[$field->field_name])) $row_vars['value:'.$field->field_name] = $row[$field->field_name];
                 }
 
-                if($field->type == 'file' && $row_vars['value:'.$field->field_name] != '')
+                if($field->type == 'file' && isset($row_vars['value:'.$field->field_name]) && 
+                    $row_vars['value:'.$field->field_name] != '')
                 {
                     $dir = $this->EE->pl_uploads->get_upload_pref($field->upload_pref_id);
                     $row_vars['filename:'.$field->field_name] = $row_vars['value:'.$field->field_name];
@@ -301,7 +314,8 @@ class Formslib
     }
     
     public function create_fields_array($form_obj, $form_session = FALSE, $field_errors = array(), $field_values = array(),
-                                         $field_checked_flags = array(), $create_field_rows = TRUE, $hidden = NULL, $all = FALSE)
+                                         $field_checked_flags = array(), $create_field_rows = TRUE, $hidden = NULL, $all = FALSE,
+                                         $include_empty = TRUE)
     {
         if(is_object($field_values))
         {
@@ -345,20 +359,6 @@ class Formslib
             // handle normal posted fields
             
             $validation_rules = $field->get_validation();
-            
-            $is_required = $field->is_required == 'y';
-            if(!$is_required)
-            {
-                // look for the always required value in the field's validation rules
-                foreach($validation_rules as $rule)
-                {
-                    if($rule == 'required')
-                    {
-                        $is_required = TRUE;
-                    }
-                }
-            }
-
             $validation = $this->EE->pl_parser->wrap_array($validation_rules, 'rule_no', 'rule');
             $validation_count = count($validation->array);
 
@@ -375,39 +375,7 @@ class Formslib
 
             $field_value = array_key_exists($field->field_name, $field_values) ? $field_values[$field->field_name] : $field->get_form_field_setting('preset_value');
 
-            if($field->type == 'list' || $field->type == 'relationship')
-            {
-                $field_options = $field->get_list_options($field_values[$field->field_name]);
-
-                if(is_array($field_value))
-                {
-                    $field_value_selections = array();
-                    foreach($field_value as $kk => $vv)
-                    {
-                        $field_value_selections[$kk] = $vv;
-                    }
-                } else {
-                    $field_value_selections = explode('|', $field_value);
-                }
-
-                // Turn the list of selected options into a wrappable array to be parsed
-                $field_value_array = array();
-                foreach($field_value_selections as $key)
-                {
-                    foreach($field_options as $option)
-                    {
-                        if($option['key'] == $key)
-                        {
-                            $field_value_array[$key] = $option['label'];
-                        }
-                    }
-                }
-                $field_options = $this->EE->pl_parser->wrap_array($field_options, 'key', 'label');
-                $field_value_wrap = $this->EE->pl_parser->wrap_array($field_value_array, 'key', 'label');
-            } else {
-                $field_options = FALSE;
-                $field_value_wrap = FALSE;
-            }
+            list($field_options, $field_value_wrap) = $this->get_field_options($field, $field_value);
 
             $field_conditionals = $field->get_conditionals();
             
@@ -424,13 +392,13 @@ class Formslib
                     'field_heading'             => $field->separator_type != PL_Form::SEPARATOR_HTML ? $field->heading : '',
                     'field_html_block'          => $field->separator_type == PL_Form::SEPARATOR_HTML ? $field->heading : '',
                     'field_is_step'             => $field->separator_type == PL_Form::SEPARATOR_STEP ? 'step' : '',
-                    'field_is_required'         => $is_required ? 'required' : '',
+                    'field_is_required'         => $field->is_required() ? 'required' : '',
                     'field_validation'          => $validation,
                     'field_validation_count'    => $validation_count,
                     'field_error'               => array_key_exists($field->field_name, $field_errors)
                                                         ? $field_errors[$field->field_name]
                                                             : '',
-                    'field_value'               => $field_value,
+                    'field_value'               => htmlentities(is_array($field_value) ? implode('|', $field_value) : $field_value),
                     'field_values'              => $field_value_wrap,
                     'field_options'             => $field_options,
                     'field_checked'             => (array_key_exists($field->field_name, $field_checked_flags)
@@ -446,7 +414,7 @@ class Formslib
             // a lot easier
             foreach($validation->array as $rule)
             {
-                $field_array['field_validation:'.$rule[0]] = '1';
+                $field_array['field_validation:'.$rule->_] = '1';
             }
 
             // Copy field settings for each field type into the field array
@@ -454,8 +422,11 @@ class Formslib
             {
                 foreach($field->form_field_settings as $k => $v)
                 {
+                    // Only concerned with string settings
+                    if(is_array($v) || is_object($v)) continue;
+                    
                     // Don't override defaults if there is no value provided in the override
-                    if(trim($v) != '' OR !isset($field_array['field_'.$k]))
+                    if(trim($v) != '' && !isset($field_array['field_'.$k]))
                     {
                         $field_array['field_'.$k] = $v;
 
@@ -494,7 +465,7 @@ class Formslib
                     $field_array['field_setting_'.$k] = $v;
                 }
             }
-
+            
             if(array_key_exists($field->field_name, $field_errors))
             {
                 if(is_array($field_errors[$field->field_name]))
@@ -541,6 +512,16 @@ class Formslib
                 $field_array['field_driver'] = FALSE;
             }
 
+            if(!$include_empty)
+            {
+                if(!$field_array['field_name']) continue;
+                if(!$field_array['field_value']) continue;
+            }
+            
+            if(!isset($field_array['field_setting_style'])) $field_array['field_setting_style'] = '';
+            
+            $field_control = $field_array['field_control'];
+            
             if($create_field_rows)
             {
                 if($field->field_row != $last_field_row)
@@ -550,28 +531,70 @@ class Formslib
                         'row_num' => $field->field_row, );
                     $last_field_row = $field->field_row;
                 }
+                
                 $field_array['field_no'] = count($result[count($result)-1]['fields']) + 1;
                 $field_array['field_even'] = $field_array['field_no'] % 2 == 0 ? 'yes' : 'no';
-                $result[count($result)-1]['fields'][] = $field_array;
-                $result[count($result)-1]['fieldrow:count'] = count($result[count($result)-1]['fields']);
-                if(!isset($result[count($result)-1]['fieldrow:hidden_count']))
-                    $result[count($result)-1]['fieldrow:hidden_count'] = 0;
-                if($field_array['field_control'] == 'hidden')
-                    $result[count($result)-1]['fieldrow:hidden_count'] ++;
             } else {
                 $field_array['field_no'] = count($result) + 1;
-                $result[] = $field_array;
+                $field_array['field_even'] = $field_array['field_no'] % 2 == 0 ? 'yes' : 'no';
             }
-        } // foreach($form_obj->fields() as $field)
 
+            $field_type = $this->fill_field_type($field_array);
+
+            $this->make_nested_type_array($field_array);
+
+            $this->add_field($field_control, $field_array, $create_field_rows, $result);
+
+
+        } // foreach($form_obj->fields() as $field)
+        
+        
+        /*
+        echo 'create_fields_array, result:<br/>';
+        krumo($result);
+        */
+        
         if ($this->EE->extensions->active_hook('proform_create_fields') === TRUE) 
         {
             $result = $this->EE->extensions->call('proform_create_fields', $this, $result, $create_field_rows); 
         }
-
         return $result;
     } // create_fields_array
 
+    public function check_permission($level, $die=TRUE)
+    {
+        $group_id = $this->EE->session->userdata('group_id');
+        if($group_id == 1) return true;
+        
+        $result = false;
+        
+        // Each level includes all of the previous level's access - if the member's group is in one of the permissions
+        // that is "higher" on this list (near the bottom), that should override and give them access even if they 
+        // didn't have the "lower" level (near the top).
+        switch($level)
+        {
+            case 'entries':
+                if(!$this->prefs->ini('permission_manage_entries')) $result = true; // All selected
+                else $result = in_array($group_id, explode('|', $this->prefs->ini('permission_manage_entries')));
+                break;
+            case 'forms':
+                if(!$this->prefs->ini('permission_manage_forms')) $result = true; // All selected
+                else $result = in_array($group_id, explode('|', $this->prefs->ini('permission_manage_forms')));
+                break;
+            case 'module':
+                if(!$this->prefs->ini('permission_manage_module')) $result = true; // All selected
+                else $result = in_array($group_id, explode('|', $this->prefs->ini('permission_manage_module')));
+                break;
+        }
+
+        if($die)
+        {
+            if(!$result) pl_show_error('You do not have the "'.$level.'" permission in ProForm.');
+        }
+        
+        return $result;
+    }
+    
     private function _get_placeholder($type, $default = '')
     {
         $result = $default;
@@ -580,6 +603,313 @@ class Formslib
             $result = $this->default_placeholders[$type];
         }
         return $result;
+    }
+    
+    public function import_xml($filename)
+    {
+    
+        if(!class_exists('SimpleXMLElement')) {
+            pl_show_error('ProForm Form Import requires the SimpleXML PHP5 module to be installed');
+        }
+        
+        $result = array();
+        
+        $content = file_get_contents($filename);
+        $xml = new SimpleXMLElement($content);
+        foreach($xml->children() as $node) {
+            if($node->getName() == "forms") {
+                foreach($node->children() as $form_xml) {
+                    $form = PL_Form::import($form_xml);
+                    $result[] = $form;
+                }
+            }
+        }
+        
+        return $result;
+        
+    }
+    
+    public function parse_options($string)
+    {
+        $result = array();
+        $list = explode("\n", $string);
+        $valid = FALSE;
+        foreach($list as $option)
+        {
+            if(strpos($option, ':') !== FALSE)
+            {
+                $option = explode(':', $option, 2);
+                $key = trim($option[0]);
+                $option = trim($option[1]);
+            } else {
+                $option = trim($option);
+                $key = $option;
+            }
+            
+            if($option != '' || $key != '')
+            {
+                $result[$key] = $option;
+            }
+        }
+        return $result;
+    }
+
+    public function get_search_arrays()
+    {
+        if(isset($this->cache['get_search_arrays'])) return $this->cache['get_search_arrays'];
+        
+        $search = $this->EE->input->get_post('search') ? $this->EE->input->get_post('search') : array();
+        $search_from = $this->EE->input->get_post('search_from') ? $this->EE->input->get_post('search_from') : array();
+        $search_to = $this->EE->input->get_post('search_to') ? $this->EE->input->get_post('search_to') : array();
+        
+        // Build from GET parameters used for pagination links
+        foreach($_GET as $key => $val)
+        {
+            if(substr($key, 0, 2) == 's_') {
+                $search[substr($key, 2, strlen($key)-2)] = $val;
+            }
+            if(substr($key, 0, 6) == 'sfrom_') {
+                $search_from[substr($key, 6, strlen($key)-6)] = $val;
+            }
+            if(substr($key, 0, 4) == 'sto_') {
+                $search_to[substr($key, 4, strlen($key)-4)] = $val;
+            }
+        }
+        
+        $search = $this->EE->security->xss_clean($search);
+        $search_from = $this->EE->security->xss_clean($search_from);
+        $search_to = $this->EE->security->xss_clean($search_to);
+        
+        $this->cache['get_search_arrays'] = array($search, $search_from, $search_to);
+        return $this->cache['get_search_arrays'];
+    }
+    
+    public function get_search_input($form)
+    {
+        list($search, $search_from, $search_to) = $this->get_search_arrays();
+        
+        foreach($search as $key => $value) {
+            if(!$value) unset($search[$key]);
+            else {
+                $search[$key] = '~'.$value;
+            }
+        }
+        
+        foreach($search_from as $key => $value) {
+            if($value)
+            {
+                $search[$key.' >='] = $value;
+            }
+        }
+        
+        foreach($search_to as $key => $value) {
+            if($value)
+            {
+                $search[$key.' <='] = $value;
+            }
+        }
+        
+        if(count($search) == 0) {
+            if($driver = $form->get_driver())
+            {
+                if(method_exists($driver, 'default_search'))
+                {
+                    $search = $driver->default_search($form->form_id);
+                }
+            }
+            
+            $search = $this->EE->pl_drivers->default_search_global($form->form_id, $search);
+        }
+        /*
+        if(count($search) > 0) {
+            var_dump($search);exit;
+        }
+        // */
+        return $search;
+    }
+
+    /**
+     * Add a field data array to the result array, generating container fieldrow arrays as we go along, if needed.
+     *
+     * @param $field_control
+     * @param $field_array
+     * @param $create_field_rows
+     * @param $result
+     */
+    private function add_field($field_control, &$field_array, $create_field_rows, &$result)
+    {
+        /*
+        echo 'create_fields_array--add_field, field_type: '. $field_type.'<br/>';
+        if($field_type == 'list') {
+            echo 'list type = '.$field_array[$field_type][0]['field_setting__type'].'<br/>';
+        }
+        krumo($field_array);
+        // */
+
+        $this->make_nested_style_array($field_array);
+
+        // Now add it
+        if ($create_field_rows) {
+            $result[count($result) - 1]['fields'][] = $field_array;
+            $result[count($result) - 1]['fieldrow:count'] = count($result[count($result) - 1]['fields']);
+            if (!isset($result[count($result) - 1]['fieldrow:hidden_count']))
+                $result[count($result) - 1]['fieldrow:hidden_count'] = 0;
+            if ($field_control == 'hidden')
+                $result[count($result) - 1]['fieldrow:hidden_count']++;
+        } else {
+            $result[] = $field_array;
+        }
+    }
+
+    /**
+     * First level of nested arrays, defines the tag paid syntax for field types, example:
+     *   {string}
+     *   {/string}
+     *   {list}
+     *   {/list}
+     *
+     * @param $field_array  field data to modify with nested structure
+     */
+    private function make_nested_type_array(&$field_array)
+    {
+        // Add type tag pairs
+        $type_array = array($field_array['field_type'] => array($field_array));
+
+        // Move root-level variables
+        /*foreach($this->root_fields as $field)
+        {
+            if(isset($field_array[$field])) {
+                $type_array[$field] = $field_array[$field];
+                unset($field_array[$field]);
+            }
+        }*/
+
+        foreach ($field_array as $field => $value) {
+            if (!in_array($field, $this->typed_fields)) {
+                $type_array[$field] = $field_array[$field];
+                unset($field_array[$field]);
+            }
+        }
+
+        $field_array = $type_array;
+        unset($type_array);
+
+        // Set other field types to empty arrays so they are removed from output
+        foreach ($this->type_pairs as $type) {
+            if ($type != $field_array['field_type']) {
+                $field_array[$type] = array();
+            }
+        }
+    }
+
+    /**
+     * The second level of nested arrays, mainly used for list types when introduced, example:
+     *   {list}
+     *     {dropdown_style}
+     *     {/dropdown_style}
+     *   {/list}
+     *
+     * @param $field_array  field data to modify with nested structure
+     */
+    private function make_nested_style_array(&$field_array)
+    {
+        $field_type = $field_array['field_type'];
+
+        $arr = $field_array[$field_type][0];
+        $style = false;
+
+        foreach(array('field_setting__type', 'field_type_style', 'field_setting_style') as $key)
+        {
+            if(isset($arr[$key]) && trim($arr[$key]) != '')
+            {
+                $style = $arr[$key];
+            }
+        }
+
+        if($style == 'list') $style = 'dropdown';
+        $field_array[$field_type][0]['field_type_style'] = $style;
+
+        // If there is a type style setting, move all of the field variables into a nested loop named after that style. For instance,
+        // a style value of "dropdown" would cause all variables to be moved into {dropdown_style}{/dropdown_style}. This
+        // is MUCH more efficient than using conditionals for theh same thhing (ex {if field_setting_stype == "dropdown"} due to
+        // the way that EE is currently processing conditionals.
+        if ($style) {
+            $style_key = $style . '_style';
+            $field_array[$field_type][0] = array($style_key => array($field_array[$field_type][0]));
+
+            if ($field_array['field_type'] == 'list' || $field_array['field_type'] == 'relationship') {
+
+                foreach (array('dropdown', 'check', 'radio') as $check_style) {
+                    if (!isset($field_array[$field_type][0][$check_style . '_style'])) {
+                        $field_array[$field_type][0][$check_style . '_style'] = array();
+                    }
+                }
+            }
+        }
+        //echo $field_array['field_name'];
+        //krumo($field_array);
+    }
+
+    /**
+     * @param $field_array
+     * @param $field_type
+     */
+    private function fill_field_type(&$field_array)
+    {
+        if (isset($field_array['field_html_block']) && $field_array['field_html_block']) {
+            $field_array['field_type'] = 'html_block';
+        }
+
+        if (isset($field_array['field_heading'])) {
+            $field_array['field_type'] = 'heading';
+        }
+
+        if ($field_array['field_driver']) {
+            $field_array['field_type'] = $field_array['field_driver'];
+        }
+
+        if ($field_array['field_type'] == 'heading' && isset($field_array['field_html_block'])) {
+            $field_array['field_type'] = 'html_block';
+        }
+
+        return $field_array['field_type'];
+    }
+
+    /**
+     * @param $field
+     * @param $field_value
+     */
+    private function get_field_options($field, $field_value)
+    {
+        if ($field->type == 'list' || $field->type == 'relationship') {
+            $field_options = $field->get_list_options($field_value);
+
+            if (is_array($field_value)) {
+                $field_value_selections = array();
+                foreach ($field_value as $kk => $vv) {
+                    $field_value_selections[$kk] = $vv;
+                }
+            } else {
+                $field_value_selections = explode('|', $field_value);
+            }
+
+            // Turn the list of selected options into a wrappable array to be parsed
+            $field_value_array = array();
+            foreach ($field_value_selections as $key) {
+                foreach ($field_options as $option) {
+                    if ($option['key'] == $key) {
+                        $field_value_array[$key] = $option['label'];
+                    }
+                }
+            }
+            $field_options = $this->EE->pl_parser->wrap_array($field_options, 'key', 'label');
+            $field_value_wrap = $this->EE->pl_parser->wrap_array($field_value_array, 'key', 'label');
+        } else {
+            $field_options = FALSE;
+            $field_value_wrap = FALSE;
+        }
+
+        return array($field_options, $field_value_wrap);
     }
 } // class Formslib
 }

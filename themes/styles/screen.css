@@ -105,7 +105,7 @@ Main Nav buttons
 .new_field .button a,
 .heading .button .submit,
 .form-btn {
-	color: #ffffff !important;
+	color: #ffffff;
 }
 
 .heading {
@@ -171,21 +171,27 @@ Create Form
 }
 
 .action-list {
-    white-space: nowrap;
+    list-style: none;
+}
+
+.action-list li {
+/*  text-decoration: underline !important;*/
+	display: inline;
+	padding: 0 8px;
+	border-left: 1px solid #555557;	
+    margin: 0;
+    list-style: none;
 }
 
 .action-list a {
-/*  text-decoration: underline !important;*/
-	display: inline-block;
-	padding: 0 8px;
-	border-left: 1px solid #555557;	
+    white-space: nowrap;
 }
 
 .action-item {
 /*  text-decoration: underline !important;  */
 }
 
-.action-list a:first-child {
+.action-list li:first-child {
 	border-left: 0;
 	padding-left: 0;
 }
@@ -604,7 +610,8 @@ Messages / Form Errors
 	color: #a43333;
 }
 
-.tabs {
+.tabs,
+.static-tabs {
 	overflow: hidden;
 /*  border-bottom: 1px solid #d1d7df; */
 }
@@ -624,7 +631,8 @@ Messages / Form Errors
     margin-top: 5px;
 }
 
-.tabs li {
+.tabs li,
+.static-tabs li {
 	float: left;
 	height: 26px;
 	line-height: 26px;
@@ -644,25 +652,33 @@ Messages / Form Errors
 	display: block; 
 }
 
-.pageContents .tabs li a {
+.pageContents .tabs li a,
+.pageContents .static-tabs li a {
 	display: block;
 	color: #333E46;	
 	font-weight: bold;
 	padding: 0 15px;
 }
 
-.tabs li:first-child {
+.tabs li:first-child,
+.static-tabs li:first-child {
 	border-left: 0;
 } 
 
-.tabs li.active {
+.tabs li.active,
+.static-tabs li.active {
 	border: 1px solid transparent;
 	height: 26px;
 	background: #2d363b url('../images/bg-btn.jpg') 0 0 repeat-x;
 }
 
-.tabs li.active a {
+.tabs li.active a,
+.static-tabs li.active a {
 	color: #fff;
+}
+
+.static-tabs {
+    float: left;
 }
 
 #main-tabs {
@@ -905,10 +921,41 @@ span.value_file a {
 }
 
 
+.table_filters {
+    float: left;
+    width: 15%;
+    padding-top: 15px;
+    border-top: 1px solid #d1d7df;
+}
+
+.table_filters input[type=text],
+.table_filters select {
+    width: 95%;
+}
+
+.table_filters input[type=text].two_up,
+.table_filters select.two_up {
+    width: 45%;
+}
+
+.table_filters label {
+    display: block;
+    margin-top: 5px;
+}
+
+.table_filters .submit {
+    margin-top: 5px;
+}
+
 .table_wrapper {
+    float: left;
+    width: 85%;
     padding-top: 15px;
     min-height: 60px;
-    min-width: 900px;
     border-top: 1px solid #d1d7df;
     overflow-x: auto;
+}
+
+.form_top_commands {
+    margin-bottom: 10px;
 }

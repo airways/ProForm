@@ -28,7 +28,11 @@
  * source is null and void. Use of this software constitutes your agreement
  * to this clause.
  *
- **/ ?>
+ **/
+
+require_once(PATH_THIRD.'proform/views/_advanced_settings.php');
+
+?>
 
 <?php if(isset($message) && $message != FALSE) echo '<div class="notice success">'.$message.'</div>'; ?>
 <?php if(isset($error) && $error != FALSE) echo '<div class="notice">'.$error.'</div>'; ?>
@@ -58,7 +62,7 @@
 <!-- start advanced settings -->
 <div class="tab-content main tab-content-advanced">
 
-    <?php include(PATH_THIRD.'proform/views/_advanced_settings.php'); ?>
+    <?php proform_build_advanced_grid('form_advanced_settings', $settings, $advanced_settings_options, $advanced_settings_forms, $advanced_settings_help, false); ?>
 
 </div>
 <!-- end advanced settings -->

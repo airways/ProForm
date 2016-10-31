@@ -29,8 +29,15 @@
  * to this clause.
  *
  **/
- 
-class PL_Field extends PL_RowInitialized
+
+interface IPL_Field
+{
+    function get_form_field_setting($key, $default = '');
+    function get_list_options($selected_items=array());
+    function get_driver();
+}
+
+class PL_Field extends PL_RowInitialized implements IPL_Field
 {
     // $types maps internal type names to mysql or other DB types
 
@@ -57,19 +64,19 @@ class PL_Field extends PL_RowInitialized
         )
     );
 
-    var $field_id = FALSE;
-    var $field_label = FALSE;
-    var $field_name = FALSE;
-    var $type = 'string';
-    var $length = FALSE;
-    var $conditional_type = FALSE;
-    var $conditional_rules = FALSE;
-    var $validation = FALSE;
-    var $placeholder = FALSE;
-    var $upload_pref_id = FALSE;
-    var $mailinglist_id = FALSE;
-    var $settings = array();
-    var $reusable = 'y';
+    public $field_id = FALSE;
+    public $field_label = FALSE;
+    public $field_name = FALSE;
+    public $type = 'string';
+    public $length = FALSE;
+    public $conditional_type = FALSE;
+    public $conditional_rules = FALSE;
+    public $validation = FALSE;
+    public $placeholder = FALSE;
+    public $upload_pref_id = FALSE;
+    public $mailinglist_id = FALSE;
+    public $settings = array();
+    public $reusable = 'y';
 
     function __construct($row=array(), &$mgr=NULL)
     {
@@ -324,20 +331,22 @@ class PL_Field extends PL_RowInitialized
         return $result;
     }
 
-    function get_validation()
+    function get_validation($synthetic_is_required=FALSE)
     {
         // Explode the validation string, and remove any blank values found in it, as well as the 'none'
         // value used to indicate a lack of validation.
         if($this->validation[0] == '[')
         {
             // Load new JSON grid syntax
-            $field_rules = json_decode($this->validation);
+            $raw_rules = json_decode($this->validation);
         } else {
             // Load old CI validation syntax
-            $field_rules = array_filter_values(explode('|', $this->validation), array('none', ''));
+            $raw_rules = array_filter_values(explode('|', $this->validation), array('none', ''));
         }
         
-        foreach($field_rules as $rule)
+        $field_rules = array();
+        $found_is_required = FALSE;
+        foreach($raw_rules as $rule)
         {
             if($rule) {
                 if(!is_object($rule)) {
@@ -354,14 +363,20 @@ class PL_Field extends PL_RowInitialized
                     {
                         $rule->value = str_replace(']', '', $arr[1]);
                     }
-                    if($rule->_ != 'none' || $rule->_ != '') continue;
+                    if($rule->_ == 'required') $found_is_required = TRUE;
+                    if($rule->_ == 'none' || $rule->_ == '') continue;
                 }
+                $field_rules[] = $rule;
             }
         }
-        
-        if($this->is_required == 'y')
-        {
-            $field_rules[] = (object)array('_' => 'required');
+
+        // Only used when running validation, in this case we need to inject a fake required rule
+        // if the field_setting is_required is set, but only if we did not see an additional required
+        // rule ("Always required") set on the field already.
+        if($this->get_form_field_setting('is_required') == 'y' && $synthetic_is_required && !$found_is_required) {
+            $field_rules[] = (object)array(
+                '_' => 'required',
+            );
         }
         
         return $field_rules;
@@ -375,7 +390,15 @@ class PL_Field extends PL_RowInitialized
     
     function is_required()
     {
-        return $this->is_required == 'y' || in_array('required', explode('|', $this->validation));
+        $result = $this->get_form_field_setting('is_required') == 'y'; 
+        $rules = $this->get_validation();
+        foreach($rules as $rule) {
+            if($rule->_ == 'required') {
+                $result = TRUE;
+                break;
+            }
+        }
+        return $result;
     }
     
     function get_conditionals()
@@ -404,5 +427,90 @@ class PL_Field extends PL_RowInitialized
         }
         
         return $rules;
+    }
+}
+
+class PL_InternalField extends PL_RowInitialized implements IPL_Field
+{
+    private $__EE = NULL;
+    private $data = array();
+    public $form = NULL;
+    public $field_id = FALSE;
+    public $field_label = FALSE;
+    public $field_name = FALSE;
+    public $type = 'string';
+    public $length = FALSE;
+    public $conditional_type = FALSE;
+    public $conditional_rules = FALSE;
+    public $validation = FALSE;
+    public $placeholder = FALSE;
+    public $upload_pref_id = FALSE;
+    public $mailinglist_id = FALSE;
+    public $heading = FALSE;
+    public $settings = array();
+    public $reusable = 'y';
+    
+    public function __construct(PL_Form $form, $data)
+    {
+        $this->__EE = get_instance();
+        
+        if(is_null($form)) throw new \ErrorException(__METHOD__.' requires a valid form to be assigned');
+        if(!is_array($data) 
+            || !array_key_exists('field_name', $data)
+            || !$data['field_name']) 
+                throw new \ErrorException(__METHOD__.' requires a valid data array with at least a field_name value');
+        
+        $this->form = $form;
+        $this->data = $data;
+        foreach($data as $key => $value)
+        {
+            $this->$key = $value;
+        }
+    }
+    
+    function get_form_field_setting($key, $default = '')
+    {
+        $result = $default;
+        if(array_key_exists($this->field_name, $this->form->internal_field_settings)
+            && array_key_exists($key, $this->form->internal_field_settings[$this->field_name]))
+        {
+            $result = $this->form->internal_field_settings[$this->field_name][$key];
+        }
+        return $result;
+    }
+    
+    function get_list_options($selected_items=array())
+    {
+        if(array_key_exists('options', $this->data))
+        {
+            $result = array();
+            $count = 0;
+            foreach($this->data['options'] as $key => $option)
+            {
+                $count++;
+                $selected = ($k = array_search($key, $selected_items)) !== FALSE ? ' selected="selected" ' : '';
+                
+                $row = array(
+                        'key'               => $option,
+                        'row'               => $option,
+                        'option'            => $key,
+                        'label'             => $option,
+                        'selected'          => $selected,
+                        'number'            => $count,
+                        'divider_number'    => 0,
+                        'is_divider'        => FALSE,
+                    );
+                $result[] = $row;
+            }
+            return $result;
+        } else {
+            return array();
+        }
+    }
+    
+    function get_driver()
+    {
+        $this->__EE->pl_drivers->init();
+        return $this->__EE->pl_drivers->get_driver($this->type);
     }
 }

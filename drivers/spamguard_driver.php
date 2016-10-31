@@ -123,6 +123,7 @@ class Spamguard_driver extends PL_base_driver {
             'help' => '',
             'form' => array(
                 'spamguard' => array('hidden', ''),
+                'spam_guard_head' => array('heading', 'SpamGuard Settings'),
                 'spamguard_error_mode' => array('dropdown', array('exit' => 'Exit Immediately', 'validation_error' => 'Return Validation Error')),
                 //'spamguard_ban_enabled' => array('dropdown', array('on' => 'On', '' => 'Off')),
                 'spamguard_honeypot_enabled' => array('dropdown', array('on' => 'On', '' => 'Off')),
