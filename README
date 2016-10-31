@@ -10,6 +10,9 @@ Installing ProForm is similar to installing any third-party Module into Expressi
 ### Installation Steps
 Follow these steps to install ProForm:
 
+ 0. This add-on REQUIRES ProLib to be in your third_party directory. Get it here:
+       https://github.com/airways/ProLib
+
  1. Download the ZIP file from the location where you purchased it.
 
  2. Extract the ZIP file.
