@@ -1,0 +1,6 @@
+Move this directory to:
+
+themes/third_party/proform
+
+Or create a symlink from this location to this directory, if you plan to submit patches via git.
+
