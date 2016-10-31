@@ -17,13 +17,21 @@ Follow these steps to install ProForm:
 
  2. Extract the ZIP file.
 
- 3. There are four folders within the extracted folder from the ZIP file. Copy each one to the matching location
+ 3. Move directories.
+ 
+ For ZIP file build:
+   There are four folders within the extracted folder from the ZIP file. Copy each one to the matching location
    within your ExpressionEngine installation:
         <extracted_folder>/system/expressionengine/third_party/proform → <doc_root>/system/expressionengine/third_party/proform
         <extracted_folder>/system/expressionengine/third_party/prolib → <doc_root>/system/expressionengine/third_party/prolib
         <extracted_folder>/themes/third_party/proform → <doc_root>/themes/third_party/proform
         <extracted_folder>/themes/third_party/prolib → <doc_root>/themes/third_party/prolib
-
+ For git checkout:
+   a. Check out or copy files from the repo directly to <doc_root>/system/expressionengine/third_party/proform
+   b. Move or create a symlink from <doc_root>/system/expressionengine/third_party/proform/themes to <doc_root>/themes/third_party/proform
+   c. Check out or copy files from the the ProLib repo directly to <doc_root>/system/expressionengine/third_party/prolib
+   d. Move or create a symlink from <doc_root>/system/expressionengine/third_party/prolib/themes to <doc_root>/themes/third_party/prolib
+ 
  4. Visit your control panel, usually located at:
         http://example.com/system/
 
