@@ -62,10 +62,15 @@ Follow these steps to install ProForm:
 
 You may now use the control panel page for ProForm to being managing forms.
 
+
 ## License
 
-Copyright (c)2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016. Isaac
-Raway and MetaSushi, LLC. All rights reserved.
+Copyright (c)2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016.
+Isaac Raway and MetaSushi, LLC. All rights reserved.
+
+You may use this software under a commercial license, if you have one,
+or under the GPL v3 contained in LICENSE, in which case you MUST
+comply with all GPL requirements.
 
 This source is commercial software. Use of this software requires a
 site license for each domain it is used on. Use of this software or any
