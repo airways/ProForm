@@ -21,7 +21,7 @@ Follow these steps to install ProForm:
  
  <b>For git checkout / git ZIP file:</b>
  
- <u>These steps do <b>not</b> apply to the old purchased ZIP file download, only to the new git ZIP file builds which are the only ones available via GitHub.</u>
+ NOTE: _These steps do <b>not</b> apply to the old purchased ZIP file download, only to a git checkout and the new git ZIP file builds which are the only ones available via GitHub._
     
    a. Check out or copy files from the repo directly to [doc_root]/system/expressionengine/third_party/proform
    
@@ -33,7 +33,7 @@ Follow these steps to install ProForm:
  
 <b>For old purchased ZIP file build:</b>
    
-<u>These steps do <b>not</b> apply to the git ZIP file download, only to the old purchased ZIP file builds which are not available via GitHub.</u>
+  NOTE: _These steps do <b>not</b> apply to the git ZIP file download, only to the old purchased ZIP file builds which are not available via GitHub._
    
    There are four folders within the extracted folder from the ZIP file. Copy each one to the matching location
    within your ExpressionEngine installation:
