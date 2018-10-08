@@ -2,7 +2,8 @@
 Please see the License section at the end of this file. By using ProForm, you are agreeing to this license.
 
 ## Documentation
-Please see the full documentation at http://metasushi.com/documentation/proform/.
+Please see the full documentation at in proform_user_guide.pdf:
+  https://github.com/airways/ProForm/blob/master/proform_user_guide.pdf
 
 ## Installation
 Installing ProForm is similar to installing any third-party Module into ExpressionEngine.
